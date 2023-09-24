@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+	id  	Int @id @default(autoincrement())
+  id42  Int @unique  
+
+	createdAt	DateTime	@default(now())
+	updatedAt	DateTime	@updatedAt
+
+	email		  String		@unique @db.VarChar(255)
+	username	String		@unique @db.VarChar(255)
+	hash		  String
+  
+  two_factor_activate Boolean?  @default(false)
+  two_factor_secret   String?
+  
+  status              status_t? @default(OFFLINE)
+
+  member  Channel[] @relation("member")
+
+  @@unique([id, email, username])
+	@@map("users")
+}
+
+model Channel {
+  id  Int   @id @default(autoincrement())
+
+  createdAt	DateTime	@default(now())
+	updatedAt	DateTime	@updatedAt
+
+  members User[]  @relation("member")
+
+  @@unique([id])
+  @@map("channels")
+}
+
+enum status_t {
+  ONLINE
+  OFFLINE
+  PLAYING
+}

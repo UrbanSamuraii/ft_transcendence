@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # POSTGRES
+  postgres:
+    container_name: postgres
+    image: postgres:13.5
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - ./backend/.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - transcendance
+
+  # BACKEND
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - 4000:4000 # Expose your NestJS app's port
+      - 5555:5555 # Expose a port for Prisma Studio
+    depends_on:
+      - postgres
+    networks:
+      - transcendance
+    volumes:
+      - ./backend:/app
+
+networks:
+  transcendance:
+
+volumes:
+  postgres:
