@@ -9,6 +9,9 @@ import { ConfigService } from "@nestjs/config";
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserService } from "src/user/user.service";
+import * as cookie from 'cookie'; // Import the cookie library
+import { AuthResponseDto } from './dto/auth-response.dto';
+
 
 @Injectable()
 export class AuthService {
@@ -19,7 +22,6 @@ export class AuthService {
 		private userService: UserService) {}
 
 	async signup(dto: AuthDto) {
-		// Generate a hash for jwt Authenticator
 		const hash = await argon.hash(dto.password);
 		try {
 			const user = await this.prisma.user.create({
@@ -31,18 +33,21 @@ export class AuthService {
 				},
 			});
 			const token = await this.signToken(user.id, user.email);
-			console.log({ token: token});
-			return {
-				email: dto.email, 
-				token: token.access_token,
+
+			const responseDto: AuthResponseDto = {
+			token: token.access_token,
+			cookieOptions: {
+				httpOnly: true,
+				secure: false,
+				sameSite: 'lax',
+				expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Adjust the expiration as needed
+				},
 			};
+			return responseDto;
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') {
-					throw new ForbiddenException('Credentials taken');
-				}
-			}
+				if (error.code === 'P2002') { throw new ForbiddenException('Credentials taken'); }}
 			throw error;
 		}
 	}
@@ -50,19 +55,27 @@ export class AuthService {
 	@HttpCode(HttpStatus.OK)
 	async signin(dto: Partial<AuthDto>) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-				email: dto.email,
-			},
+			where: { email: dto.email }
 		});
 		if (!user) {
 			throw new ForbiddenException('Credentials incorrect : email');
 		}
-
 		const pwMatch = await argon.verify(user.hash, dto.password);
 		if (!pwMatch) {
 			throw new ForbiddenException('Credentials incorrect : password');
 		}
-		return this.signToken(user.id, user.email);
+		const token = await this.signToken(user.id, user.email);
+		
+		const responseDto: AuthResponseDto = {
+			token: token.access_token,
+			cookieOptions: {
+				httpOnly: true,
+				secure: false,
+				sameSite: 'lax',
+				expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Adjust the expiration as needed
+				},
+			};
+			return responseDto;
 	}
 
 	async signToken(userID: number, email: string): Promise<{access_token: string}> {
@@ -72,10 +85,9 @@ export class AuthService {
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await  this.jwt.signAsync(payload, {
-			expiresIn: '15m',
+			expiresIn: '1d',
 			secret: secret,
 		});
-		console.log({ access_token : token });
 		return { access_token: token };
 	}
 

@@ -4,7 +4,7 @@ import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
 import { TwoFactorDto } from "./dto";
 import { AuthGuard } from '@nestjs/passport';
-import { JwtGuard } from 'src/auth/guard';
+import { JwtAuthGuard } from 'src/auth/guard';
 import { UserService } from "src/user/user.service";
 import { use } from "passport";
 
@@ -24,12 +24,12 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK) // When we signin we don t create any ressource -> 200 code return
 	@IsPublic(true)
 	@Post('signin')
-	signin(@Body() dto:Partial<AuthDto>) {
+	signin(@Body() dto:Partial<AuthDto>) {1
 		return this.authService.signin(dto);
 	}
 
 	@Post('2fa/generate')
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtAuthGuard)
 	async register(@Body() dto:Partial<AuthDto>) {
 		const user = await this.userService.getUserByEmail(dto.email);
 		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
@@ -38,7 +38,7 @@ export class AuthController {
 	}
 
 	@Post('2fa/turn-on')
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtAuthGuard)
 	async turnOnTwoFactorAuthentication(@Body() dto:TwoFactorDto) {
 		const user = await this.userService.getUserByEmail(dto.email);
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
@@ -53,7 +53,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
 	@HttpCode(200)
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtAuthGuard)
 	async authenticate(@Body() dto:TwoFactorDto) {
 		const user = await this.userService.getUserByEmail(dto.email);
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
