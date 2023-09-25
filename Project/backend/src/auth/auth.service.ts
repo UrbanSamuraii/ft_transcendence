@@ -30,9 +30,12 @@ export class AuthService {
 					hash,
 				},
 			});
+			const token = await this.signToken(user.id, user.email);
+			console.log({ token: token});
 			return {
-				token: this.signToken(user.id, user.email),
-			  };
+				email: dto.email, 
+				token: token.access_token,
+			};
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -45,7 +48,7 @@ export class AuthService {
 	}
 
 	@HttpCode(HttpStatus.OK)
-	async signin(dto: AuthDto) {
+	async signin(dto: Partial<AuthDto>) {
 		const user = await this.prisma.user.findUnique({
 			where: {
 				email: dto.email,
@@ -71,9 +74,9 @@ export class AuthService {
 		const token = await  this.jwt.signAsync(payload, {
 			expiresIn: '15m',
 			secret: secret,
-		})
-
-		return { access_token: token};
+		});
+		console.log({ access_token : token });
+		return { access_token: token };
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: User) {

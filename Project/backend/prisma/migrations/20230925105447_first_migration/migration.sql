@@ -10,6 +10,8 @@ CREATE TABLE "users" (
     "email" VARCHAR(255) NOT NULL,
     "username" VARCHAR(255) NOT NULL,
     "hash" TEXT NOT NULL,
+    "two_factor_activate" BOOLEAN DEFAULT false,
+    "two_factor_secret" TEXT,
     "status" "status_t" DEFAULT 'OFFLINE',
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
@@ -40,7 +42,7 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_id_email_key" ON "users"("id", "email");
+CREATE UNIQUE INDEX "users_id_email_username_key" ON "users"("id", "email", "username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "channels_id_key" ON "channels"("id");

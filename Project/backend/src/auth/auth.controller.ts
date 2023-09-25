@@ -24,13 +24,13 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK) // When we signin we don t create any ressource -> 200 code return
 	@IsPublic(true)
 	@Post('signin')
-	signin(@Body() dto:AuthDto) {
+	signin(@Body() dto:Partial<AuthDto>) {
 		return this.authService.signin(dto);
 	}
 
 	@Post('2fa/generate')
 	@UseGuards(JwtGuard)
-	async register(@Body() dto:AuthDto) {
+	async register(@Body() dto:Partial<AuthDto>) {
 		const user = await this.userService.getUserByEmail(dto.email);
 		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
 
