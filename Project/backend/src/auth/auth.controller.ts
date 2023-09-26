@@ -1,17 +1,32 @@
-import { Controller, Post, Res, Response, Body, HttpCode, HttpStatus, UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Controller, Post, Get, Res, Response,
+	Body, HttpCode, HttpStatus, UseGuards, 
+	Req, Request, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
 import { TwoFactorDto } from "./dto";
 import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/auth/guard';
+import { JwtAuthGuard, FortyTwoAuthGuard } from 'src/auth/guard';
 import { UserService } from "src/user/user.service";
 import { use } from "passport";
+
 
 
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService, private userService: UserService) {}
+
+	@IsPublic(true)
+	@Get()
+	@UseGuards(FortyTwoAuthGuard)
+	async Auth() {}
+
+	@IsPublic(true)
+	@Get('sign42')
+	@UseGuards(FortyTwoAuthGuard)
+	async callback(@Req() req: Request, @Res() res: Response) { 
+		return this.authService.forty2signup(req, res);
+	}
 
 	// signup - create account - Creates a new user email/username/password
 	@IsPublic(true)

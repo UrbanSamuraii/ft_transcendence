@@ -1,4 +1,4 @@
-import { Injectable, Response, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Request, Req, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthDto } from "./dto";
@@ -19,6 +19,12 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService) {}
 
+	async forty2signup(@Req() req: Request, @Res() res: any) {
+		if (!req.user) {
+            return "";
+        }
+	}
+	
 	async signup(dto: AuthDto, @Res() res: any) {
 		const hash = await argon.hash(dto.password);
 		try {
