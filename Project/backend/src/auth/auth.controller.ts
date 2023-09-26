@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Controller, Post, Res, Response, Body, HttpCode, HttpStatus, UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
@@ -16,16 +16,16 @@ export class AuthController {
 	// signup - create account - Creates a new user email/username/password
 	@IsPublic(true)
 	@Post('signup')
-	signup(@Body() dto:AuthDto) { 
-	  return this.authService.signup(dto);
+	signup(@Body() dto:AuthDto, @Res() res: Response) { 
+	  return this.authService.signup(dto, res);
 	}
 
 	// signin - sign in to API - Signs an existing user email/username and password
 	@HttpCode(HttpStatus.OK) // When we signin we don t create any ressource -> 200 code return
 	@IsPublic(true)
 	@Post('signin')
-	signin(@Body() dto:Partial<AuthDto>) {1
-		return this.authService.signin(dto);
+	signin(@Body() dto:Partial<AuthDto>, @Res() res: Response) {1
+		return this.authService.signin(dto, res);
 	}
 
 	@Post('2fa/generate')

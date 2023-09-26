@@ -1,4 +1,4 @@
-import { Injectable, Body, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Response, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthDto } from "./dto";
@@ -10,8 +10,6 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserService } from "src/user/user.service";
 import * as cookie from 'cookie'; // Import the cookie library
-import { AuthResponseDto } from './dto/auth-response.dto';
-
 
 @Injectable()
 export class AuthService {
@@ -21,7 +19,7 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService) {}
 
-	async signup(dto: AuthDto) {
+	async signup(dto: AuthDto, @Res() res: any) {
 		const hash = await argon.hash(dto.password);
 		try {
 			const user = await this.prisma.user.create({
@@ -33,17 +31,13 @@ export class AuthService {
 				},
 			});
 			const token = await this.signToken(user.id, user.email);
-
-			const responseDto: AuthResponseDto = {
-			token: token.access_token,
-			cookieOptions: {
+			// Set a cookie with the token in the response
+			res.cookie('token', token, {
 				httpOnly: true,
 				secure: false,
 				sameSite: 'lax',
-				expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Adjust the expiration as needed
-				},
-			};
-			return responseDto;
+				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+			}).send({ status: 'ok' });
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -53,7 +47,7 @@ export class AuthService {
 	}
 
 	@HttpCode(HttpStatus.OK)
-	async signin(dto: Partial<AuthDto>) {
+	async signin(dto: Partial<AuthDto>, @Res() res: any) {
 		const user = await this.prisma.user.findUnique({
 			where: { email: dto.email }
 		});
@@ -65,17 +59,12 @@ export class AuthService {
 			throw new ForbiddenException('Credentials incorrect : password');
 		}
 		const token = await this.signToken(user.id, user.email);
-		
-		const responseDto: AuthResponseDto = {
-			token: token.access_token,
-			cookieOptions: {
-				httpOnly: true,
-				secure: false,
-				sameSite: 'lax',
-				expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Adjust the expiration as needed
-				},
-			};
-			return responseDto;
+		res.cookie('token', token, {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'lax',
+			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+		}).send({ status: 'ok' });
 	}
 
 	async signToken(userID: number, email: string): Promise<{access_token: string}> {

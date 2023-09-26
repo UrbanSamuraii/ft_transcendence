@@ -24,7 +24,7 @@ model User {
   two_factor_activate Boolean?  @default(false)
   two_factor_secret   String?
   
-  status              status_t? @default(OFFLINE)
+  status  status_t? @default(OFFLINE)
 
   member  Channel[] @relation("member")
 
