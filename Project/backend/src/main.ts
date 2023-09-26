@@ -2,10 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import * as passport from "passport";
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = +process.env.APP_PORT || 4000;
+  // Initialize Passport
+  app.use(cookieParser()); // Add cookie parser middleware if needed
+  app.use(passport.initialize());
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
   }));

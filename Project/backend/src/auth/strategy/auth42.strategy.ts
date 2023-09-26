@@ -15,7 +15,6 @@ export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 			profileFields: [
 				"id",
 				"login",
-				"displayname",
 				"last_name",
 				"first_name",
 				"email",

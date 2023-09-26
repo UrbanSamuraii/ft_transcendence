@@ -19,10 +19,46 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService) {}
 
-	async forty2signup(@Req() req: Request, @Res() res: any) {
-		if (!req.user) {
-            return "";
-        }
+	async forty2signup(req: any, @Res() res: any) {
+			if (!req.user) {
+			  return res.status(401).json({ message: "Unauthorized" });
+			}
+
+			const intra_id = Number(req.user.id);
+        	const email = req.user.emails[0].value;
+        	const first_name = req.user.name.givenName;
+       		const last_name = req.user.name.familyName;
+        	const username = req.user.username;
+        	const img_url = req.user.photos[0].value;
+			
+        	const user = await this.userService.getUserById(intra_id);
+			if (!user) {
+				try {
+					const user = await this.prisma.user.create({
+						data: {
+							id42: intra_id,
+							first_name: first_name,
+							last_name: last_name,
+							email: email,
+							username: username,
+							img_url: img_url
+						},
+					});
+					const token = await this.signToken(user.id, user.email);
+					// Set a cookie with the token in the response
+					res.cookie('token', token, {
+						httpOnly: true,
+						secure: false,
+						sameSite: 'lax',
+						expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+					}).send({ status: 'ok' });``
+				}
+				catch(error) {
+					if (error instanceof PrismaClientKnownRequestError) {
+						if (error.code === 'P2002') { throw new ForbiddenException('Credentials taken'); }}
+					throw error;
+			}
+		}
 	}
 	
 	async signup(dto: AuthDto, @Res() res: any) {
