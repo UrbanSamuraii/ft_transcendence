@@ -14,15 +14,15 @@ export class UserService {
 	
 	constructor(private prisma: PrismaService) {}
 	
-	async createUser(data: Prisma.usersCreateInput): Promise<users> {
+	async createUser(data: Prisma.UserCreateInput): Promise<User> {
 		try {
-		  return await this.prisma.users.create({
-			data,
-		  });
+			return await this.prisma.user.create({
+				data,
+				});
 		} catch (error) {
-		  return error;
+			return error;
 		}
-	  }
+	}
 
 	async edithUser(userId: number, dto: EdithUserDto) {
 		const user = await this.prisma.user.update({
@@ -37,20 +37,20 @@ export class UserService {
 		return user;
 	}
 
-	async getUserById(userId: number): Promise<User | null> {
-		return this.prisma.user.findUnique({
-		  	where: {
-				id: userId,
-			},
+	async getUser(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
+		return await this.prisma.user.findUnique({
+			where,
 		});
 	}
 
-	async getUserByEmail(email: string): Promise<User | null> {
-		return this.prisma.user.findUnique({
-			where: {
-				email: email,
-			},
-		});
+	async deleteUser(where: Prisma.UserWhereUniqueInput) {
+		try {
+			return await this.prisma.user.delete({
+				where,
+			});
+		} catch (error) {
+		return error;
+		}
 	}
 	
 	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {

@@ -32,7 +32,7 @@ export class AuthController {
 	@IsPublic(true)
 	@Post('signup')
 	signup(@Body() dto:AuthDto, @Res() res: Response) { 
-	  return this.authService.signup(dto, res);
+		return this.authService.signup(dto, res);
 	}
 
 	// signin - sign in to API - Signs an existing user email/username and password
@@ -46,7 +46,7 @@ export class AuthController {
 	@Post('2fa/generate')
 	@UseGuards(JwtAuthGuard)
 	async register(@Body() dto:Partial<AuthDto>) {
-		const user = await this.userService.getUserByEmail(dto.email);
+		const user = await this.userService.getUser({ email: dto.email });
 		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
 
 		return { qrCodeDataUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl) };
@@ -55,7 +55,7 @@ export class AuthController {
 	@Post('2fa/turn-on')
 	@UseGuards(JwtAuthGuard)
 	async turnOnTwoFactorAuthentication(@Body() dto:TwoFactorDto) {
-		const user = await this.userService.getUserByEmail(dto.email);
+		const user = await this.userService.getUser({ email: dto.email });
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			dto.secret,
 			user,
@@ -70,7 +70,7 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(JwtAuthGuard)
 	async authenticate(@Body() dto:TwoFactorDto) {
-		const user = await this.userService.getUserByEmail(dto.email);
+		const user = await this.userService.getUser({ email: dto.email });
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			dto.secret,
 			user,

@@ -7,6 +7,14 @@ export class AuthDto {
 
 	@IsString()
 	@IsNotEmpty()
+	first_name: string;
+
+	@IsString()
+	@IsNotEmpty()
+	last_name: string;
+
+	@IsString()
+	@IsNotEmpty()
 	password: string;
 
 	@IsString()
@@ -14,7 +22,4 @@ export class AuthDto {
 	@MaxLength(10)
 	@MinLength(4)
 	username: string;
-
-	@IsNotEmpty()
-	id42: string;
 }

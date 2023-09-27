@@ -1,5 +1,5 @@
 # Docker compose file location
-COMPOSE		=	docker-compose.yml
+COMPOSE		=	docker compose
 
 # BASIC COMPOSE COMMANDS
 build:
