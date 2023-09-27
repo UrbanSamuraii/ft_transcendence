@@ -20,46 +20,58 @@ export class AuthService {
 		private userService: UserService) {}
 
 	async forty2signup(req: any, @Res() res: any) {
-			if (!req.user) {
-			  return res.status(401).json({ message: "Unauthorized" });
-			}
-
-			const intra_id = Number(req.user.id);
-        	const email = req.user.emails[0].value;
-        	const first_name = req.user.name.givenName;
-       		const last_name = req.user.name.familyName;
-        	const username = req.user.username;
-        	const img_url = req.user.photos[0].value;
 			
-        	const user = await this.userService.getUserById(intra_id);
-			if (!user) {
-				try {
-					const user = await this.prisma.user.create({
-						data: {
-							id42: intra_id,
-							first_name: first_name,
-							last_name: last_name,
-							email: email,
-							username: username,
-							img_url: img_url
-						},
-					});
-					const token = await this.signToken(user.id, user.email);
-					// Set a cookie with the token in the response
-					res.cookie('token', token, {
-						httpOnly: true,
-						secure: false,
-						sameSite: 'lax',
-						expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-					}).send({ status: 'ok' });``
-				}
-				catch(error) {
-					if (error instanceof PrismaClientKnownRequestError) {
-						if (error.code === 'P2002') { throw new ForbiddenException('Credentials taken'); }}
-					throw error;
+		try {
+			if (!req.user) { 
+				return res.status(401).json({ message: "Unauthorized" });
 			}
+		
+			const id42 = Number(req.user.id);
+			const email = req.user.emails[0]?.value || '';
+			const first_name = req.user.name.givenName;
+			const last_name = req.user.name.familyName;
+			const username = req.user.username;
+			const img_url = req.user.photos[0]?.value || ''; 
+		
+			// Check if a user with the same id42 already exists
+			const existingUser = await this.userService.getUserById(id42);
+		
+			if (!existingUser) {
+			const user = await this.prisma.user.create({
+				data: {
+					id42: id42,
+					first_name: first_name,
+					last_name: last_name,
+					email: email,
+					username: username,
+					img_url: img_url
+				},
+			});
+			const token = await this.signToken(user.id, user.email);
+		
+			// Set a cookie with the token in the response
+			res.cookie('token', token, {
+				httpOnly: true,
+				secure: false,
+				sameSite: 'lax',
+				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+			}).send({ status: 'ok' });
+			} else {
+			// Handle the case when the user already exists (e.g., return an error)
+			return res.status(409).json({ message: 'User already exists' });
+			}
+		} catch (error) {
+			console.error('Error during signup:', error);
+		
+			if (error instanceof PrismaClientKnownRequestError) {
+			if (error.code === 'P2002') {
+				return res.status(400).json({ message: 'Credentials taken' });
+			}
+			}
+		
+			return res.status(500).json({ message: 'Internal server error' });
 		}
-	}
+		}
 	
 	async signup(dto: AuthDto, @Res() res: any) {
 		const hash = await argon.hash(dto.password);

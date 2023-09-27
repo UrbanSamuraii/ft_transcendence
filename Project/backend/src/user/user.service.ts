@@ -14,6 +14,16 @@ export class UserService {
 	
 	constructor(private prisma: PrismaService) {}
 	
+	async createUser(data: Prisma.usersCreateInput): Promise<users> {
+		try {
+		  return await this.prisma.users.create({
+			data,
+		  });
+		} catch (error) {
+		  return error;
+		}
+	  }
+
 	async edithUser(userId: number, dto: EdithUserDto) {
 		const user = await this.prisma.user.update({
 			where: {
