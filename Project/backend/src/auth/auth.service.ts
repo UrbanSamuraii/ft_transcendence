@@ -126,38 +126,4 @@ export class AuthService {
 		});
 		return { access_token: token };
 	}
-
-	async generateTwoFactorAuthenticationSecret(user: User) {
-		const secret = authenticator.generateSecret();
-		const otpAuthUrl = authenticator.keyuri(
-		  user.email,
-		  'ft_transcendance',
-		  secret,
-		);
-	
-		await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-	
-		return { secret, otpAuthUrl };
-	}
-
-	async generateQrCodeDataURL(otpAuthUrl: string) {
-		return toDataURL(otpAuthUrl);
-	}
-
-	isTwoFactorAuthenticationCodeValid(two_factor_secret: string, user: User) {
-		return authenticator.verify({ token: two_factor_secret, secret: user.two_factor_secret });
-	}
-
-	async loginWith2fa(userWithoutPsw: Partial<User>) {
-		const payload = {
-			email: userWithoutPsw.email,
-			isTwoFactorAuthenticationEnabled: !!userWithoutPsw.two_factor_activate,
-			isTwoFactorAuthenticated: true,
-		};
-
-		return {
-			email: payload.email,
-			access_token: this.jwt.sign(payload),
-		};
-	}
 }

@@ -21,9 +21,11 @@ model User {
   last_name   String    @db.VarChar(255)
   email       String		@unique @db.VarChar(255)
 	username	  String		@unique @db.VarChar(255)
-	hash		    String    @default("noTokenBecause42Identification")
-
-  img_url   String?     @db.VarChar(255)
+  img_url     String?   @db.VarChar(255)
+	
+  hash          String  @default("noTokenBecause42Identification")
+  accessToken   String? @unique
+  refreshToken  String? @unique
   
   two_factor_activate Boolean?  @default(false)
   two_factor_secret   String?
