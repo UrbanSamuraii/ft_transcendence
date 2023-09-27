@@ -23,7 +23,7 @@ export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 		})
 	}
 
-	async validate( access_token: string, refreshToken: string, profile: any, done: VerifyCallback ): Promise<any> {
+	async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
 		return done(null, profile);
 	}
 }

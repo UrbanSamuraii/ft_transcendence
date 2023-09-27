@@ -43,28 +43,13 @@ export class UserService {
 		});
 	}
 
-	async deleteUser(where: Prisma.UserWhereUniqueInput) {
-		try {
-			return await this.prisma.user.delete({
-				where,
-			});
-		} catch (error) {
-		return error;
-		}
-	}
-	
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-		const user = this.prisma.user.findUnique({
-			where: { id: userId },
-		});
-
-		(await user).two_factor_secret = secret;
-	}
-	
-	async turnOnTwoFactorAuthentication(userId: number) {
-		const user = this.prisma.user.findUnique({
-			where: { id: userId },
-		});
-		(await user).two_factor_activate = true;
-	}
+	// async deleteUser(where: Prisma.UserWhereUniqueInput) {
+	// 	try {
+	// 		return await this.prisma.user.delete({
+	// 			where,
+	// 		});
+	// 	} catch (error) {
+	// 	return error;
+	// 	}
+	// }
 }

@@ -10,6 +10,6 @@ import { UserService } from "src/user/user.service";
 @Module({
 	imports: [JwtModule.register({})],
 	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy, UserService, Auth42Strategy],
+	providers: [AuthService, JwtStrategy, Auth42Strategy, UserService],
 })
 export class AuthModule {}

@@ -1,2 +1,3 @@
 export * from './jwt.guard';
-export * from './auth42.guard';
+export * from './42auth.guard';
+

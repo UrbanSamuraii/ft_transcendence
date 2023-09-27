@@ -19,8 +19,8 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService) {}
 
-		async forty2signup(req: any, @Res() res: any) {
-			try {
+	async forty2signup(req: any, @Res() res: any) {
+		try {
 			if (!req.user) {
 				return res.status(401).json({ message: "Unauthorized" });
 			}
@@ -32,7 +32,6 @@ export class AuthService {
 			const last_name = req.user.name.familyName;
 			const img_url = req.user.photos[0]?.value || '';
 		
-			// Check if a user with the same email already exists
 			const existingUser = await this.userService.getUser({ email });
 		
 			if (!existingUser) {
@@ -44,10 +43,8 @@ export class AuthService {
 					last_name,
 					img_url,
 				});
-		
-				const token = await this.signToken(user.id, user.email);
-				// Set a cookie with the token in the response
-				res.cookie('token', token, {
+				user.accessToken = await this.signToken(user.id, user.email);
+				res.cookie('token', user.accessToken, {
 					httpOnly: true,
 					secure: false,
 					sameSite: 'lax',
@@ -64,7 +61,6 @@ export class AuthService {
 		}
 	}
 
-	
 	async signup(dto: AuthDto, @Res() res: any) {
 		const hash = await argon.hash(dto.password);
 		try {
@@ -77,9 +73,8 @@ export class AuthService {
 					hash,
 				},
 			});
-			const token = await this.signToken(user.id, user.email);
-			// Set a cookie with the token in the response
-			res.cookie('token', token, {
+			user.accessToken = await this.signToken(user.id, user.email);
+			res.cookie('token', user.accessToken, {
 				httpOnly: true,
 				secure: false,
 				sameSite: 'lax',
@@ -114,16 +109,17 @@ export class AuthService {
 		}).send({ status: 'ok' });
 	}
 
-	async signToken(userID: number, email: string): Promise<{access_token: string}> {
+	async signToken(userID: number, email: string): Promise<string> {
 		const payload = {
 			sub: userID,
 			email
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await  this.jwt.signAsync(payload, {
-			expiresIn: '1d',
+			expiresIn: '10m',
 			secret: secret,
 		});
-		return { access_token: token };
+		return token;
 	}
+
 }
