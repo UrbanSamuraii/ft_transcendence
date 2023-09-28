@@ -6,8 +6,6 @@ import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
 import { UserService } from "src/user/user.service";
 import * as cookie from 'cookie'; // Import the cookie library
 
@@ -21,20 +19,14 @@ export class AuthService {
 
 	async forty2signup(req: any, @Res() res: any) {
 		try {
-
-			if (!req.user) {
-				return res.status(401).json({ message: "Unauthorized" });
-			}
-		
+			if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
+			
 			const id42 = Number(req.user.id);
 			const email = req.user.emails[0]?.value || '';
 			const username = req.user.username;
 			const first_name = req.user.name.givenName;
 			const last_name = req.user.name.familyName;
 			const img_url = req.user.photos[0]?.value || '';
-			
-			console.log({ email : email });
-
 			const existingUser = await this.userService.getUser({ email });
 		
 			if (!existingUser) {
@@ -52,14 +44,26 @@ export class AuthService {
 					secure: false,
 					sameSite: 'lax',
 					expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-				}).send({ status: 'ok' });
+				}).send({ status: '42user has been created' });
 			}
-			} catch (error) {
+			else {
+				const user = await this.userService.getUser({ email });
+				user.accessToken = await this.signToken(user.id, user.email);
+				res.cookie('token', user.accessToken, {
+					httpOnly: true,
+					secure: false,
+					sameSite: 'lax',
+					expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+				}).send({ status: '42user already exist : cookie updated' });
+			}
+			res.redirect('http://localhost:4000/auth/test-42-user');
+		} 
+		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {
 					throw new ForbiddenException('Credentials taken');
 				}
-				throw error;
+			throw error;
 			}
 		}
 	}
@@ -82,7 +86,8 @@ export class AuthService {
 				secure: false,
 				sameSite: 'lax',
 				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-			}).send({ status: 'ok' });
+			}).send({ status: 'user has been created' });
+			res.redirect('http://localhost:4000/auth/test-normal-user');
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -109,7 +114,8 @@ export class AuthService {
 			secure: false,
 			sameSite: 'lax',
 			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-		}).send({ status: 'ok' });
+		}).send({ status: 'SIGNED' });
+		res.redirect('http://localhost:4000/auth/test-normal-user');
 	}
 
 	async signToken(userID: number, email: string): Promise<string> {

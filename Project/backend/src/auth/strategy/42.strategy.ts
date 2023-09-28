@@ -12,21 +12,13 @@ export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 			clientID: config.get('UID_42_API'),
    			clientSecret: config.get('SECRET_42_API'),
 			callbackURL: 'http://localhost:4000/auth/sign42',
-			// callbackURL: config.get('CALL_BACK_URL_42_API'),
-			profileFields: [
-				"id",
-				"login",
-				"last_name",
-				"first_name",
-				"email",
-				"image_url",
-			],
+			// profileFields: ['id', 'login', 'last_name', 'first_name', 'email', 'image_url'],
 			scope: 'public',
 		})
 	}
 
 	async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
-		console.log({ profile });
+		// console.log(profile);
 		return done(null, profile);
 	}
 }
