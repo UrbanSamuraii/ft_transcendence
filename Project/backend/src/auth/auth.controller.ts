@@ -15,10 +15,9 @@ import { use } from "passport";
 export class AuthController {
 	constructor(private authService: AuthService, private userService: UserService) {}
 
-	
 	@Post("signup42")
 	@UseGuards(FortyTwoAuthGuard)
-	async Auth() {}
+	async Auth() { console.log({ test: "HELLO!" }); }
 	@Get('sign42')
 	@UseGuards(FortyTwoAuthGuard)
 	async Callback(@Req() req: Request, @Res() res: Response) {

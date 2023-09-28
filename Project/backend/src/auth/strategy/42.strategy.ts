@@ -1,17 +1,18 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-42';
-import { PrismaService } from "../../prisma/prisma.service";
+import { AuthService } from "../auth.service";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 {
-	constructor (private config: ConfigService, private prisma: PrismaService) {
+	constructor (private config: ConfigService, private authService: AuthService) {
 		super({
 			clientID: config.get('UID_42_API'),
    			clientSecret: config.get('SECRET_42_API'),
-    		callbackURL: config.get('CALL_BACK_URL_42_API'),
+			callbackURL: 'http://localhost:4000/auth/sign42',
+			// callbackURL: config.get('CALL_BACK_URL_42_API'),
 			profileFields: [
 				"id",
 				"login",
@@ -20,10 +21,12 @@ export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 				"email",
 				"image_url",
 			],
+			scope: 'public',
 		})
 	}
 
-	async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
+	async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
+		console.log({ profile });
 		return done(null, profile);
 	}
 }

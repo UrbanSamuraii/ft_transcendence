@@ -21,6 +21,7 @@ export class AuthService {
 
 	async forty2signup(req: any, @Res() res: any) {
 		try {
+
 			if (!req.user) {
 				return res.status(401).json({ message: "Unauthorized" });
 			}
@@ -31,7 +32,9 @@ export class AuthService {
 			const first_name = req.user.name.givenName;
 			const last_name = req.user.name.familyName;
 			const img_url = req.user.photos[0]?.value || '';
-		
+			
+			console.log({ email : email });
+
 			const existingUser = await this.userService.getUser({ email });
 		
 			if (!existingUser) {
