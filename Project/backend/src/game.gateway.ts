@@ -3,8 +3,6 @@ import { SubscribeMessage, WebSocketGateway, OnGatewayInit, WebSocketServer } fr
 import { Server, Socket } from 'socket.io';
 
 const nbrOfSquares = 1;
-// const aspectRatio = 2.0317460317;
-// const aspectRatio = 1920 / 945;
 const aspectRatio = 1318 / 807;
 const paddleDistToWall = 1;
 const paddleWidth = 2.26;
@@ -17,24 +15,17 @@ const maxDy = 4;
 const squareSize = 2.2;
 const squareDy = 0;
 const squareDx = 1.25;
+const clientInputs = {};
 
 @WebSocketGateway(3002, {
     cors: {
-        origin: ["http://made-f0br5s2:3000", "http://localhost:3000", "*"], // allowed origins
+        origin: ["http://made-f0br8s11:3000", "http://localhost:3000", "*"], // allowed origins
         methods: ["GET", "POST"], // allowed methods
         credentials: true, // enable credentials
     },
 })
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
-
-    // private squares = Array(nbrOfSquares).fill(null).map(() => ({
-    //     x: Math.random() * 80,  // ensure they don't spawn outside boundaries
-    //     y: Math.random() * 80,
-    //     dx: Math.random() * 4 - 2,
-    //     dy: Math.random() * 4 - 2,
-    //     size: 2
-    // }));
 
     private squares = Array.from({ length: nbrOfSquares }, (_, index) => {
         const ySpacing = 100 / nbrOfSquares;
@@ -49,18 +40,6 @@ export class GameGateway implements OnGatewayInit {
             size: squareSize
         };
     });
-
-    // private squares = Array.from({ length: nbrOfSquares }, (_, index) => {
-    //     const ySpacing = 100 / nbrOfSquares;
-    //     return {
-    //         x: 50,
-    //         y: 38,
-    //         dx: index % 2 === 0 ? 1.8 : -0.5,  // Alternate directions: right for even indices, left for odd
-    //         // dx: 1,  // Alternate directions: right for even indices, left for odd
-    //         dy: 0,  // No vertical movement
-    //         size: 2
-    //     };
-    // });
 
     private width = 100;
     private height = 100;
@@ -89,23 +68,36 @@ export class GameGateway implements OnGatewayInit {
         this.startGameLoop();
     }
 
+    // @SubscribeMessage('paddleMovements')
+    // handlePaddleMovements(client: Socket, activeKeys: string[]) {
+    //     if (activeKeys.includes("w")) {
+    //         this.desiredLeftPaddleMovement = 'up';
+    //     } else if (activeKeys.includes("s")) {
+    //         this.desiredLeftPaddleMovement = 'down';
+    //     } else {
+    //         this.desiredLeftPaddleMovement = null;
+    //     }
+
+    //     if (activeKeys.includes("ArrowUp")) {
+    //         this.desiredRightPaddleMovement = 'up';
+    //     } else if (activeKeys.includes("ArrowDown")) {
+    //         this.desiredRightPaddleMovement = 'down';
+    //     } else {
+    //         this.desiredRightPaddleMovement = null;
+    //     }
+    // }
+
     @SubscribeMessage('paddleMovements')
     handlePaddleMovements(client: Socket, activeKeys: string[]) {
-        if (activeKeys.includes("w")) {
-            this.desiredLeftPaddleMovement = 'up';
-        } else if (activeKeys.includes("s")) {
-            this.desiredLeftPaddleMovement = 'down';
-        } else {
-            this.desiredLeftPaddleMovement = null;
-        }
+        const clientId = client.id;
+        clientInputs[clientId] = activeKeys;
 
-        if (activeKeys.includes("ArrowUp")) {
-            this.desiredRightPaddleMovement = 'up';
-        } else if (activeKeys.includes("ArrowDown")) {
-            this.desiredRightPaddleMovement = 'down';
-        } else {
-            this.desiredRightPaddleMovement = null;
-        }
+        client.on('disconnect', () => {
+            console.log('Client disconnected:', client.id);
+
+            // If needed, remove the client's data from your storage (e.g., clientInputs)
+            delete clientInputs[client.id];
+        });
     }
 
     @SubscribeMessage('pauseGame')
@@ -123,9 +115,6 @@ export class GameGateway implements OnGatewayInit {
         this.rightScore = 0;
         this.isGameOver = false;
 
-        // Reset the left and right paddles to their initial positions
-        // this.leftPaddle = { x: 10, y: 40, width: 1, height: 15 };
-        // this.rightPaddle = { x: 88, y: 40, width: 1, height: 15 };
         this.leftPaddle = { x: leftPaddleX, y: leftPaddleY, width: paddleWidth, height: paddleHeight };
         this.rightPaddle = { x: rightPaddleX, y: rightPaddleY, width: paddleWidth, height: paddleHeight };
 
@@ -154,59 +143,49 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
-    // adjustDyOnCollision = (squareY, paddleY, paddleHeight) => {
-    //     const relativeSquarePosition = (squareY + 1.1 * aspectRatio - paddleY) / paddleHeight;
-    //     // console.log("hitting, dy = ", square.dy);
-    //     console.log("hitting, square.y = ", squareY);
-    //     console.log("hitting, paddleY = ", paddleY);
-    //     console.log("hitting, paddleHeight = ", paddleHeight);
-    //     console.log("relativeSquarePosition = ", relativeSquarePosition);
-
-    //     return (relativeSquarePosition - 0.5) * this.angleFactor;
-    // };
-
     adjustDyOnCollision(distanceFromCenter, paddleHeight) {
         const relativeDistance = distanceFromCenter / paddleHeight;
         return (relativeDistance) * this.angleFactor;
     }
 
     moveSquare() {
-        // Move the left paddle based on desired movement
-
-
         if (this.isGamePaused) return;
 
-        if (this.desiredLeftPaddleMovement === 'up') {
-            const potentialY = this.leftPaddle.y - this.paddleMoveAmount;
-            this.leftPaddle.y = Math.max(potentialY, 0);
-        } else if (this.desiredLeftPaddleMovement === 'down') {
-            const potentialY = this.leftPaddle.y + this.paddleMoveAmount;
-            this.leftPaddle.y = Math.min(potentialY, 100 - this.leftPaddle.height);
+        // function updateGameState() {
+        const updateGameState = () => {
+
+            const clientIds = Object.keys(clientInputs);
+
+            console.log("clientIds", clientIds);
+            // Assuming 2 players for left and right paddle
+            if (clientIds.length >= 2) {
+                const leftClientActiveKeys = clientInputs[clientIds[0]];
+                const rightClientActiveKeys = clientInputs[clientIds[1]];
+
+                if (leftClientActiveKeys.includes("w")) {
+                    const potentialY = this.leftPaddle.y - this.paddleMoveAmount;
+                    this.leftPaddle.y = Math.max(potentialY, 0);
+                } else if (leftClientActiveKeys.includes("s")) {
+                    const potentialY = this.leftPaddle.y + this.paddleMoveAmount;
+                    this.leftPaddle.y = Math.min(potentialY, 100 - this.leftPaddle.height);
+                }
+
+                if (rightClientActiveKeys.includes("ArrowUp")) {
+                    const potentialY = this.rightPaddle.y - this.paddleMoveAmount;
+                    this.rightPaddle.y = Math.max(potentialY, 0);
+                } else if (rightClientActiveKeys.includes("ArrowDown")) {
+                    const potentialY = this.rightPaddle.y + this.paddleMoveAmount;
+                    this.rightPaddle.y = Math.min(potentialY, 100 - this.rightPaddle.height);
+                }
+            }
         }
 
-        // Move the right paddle based on desired movement
-        if (this.desiredRightPaddleMovement === 'up') {
-            const potentialY = this.rightPaddle.y - this.paddleMoveAmount;
-            this.rightPaddle.y = Math.max(potentialY, 0);
-        } else if (this.desiredRightPaddleMovement === 'down') {
-            const potentialY = this.rightPaddle.y + this.paddleMoveAmount;
-            this.rightPaddle.y = Math.min(potentialY, 100 - this.rightPaddle.height);
-        }
+        updateGameState();
 
         this.squares.forEach((square, idx) => {
 
             square.x += square.dx;
             square.y += square.dy;
-
-            // if (this.intersects(square, this.leftPaddle)) {
-            //     square.dx = -square.dx;
-            //     square.dy += this.adjustDyOnCollision(square.y, this.leftPaddle.y, this.leftPaddle.height);
-            // }
-
-            // if (this.intersects(square, this.rightPaddle)) {
-            //     square.dx = -square.dx;
-            //     square.dy += this.adjustDyOnCollision(square.y, this.rightPaddle.y, this.rightPaddle.height);
-            // }
 
             const leftPaddleDistance = this.intersects(square, this.leftPaddle);
             if (leftPaddleDistance !== null) {
@@ -276,34 +255,6 @@ export class GameGateway implements OnGatewayInit {
     }
 
     private i = 0;
-    // intersects(square, paddle) {
-    //     if (
-    //         square.x <= paddle.x + paddle.width && square.x + square.size > paddle.x &&
-    //         // square.y + square.size >= paddle.y && square.y <= paddle.y + paddle.height
-    //         square.y + square.size * aspectRatio >= paddle.y && square.y <= paddle.y + paddle.height
-    //     ) {
-    //         // if (this.i < 1)
-    //         //     console.log("true = ", square.x, paddle.x, paddle.width, square.size);
-    //         this.i++;
-    //         return true;
-    //     }
-    //     // if (this.i < 1)
-    //     // console.log("false = ", square.x, paddle.x, paddle.width, square.size);
-    //     return false;
-    // }
-
-    // intersects(square, paddle) {
-    //     if (
-    //         square.x + square.size > paddle.x &&
-    //         square.x < paddle.x + paddle.width &&
-    //         square.y + square.size * aspectRatio > paddle.y &&
-    //         square.y < paddle.y + paddle.height
-    //     ) {
-    //         // Collision detected on left or right side
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     intersects(square, paddle) {
         if (
