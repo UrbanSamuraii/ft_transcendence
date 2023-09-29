@@ -92,10 +92,20 @@ export class GameGateway implements OnGatewayInit {
         const clientId = client.id;
         clientInputs[clientId] = activeKeys;
 
+        // client.on('disconnect', () => {
+        //     console.log('Client disconnected:', client.id);
+
+        //     // If needed, remove the client's data from your storage (e.g., clientInputs)
+        //     delete clientInputs[client.id];
+        // });
+    }
+
+    handleConnection(client: Socket) {
+        console.log('Client connected:', client.id);
+
+        // Listen for disconnect
         client.on('disconnect', () => {
             console.log('Client disconnected:', client.id);
-
-            // If needed, remove the client's data from your storage (e.g., clientInputs)
             delete clientInputs[client.id];
         });
     }
@@ -150,7 +160,10 @@ export class GameGateway implements OnGatewayInit {
 
     moveSquare() {
         if (this.isGamePaused) return;
+        const clientIds = Object.keys(clientInputs);
 
+        if (clientIds.length < 2)
+            return;
         // function updateGameState() {
         const updateGameState = () => {
 

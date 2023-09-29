@@ -229,6 +229,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             gameHeight = gameWidth / targetAspectRatio;
         }
 
+
         const offsetX = (canvas.width - gameWidth) / 2;
         const offsetY = (canvas.height - gameHeight) / 2;
 
@@ -261,8 +262,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             drawButton(offsetX + buttonOffsetX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu, gameWidth, gameHeight, offsetX, offsetY);
             drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
         }
-
-
 
         drawNet(data);
 
