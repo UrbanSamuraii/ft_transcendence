@@ -1,0 +1,32 @@
+.gameArea {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+:root {
+    --paddle-height: 20%;
+    --paddle-width: 2%;
+    --ball-diameter: 5%;
+}
+
+.leftPaddle,
+.rightPaddle {
+    position: absolute;
+    background-color: white;
+    top: 50%;
+}
+
+.leftPaddle {
+    left: 0%;
+}
+
+.rightPaddle {
+    right: 0%;
+}
+
+.square {
+    position: absolute;
+    background-color: white;
+}
