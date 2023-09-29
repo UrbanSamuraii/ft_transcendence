@@ -11,7 +11,7 @@ export class Auth42Strategy extends PassportStrategy(Strategy, '42')
 		super({
 			clientID: config.get('UID_42_API'),
    			clientSecret: config.get('SECRET_42_API'),
-			callbackURL: 'http://localhost:4000/auth/sign42',
+			callbackURL: 'http://localhost:3001/auth/sign42',
 			// profileFields: ['id', 'login', 'last_name', 'first_name', 'email', 'image_url'],
 			scope: 'public',
 		})

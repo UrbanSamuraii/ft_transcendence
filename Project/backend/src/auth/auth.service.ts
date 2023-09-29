@@ -27,6 +27,7 @@ export class AuthService {
 			const first_name = req.user.name.givenName;
 			const last_name = req.user.name.familyName;
 			const img_url = req.user.photos[0]?.value || '';
+			
 			const existingUser = await this.userService.getUser({ email });
 		
 			if (!existingUser) {
