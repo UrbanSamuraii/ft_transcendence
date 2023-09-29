@@ -48,7 +48,9 @@ services:
       - backend
     networks:
       - transcendance
-
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 networks:
   transcendance:
 
