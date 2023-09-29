@@ -24,7 +24,7 @@ export class AuthController {
 
 	@Get('signup42')
 	@UseGuards(FortyTwoAuthGuard)
-	async Auth() { }
+	async Auth() { console.log("TEST"); }
 
 	@Get('sign42')
 	@UseGuards(FortyTwoAuthGuard)

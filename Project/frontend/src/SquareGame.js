@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
+// import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './SquareGame.css';
 import { drawGrid } from './Utils.js';

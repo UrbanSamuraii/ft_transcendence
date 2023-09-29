@@ -57,7 +57,7 @@ export class AuthService {
 					expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
 				});//.send({ status: '42user already exist : cookie updated' });
 			}
-			res.redirect('http://localhost:3000');
+			res.redirect('http://localhost:3000/play');
 		} 
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -88,7 +88,7 @@ export class AuthService {
 				sameSite: 'lax',
 				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
 			});//.send({ status: 'user has been created' });
-			res.redirect('http://localhost:3000');
+			res.redirect('http://localhost:3000/play');
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -116,7 +116,7 @@ export class AuthService {
 			sameSite: 'lax',
 			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
 		});//.send({ status: 'SIGNED' });
-		res.redirect('http://localhost:3000');
+		res.redirect('http://localhost:3000/play');
 	}
 
 	async signToken(userID: number, email: string): Promise<string> {

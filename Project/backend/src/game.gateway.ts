@@ -20,7 +20,7 @@ const squareDx = 1.25;
 
 @WebSocketGateway(3002, {
     cors: {
-        origin: ["http://made-f0br5s2:3000", "http://localhost:3000", "*"], // allowed origins
+        origin: ["http://made-f0br5s2:3000", "http://localhost:3000", "http://localhost:3001", "*"], // allowed origins
         methods: ["GET", "POST"], // allowed methods
         credentials: true, // enable credentials
     },

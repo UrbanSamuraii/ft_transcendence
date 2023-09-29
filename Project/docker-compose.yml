@@ -20,6 +20,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
     container_name: backend
     restart: always
     env_file:
@@ -40,6 +42,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
     container_name: frontend
     restart: always
     ports:
@@ -51,6 +55,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+
 networks:
   transcendance:
 

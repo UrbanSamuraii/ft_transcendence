@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
+//import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import SquareGame from './SquareGame';
+import axios from 'axios'
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -12,6 +15,7 @@ const routeBackgroundStyles = {
     '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
     '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
 };
+
 
 function App() {
     const [backgroundStyle, setBackgroundStyle] = useState(defaultBackgroundStyle);
@@ -57,8 +61,22 @@ function Content({ setBackgroundStyle }) {
         navigate("/");
     }
 
+    const handleSignUp42Click = async () => {
+        // Define our backend API URL
+        const backendURL = 'http://localhost:3001';
+        try { 
+            await axios.post(`${backendURL}/auth/signup42`); } 
+        catch (error) { 
+            console.error('Sign up request error:', error); }
+    };
+      
     return (
         <Routes>
+            <Route path="/" element={
+                <div> 
+                    <button className="play-button" onClick={handleSignUp42Click}> SIGNUP </button>
+                </div>
+            } />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={
                 <div className="mode-selection">
@@ -68,7 +86,7 @@ function Content({ setBackgroundStyle }) {
 
                 </div>
             } />
-            <Route path="/" element={
+            <Route path="/play" element={
                 <button className="play-button" onClick={handlePlayClick}>
                     PLAY
                 </button>

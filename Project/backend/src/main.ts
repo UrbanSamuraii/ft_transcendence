@@ -15,6 +15,10 @@ async function bootstrap() {
     app.use(cookieParser()); // Add cookie parser middleware if needed
     app.use(passport.initialize());
     app.use(cors());
+    app.enableCors({
+        origin: 'http://localhost:3000', // Update with your frontend URL
+        credentials: true, // If needed
+      });
     app.useGlobalPipes(new ValidationPipe({
         whitelist: true,
     }));
