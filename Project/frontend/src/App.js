@@ -69,14 +69,12 @@ function Content({ setBackgroundStyle }) {
                 </div>
             } />
             <Route path="/" element={
-                <button className="play-button" onClick={handlePlayClick}>
-                    PLAY
+                <button className="play-button" onClick={handlePlayClick}>PLAY
                 </button>
             } />
         </Routes>
     );
 }
-
 
 
 export default App;
