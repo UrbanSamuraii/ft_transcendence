@@ -5,11 +5,13 @@ import { ChannelsModule } from './channels/channels.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaClient } from '@prisma/client';
 import { ConfigModule } from '@nestjs/config';
+import { GameGateway } from './game.gateway';
 
 
 @Module({
-  imports: [AuthModule, UserModule, ChannelsModule, PrismaModule, ConfigModule.forRoot({isGlobal: true})],
+    imports: [AuthModule, UserModule, ChannelsModule, PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
+    providers: [GameGateway],
 })
-export class AppModule {}
+export class AppModule { }
 
 // Similar to Prisma - making our ConfigModule global

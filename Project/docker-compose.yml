@@ -25,7 +25,8 @@ services:
     env_file:
       - ./backend/.env
     ports:
-      - 4000:4000 # Expose your NestJS app's port
+      - 3001:3001 # Expose your NestJS app's port
+      - 3002:3002 # Websockets
       - 5555:5555 # Expose a port for Prisma Studio
     depends_on:
       - postgres
