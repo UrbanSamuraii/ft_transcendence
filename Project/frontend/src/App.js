@@ -69,8 +69,10 @@ function Content({ setBackgroundStyle }) {
                 </div>
             } />
             <Route path="/" element={
-                <button className="play-button" onClick={handlePlayClick}>PLAY
-                </button>
+                <div>
+                    <button className="play-button" onClick={handlePlayClick}>PLAY</button>
+                    <button className="play-button" >REACT</button>
+                </div>
             } />
         </Routes>
     );
