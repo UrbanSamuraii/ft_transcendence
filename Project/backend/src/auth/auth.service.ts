@@ -45,7 +45,7 @@ export class AuthService {
 					secure: false,
 					sameSite: 'lax',
 					expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-				}).send({ status: '42user has been created' });
+				});//.send({ status: '42user has been created' });
 			}
 			else {
 				const user = await this.userService.getUser({ email });
@@ -55,9 +55,9 @@ export class AuthService {
 					secure: false,
 					sameSite: 'lax',
 					expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-				}).send({ status: '42user already exist : cookie updated' });
+				});//.send({ status: '42user already exist : cookie updated' });
 			}
-			res.redirect('http://localhost:4000/auth/test-42-user');
+			res.redirect('http://localhost:3000');
 		} 
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -87,8 +87,8 @@ export class AuthService {
 				secure: false,
 				sameSite: 'lax',
 				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-			}).send({ status: 'user has been created' });
-			res.redirect('http://localhost:4000/auth/test-normal-user');
+			});//.send({ status: 'user has been created' });
+			res.redirect('http://localhost:3000');
 		}
 		catch(error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -115,8 +115,8 @@ export class AuthService {
 			secure: false,
 			sameSite: 'lax',
 			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-		}).send({ status: 'SIGNED' });
-		res.redirect('http://localhost:4000/auth/test-normal-user');
+		});//.send({ status: 'SIGNED' });
+		res.redirect('http://localhost:3000');
 	}
 
 	async signToken(userID: number, email: string): Promise<string> {

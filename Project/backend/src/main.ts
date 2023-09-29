@@ -10,8 +10,7 @@ async function bootstrap() {
     // const app = await NestFactory.create(AppModule);
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-    // const port = +process.env.APP_PORT || 4000;
-    const port = 3001;
+    const port = +process.env.APP_PORT || 3001;
     // Initialize Passport
     app.use(cookieParser()); // Add cookie parser middleware if needed
     app.use(passport.initialize());
