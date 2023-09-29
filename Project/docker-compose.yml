@@ -16,7 +16,7 @@ services:
       - transcendance
 
   # BACKEND
-  app:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -34,6 +34,20 @@ services:
       - transcendance
     volumes:
       - ./backend:/app
+
+  # FRONTEND
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    networks:
+      - transcendance
 
 networks:
   transcendance:

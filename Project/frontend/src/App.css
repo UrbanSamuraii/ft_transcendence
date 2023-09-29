@@ -1,0 +1,126 @@
+.App {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(45deg, #f6494d, #F5BD02, #0001ff);
+    /* background: #f5bd01; */
+    /* More gradient variation for gold-ish feel */
+    transition: background-color 0.3s;
+    position: relative;
+    /* Added this line */
+    /* Temporary */
+
+}
+
+@keyframes gradientWave {
+    0% {
+        background-position: 100% 0%;
+    }
+
+    50% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 100% 0%;
+    }
+}
+
+.mode-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.mode-button {
+    padding: 20px 40px;
+    font-size: 24px;
+}
+
+.classic-mode {
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
+    /* Pixelated font */
+    font-size: 24px;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    align-items: center;
+}
+
+/* Hover effect for CLASSIC mode */
+.classic-mode:hover {
+    background-color: white;
+    color: black;
+}
+
+/* Styles for PLACEHOLDER 1 */
+.placeholder-1 {
+    background-color: #2196F3;
+    /* Blue color */
+    color: white;
+}
+
+/* Hover effect for PLACEHOLDER 1 */
+.placeholder-1:hover {
+    background-color: #0b7dda;
+}
+
+/* Styles for PLACEHOLDER 2 */
+.placeholder-2 {
+    background-color: #f44336;
+    /* Red color */
+    color: white;
+}
+
+/* Hover effect for PLACEHOLDER 2 */
+.placeholder-2:hover {
+    background-color: #da190b;
+}
+
+.play-button {
+    background: rgba(255, 255, 255, 0.1);
+    /* Transparent white background for glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Soft white border */
+    padding: 20px 40px;
+    /* Padding around the text for a larger button */
+    font-size: 24px;
+    /* Larger font size */
+    color: rgba(255, 255, 255, 0.9);
+    /* Soft white color for the text */
+    cursor: pointer;
+    /* Hand pointer when hovering over the button */
+    border-radius: 20px;
+    /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+        /* Soft shadow below the button */
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(255, 255, 255, 0.05),
+        /* Inner shadow for more depth */
+        inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    /* Blur the background behind the button for more glass effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Smooth transitions for the hover effect */
+}
+
+.play-button:hover {
+    transform: scale(1.05);
+    /* Enlarge button a bit on hover */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15),
+        /* Increase shadow depth on hover */
+        0 3px 6px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.play-button:active {
+    transform: scale(0.98);
+    /* Shrink a bit when active/clicked */
+}
