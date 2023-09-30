@@ -7,6 +7,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
+import { authenticator } from 'otplib';
 import * as cookie from 'cookie'; // Import the cookie library
 
 @Injectable()
@@ -130,6 +131,18 @@ export class AuthService {
 			secret: secret,
 		});
 		return token;
+	}
+
+	async generateTwoFactorAuthenticationSecret(user: User, config: ConfigService) {
+		const secret = authenticator.generateSecret();
+		const otpauthUrl = authenticator.keyuri(user.email, config.get('AUTH_APP_NAME'), secret);
+	
+		await this.userService.setTwoFactorAuthenticationSecret(secret, user.userId);
+	
+		return {
+		secret,
+		otpauthUrl
+		}
 	}
 
 }
