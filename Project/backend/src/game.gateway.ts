@@ -68,36 +68,11 @@ export class GameGateway implements OnGatewayInit {
         this.startGameLoop();
     }
 
-    // @SubscribeMessage('paddleMovements')
-    // handlePaddleMovements(client: Socket, activeKeys: string[]) {
-    //     if (activeKeys.includes("w")) {
-    //         this.desiredLeftPaddleMovement = 'up';
-    //     } else if (activeKeys.includes("s")) {
-    //         this.desiredLeftPaddleMovement = 'down';
-    //     } else {
-    //         this.desiredLeftPaddleMovement = null;
-    //     }
-
-    //     if (activeKeys.includes("ArrowUp")) {
-    //         this.desiredRightPaddleMovement = 'up';
-    //     } else if (activeKeys.includes("ArrowDown")) {
-    //         this.desiredRightPaddleMovement = 'down';
-    //     } else {
-    //         this.desiredRightPaddleMovement = null;
-    //     }
-    // }
-
     @SubscribeMessage('paddleMovements')
     handlePaddleMovements(client: Socket, activeKeys: string[]) {
         const clientId = client.id;
         clientInputs[clientId] = activeKeys;
 
-        // client.on('disconnect', () => {
-        //     console.log('Client disconnected:', client.id);
-
-        //     // If needed, remove the client's data from your storage (e.g., clientInputs)
-        //     delete clientInputs[client.id];
-        // });
     }
 
     handleConnection(client: Socket) {
