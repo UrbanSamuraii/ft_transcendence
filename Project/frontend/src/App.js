@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 //import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, useHistory } from 'react-router-dom';
 import './App.css';
 import SquareGame from './SquareGame';
 import axios from 'axios'
@@ -61,11 +61,13 @@ function Content({ setBackgroundStyle }) {
         navigate("/");
     }
 
-    const handleSignUp42Click = async () => {
-        // Define our backend API URL
-        const backendURL = 'http://localhost:3001';
+    async function handleSignUp42Click() {
+        // const backendURL = 'http://localhost:3001';
+        // const history = useHistory();
+
         try { 
-            await axios.post(`${backendURL}/auth/signup42`); } 
+            window.location.href = 'http://localhost:3001/auth/signup42'; }
+            // await axios.get(`${backendURL}/auth/signup42`); } 
         catch (error) { 
             console.error('Sign up request error:', error); }
     };
@@ -74,7 +76,7 @@ function Content({ setBackgroundStyle }) {
         <Routes>
             <Route path="/" element={
                 <div> 
-                    <button className="play-button" onClick={handleSignUp42Click}> SIGNUP </button>
+                    <button className="play-button" onClick={ handleSignUp42Click }> SIGNUP </button>
                 </div>
             } />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />

@@ -24,12 +24,12 @@ export class AuthController {
 
 	@Get('signup42')
 	@UseGuards(FortyTwoAuthGuard)
-	async Auth() { console.log("TEST"); }
+	async Auth() { }
 
 	@Get('sign42')
 	@UseGuards(FortyTwoAuthGuard)
 	async Callback(@Req() req: Request, @Res() res: Response) {
-		return (await this.authService.forty2signup(req, res));
+		return ( await this.authService.forty2signup(req, res));
 	}
 
 	@IsPublic(true)
