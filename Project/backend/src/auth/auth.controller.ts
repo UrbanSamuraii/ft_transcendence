@@ -7,20 +7,12 @@ import { AuthDto } from "./dto";
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
-import { Response } from "express";
+import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
-import { use } from "passport";
-
 
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService, private userService: UserService) {}
-
-	@Get('test-42-user')
-	async welcome42students() { return ("42student - success"); }
-
-	@Get('test-normal-user')
-	async welcomeRandomUser() { return ("Random user - success"); }
 
 	@Get('signup42')
 	@UseGuards(FortyTwoAuthGuard)
@@ -43,5 +35,41 @@ export class AuthController {
 	@Get('signin')
 	async signin(@Body() dto:Partial<AuthDto>, @Res() res: Response) {1
 		return this.authService.signin(dto, res);
+	}
+
+	// To add the turn on route in the authentication controller
+	@Post('2fa/turn-on')
+  	@UseGuards(JwtAuthGuard)
+	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+			body.twoFactorAuthenticationCode,
+			request.user,
+		);
+		if (!isCodeValid) { 
+			throw new UnauthorizedException('Wrong authentication code'); 
+		}
+		await this.userService.turnOnTwoFactorAuthentication(request.user.id);
+	}
+
+	@Post('2fa/generate')
+	@UseGuards(JwtAuthGuard)
+	async register(@Res() response: ExpressResponse, @Request() request: Request) {
+		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
+		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
+	}
+
+	@HttpCode(200)
+	@IsPublic(true)
+	@Post('2fa/authenticate')
+	@UseGuards(JwtAuthGuard)
+	async authenticate(@Request() request, @Body() body) {
+		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+		body.twoFactorAuthenticationCode,
+		request.user,
+		);
+		if (!isCodeValid) {
+		throw new UnauthorizedException('Wrong authentication code');
+		}
+		return this.authService.loginWith2fa(request.user);
 	}
 }

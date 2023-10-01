@@ -8,6 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
 import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 import * as cookie from 'cookie'; // Import the cookie library
 
 @Injectable()
@@ -133,16 +134,37 @@ export class AuthService {
 		return token;
 	}
 
-	async generateTwoFactorAuthenticationSecret(user: User, config: ConfigService) {
-		const secret = authenticator.generateSecret();
-		const otpauthUrl = authenticator.keyuri(user.email, config.get('AUTH_APP_NAME'), secret);
-	
-		await this.userService.setTwoFactorAuthenticationSecret(secret, user.userId);
-	
+	async loginWith2fa(userWithoutPsw: Partial<User>) {
+		const payload = {
+			email: userWithoutPsw.email,
+			two_factor_activate: !!userWithoutPsw.two_factor_activate,
+			isTwoFactorAuthenticated: true,
+		};
 		return {
-		secret,
-		otpauthUrl
-		}
+			email: payload.email,
+			access_token: this.jwt.sign(payload),
+		};
+	}
+
+	async generateTwoFactorAuthenticationSecret(user: User) {
+		const secret = authenticator.generateSecret();
+		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
+	
+		await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
+	
+		return { secret, otpAuthUrl }
+	}
+
+	async generateQrCodeDataURL(otpAuthUrl: string) {
+		return toDataURL(otpAuthUrl);
+	}
+
+	// Method that will verify the authentication code with the user's secret
+	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		return authenticator.verify({
+		  token: twoFactorAuthenticationCode,
+		  secret: user.two_factor_secret,
+		});
 	}
 
 }

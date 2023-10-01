@@ -2,6 +2,7 @@ import { EdithUserDto } from "./dto";
 import { Injectable, Body, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
+
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
@@ -52,4 +53,25 @@ export class UserService {
 	// 	return error;
 	// 	}
 	// }
+
+
+
+	////////////////// 2FA SETTNGS //////////////////
+
+	// Setting the 2FA authentication for our user
+	async turnOnTwoFactorAuthentication(userId: number) {
+		const user = await this.prisma.user.findUnique({ where:
+			{ id : userId }
+		});
+		user.two_factor_activate = true;
+	}
+	// Setting the 2FA authentication for our user
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		const user = await this.prisma.user.findUnique({ where:
+			{ id : userId }
+		});
+		user.two_factor_secret = secret;
+	}
+
+
 }
