@@ -22,6 +22,7 @@ const handleSubmit = async (e) => {
 	console.log('Registration successful:', response.data);
 	} catch (error) {
 	console.error('Sign up request error:', error);
+	navigate('/');
 	}
 };
 
