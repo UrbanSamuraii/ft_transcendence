@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, useHistory } from 'react-router-dom';
 import './App.css';
 import SquareGame from './SquareGame';
-import axios from 'axios'
+import axios from 'axios';
+import SignupForm from './SignupForm';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -62,22 +63,23 @@ function Content({ setBackgroundStyle }) {
     }
 
     async function handleSignUp42Click() {
-        // const backendURL = 'http://localhost:3001';
-        // const history = useHistory();
-
         try { 
             window.location.href = 'http://localhost:3001/auth/signup42'; }
-            // await axios.get(`${backendURL}/auth/signup42`); } 
         catch (error) { 
             console.error('Sign up request error:', error); }
     };
+
+    function handleSignUpClick() {
+        navigate('/signup');
+      }
       
     return (
         <Routes>
             <Route path="/" element={
-                <div> 
-                    <button className="play-button" onClick={ handleSignUp42Click }> SIGNUP </button>
-                </div>
+                <div>
+                    <button className="play-button black-shiny-button" onClick={handleSignUp42Click}>42 SIGNUP</button>
+                    <button className="play-button" onClick={handleSignUpClick}>SIGNUP</button>
+              </div>
             } />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={
@@ -88,6 +90,7 @@ function Content({ setBackgroundStyle }) {
 
                 </div>
             } />
+            <Route path="/signup" element={<SignupForm />} />
             <Route path="/play" element={
                 <button className="play-button" onClick={handlePlayClick}>
                     PLAY
@@ -96,7 +99,5 @@ function Content({ setBackgroundStyle }) {
         </Routes>
     );
 }
-
-
 
 export default App;
