@@ -84,18 +84,30 @@ export class AuthService {
 				},
 			});
 			user.accessToken = await this.signToken(user.id, user.email);
+			// Set the token as a cookie
 			res.cookie('token', user.accessToken, {
 				httpOnly: true,
 				secure: false,
 				sameSite: 'lax',
 				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-			});//.send({ status: 'user has been created' });
-			res.redirect('http://localhost:3000/play');
+			});
+        	// Send a success response with a JSON body
+        	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
 		}
-		catch(error) {
+		catch (error: any) { // Explicitly type error as any
 			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') { throw new ForbiddenException('Credentials taken'); }}
-			throw error;
+				if (error.code === 'P2002') {
+					if (Array.isArray(error.meta?.target)) {
+						if (error.meta.target.includes('email')) {
+							res.status(400).json({ error: 'Email already exists' });
+						} else if (error.meta.target.includes('username')) {
+							res.status(400).json({ error: 'Username already exists' });
+						}
+					}
+				}
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
