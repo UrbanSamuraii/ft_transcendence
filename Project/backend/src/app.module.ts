@@ -5,7 +5,7 @@ import { ChannelsModule } from './channels/channels.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaClient } from '@prisma/client';
 import { ConfigModule } from '@nestjs/config';
-import { GameGateway } from './game.gateway';
+import { GameGateway } from './game/game.gateway';
 
 
 @Module({
