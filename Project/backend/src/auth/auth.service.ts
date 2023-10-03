@@ -91,8 +91,8 @@ export class AuthService {
 				sameSite: 'lax',
 				expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
 			});
-        	// Send a success response with a JSON body
-        	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
+			// Send a success response with a JSON body
+			res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
 		}
 		catch (error: any) { // Explicitly type error as any
 			if (error instanceof PrismaClientKnownRequestError) {

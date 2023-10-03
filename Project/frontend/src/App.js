@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './SquareGame';
 import SignupForm from './SignupForm';
-import CustomRedirectionFrom42Route from './RedirectionFrom42';
+// import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',

@@ -6,6 +6,7 @@ import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guard';
+import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
@@ -71,5 +72,21 @@ export class AuthController {
 		throw new UnauthorizedException('Wrong authentication code');
 		}
 		return this.authService.loginWith2fa(request.user);
+	}
+
+	@IsPublic(false)
+	@Post('signout')
+	@UseGuards(Jwt2faAuthGuard)
+	async signout(@Request() request, @Res() response: ExpressResponse) { 
+		try {	
+			const email = request.user.email;
+			await this.userService.deleteUser(email);
+			// Clear the authentication cookie
+			response.clearCookie('token');
+			return response.status(200).json({ message: 'Logout successful' });
+	
+		} catch (error) {
+			return response.status(500).json({ error: 'Internal server error' });
+		}
 	}
 }
