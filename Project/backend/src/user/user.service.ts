@@ -44,15 +44,15 @@ export class UserService {
 		});
 	}
 
-	// async deleteUser(where: Prisma.UserWhereUniqueInput) {
-	// 	try {
-	// 		return await this.prisma.user.delete({
-	// 			where,
-	// 		});
-	// 	} catch (error) {
-	// 	return error;
-	// 	}
-	// }
+	async deleteUser(where: Prisma.UserWhereUniqueInput) {
+		try {
+			return await this.prisma.user.delete({
+				where,
+			});
+		} catch (error) {
+		return error;
+		}
+	}
 
 
 
