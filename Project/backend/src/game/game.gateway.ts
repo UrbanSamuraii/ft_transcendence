@@ -15,14 +15,13 @@ const clientInputs = {};
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
 
-    private isGamePaused = false; // To keep track of the paused state
     private gameLoop: NodeJS.Timeout;
 
     constructor(private gameService: SquareGameService) { }  // <-- Inject the service
 
     afterInit(server: Server) {
         console.log('Socket.io initialized');
-        this.gameService.updateGameState(clientInputs, this.isGamePaused, (data) => {
+        this.gameService.updateGameState(clientInputs, (data) => {
             this.server.emit('updateGameData', data);
         });
     }
@@ -46,12 +45,12 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('pauseGame')
     handlePauseGame(client: Socket) {
-        this.isGamePaused = true;
+        this.gameService.isGamePaused = true;
     }
 
     @SubscribeMessage('resumeGame')
     handleResumeGame(client: Socket) {
-        this.isGamePaused = false;
+        this.gameService.isGamePaused = false;
     }
 
     @SubscribeMessage('startGame')
@@ -60,15 +59,4 @@ export class GameGateway implements OnGatewayInit {
             this.gameService.resetGame();
         }
     }
-
-    // startGameLoop() {
-    //     setTimeout(() => {
-    //         this.gameLoop = setInterval(() => {
-    //             this.gameService.updateGameState(clientInputs, this.isGamePaused, (data) => {
-    //                 this.server.emit('updateGameData', data);
-    //             });
-    //         }, 1000 / 60);
-    //     }, 10);
-    // }
-
 }

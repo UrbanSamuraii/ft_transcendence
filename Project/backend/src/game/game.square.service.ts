@@ -51,6 +51,7 @@ export class SquareGameService {
     private maxDyValue = 5;
     private maxDxValue = 5;
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
+    public isGamePaused = false; // To keep track of the paused state
 
     resetGame() {
         this.leftScore = 0;
@@ -81,23 +82,12 @@ export class SquareGameService {
         return (relativeDistance) * this.angleFactor;
     }
 
-    updateGameState(clientInputs, isGamePaused: boolean, callback: Function) {
-        console.log("here");
-
-        if (isGamePaused) return;
+    updateGameState(clientInputs, callback: Function) {
 
         const clientIds = Object.keys(clientInputs);
 
-        console.log("here2");
-
-        // if (clientIds.length < 2)
-        // return;
-
-        console.log("here2");
-        console.log("clientIds", clientIds);
-
         // Assuming 2 players for left and right paddle
-        if (clientIds.length >= 2) {
+        if (clientIds.length >= 2 && !this.isGamePaused) {
             const leftClientActiveKeys = clientInputs[clientIds[0]];
             const rightClientActiveKeys = clientInputs[clientIds[1]];
 
@@ -116,57 +106,58 @@ export class SquareGameService {
                 const potentialY = this.rightPaddle.y + this.paddleMoveAmount;
                 this.rightPaddle.y = Math.min(potentialY, 100 - this.rightPaddle.height);
             }
+
+            this.squares.forEach((square, idx) => {
+
+                square.x += square.dx;
+                square.y += square.dy;
+
+                const leftPaddleDistance = this.intersects(square, this.leftPaddle);
+                if (leftPaddleDistance !== null) {
+                    square.dx = -square.dx;
+                    square.dy = this.adjustDyOnCollision(leftPaddleDistance, this.leftPaddle.height);
+
+                    // Reposition the square outside of the left paddle bounds
+                    square.x = this.leftPaddle.x + this.leftPaddle.width;
+                }
+
+                const rightPaddleDistance = this.intersects(square, this.rightPaddle);
+                if (rightPaddleDistance !== null) {
+                    square.dx = -square.dx;
+                    square.dy = this.adjustDyOnCollision(rightPaddleDistance, this.rightPaddle.height);
+
+                    // Reposition the square outside of the right paddle bounds
+                    square.x = this.rightPaddle.x - square.size;
+
+                }
+
+                // Check for wall intersections
+                if (square.x + square.size < 0 || square.x > this.width) {
+                    // Reset square position to the center
+                    if (square.x > this.width)
+                        this.leftScore++;
+                    if (square.x + square.size < 0)
+                        this.rightScore++;
+                    square.x = this.width / 2;
+                    square.y = this.height / 2;
+
+                    square.dx = squareDx;
+                    square.dy = squareDy;
+                }
+
+                //top wall
+                if (square.y <= 0) {
+                    square.dy = -square.dy;
+                }
+
+                //bottom wall
+                if (square.y + square.size * aspectRatio >= 100) {
+                    square.dy = -square.dy;
+                }
+
+            });
+
         }
-
-        this.squares.forEach((square, idx) => {
-
-            square.x += square.dx;
-            square.y += square.dy;
-
-            const leftPaddleDistance = this.intersects(square, this.leftPaddle);
-            if (leftPaddleDistance !== null) {
-                square.dx = -square.dx;
-                square.dy = this.adjustDyOnCollision(leftPaddleDistance, this.leftPaddle.height);
-
-                // Reposition the square outside of the left paddle bounds
-                square.x = this.leftPaddle.x + this.leftPaddle.width;
-            }
-
-            const rightPaddleDistance = this.intersects(square, this.rightPaddle);
-            if (rightPaddleDistance !== null) {
-                square.dx = -square.dx;
-                square.dy = this.adjustDyOnCollision(rightPaddleDistance, this.rightPaddle.height);
-
-                // Reposition the square outside of the right paddle bounds
-                square.x = this.rightPaddle.x - square.size;
-
-            }
-
-            // Check for wall intersections
-            if (square.x + square.size < 0 || square.x > this.width) {
-                // Reset square position to the center
-                if (square.x > this.width)
-                    this.leftScore++;
-                if (square.x + square.size < 0)
-                    this.rightScore++;
-                square.x = this.width / 2;
-                square.y = this.height / 2;
-
-                square.dx = squareDx;
-                square.dy = squareDy;
-            }
-
-            //top wall
-            if (square.y <= 0) {
-                square.dy = -square.dy;
-            }
-
-            //bottom wall
-            if (square.y + square.size * aspectRatio >= 100) {
-                square.dy = -square.dy;
-            }
-
-        });
 
         if (this.leftScore >= 10000 || this.rightScore >= 10000) {
             this.isGameOver = true;
@@ -183,7 +174,7 @@ export class SquareGameService {
         });
 
         if (!this.isGameOver) {
-            setTimeout(() => this.updateGameState(clientInputs, isGamePaused, callback), 1000 / 60);
+            setTimeout(() => this.updateGameState(clientInputs, callback), 1000 / 60);
         }
     }
 
