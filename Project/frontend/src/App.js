@@ -14,6 +14,7 @@ const routeBackgroundStyles = {
     '/': { background: 'linear-gradient(45deg, #ff0000, #ff7700, #ff00cc)' },
     '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
     '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
+    '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' }, // Added background style for add-user route
 };
 
 function App() {
@@ -103,5 +104,26 @@ function Content({ setBackgroundStyle }) {
       </Routes>
     );
 }
+
+
+    // return (
+    //     <Routes>
+    //         <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
+    //         <Route path="/select-mode" element={
+    //             <div className="mode-selection">
+    //                 <button className="mode-button classic-mode" onClick={startGame}>CLASSIC</button>
+    //                 <button className="mode-button start-button placeholder-1">PLACEHOLDER 1</button>
+    //                 <button className="mode-button start-button placeholder-2">PLACEHOLDER 2</button>
+    //             </div>
+    //         } />
+    //         <Route path="/add-user" element={<AddUserForm />} />
+    //         <Route path="/" element={
+    //             <div>
+    //                 <button className="play-button" onClick={handlePlayClick}>PLAY</button>
+    //                 <button className="play-button" onClick={handleLoginClick}>LOGIN</button>
+    //             </div>
+    //         } />
+    //     </Routes>
+    // );
 
 export default App;

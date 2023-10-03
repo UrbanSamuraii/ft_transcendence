@@ -12,37 +12,37 @@ import qrcode from 'qrcode';
 
 @Injectable()
 export class UserService {
-	
-	constructor(private prisma: PrismaService) {}
-	
-	async createUser(data: Prisma.UserCreateInput): Promise<User> {
-		try {
-			return await this.prisma.user.create({
-				data,
-				});
-		} catch (error) {
-			return error;
-		}
-	}
 
-	async edithUser(userId: number, dto: EdithUserDto) {
-		const user = await this.prisma.user.update({
-			where: {
-				id: userId,
-			},
-			data: {
-				...dto,
-			},
-		});
-		delete user.hash;
-		return user;
-	}
+    constructor(private prisma: PrismaService) { }
+
+    async createUser(data: Prisma.UserCreateInput): Promise<User> {
+        try {
+            return await this.prisma.user.create({
+                data,
+            });
+        } catch (error) {
+            return error;
+        }
+    }
 
 	async getUser(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
-		return await this.prisma.user.findUnique({
-			where,
-		});
-	}
+        return await this.prisma.user.findUnique({
+            where,
+        });
+    }
+
+	async edithUser(userId: number, dto: EdithUserDto) {
+        const user = await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                ...dto,
+            },
+        });
+        delete user.hash;
+        return user;
+    }
 
 	async deleteUser(where: Prisma.UserWhereUniqueInput) {
 		try {
@@ -70,6 +70,4 @@ export class UserService {
 		});
 		user.two_factor_secret = secret;
 	}
-
-
 }

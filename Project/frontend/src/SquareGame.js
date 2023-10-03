@@ -5,7 +5,6 @@ import io from 'socket.io-client';
 import './SquareGame.css';
 import { drawGrid } from './Utils.js';
 
-// const targetAspectRatio = 1920 / 945;
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 945;
@@ -35,13 +34,10 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [activeKeys]);
 
     useEffect(() => {
-        // const socketConnection = io.connect("http://localhost:3002");
-        // const socketConnection = io.connect("http://192.168.1.2:3002" || "http://localhost:3002");
         const serverAddress = window.location.hostname === 'localhost' ?
             'http://localhost:3002' :
             `http://${window.location.hostname}:3002`;
         const socketConnection = io.connect(serverAddress); // this is not fit for prod
-
 
         socketConnection.on("updateGameData", (data) => {
             console.log('Received game update from socket.');
@@ -64,7 +60,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         // Emit paddle movements every 100ms
         const intervalId = setInterval(() => {
             socketConnection.emit('paddleMovements', activeKeysRef.current);  // Use the ref here
-        }, 10);
+        }, 100 / 60);
 
         return () => {
             clearInterval(intervalId);
@@ -134,7 +130,8 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [activeKeys, isGamePaused, socket]);
+        // }, [activeKeys, isGamePaused, socket]);
+    }, [activeKeys, isGamePaused]);
 
 
     const drawButton = (x, y, width, height, text, callback) => {
@@ -227,16 +224,13 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         let gameWidth, gameHeight;
 
         if (canvasAspectRatio > targetAspectRatio) {
-            // Canvas is wider than target aspect ratio, so set gameHeight to canvas height
-            // and compute gameWidth based on the desired aspect ratio
             gameHeight = canvas.height;
             gameWidth = gameHeight * targetAspectRatio;
         } else {
-            // Canvas is taller than or equal to target aspect ratio, so set gameWidth to canvas width
-            // and compute gameHeight based on the desired aspect ratio
             gameWidth = canvas.width;
             gameHeight = gameWidth / targetAspectRatio;
         }
+
 
         const offsetX = (canvas.width - gameWidth) / 2;
         const offsetY = (canvas.height - gameHeight) / 2;
@@ -271,8 +265,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
         }
 
-
-
         drawNet(data);
 
         const fontSize = 100 * gameWidth / 1920; // Adjust font size based on gameWidth
@@ -283,7 +275,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         ctx.fillText(data.leftScore, offsetX + 0.25 * gameWidth, offsetY + fontSize);
         ctx.fillText(data.rightScore, offsetX + 0.75 * gameWidth, offsetY + fontSize);
 
-        // drawGrid(ctx, offsetX, offsetY, gameWidth, gameHeight);
     }
 
     useEffect(() => {
