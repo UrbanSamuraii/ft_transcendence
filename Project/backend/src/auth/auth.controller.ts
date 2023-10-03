@@ -81,7 +81,6 @@ export class AuthController {
 		try {	
 			const email = request.user.email;
 			await this.userService.deleteUser(email);
-			// Clear the authentication cookie
 			response.clearCookie('token');
 			return response.status(200).json({ message: 'Logout successful' });
 	
