@@ -125,37 +125,27 @@
     /* Shrink a bit when active/clicked */
 }
 
-/* Define the black-shiny-button class */
-.black-shiny-button {
-    background-color: black;
-    color: white;
-    padding: 20px 40px;
-    font-size: 24px;
+.signup-section,
+.signin-section {
+  text-align: center;
+}
+
+.signup-button,
+.signin-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  margin: 10px 0;
+  border: none;
+  cursor: pointer;
+}
+
+.signup-button.black-shiny-button {
+    background-color: #0d1111;
+    padding: 10px 20px;
+    font-size: 18px;
+    margin: 10px 0;
     border: none;
-    border-radius: 20px;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
-                0 1px 3px rgba(0, 0, 0, 0.1),
-                inset 0 2px 4px rgba(255, 255, 255, 0.05),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Hover effect for the black-shiny-button class */
-.black-shiny-button:hover {
-    background-color: #333; /* Darker shade of black for hover effect */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15),
-                0 3px 6px rgba(0, 0, 0, 0.1),
-                inset 0 2px 4px rgba(255, 255, 255, 0.1),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-    transform: scale(1.05);
-}
-
-/* Active state for the black-shiny-button class */
-.black-shiny-button:active {
-    background-color: #111; /* Even darker shade of black when clicked */
-    transform: scale(0.98);
 }
 
 body {

@@ -78,6 +78,23 @@ function Content({ setBackgroundStyle }) {
         navigate('/signup');
     }
 
+    const handleSignInClick = async () => {
+        const response = await fetch('http://localhost:3001/auth/signin', {
+        method: 'GET',
+        });
+        if (response.status === 200) {
+            navigate('/play');
+        }
+        else {
+            alert(`Error: User doesn't exist`);
+            setTimeout(() => {
+                // Hide the alert after 5 seconds
+                alert(null);
+                navigate('/');
+            }, 5000); 
+        }
+    }
+
     const handleSignoutClick = async () => {
         try {
             await fetch('http://localhost:3001/auth/signout', {
@@ -91,13 +108,23 @@ function Content({ setBackgroundStyle }) {
     }
 
     return (
-      <Routes>
-          <Route path="/" element={
-              <div>
-                  <button className="play-button black-shiny-button" onClick={handleSignUp42Click}>42 SIGNUP</button>
-                  <button className="play-button" onClick={handleSignUpClick}>SIGNUP</button>
+        <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              <div className="new-user-section">
+                <h2>New User</h2>
+                <button className="signup-button black-shiny-button" onClick={handleSignUp42Click} style={{ marginRight: '10px' }}>42 SIGNUP</button>
+                <button className="signup-button" onClick={handleSignUpClick}> SIGNUP </button>
+              </div>
+              <div className="welcome-back-section">
+                <h2>Welcome Back</h2>
+                <button className="signin-button" onClick={handleSignInClick}> SIGNIN </button>
+              </div>
             </div>
-          } />
+          }
+        />
           <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
           <Route path="/select-mode" element={
               <div className="mode-selection">
