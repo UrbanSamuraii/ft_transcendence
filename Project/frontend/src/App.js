@@ -118,25 +118,4 @@ function Content({ setBackgroundStyle }) {
     );
 }
 
-
-    // return (
-    //     <Routes>
-    //         <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-    //         <Route path="/select-mode" element={
-    //             <div className="mode-selection">
-    //                 <button className="mode-button classic-mode" onClick={startGame}>CLASSIC</button>
-    //                 <button className="mode-button start-button placeholder-1">PLACEHOLDER 1</button>
-    //                 <button className="mode-button start-button placeholder-2">PLACEHOLDER 2</button>
-    //             </div>
-    //         } />
-    //         <Route path="/add-user" element={<AddUserForm />} />
-    //         <Route path="/" element={
-    //             <div>
-    //                 <button className="play-button" onClick={handlePlayClick}>PLAY</button>
-    //                 <button className="play-button" onClick={handleLoginClick}>LOGIN</button>
-    //             </div>
-    //         } />
-    //     </Routes>
-    // );
-
 export default App;
