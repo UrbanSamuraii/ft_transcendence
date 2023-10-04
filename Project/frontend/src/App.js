@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './SquareGame';
 import SignupForm from './SignupForm';
+import SigninForm from './SigninForm';
+
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
 const defaultBackgroundStyle = {
@@ -78,21 +80,8 @@ function Content({ setBackgroundStyle }) {
         navigate('/signup');
     }
 
-    const handleSignInClick = async () => {
-        const response = await fetch('http://localhost:3001/auth/signin', {
-        method: 'GET',
-        });
-        if (response.status === 200) {
-            navigate('/play');
-        }
-        else {
-            alert(`Error: User doesn't exist`);
-            setTimeout(() => {
-                // Hide the alert after 5 seconds
-                alert(null);
-                navigate('/');
-            }, 5000); 
-        }
+    function handleSignInClick() {
+        navigate('/signin');
     }
 
     const handleSignoutClick = async () => {
@@ -135,6 +124,7 @@ function Content({ setBackgroundStyle }) {
               </div>
           } />
           <Route path="/signup" element={<SignupForm />} />
+          <Route path="/signin" element={<SigninForm />} />
           <Route path="/play" element={
             <div>
                 <button className="play-button" onClick={handlePlayClick}>PLAY</button>

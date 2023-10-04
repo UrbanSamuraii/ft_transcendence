@@ -33,9 +33,9 @@ export class AuthController {
 
 	@HttpCode(HttpStatus.OK)
 	@IsPublic(true)
-	@Get('signin')
-	async signin(@Body() dto:Partial<AuthDto>, @Res() res: Response) {1
-		return this.authService.signin(dto, res);
+	@Post('signin')
+	async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
+		return this.authService.signin(email, password, res);
 	}
 
 	// To add the turn on route in the authentication controller

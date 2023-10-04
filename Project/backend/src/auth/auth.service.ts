@@ -1,4 +1,4 @@
-import { Injectable, Request, Req, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Body, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthDto } from "./dto";
@@ -90,10 +90,9 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-            // Send a success response with a JSON body
         	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
         }
-        catch (error: any) { // Explicitly type error as any
+        catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {
 					if (Array.isArray(error.meta?.target)) {
@@ -111,16 +110,18 @@ export class AuthService {
 	}
 
     @HttpCode(HttpStatus.OK)
-    async signin(dto: Partial<AuthDto>, @Res() res: any) {
+    async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
+        console.log({ "Email": email });
+        console.log({ "Password": password });
         const user = await this.prisma.user.findUnique({
-            where: { email: dto.email }
+            where: { email: email }
         });
         if (!user) {
-            throw new ForbiddenException('Credentials incorrect : email');
+            throw new ForbiddenException('Credentials incorrect: email');
         }
-        const pwMatch = await argon.verify(user.hash, dto.password);
+        const pwMatch = await argon.verify(user.hash, password);
         if (!pwMatch) {
-            throw new ForbiddenException('Credentials incorrect : password');
+            throw new ForbiddenException('Credentials incorrect: password');
         }
         const token = await this.signToken(user.id, user.email);
         res.cookie('token', token, {
@@ -128,7 +129,9 @@ export class AuthService {
             secure: false,
             sameSite: 'lax',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-        })
+        });
+        console.log( "Ready to play" );
+        res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
     }
 
     async signToken(userID: number, email: string): Promise<string> {
