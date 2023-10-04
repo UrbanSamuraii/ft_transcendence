@@ -34,8 +34,8 @@ services:
       - postgres
     networks:
       - transcendance
-    volumes:
-      - ./backend:/app
+    # volumes:
+    #   - ./backend:/app
 
   # FRONTEND
   frontend:
