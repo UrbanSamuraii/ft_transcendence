@@ -90,7 +90,8 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-            res.redirect('http://localhost:3000/play');
+            // Send a success response with a JSON body
+        	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
         }
         catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
