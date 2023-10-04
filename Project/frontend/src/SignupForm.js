@@ -36,6 +36,7 @@ function SignupForm() {
 					alert(`Error: ${customError}`);
 				}
 			}
+			// navigate('/');
 		}
 	};
 
