@@ -4,31 +4,15 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
+# COPY entrypoint.sh /app/entrypoint.sh
 COPY . .
 
 RUN npm i -g @nestjs/cli
 RUN npm install
-
-
 # RUN npx prisma generate
-# RUN sleep 2
-# RUN npx prisma migrate dev --name toto
 
-# RUN npm run build
+# RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 3001 3002 5555
-ENTRYPOINT [ "npm", "run", "start:dev" ]
-
-
-# FROM node:16-alpine
-
-# WORKDIR /app
-
-# COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/package*.json ./
-# COPY --from=builder /app/tsconfig.json ./
-# COPY --from=builder /app/dist ./dist
-# COPY --from=builder /app/prisma ./prisma
-
-# EXPOSE 4000
-# CMD [ "npm", "run", "start:dev" ]
+# ENTRYPOINT [ "/app/entrypoint.sh" ]
+CMD [ "npm", "run", "start:dev" ]

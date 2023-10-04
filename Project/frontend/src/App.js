@@ -78,6 +78,18 @@ function Content({ setBackgroundStyle }) {
         navigate('/signup');
     }
 
+    const handleSignoutClick = async () => {
+        try {
+            await fetch('http://localhost:3001/auth/signout', {
+            method: 'POST',
+        });
+        // If the signout was successful, navigate to the main menu or login page
+        navigate('/');
+        } catch (error) {
+            console.error('Signout failed:', error);
+        }
+    }
+
     return (
       <Routes>
           <Route path="/" element={
@@ -92,14 +104,15 @@ function Content({ setBackgroundStyle }) {
                   <button className="mode-button classic-mode" onClick={startGame}>CLASSIC</button>
                   <button className="mode-button start-button placeholder-1">PLACEHOLDER 1</button>
                   <button className="mode-button start-button placeholder-2">PLACEHOLDER 2</button>
-
+                  <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button>
               </div>
           } />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/play" element={
-              <button className="play-button" onClick={handlePlayClick}>
-                  PLAY
-              </button>
+            <div>
+                <button className="play-button" onClick={handlePlayClick}>PLAY</button>
+                <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button>
+            </div>
           } />
       </Routes>
     );

@@ -47,7 +47,7 @@ export class AuthService {
                     secure: false,
                     sameSite: 'lax',
                     expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                }).send({ status: '42user has been created' });
+                })//.send({ status: '42user has been created' });
             }
             else {
                 const user = await this.userService.getUser({ email });
@@ -59,7 +59,7 @@ export class AuthService {
                     expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
                 }).send({ status: '42user already exist : cookie updated' });
             }
-            res.redirect('http://localhost:4000/auth/test-42-user');
+            res.redirect('http://localhost:3000/play');
         }
         catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {

@@ -55,7 +55,7 @@ export class AuthController {
 	@Post('2fa/generate')
 	@UseGuards(JwtAuthGuard)
 	async register(@Res() response: ExpressResponse, @Req() request) {
-		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user.id);
+		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
 		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
 	}
 
@@ -65,11 +65,11 @@ export class AuthController {
 	@UseGuards(JwtAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-		body.twoFactorAuthenticationCode,
-		request.user,
+			body.twoFactorAuthenticationCode,
+			request.user,
 		);
 		if (!isCodeValid) {
-		throw new UnauthorizedException('Wrong authentication code');
+			throw new UnauthorizedException('Wrong authentication code');
 		}
 		return this.authService.loginWith2fa(request.user);
 	}
@@ -79,8 +79,6 @@ export class AuthController {
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() response: ExpressResponse) { 
 		try {	
-			const email = request.user.email;
-			await this.userService.deleteUser(email);
 			response.clearCookie('token');
 			return response.status(200).json({ message: 'Logout successful' });
 	
