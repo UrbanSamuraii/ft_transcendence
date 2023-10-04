@@ -93,13 +93,22 @@ export class AuthService {
             // Send a success response with a JSON body
         	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
         }
-        catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                if (error.code === 'P2002') { throw new ForbiddenException('Credentials taken'); }
-            }
-            throw error;
-        }
-    }
+        catch (error: any) { // Explicitly type error as any
+			if (error instanceof PrismaClientKnownRequestError) {
+				if (error.code === 'P2002') {
+					if (Array.isArray(error.meta?.target)) {
+						if (error.meta.target.includes('email')) {
+							res.status(400).json({ error: 'Email already exists' });
+						} else if (error.meta.target.includes('username')) {
+							res.status(400).json({ error: 'Username already exists' });
+						}
+					}
+				}
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
+		}
+	}
 
     @HttpCode(HttpStatus.OK)
     async signin(dto: Partial<AuthDto>, @Res() res: any) {
