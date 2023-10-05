@@ -7,9 +7,13 @@ import { JwtStrategy } from "./strategy";
 import { Jwt2faStrategy } from "./strategy";
 import { Auth42Strategy } from "./strategy";
 import { UserService } from "src/user/user.service";
+import passport from "passport";
+import { PassportModule } from "@nestjs/passport";
 
 @Module({
-	imports: [JwtModule.register({})],
+	imports: [PassportModule.register({defaultStrategy: 'jwt', session:false}),
+		PassportModule.register({defaultStrategy: 'jwt-2fa', session:false}),
+		JwtModule.register({})],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy, Auth42Strategy, UserService, Jwt2faStrategy],
 })

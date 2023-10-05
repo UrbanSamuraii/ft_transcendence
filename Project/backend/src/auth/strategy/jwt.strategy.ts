@@ -21,17 +21,22 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 
 	// Custom extractor to get JWT from cookie
 	private static extractJWTFromCookie(req: Request) {
+		console.log({ "COOKIE :": req.cookies });
 		if (req.cookies) {
 			return req.cookies.token;
 		}
 		return null;
 	}	
 	
-	async validate(payload: { sub: number, email: string }) {
-		const user = await this.prisma.user.findUnique({
-			where: { id: payload.sub },
-		});
-		delete user.hash;
-		return user;
+	// async validate(payload: { sub: number, email: string }) {
+	// 	const user = await this.prisma.user.findUnique({
+	// 		where: { id: payload.sub },
+	// 	});
+	// 	delete user.hash;
+	// 	return user;
+	// }
+
+	async validate(payload: any) {
+		return payload;
 	}
 }

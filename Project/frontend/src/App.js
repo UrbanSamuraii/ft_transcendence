@@ -86,11 +86,11 @@ function Content({ setBackgroundStyle }) {
 
     const handleSignoutClick = async () => {
         try {
-            await fetch('http://localhost:3001/auth/signout', {
-            method: 'GET',
-        });
-        // If the signout was successful, navigate to the main menu or login page
-        navigate('/');
+            const response = await fetch('http://localhost:3001/auth/signout', {
+                method: 'GET',
+                credentials: 'include'});
+            console.log('Lets get out successful:', response);
+            navigate('/');
         } catch (error) {
             console.error('Signout failed:', error);
         }

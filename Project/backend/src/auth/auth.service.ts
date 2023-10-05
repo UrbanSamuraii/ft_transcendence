@@ -71,7 +71,7 @@ export class AuthService {
         }
     }
 
-    async signup(dto: AuthDto, @Res() res: any) {
+    async signup(dto: AuthDto, @Res({ passthrough: true }) res: any) {
         const hash = await argon.hash(dto.password);
         try {
             const user = await this.prisma.user.create({
@@ -84,13 +84,14 @@ export class AuthService {
                 },
             });
             user.accessToken = await this.signToken(user.id, user.email);
+            console.log({"ACCESS_TOKEN": user.accessToken});
             res.cookie('token', user.accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	// res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
+        	return res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -136,7 +137,7 @@ export class AuthService {
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         });
         // console.log( "Ready to play" );
-        res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
+        // res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
     }
 
     async signToken(userID: number, email: string): Promise<string> {

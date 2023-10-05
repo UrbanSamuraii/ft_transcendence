@@ -27,7 +27,7 @@ export class AuthController {
 
 	@IsPublic(true)
 	@Post('signup')
-	async signup(@Body() dto:AuthDto, @Req() req, @Res() res: Response) { 
+	async signup(@Body() dto:AuthDto, @Req() req, @Res({ passthrough: true }) res: Response) { 
 		return this.authService.signup(dto, res);
 	}
 
@@ -40,7 +40,7 @@ export class AuthController {
 
 	// To add the turn on route in the authentication controller
 	@Post('2fa/turn-on')
-  	@UseGuards(JwtAuthGuard)
+  	@UseGuards(Jwt2faAuthGuard)
 	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
@@ -53,7 +53,7 @@ export class AuthController {
 	}
 
 	@Post('2fa/generate')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
 	async register(@Res() response: ExpressResponse, @Req() request) {
 		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
 		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
@@ -62,7 +62,7 @@ export class AuthController {
 	@HttpCode(200)
 	@IsPublic(true)
 	@Post('2fa/authenticate')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
@@ -74,22 +74,21 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
-	@IsPublic(false)
+	@Post('bidon')
+	@UseGuards(Jwt2faAuthGuard)
+
+	// @IsPublic(false)
 	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
-	async signout(@Request() request, @Res() response: ExpressResponse) { 
+	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
-			response.cookie('token', request.token, {
-				httpOnly: true,
-				secure: false,
-				sameSite: 'lax',
-				expires: new Date(0), // Set the expiration date in the past
-			});
-			response.clearCookie('token');
-			return response.status(200).json({ message: 'Logout successful' });
+			console.log({'REQUEST' : request});
+			console.log({'RESPONSE' : res});
+			res.clearCookie('token');
+			return res.status(200).json({ message: 'Logout successful' });
 	
 		} catch (error) {
-			return response.status(500).json({ error: 'Internal server error' });
+			return res.status(500).json({ error: 'Internal server error' });
 		}
 	}
 }
