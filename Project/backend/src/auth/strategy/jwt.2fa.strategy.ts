@@ -19,9 +19,7 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 
 	// Custom extractor to get JWT from cookie
 	private static extractJWTFromCookie(req: Request) {
-		console.log({ "REQUEST": req });
-		console.log({ "COOKIE": req.cookies });
-		console.log({ "USER": req.user });
+		console.log("req.cookies.token =", req.cookies.token);
 		if (req.cookies) {
 			return req.cookies.token;
 		}

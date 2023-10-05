@@ -5,6 +5,7 @@ import './App.css';
 import SquareGame from './SquareGame';
 import SignupForm from './SignupForm';
 import SigninForm from './SigninForm';
+import axios from 'axios';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
 

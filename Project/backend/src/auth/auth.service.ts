@@ -84,7 +84,7 @@ export class AuthService {
                 },
             });
             user.accessToken = await this.signToken(user.id, user.email);
-            console.log({"ACCESS_TOKEN": user.accessToken});
+            console.log({"ACCESS_TOKEN from signup user": user.accessToken});
             res.cookie('token', user.accessToken, {
                 httpOnly: true,
                 secure: false,

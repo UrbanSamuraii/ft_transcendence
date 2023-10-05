@@ -74,16 +74,16 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
-	@Post('bidon')
-	@UseGuards(Jwt2faAuthGuard)
+	// @Post('bidon')
+	// @UseGuards(Jwt2faAuthGuard)
 
 	// @IsPublic(false)
 	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
-			console.log({'REQUEST' : request});
-			console.log({'RESPONSE' : res});
+			console.log({'REQUEST' : request.cookies});
+			// console.log({'RESPONSE' : res});
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
 	

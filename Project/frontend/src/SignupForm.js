@@ -24,7 +24,7 @@ function SignupForm() {
 		e.preventDefault();
 		try {
 			const response = await axios.post('http://localhost:3001/auth/signup', formData);
-			console.log('Registration successful:', response.data);
+			// console.log('Registration successful:', response.data);
 			navigate('/play');
 		} catch (error) {
 			console.error('Sign up request error:', error);
