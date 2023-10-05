@@ -25,8 +25,8 @@ model User {
   img_url     String?   @db.VarChar(255)
 	
   hash          String  @default("noTokenBecause42Identification")
-  accessToken   String? @unique
-  refreshToken  String? @unique
+  accessToken   String  @default("noToken")
+  isRegistered  Boolean @default(false)
   
   two_factor_activate Boolean?  @default(false)
   two_factor_secret   String?

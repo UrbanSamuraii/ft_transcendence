@@ -27,7 +27,7 @@ export class AuthController {
 
 	@IsPublic(true)
 	@Post('signup')
-	async signup(@Body() dto:AuthDto, @Res() res: Response) { 
+	async signup(@Body() dto:AuthDto, @Req() req, @Res() res: Response) { 
 		return this.authService.signup(dto, res);
 	}
 
@@ -75,10 +75,16 @@ export class AuthController {
 	}
 
 	@IsPublic(false)
-	@Post('signout')
+	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() response: ExpressResponse) { 
 		try {	
+			response.cookie('token', request.token, {
+				httpOnly: true,
+				secure: false,
+				sameSite: 'lax',
+				expires: new Date(0), // Set the expiration date in the past
+			});
 			response.clearCookie('token');
 			return response.status(200).json({ message: 'Logout successful' });
 	

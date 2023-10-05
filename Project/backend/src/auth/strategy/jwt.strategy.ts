@@ -21,8 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 
 	// Custom extractor to get JWT from cookie
 	private static extractJWTFromCookie(req: Request) {
-		if (req.cookies && req.cookies.access_token) {
-			return req.cookies.access_token;
+		if (req.cookies) {
+			return req.cookies.token;
 		}
 		return null;
 	}	

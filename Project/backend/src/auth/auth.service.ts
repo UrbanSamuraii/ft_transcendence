@@ -90,7 +90,7 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
+        	// res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -111,8 +111,6 @@ export class AuthService {
 
     @HttpCode(HttpStatus.OK)
     async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
-        console.log({ "Email": email });
-        console.log({ "Password": password });
         const user = await this.prisma.user.findUnique({
             where: { email: email }
         });
@@ -123,6 +121,13 @@ export class AuthService {
         if (!pwMatch) {
             throw new ForbiddenException('Credentials incorrect: password');
         }
+        res.cookie('token', user.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            expires: new Date(0), // Set the expiration date in the past
+        });
+        res.clearCookie('token');
         const token = await this.signToken(user.id, user.email);
         res.cookie('token', token, {
             httpOnly: true,
@@ -130,7 +135,7 @@ export class AuthService {
             sameSite: 'lax',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         });
-        console.log( "Ready to play" );
+        // console.log( "Ready to play" );
         res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
     }
 
@@ -141,7 +146,7 @@ export class AuthService {
         };
         const secret = this.config.get('JWT_SECRET');
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '10m',
+            expiresIn: '1d',
             secret: secret,
         });
         return token;
@@ -155,7 +160,7 @@ export class AuthService {
 		};
 		return {
 			email: payload.email,
-			access_token: this.jwt.sign(payload),
+			token: this.jwt.sign(payload),
 		};
 	}
 
