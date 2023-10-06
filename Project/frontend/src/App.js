@@ -2,9 +2,12 @@ import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
-import SquareGame from './SquareGame';
-import SignupForm from './SignupForm';
-import SigninForm from './SigninForm';
+import SquareGame from './pages/Game/SquareGame';
+import SignupForm from './pages/SignUp/SignupForm';
+import Play from './pages/Play/Play';
+import SigninForm from './pages/SignIn/SigninForm';
+import SelectModePage from './pages/SelectMode/SelectModesPage';
+import HomePage from './pages/Home/HomePage';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
@@ -29,7 +32,7 @@ function App() {
             </div>
         </Router>
     );
-  }
+}
 
 function Content({ setBackgroundStyle }) {
     const location = useLocation();
@@ -88,7 +91,8 @@ function Content({ setBackgroundStyle }) {
         try {
             const response = await fetch('http://localhost:3001/auth/signout', {
                 method: 'GET',
-                credentials: 'include'});
+                credentials: 'include'
+            });
             console.log('Lets get out successful:', response);
             navigate('/');
         } catch (error) {
@@ -98,40 +102,13 @@ function Content({ setBackgroundStyle }) {
 
     return (
         <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              <div className="new-user-section">
-                <h2>New User</h2>
-                <button className="signup-button black-shiny-button" onClick={handleSignUp42Click} style={{ marginRight: '10px' }}>42 SIGNUP</button>
-                <button className="signup-button" onClick={handleSignUpClick}> SIGNUP </button>
-              </div>
-              <div className="welcome-back-section">
-                <h2>Welcome Back</h2>
-                <button className="signin-button" onClick={handleSignInClick}> SIGNIN </button>
-              </div>
-            </div>
-          }
-        />
-          <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-          <Route path="/select-mode" element={
-              <div className="mode-selection">
-                  <button className="mode-button classic-mode" onClick={startGame}>CLASSIC</button>
-                  <button className="mode-button start-button placeholder-1">PLACEHOLDER 1</button>
-                  <button className="mode-button start-button placeholder-2">PLACEHOLDER 2</button>
-                  <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button>
-              </div>
-          } />
-          <Route path="/signup" element={<SignupForm />} />
-          <Route path="/signin" element={<SigninForm />} />
-          <Route path="/play" element={
-            <div>
-                <button className="play-button" onClick={handlePlayClick}>PLAY</button>
-                <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button>
-            </div>
-          } />
-      </Routes>
+            <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
+            <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
+            <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} />
+            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/signin" element={<SigninForm />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} />} />
+        </Routes>
     );
 }
 
