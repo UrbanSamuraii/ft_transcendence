@@ -10,11 +10,11 @@ async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
     const port = +process.env.APP_PORT || 3001;
-    
+
     // Initialize Passport
-    app.use(cookieParser()); // Add cookie parser middleware if needed
+    // app.use(cookieParser()); // Add cookie parser middleware if needed
     app.use(passport.initialize());
-    
+
     app.enableCors({
         origin: 'http://localhost:3000', // Update with your frontend URL
         credentials: true, // If needed
