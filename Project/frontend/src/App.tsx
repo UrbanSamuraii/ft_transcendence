@@ -8,6 +8,7 @@ import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
+import { CSSProperties } from 'react';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
@@ -15,15 +16,24 @@ const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
 };
 
-const routeBackgroundStyles = {
+interface ContentProps {
+    setBackgroundStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
+}
+
+interface RouteBackgroundStyles {
+    [key: string]: React.CSSProperties;
+}
+
+const routeBackgroundStyles: RouteBackgroundStyles = {
     '/': { background: 'linear-gradient(45deg, #ff0000, #ff7700, #ff00cc)' },
     '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
     '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
-    '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' }, // Added background style for add-user route
+    '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
 };
 
 function App() {
-    const [backgroundStyle, setBackgroundStyle] = useState(defaultBackgroundStyle);
+    // const [backgroundStyle, setBackgroundStyle] = useState(defaultBackgroundStyle);
+    const [backgroundStyle, setBackgroundStyle] = useState<CSSProperties>(defaultBackgroundStyle);
 
     return (
         <Router>
@@ -34,7 +44,8 @@ function App() {
     );
 }
 
-function Content({ setBackgroundStyle }) {
+// function Content({ setBackgroundStyle }) {
+function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
@@ -89,6 +100,9 @@ function Content({ setBackgroundStyle }) {
 
     const handleSignoutClick = async () => {
         try {
+            interface ContentProps {
+                setBackgroundStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
+            }
             const response = await fetch('http://localhost:3001/auth/signout', {
                 method: 'GET',
                 credentials: 'include'
