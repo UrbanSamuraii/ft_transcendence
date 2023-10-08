@@ -14,8 +14,8 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 				ExtractJwt.fromAuthHeaderAsBearerToken(), // Fallback to header if cookie doesn't contain token
 			]),
 			ignoreExpiration: true,
-			// secretOrKey: config.get('JWT_2FA_SECRET'),
-			secretOrKey: 'secret jwt 2factors transcendance',
+			secretOrKey: config.get('JWT_2FA_SECRET'),
+			// secretOrKey: 'secret jwt 2factors transcendance',
 		});
 	}
 

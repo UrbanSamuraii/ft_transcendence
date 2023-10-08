@@ -5,7 +5,6 @@ import axios from 'axios';
 function SignupForm() {
 
 	const navigate = useNavigate();
-	// const history = useHistory();
 
 	const [formData, setFormData] = useState({
 		email: '',
@@ -23,8 +22,13 @@ function SignupForm() {
 	async function handleSubmit(e) {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:3001/auth/signup', formData);
-			// console.log('Registration successful:', response.data);
+			console.log({"HEEEEEELP": formData});
+			// const response = axios.post('http://localhost:3001/auth/signup', formData);
+			// console.log('Registration successful:', response);
+			axios.post('http://localhost:3001/auth/signup', formData, {
+				withCredentials: true }).then((response) => {
+				console.log(response.status, response.data.token);
+			});
 			navigate('/play');
 		} catch (error) {
 			console.error('Sign up request error:', error);
@@ -36,7 +40,6 @@ function SignupForm() {
 					alert(`Error: ${customError}`);
 				}
 			}
-			// navigate('/');
 		}
 	};
 

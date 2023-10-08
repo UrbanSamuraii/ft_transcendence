@@ -1,4 +1,4 @@
-import { Injectable, Body, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Body, Res, Req, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthDto } from "./dto";
@@ -71,15 +71,15 @@ export class AuthService {
         }
     }
 
-    async signup(dto: AuthDto, @Res({ passthrough: true }) res: any) {
-        const hash = await argon.hash(dto.password);
+    async signup(@Req() req, @Res({ passthrough: true }) res: any) {
+        const hash = await argon.hash(req.body.password);
         try {
             const user = await this.prisma.user.create({
                 data: {
-                    email: dto.email,
-                    username: dto.username,
-                    first_name: dto.first_name,
-                    last_name: dto.last_name,
+                    email: req.body.email,
+                    username: req.body.username,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
                     hash,
                 },
             });
@@ -91,7 +91,7 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	return res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
+        	res.status(201).json({ message: 'User created successfully', token: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -145,7 +145,7 @@ export class AuthService {
             sub: userID,
             email
         };
-        const secret = this.config.get('JWT_SECRET');
+        const secret = this.config.get('JWT_2FA_SECRET');
         const token = await this.jwt.signAsync(payload, {
             expiresIn: '1d',
             secret: secret,

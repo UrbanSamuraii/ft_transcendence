@@ -25,17 +25,18 @@ export class AuthController {
 		return ( await this.authService.forty2signup(req, res));
 	}
 
-	@IsPublic(true)
+	// @IsPublic(true)
 	@Post('signup')
-	async signup(@Body() dto:AuthDto, @Req() req, @Res({ passthrough: true }) res: Response) { 
-		return this.authService.signup(dto, res);
+	async signup(@Req() req, @Res({ passthrough: true }) res: Response) { 
+		console.log('Received signup request:', req.body);
+		return (await this.authService.signup(req, res));
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@IsPublic(true)
+	// @IsPublic(true)
 	@Post('signin')
 	async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
-		return this.authService.signin(email, password, res);
+		return (await this.authService.signin(email, password, res));
 	}
 
 	// To add the turn on route in the authentication controller
@@ -74,16 +75,11 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
-	// @Post('bidon')
-	// @UseGuards(Jwt2faAuthGuard)
-
-	// @IsPublic(false)
 	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
 			console.log({'REQUEST' : request.cookies});
-			// console.log({'RESPONSE' : res});
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
 	
