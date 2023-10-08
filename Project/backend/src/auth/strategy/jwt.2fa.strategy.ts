@@ -32,11 +32,14 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 		const user = await this.prisma.user.findUnique({
 			where: { email: payload.email },
 		});
+		console.log({ "PAYLOAD": payload });
 		if (!user.two_factor_activate) {
+			console.log("!user.two_factor_activate");
 			// return user;
 			return payload;
 		}
 		if (payload.isTwoFactorAuthenticated) {
+			console.log("TwoFactorAuthenticated");
 			// return user; 
 			return payload;
 		}
