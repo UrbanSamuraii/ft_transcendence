@@ -52,6 +52,7 @@ export class AuthController {
 		const email = request.user.email;
         const user = await this.userService.getUser({ email });
 		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		user.is_two_factor_activate = true;
 		console.log({"MY USER ": user});
 		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
 	}
