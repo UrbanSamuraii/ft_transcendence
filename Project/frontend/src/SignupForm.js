@@ -22,7 +22,7 @@ function SignupForm() {
 	async function handleSubmit(e) {
 		e.preventDefault();
 		try {
-			console.log({"HEEEEEELP": formData});
+			// console.log({"HEEEEEELP": formData});
 			// const response = axios.post('http://localhost:3001/auth/signup', formData);
 			// console.log('Registration successful:', response);
 			axios.post('http://localhost:3001/auth/signup', formData, {

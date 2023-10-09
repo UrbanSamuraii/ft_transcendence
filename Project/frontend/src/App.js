@@ -5,6 +5,7 @@ import './App.css';
 import SquareGame from './SquareGame';
 import SignupForm from './SignupForm';
 import SigninForm from './SigninForm';
+import TwoFactorSetup from './2faForm';
 import axios from 'axios';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
@@ -85,6 +86,10 @@ function Content({ setBackgroundStyle }) {
         navigate('/signin');
     }
 
+    const handleSetup2FA = () => {
+        navigate('/2fa-setup');
+    }
+
     const handleSignoutClick = async () => {
         try {
             const response = await fetch('http://localhost:3001/auth/signout', {
@@ -126,9 +131,11 @@ function Content({ setBackgroundStyle }) {
           } />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/signin" element={<SigninForm />} />
+          <Route path="/2fa-setup" element={<TwoFactorSetup />} />
           <Route path="/play" element={
             <div>
                 <button className="play-button" onClick={handlePlayClick}>PLAY</button>
+                <button className="setup-2fa-button" onClick={handleSetup2FA}>Set up 2FA</button>
                 <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button>
             </div>
           } />

@@ -13,9 +13,9 @@ CREATE TABLE "users" (
     "username" VARCHAR(255) NOT NULL,
     "img_url" VARCHAR(255),
     "hash" TEXT NOT NULL DEFAULT 'noTokenBecause42Identification',
-    "accessToken" TEXT,
-    "refreshToken" TEXT,
-    "two_factor_activate" BOOLEAN DEFAULT false,
+    "accessToken" TEXT NOT NULL DEFAULT 'noToken',
+    "isRegistered" BOOLEAN NOT NULL DEFAULT false,
+    "is_two_factor_activate" BOOLEAN DEFAULT false,
     "two_factor_secret" TEXT,
     "status" "status_t" DEFAULT 'OFFLINE',
 
@@ -45,12 +45,6 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
-
--- CreateIndex
-CREATE UNIQUE INDEX "users_accessToken_key" ON "users"("accessToken");
-
--- CreateIndex
-CREATE UNIQUE INDEX "users_refreshToken_key" ON "users"("refreshToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_id_email_username_key" ON "users"("id", "email", "username");

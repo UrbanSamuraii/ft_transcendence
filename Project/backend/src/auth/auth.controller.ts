@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Res,
 	Body, HttpCode, HttpStatus, UseGuards, 
-	Req, Request, UnauthorizedException } from "@nestjs/common";
+	Req, Request, Response, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
@@ -25,39 +25,50 @@ export class AuthController {
 		return ( await this.authService.forty2signup(req, res));
 	}
 
-	// @IsPublic(true)
+	@IsPublic(true)
 	@Post('signup')
 	async signup(@Req() req, @Res({ passthrough: true }) res: Response) { 
-		console.log('Received signup request:', req.body);
+		// console.log('Received signup request:', req.body);
 		return (await this.authService.signup(req, res));
 	}
 
 	@HttpCode(HttpStatus.OK)
-	// @IsPublic(true)
+	@IsPublic(true)
 	@Post('signin')
+	@UseGuards(Jwt2faAuthGuard)
 	async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
 		return (await this.authService.signin(email, password, res));
 	}
 
+	// @Post('2fa/token')
+	// @UseGuards(Jwt2faAuthGuard)
+	// async generateToken(@Response() response, @Request() request) {
+	// 	return response.json( await this.authService.generateTwoFactorAuthenticationToken(request.user));
+	// }
+
+	@Post('2fa/generate')
+	@UseGuards(Jwt2faAuthGuard)
+	async register(@Request() request, @Res() response: ExpressResponse) {
+		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
+		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
+	}
+	
 	// To add the turn on route in the authentication controller
 	@Post('2fa/turn-on')
   	@UseGuards(Jwt2faAuthGuard)
-	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
+		const email = request.user.email;
+        const myUser = await this.userService.getUser({ email }); 
+		console.log({"MY USER ": myUser});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
-			request.user,
+			myUser,
 		);
 		if (!isCodeValid) { 
 			throw new UnauthorizedException('Wrong authentication code'); 
 		}
+		// console.log({"User when turning on 2fa": request.user});
 		await this.userService.turnOnTwoFactorAuthentication(request.user.id);
-	}
-
-	@Post('2fa/generate')
-	@UseGuards(Jwt2faAuthGuard)
-	async register(@Res() response: ExpressResponse, @Req() request) {
-		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
-		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
 	}
 
 	@HttpCode(200)
@@ -79,7 +90,7 @@ export class AuthController {
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
-			console.log({'REQUEST' : request.cookies});
+			// console.log({'REQUEST' : request.cookies});
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
 	

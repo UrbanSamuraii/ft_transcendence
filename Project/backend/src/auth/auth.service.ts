@@ -85,13 +85,13 @@ export class AuthService {
             });
             user.accessToken = await this.signToken(user.id, user.email);
             console.log({"ACCESS_TOKEN from signup user": user.accessToken});
-            res.cookie('token', user.accessToken, {
+            res.status(200).cookie('token', user.accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	res.status(201).json({ message: 'User created successfully', token: user.accessToken });
+        	// res.status(201).json({ message: 'User created successfully', token: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -130,7 +130,7 @@ export class AuthService {
         });
         res.clearCookie('token');
         const token = await this.signToken(user.id, user.email);
-        res.cookie('token', token, {
+        res.status(200).cookie('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
@@ -156,7 +156,7 @@ export class AuthService {
 	async loginWith2fa(userWithoutPsw: Partial<User>) {
 		const payload = {
 			email: userWithoutPsw.email,
-			two_factor_activate: !!userWithoutPsw.two_factor_activate,
+			is_two_factor_activate: !!userWithoutPsw.is_two_factor_activate,
 			isTwoFactorAuthenticated: true,
 		};
 		return {
@@ -165,18 +165,27 @@ export class AuthService {
 		};
 	}
 
-	async generateTwoFactorAuthenticationSecret(user: User) {
-		const secret = authenticator.generateSecret();
+	async generateTwoFactorAuthenticationSecret(User: User) {
+		// console.log({"USER ": User});
+        const email = User.email;
+        const user = await this.userService.getUser({ email }); 
+        const secret = authenticator.generateSecret();
 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-	
+        
 		await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
 	
 		return { secret, otpAuthUrl }
 	}
 
-	async generateQrCodeDataURL(otpAuthUrl: string) {
-		return toDataURL(otpAuthUrl);
-	}
+    async generateQrCodeDataURL(otpAuthUrl: string) {
+        console.log({"OTP AuthUrl": otpAuthUrl});
+        return toDataURL(otpAuthUrl);
+    }
+
+    generateTwoFactorAuthenticationToken(user: User) {
+        // console.log(authenticator.generateSecret());
+        return authenticator.generate(user.two_factor_secret);
+    }
 
 	// Method that will verify the authentication code with the user's secret
 	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
