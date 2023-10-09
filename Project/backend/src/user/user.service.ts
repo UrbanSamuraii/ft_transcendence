@@ -73,18 +73,17 @@ export class UserService {
 
 	// Setting the 2FA authentication for our user
 	async turnOnTwoFactorAuthentication(userId: number) {
-		// console.log({"UserId from TURNON": userId});
 		const user = await this.prisma.user.findUnique({ 
 			where: { id: userId },
 		});
 		user.is_two_factor_activate = true;
 	}
 	// Setting the 2FA authentication for our user
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-		// console.log({"UserId from SET2FA": userId});
-		const user = await this.prisma.user.findUnique({ 
-			where: { id: userId },
-		});
-		user.two_factor_secret = secret;
-	}
+	// async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+	// 	const user = await this.prisma.user.findUnique({ 
+	// 		where: { id: userId },
+	// 	});
+	// 	user.two_factor_secret = secret;
+	// 	console.log({"MY 2fa USER SECRET": user.two_factor_secret});
+	// }
 }

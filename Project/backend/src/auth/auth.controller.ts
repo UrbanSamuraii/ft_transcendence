@@ -49,7 +49,10 @@ export class AuthController {
 	@Post('2fa/generate')
 	@UseGuards(Jwt2faAuthGuard)
 	async register(@Request() request, @Res() response: ExpressResponse) {
-		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
+		const email = request.user.email;
+        const user = await this.userService.getUser({ email });
+		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		console.log({"MY USER ": user});
 		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
 	}
 	

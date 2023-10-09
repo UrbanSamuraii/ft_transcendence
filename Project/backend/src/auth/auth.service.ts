@@ -165,15 +165,12 @@ export class AuthService {
 		};
 	}
 
-	async generateTwoFactorAuthenticationSecret(User: User) {
-		// console.log({"USER ": User});
-        const email = User.email;
-        const user = await this.userService.getUser({ email }); 
+	async generateTwoFactorAuthenticationSecret(user: User) {
         const secret = authenticator.generateSecret();
 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-        
-		await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-	
+		user.two_factor_secret = secret;
+        // await this.userService.setTwoFactorAuthenticationSecret(secret, user);
+        // console.log({"MY 2fa SECRET after generating secret": user.two_factor_secret});
 		return { secret, otpAuthUrl }
 	}
 

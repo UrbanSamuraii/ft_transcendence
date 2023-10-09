@@ -8,8 +8,7 @@ function TwoFactorSetup() {
   const handleSetupClick = async () => {
     try {
       axios.post('http://localhost:3001/auth/2fa/generate', null, { withCredentials: true }).then((response) => {
-      // console.log({"REPONSE DATA from handleSetupClick":  response.data});
-      console.log({"REPONSE DATA URL from handleSetupClick":  response.data.qrCodeUrl});
+      console.log({"REPONSE DATA URL from handleSetupClick":  response.data});
       setQrCodeUrl(response.data);
     });
     } catch (error) {
@@ -31,6 +30,9 @@ function TwoFactorSetup() {
   return (
     <div>
       <h2>Two-Factor Authentication Setup</h2>
+      {!qrCodeUrl && (
+        <button onClick={handleSetupClick}>Start 2FA Setup</button>
+      )}
       {qrCodeUrl && (
         <div>
           <img src={qrCodeUrl} alt="QR Code" />
@@ -42,9 +44,6 @@ function TwoFactorSetup() {
           />
           <button onClick={handleEnableClick}>Enable 2FA</button>
         </div>
-      )}
-      {!qrCodeUrl && (
-        <button onClick={handleSetupClick}>Start 2FA Setup</button>
       )}
     </div>
   );
