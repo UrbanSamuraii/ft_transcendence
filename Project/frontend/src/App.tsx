@@ -4,12 +4,12 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
+import TwoFactorSetup from './pages/2faAuthentication/2faForm';
 import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
-import TwoFactorSetup from './2faForm';
 import axios from 'axios';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
