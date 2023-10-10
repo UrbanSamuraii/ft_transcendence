@@ -2,13 +2,7 @@ import { EdithUserDto } from "./dto";
 import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
-
-import * as argon from 'argon2'
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import speakeasy from 'speakeasy';
-import qrcode from 'qrcode';
+import { HttpException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -30,6 +24,27 @@ export class UserService {
             where,
         });
     }
+
+	async getUserByToken(@Req() req) {
+		try {
+		const accessToken = req.cookies.token;
+		const user = await this.prisma.user.findFirst({
+			where: { accessToken: accessToken },
+			});
+			if (!user) {
+				throw new HttpException( {
+				status: HttpStatus.BAD_REQUEST,
+				error: "Error to get the user by token" },
+				HttpStatus.BAD_REQUEST);
+			};
+			return user;
+		} catch (error) {
+		  throw new HttpException( {
+			  status: HttpStatus.BAD_REQUEST,
+			  error: "Error to get the user by token"},
+			 HttpStatus.BAD_REQUEST);
+			};
+	  }
 
 	async edithUser(userId: number, dto: EdithUserDto) {
         const user = await this.prisma.user.update({
@@ -56,18 +71,21 @@ export class UserService {
 
 	////////////////// 2FA SETTNGS //////////////////
 
-	// Setting the 2FA authentication for our user
 	async turnOnTwoFactorAuthentication(userId: number) {
-		const user = await this.prisma.user.findUnique({ where:
-			{ id : userId }
+		const user = await this.prisma.user.findUnique({ 
+			where: { id: userId },
 		});
-		user.two_factor_activate = true;
+		user.is_two_factor_activate = true;
 	}
-	// Setting the 2FA authentication for our user
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-		const user = await this.prisma.user.findUnique({ where:
-			{ id : userId }
-		});
-		user.two_factor_secret = secret;
+	
+	async disableTwoFactorAuthentication(user: User) {
+		try {
+			return await this.prisma.user.update({
+				where: { id: user.id },
+				data: { is_two_factor_activate: false, two_factor_secret: null },
+			});
+			} catch (error) {
+			throw error;
+		}
 	}
 }

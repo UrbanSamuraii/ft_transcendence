@@ -13,15 +13,12 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 				Jwt2faStrategy.extractJWTFromCookie,
 				ExtractJwt.fromAuthHeaderAsBearerToken(), // Fallback to header if cookie doesn't contain token
 			]),
+			ignoreExpiration: true,
 			secretOrKey: config.get('JWT_2FA_SECRET'),
 		});
 	}
 
-	// Custom extractor to get JWT from cookie
 	private static extractJWTFromCookie(req: Request) {
-		console.log({ "REQUEST": req });
-		console.log({ "COOKIE": req.cookies });
-		console.log({ "USER": req.user });
 		if (req.cookies) {
 			return req.cookies.token;
 		}
@@ -32,8 +29,10 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 		const user = await this.prisma.user.findUnique({
 			where: { email: payload.email },
 		});
-
-		if (!user.two_factor_activate) {
+		console.log({ "USER IN STRATEGY": user });
+		console.log({"2fa payload from strategy": payload});
+		if (!user.is_two_factor_activate) {
+			// console.log("!user.is_two_factor_activate");
 			// return user;
 			return payload;
 		}

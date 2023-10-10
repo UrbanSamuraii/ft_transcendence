@@ -9,6 +9,8 @@ import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
+import TwoFactorSetup from './2faForm';
+import axios from 'axios';
 
 // import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
@@ -98,6 +100,10 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/signin');
     }
 
+    const handleSetup2FA = () => {
+        navigate('/2fa-setup');
+    }
+
     const handleSignoutClick = async () => {
         try {
             interface ContentProps {
@@ -121,7 +127,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/signin" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} />} />
+            <Route path="/2fa-setup" element={<TwoFactorSetup />} />
         </Routes>
     );
 }

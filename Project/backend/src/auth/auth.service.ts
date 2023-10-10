@@ -1,4 +1,4 @@
-import { Injectable, Body, Res, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Body, Res, Req, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthDto } from "./dto";
@@ -9,6 +9,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { pick } from 'lodash';
 import * as cookie from 'cookie'; // Import the cookie library
 
 @Injectable()
@@ -71,27 +72,27 @@ export class AuthService {
         }
     }
 
-    async signup(dto: AuthDto, @Res({ passthrough: true }) res: any) {
-        const hash = await argon.hash(dto.password);
+    async signup(@Req() req, @Res({ passthrough: true }) res: any) {
+        const hash = await argon.hash(req.body.password);
         try {
             const user = await this.prisma.user.create({
                 data: {
-                    email: dto.email,
-                    username: dto.username,
-                    first_name: dto.first_name,
-                    last_name: dto.last_name,
+                    email: req.body.email,
+                    username: req.body.username,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
                     hash,
                 },
             });
             user.accessToken = await this.signToken(user.id, user.email);
-            console.log({"ACCESS_TOKEN": user.accessToken});
-            res.cookie('token', user.accessToken, {
+            console.log({"ACCESS_TOKEN from signup user": user.accessToken});
+            res.status(200).cookie('token', user.accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	return res.status(200).json({ status: 'User has been created', accessToken: user.accessToken });
+        	// res.status(201).json({ message: 'User created successfully', token: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -130,14 +131,12 @@ export class AuthService {
         });
         res.clearCookie('token');
         const token = await this.signToken(user.id, user.email);
-        res.cookie('token', token, {
+        res.status(200).cookie('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         });
-        // console.log( "Ready to play" );
-        // res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
     }
 
     async signToken(userID: number, email: string): Promise<string> {
@@ -145,7 +144,7 @@ export class AuthService {
             sub: userID,
             email
         };
-        const secret = this.config.get('JWT_SECRET');
+        const secret = this.config.get('JWT_2FA_SECRET');
         const token = await this.jwt.signAsync(payload, {
             expiresIn: '1d',
             secret: secret,
@@ -156,7 +155,7 @@ export class AuthService {
 	async loginWith2fa(userWithoutPsw: Partial<User>) {
 		const payload = {
 			email: userWithoutPsw.email,
-			two_factor_activate: !!userWithoutPsw.two_factor_activate,
+			is_two_factor_activate: !!userWithoutPsw.is_two_factor_activate,
 			isTwoFactorAuthenticated: true,
 		};
 		return {
@@ -166,17 +165,29 @@ export class AuthService {
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: User) {
-		const secret = authenticator.generateSecret();
+        const secret = authenticator.generateSecret();
 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-	
-		await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-	
-		return { secret, otpAuthUrl }
+        try {
+            const updatedUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                is_two_factor_activate: true,
+                two_factor_secret: secret },
+            });
+            return { secret, otpAuthUrl, updatedUser };
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error; }
 	}
 
-	async generateQrCodeDataURL(otpAuthUrl: string) {
-		return toDataURL(otpAuthUrl);
-	}
+    async generateQrCodeDataURL(otpAuthUrl: string) {
+        console.log({"OTP AuthUrl": otpAuthUrl});
+        return toDataURL(otpAuthUrl);
+    }
+
+    generateTwoFactorAuthenticationToken(user: User) {
+        return authenticator.generate(user.two_factor_secret);
+    }
 
 	// Method that will verify the authentication code with the user's secret
 	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
@@ -185,5 +196,31 @@ export class AuthService {
 		  secret: user.two_factor_secret,
 		});
 	}
+
+    // get auth profile
+    // async authMe(id: number, @Res() res: ExpressResponse) {
+    //     try {
+    //         const data = await this.userService.getUser(id);
+    //         if (!data) { 
+    //         return res.status(404).json({ message: "user not found" });
+    //         }
+    //         const ret = pick(data, [
+    //             "id",
+    //             "id42",
+    //             "username",
+    //             "email",
+    //             "first_name",
+    //             "last_name",
+    //             "img_url",
+    //             "created_at",
+    //             "updated_at",
+    //         ]);
+    //         return res.status(200).json(ret);
+    //     } catch (error) {
+    //         return res.status(400).json({
+    //             message: error,
+    //         });
+    //     }
+    // }
 
 }

@@ -15,11 +15,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 				JwtStrategy.extractJWTFromCookie,
 				ExtractJwt.fromAuthHeaderAsBearerToken(), // Fallback to header if cookie doesn't contain token
 			  ]),
-			secretOrKey: config.get('JWT_SECRET'),
+			secretOrKey: config.get('JWT_2FA_SECRET'),
 		  });
 	}
 
-	// Custom extractor to get JWT from cookie
 	private static extractJWTFromCookie(req: Request) {
 		console.log({ "COOKIE :": req.cookies });
 		if (req.cookies) {
@@ -27,16 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 		}
 		return null;
 	}	
-	
-	// async validate(payload: { sub: number, email: string }) {
-	// 	const user = await this.prisma.user.findUnique({
-	// 		where: { id: payload.sub },
-	// 	});
-	// 	delete user.hash;
-	// 	return user;
-	// }
 
 	async validate(payload: any) {
+		console.log({ "PAYLOAD ": payload });
 		return payload;
 	}
 }

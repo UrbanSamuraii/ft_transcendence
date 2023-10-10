@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Res,
 	Body, HttpCode, HttpStatus, UseGuards, 
-	Req, Request, UnauthorizedException } from "@nestjs/common";
+	Req, Request, Response, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
 import { AuthDto } from "./dto";
@@ -27,43 +27,62 @@ export class AuthController {
 
 	@IsPublic(true)
 	@Post('signup')
-	async signup(@Body() dto:AuthDto, @Req() req, @Res({ passthrough: true }) res: Response) { 
-		return this.authService.signup(dto, res);
+	async signup(@Req() req, @Res({ passthrough: true }) res: Response) { 
+		// console.log('Received signup request:', req.body);
+		return (await this.authService.signup(req, res));
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@IsPublic(true)
 	@Post('signin')
+	@UseGuards(Jwt2faAuthGuard)
 	async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
-		return this.authService.signin(email, password, res);
+		return (await this.authService.signin(email, password, res));
 	}
 
+	// @Post('2fa/token')
+	// @UseGuards(Jwt2faAuthGuard)
+	// async generateToken(@Response() response, @Request() request) {
+	// 	return response.json( await this.authService.generateTwoFactorAuthenticationToken(request.user));
+	// }
+
+	@Post('2fa/generate')
+	@UseGuards(JwtAuthGuard)
+	async register(@Request() request, @Res() response: ExpressResponse) {
+		const email = request.user.email;
+        const user = await this.userService.getUser({ email });
+		const { secret, otpAuthUrl, updatedUser } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		console.log({"MY USER after 2fa/generate": updatedUser});
+		return response.status(201).json({
+			updatedUser, // Include the updated user object in the response
+			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
+		  });
+	}
+	
 	// To add the turn on route in the authentication controller
 	@Post('2fa/turn-on')
-  	@UseGuards(Jwt2faAuthGuard)
-	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+  	@UseGuards(JwtAuthGuard)
+	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
+		const email = request.user.email;
+        const myUser = await this.userService.getUser({ email }); 
+		console.log({"MY USER when 2fa/turn-on ": myUser});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
-			request.user,
+			myUser,
 		);
 		if (!isCodeValid) { 
 			throw new UnauthorizedException('Wrong authentication code'); 
 		}
-		await this.userService.turnOnTwoFactorAuthentication(request.user.id);
-	}
-
-	@Post('2fa/generate')
-	@UseGuards(Jwt2faAuthGuard)
-	async register(@Res() response: ExpressResponse, @Req() request) {
-		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
-		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
+		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
 	}
 
 	@HttpCode(200)
 	@IsPublic(true)
 	@Post('2fa/authenticate')
-	@UseGuards(Jwt2faAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
+		console.log({"body for 2fa authenticate": body});
+		console.log({"REQUEST for 2fa authenticate": request});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			request.user,
@@ -74,16 +93,18 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
-	@Post('bidon')
-	@UseGuards(Jwt2faAuthGuard)
+	@Post("2fa/disable")
+    @UseGuards(Jwt2faAuthGuard)
+    async disableTwoFa(@Request() request, @Res() res: ExpressResponse) {
+        await this.userService.disableTwoFactorAuthentication(request.user);
+        return res.status(201).json({ message: "success disabled 2fat" });
+    }
 
-	// @IsPublic(false)
 	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
-			console.log({'REQUEST' : request});
-			console.log({'RESPONSE' : res});
+			// console.log({'REQUEST' : request.cookies});
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
 	

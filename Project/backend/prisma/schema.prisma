@@ -28,8 +28,8 @@ model User {
   accessToken   String  @default("noToken")
   isRegistered  Boolean @default(false)
   
-  two_factor_activate Boolean?  @default(false)
-  two_factor_secret   String?
+  is_two_factor_activate Boolean?  @default(false)
+  two_factor_secret      String?
   
   status  status_t? @default(OFFLINE)
 
