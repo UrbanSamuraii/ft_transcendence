@@ -24,7 +24,7 @@ function TwoFactorSetup() {
     try {
       axios.post('http://localhost:3001/auth/2fa/turn-on', { twoFactorAuthenticationCode: authenticationCode }, { withCredentials: true }).then((response) => {
       console.log(response.status, response.data);
-      // Handle successful 2FA setup and enable here
+      navigate('/play');
     });
     } catch (error) {
       console.error('Error enabling 2FA:', error);

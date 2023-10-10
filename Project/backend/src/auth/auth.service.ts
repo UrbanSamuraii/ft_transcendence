@@ -9,6 +9,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { pick } from 'lodash';
 import * as cookie from 'cookie'; // Import the cookie library
 
 @Injectable()
@@ -195,4 +196,31 @@ export class AuthService {
 		  secret: user.two_factor_secret,
 		});
 	}
+
+    // get auth profile
+    // async authMe(id: number, @Res() res: ExpressResponse) {
+    //     try {
+    //         const data = await this.userService.getUser(id);
+    //         if (!data) { 
+    //         return res.status(404).json({ message: "user not found" });
+    //         }
+    //         const ret = pick(data, [
+    //             "id",
+    //             "id42",
+    //             "username",
+    //             "email",
+    //             "first_name",
+    //             "last_name",
+    //             "img_url",
+    //             "created_at",
+    //             "updated_at",
+    //         ]);
+    //         return res.status(200).json(ret);
+    //     } catch (error) {
+    //         return res.status(400).json({
+    //             message: error,
+    //         });
+    //     }
+    // }
+
 }

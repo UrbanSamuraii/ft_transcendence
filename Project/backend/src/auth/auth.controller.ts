@@ -93,6 +93,13 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
+	@Post("2fa/disable")
+    @UseGuards(Jwt2faAuthGuard)
+    async disableTwoFa(@Request() request, @Res() res: ExpressResponse) {
+        await this.userService.disableTwoFactorAuthentication(request.user);
+        return res.status(201).json({ message: "success disabled 2fat" });
+    }
+
 	@Get('signout')
 	@UseGuards(Jwt2faAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
