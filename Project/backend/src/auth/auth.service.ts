@@ -195,5 +195,4 @@ export class AuthService {
 		  secret: user.two_factor_secret,
 		});
 	}
-
 }

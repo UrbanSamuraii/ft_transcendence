@@ -47,7 +47,7 @@ export class AuthController {
 	// }
 
 	@Post('2fa/generate')
-	@UseGuards(Jwt2faAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async register(@Request() request, @Res() response: ExpressResponse) {
 		const email = request.user.email;
         const user = await this.userService.getUser({ email });
@@ -61,7 +61,7 @@ export class AuthController {
 	
 	// To add the turn on route in the authentication controller
 	@Post('2fa/turn-on')
-  	@UseGuards(Jwt2faAuthGuard)
+  	@UseGuards(JwtAuthGuard)
 	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
 		const email = request.user.email;
         const myUser = await this.userService.getUser({ email }); 
@@ -73,14 +73,16 @@ export class AuthController {
 		if (!isCodeValid) { 
 			throw new UnauthorizedException('Wrong authentication code'); 
 		}
-		await this.userService.turnOnTwoFactorAuthentication(request.user.id);
+		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
 	}
 
 	@HttpCode(200)
 	@IsPublic(true)
 	@Post('2fa/authenticate')
-	@UseGuards(Jwt2faAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
+		console.log({"body for 2fa authenticate": body});
+		console.log({"REQUEST for 2fa authenticate": request});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			request.user,
