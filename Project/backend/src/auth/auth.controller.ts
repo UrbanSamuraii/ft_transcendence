@@ -51,10 +51,12 @@ export class AuthController {
 	async register(@Request() request, @Res() response: ExpressResponse) {
 		const email = request.user.email;
         const user = await this.userService.getUser({ email });
-		const { otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
-		user.is_two_factor_activate = true;
-		console.log({"MY USER ": user});
-		return response.json(await this.authService.generateQrCodeDataURL(otpAuthUrl));
+		const { secret, otpAuthUrl, updatedUser } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		console.log({"MY USER after 2fa/generate": updatedUser});
+		return response.status(201).json({
+			updatedUser, // Include the updated user object in the response
+			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
+		  });
 	}
 	
 	// To add the turn on route in the authentication controller
@@ -63,7 +65,7 @@ export class AuthController {
 	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
 		const email = request.user.email;
         const myUser = await this.userService.getUser({ email }); 
-		console.log({"MY USER ": myUser});
+		console.log({"MY USER when 2fa/turn-on ": myUser});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			myUser,
@@ -71,7 +73,6 @@ export class AuthController {
 		if (!isCodeValid) { 
 			throw new UnauthorizedException('Wrong authentication code'); 
 		}
-		// console.log({"User when turning on 2fa": request.user});
 		await this.userService.turnOnTwoFactorAuthentication(request.user.id);
 	}
 

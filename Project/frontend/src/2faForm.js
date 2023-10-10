@@ -7,10 +7,14 @@ function TwoFactorSetup() {
 
   const handleSetupClick = async () => {
     try {
-      axios.post('http://localhost:3001/auth/2fa/generate', null, { withCredentials: true }).then((response) => {
-      console.log({"REPONSE DATA URL from handleSetupClick":  response.data});
-      setQrCodeUrl(response.data);
-    });
+      const response = await axios.post('http://localhost:3001/auth/2fa/generate', null, { withCredentials: true });
+      console.log({"RESPONSE": response});
+      const { updatedUser, qrCodeUrl } = response.data;
+      if (updatedUser) {
+        setQrCodeUrl(qrCodeUrl);
+      } else {
+        console.error('User not updated in response.');
+      }
     } catch (error) {
       console.error('Error setting up 2FA:', error);
     }

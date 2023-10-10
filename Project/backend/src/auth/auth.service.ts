@@ -136,8 +136,6 @@ export class AuthService {
             sameSite: 'lax',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         });
-        // console.log( "Ready to play" );
-        // res.status(200).json({ status: 'User is identified', accessToken: user.accessToken });
     }
 
     async signToken(userID: number, email: string): Promise<string> {
@@ -168,10 +166,17 @@ export class AuthService {
 	async generateTwoFactorAuthenticationSecret(user: User) {
         const secret = authenticator.generateSecret();
 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-		user.two_factor_secret = secret;
-        // await this.userService.setTwoFactorAuthenticationSecret(secret, user);
-        // console.log({"MY 2fa SECRET after generating secret": user.two_factor_secret});
-		return { secret, otpAuthUrl }
+        try {
+            const updatedUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                is_two_factor_activate: true,
+                two_factor_secret: secret },
+            });
+            return { secret, otpAuthUrl, updatedUser };
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error; }
 	}
 
     async generateQrCodeDataURL(otpAuthUrl: string) {
@@ -180,7 +185,6 @@ export class AuthService {
     }
 
     generateTwoFactorAuthenticationToken(user: User) {
-        // console.log(authenticator.generateSecret());
         return authenticator.generate(user.two_factor_secret);
     }
 
