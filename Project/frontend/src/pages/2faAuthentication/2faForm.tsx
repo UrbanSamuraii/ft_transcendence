@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function TwoFactorSetup() {
+
+  const navigate = useNavigate();
+
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [authenticationCode, setAuthenticationCode] = useState('');
 
