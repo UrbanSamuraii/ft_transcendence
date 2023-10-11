@@ -252,3 +252,25 @@ button:hover {
   .setup-2fa-button:hover {
     background-color: darkgreen; /* Define the hover color for the setup 2FA button */
   }
+
+  /* TwoFactorMenu.css */
+
+    .two-factor-menu {
+        width: 100px; /* Adjust the width as needed */
+        height: 150px; /* Adjust the height as needed */
+        overflow-y: auto; /* Enable vertical scrolling if the content overflows */
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .menu-item {
+        padding: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    
+        &:hover {
+        background-color: #f0f0f0; /* Change the background color on hover */
+        }
+    }
+  

@@ -1,18 +1,14 @@
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
-import TwoFactorSetup from './pages/2faAuthentication/2faForm';
 import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
-import axios from 'axios';
-
-// import CustomRedirectionFrom42Route from './RedirectionFrom42';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -20,6 +16,8 @@ const defaultBackgroundStyle = {
 
 interface ContentProps {
     setBackgroundStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
+    isTwoFactorEnabled: boolean; 
+    setIsTwoFactorEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface RouteBackgroundStyles {
@@ -34,20 +32,23 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
 };
 
 function App() {
-    // const [backgroundStyle, setBackgroundStyle] = useState(defaultBackgroundStyle);
     const [backgroundStyle, setBackgroundStyle] = useState<CSSProperties>(defaultBackgroundStyle);
+    const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false); // Add 2FA state
 
     return (
         <Router>
             <div className="App" style={backgroundStyle}>
-                <Content setBackgroundStyle={setBackgroundStyle} />
+                <Content
+                    setBackgroundStyle={setBackgroundStyle}
+                    isTwoFactorEnabled={isTwoFactorEnabled} // Pass 2FA state to Content component
+                    setIsTwoFactorEnabled={setIsTwoFactorEnabled} // Pass 2FA state setter to Content component
+                />
             </div>
         </Router>
     );
 }
 
-// function Content({ setBackgroundStyle }) {
-function Content({ setBackgroundStyle }: ContentProps) {
+function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
@@ -81,16 +82,11 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
     async function handleSignUp42Click() {
         try {
-            // Set a session storage flag to identify users coming from signup42
-            // sessionStorage.setItem('cameFromSignup42', 'true');
             window.location.href = 'http://localhost:3001/auth/signup42';
         } catch (error) {
             console.error('Sign up request error:', error);
         }
     }
-
-    // Check if the user came from signup42
-    // const cameFromSignup42 = sessionStorage.getItem('cameFromSignup42');
 
     function handleSignUpClick() {
         navigate('/signup');
@@ -100,20 +96,21 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/signin');
     }
 
-    const handleSetup2FA = () => {
-        navigate('/2fa-setup');
+    function handleEnable2FA() {
+        setIsTwoFactorEnabled(true); // enable 2FA
+    }
+
+    function handleDisable2FA() {
+        setIsTwoFactorEnabled(false); // disable 2FA
     }
 
     const handleSignoutClick = async () => {
         try {
-            interface ContentProps {
-                setBackgroundStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
-            }
             const response = await fetch('http://localhost:3001/auth/signout', {
                 method: 'GET',
                 credentials: 'include'
             });
-            console.log('Lets get out successful:', response);
+            console.log('Signout successful:', response);
             navigate('/');
         } catch (error) {
             console.error('Signout failed:', error);
@@ -127,8 +124,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/signin" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} />} />
-            <Route path="/2fa-setup" element={<TwoFactorSetup />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onEnable2FA={handleEnable2FA} onDisable2FA={handleDisable2FA} isTwoFactorEnabled={isTwoFactorEnabled} />}/>
         </Routes>
     );
 }
