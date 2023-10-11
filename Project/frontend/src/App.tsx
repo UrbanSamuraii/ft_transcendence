@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
+// import TwoFactorSetup from './pages/TwoFactorMenu/2faEnable';
+// import TwoFactorDisable from './pages/2faAuthentication/2faDisable';
 import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
@@ -93,16 +95,27 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
     }
 
     function handleSignInClick() {
-        navigate('/signin');
+        navigate('/login');
     }
 
-    function handleEnable2FA() {
-        setIsTwoFactorEnabled(true); // enable 2FA
-    }
+    // function handleEnable2FA() {
+    //     setIsTwoFactorEnabled(true); // enable 2FA
+    // }
 
-    function handleDisable2FA() {
-        setIsTwoFactorEnabled(false); // disable 2FA
-    }
+    // function handleDisable2FA() {
+    //     setIsTwoFactorEnabled(false); // disable 2FA
+    // }
+
+    // const handleDisable2FA = async () => {
+    //     try {
+    //         const response = await axios.post('http://localhost:3001/auth/2fa/disable', null, {
+    //             withCredentials: true
+    //         });
+    //         console.log(response.status, response.data);
+    //     } catch (error) {
+    //         console.error('Error disabling 2FA:', error);
+    //     }
+    // };
 
     const handleSignoutClick = async () => {
         try {
@@ -123,8 +136,9 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} />
             <Route path="/signup" element={<SignupForm />} />
-            <Route path="/signin" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onEnable2FA={handleEnable2FA} onDisable2FA={handleDisable2FA} isTwoFactorEnabled={isTwoFactorEnabled} />}/>
+            <Route path="/login" element={<SigninForm />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} />
+            {/* <Route path="/2fa-setup" element={<TwoFactorSetup />} /> */}
         </Routes>
     );
 }

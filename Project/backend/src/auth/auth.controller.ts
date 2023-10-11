@@ -28,16 +28,15 @@ export class AuthController {
 	@IsPublic(true)
 	@Post('signup')
 	async signup(@Req() req, @Res({ passthrough: true }) res: Response) { 
-		// console.log('Received signup request:', req.body);
 		return (await this.authService.signup(req, res));
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@IsPublic(true)
-	@Post('signin')
+	@Post('login')
 	@UseGuards(Jwt2faAuthGuard)
-	async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
-		return (await this.authService.signin(email, password, res));
+	async login(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
+		return (await this.authService.login(email, password, res));
 	}
 
 	// @Post('2fa/token')
@@ -52,7 +51,6 @@ export class AuthController {
 		const email = request.user.email;
         const user = await this.userService.getUser({ email });
 		const { secret, otpAuthUrl, updatedUser } = await this.authService.generateTwoFactorAuthenticationSecret(user);
-		console.log({"MY USER after 2fa/generate": updatedUser});
 		return response.status(201).json({
 			updatedUser, // Include the updated user object in the response
 			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
@@ -65,12 +63,12 @@ export class AuthController {
 	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
 		const email = request.user.email;
         const myUser = await this.userService.getUser({ email }); 
-		console.log({"MY USER when 2fa/turn-on ": myUser});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			myUser,
 		);
-		if (!isCodeValid) { 
+		if (!isCodeValid) {
+			console.log({"CODE INVALIDE": body.twoFactorAuthenticationCode});
 			throw new UnauthorizedException('Wrong authentication code'); 
 		}
 		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
@@ -81,8 +79,6 @@ export class AuthController {
 	@Post('2fa/authenticate')
 	@UseGuards(JwtAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
-		console.log({"body for 2fa authenticate": body});
-		console.log({"REQUEST for 2fa authenticate": request});
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			request.user,
@@ -94,17 +90,19 @@ export class AuthController {
 	}
 
 	@Post("2fa/disable")
-    @UseGuards(Jwt2faAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async disableTwoFa(@Request() request, @Res() res: ExpressResponse) {
-        await this.userService.disableTwoFactorAuthentication(request.user);
-        return res.status(201).json({ message: "success disabled 2fa authentication mode" });
+        const email = request.user.email;
+        const myUser = await this.userService.getUser({ email });
+		console.log("LETS DISABLE");
+		const myUpdateUser = await this.userService.disableTwoFactorAuthentication(myUser);
+        return res.status(200).json({ myUpdateUser, message: "success disabled 2fa" });
     }
 
 	@Get('signout')
-	@UseGuards(Jwt2faAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async signout(@Request() request, @Res() res: ExpressResponse) { 
 		try {	
-			// console.log({'REQUEST' : request});
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
 	

@@ -23,7 +23,7 @@ function SigninForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/auth/signin', formData);
+      const response = await axios.post('http://localhost:3001/auth/login', formData);
       console.log('Registration successful:', response.data);
       navigate('/play');
     } catch (error) {

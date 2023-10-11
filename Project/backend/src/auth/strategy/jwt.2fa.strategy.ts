@@ -32,11 +32,12 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 		console.log({ "USER IN STRATEGY": user });
 		console.log({"2fa payload from strategy": payload});
 		if (!user.is_two_factor_activate) {
-			// console.log("!user.is_two_factor_activate");
+			console.log("!user.is_two_factor_activate");
 			// return user;
 			return payload;
 		}
 		if (payload.isTwoFactorAuthenticated) {
+			console.log("isTwoFactorAuthenticated");
 			// return user; 
 			return payload;
 		}

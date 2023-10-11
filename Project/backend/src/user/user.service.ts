@@ -72,18 +72,21 @@ export class UserService {
 	////////////////// 2FA SETTNGS //////////////////
 
 	async turnOnTwoFactorAuthentication(userId: number) {
-		const user = await this.prisma.user.findUnique({ 
+		const updateUser = await this.prisma.user.update({
 			where: { id: userId },
-		});
-		user.is_two_factor_activate = true;
+			data: { is_two_factor_activate: true }});
 	}
 	
 	async disableTwoFactorAuthentication(user: User) {
 		try {
-			return await this.prisma.user.update({
+			console.log({"USER who want to disable 2FA": user});
+			const updateUser = await this.prisma.user.update({
 				where: { id: user.id },
-				data: { is_two_factor_activate: false, two_factor_secret: null },
+				data: { 
+					is_two_factor_activate: false, 
+					two_factor_secret: '' },
 			});
+			return {updateUser};
 			} catch (error) {
 			throw error;
 		}

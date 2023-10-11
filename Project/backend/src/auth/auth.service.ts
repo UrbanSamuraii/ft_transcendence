@@ -20,6 +20,20 @@ export class AuthService {
         private config: ConfigService,
         private userService: UserService) { }
 
+
+    async signToken(userID: number, email: string): Promise<string> {
+        const payload = {
+            sub: userID,
+            email
+        };
+        const secret = this.config.get('JWT_2FA_SECRET');
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '1d',
+            secret: secret,
+        });
+        return token;
+    }
+    
     async forty2signup(req: any, @Res() res: any) {
         try {
             if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
@@ -42,8 +56,12 @@ export class AuthService {
                     last_name,
                     img_url,
                 });
-                user.accessToken = await this.signToken(user.id, user.email);
-                res.cookie('token', user.accessToken, {
+                const accessToken = await this.signToken(user.id, user.email);
+                await this.prisma.user.update({
+                    where: { id: user.id },
+                    data: { accessToken: accessToken },
+                });
+                res.cookie('token', accessToken, {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'lax',
@@ -52,8 +70,12 @@ export class AuthService {
             }
             else {
                 const user = await this.userService.getUser({ email });
-                user.accessToken = await this.signToken(user.id, user.email);
-                res.cookie('token', user.accessToken, {
+                const accessToken = await this.signToken(user.id, user.email);
+                await this.prisma.user.update({
+                    where: { id: user.id },
+                    data: { accessToken: accessToken },
+                });
+                res.cookie('token', accessToken, {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'lax',
@@ -84,15 +106,17 @@ export class AuthService {
                     hash,
                 },
             });
-            user.accessToken = await this.signToken(user.id, user.email);
-            console.log({"ACCESS_TOKEN from signup user": user.accessToken});
-            res.status(200).cookie('token', user.accessToken, {
+            const accessToken = await this.signToken(user.id, user.email);
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { accessToken: accessToken },
+            });
+            res.status(200).cookie('token', accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-        	// res.status(201).json({ message: 'User created successfully', token: user.accessToken });
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -111,116 +135,110 @@ export class AuthService {
 		}
 	}
 
-    @HttpCode(HttpStatus.OK)
-    async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
+    async validateUser(email: string, pass: string) {
         const user = await this.prisma.user.findUnique({
             where: { email: email }
         });
         if (!user) {
             throw new ForbiddenException('Credentials incorrect: email');
         }
-        const pwMatch = await argon.verify(user.hash, password);
+        const pwMatch = await argon.verify(user.hash, pass);
         if (!pwMatch) {
             throw new ForbiddenException('Credentials incorrect: password');
         }
-        res.cookie('token', user.accessToken, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            expires: new Date(0), // Set the expiration date in the past
-        });
-        res.clearCookie('token');
-        const token = await this.signToken(user.id, user.email);
-        res.status(200).cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-        });
+        const { hash: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
 
-    async signToken(userID: number, email: string): Promise<string> {
-        const payload = {
-            sub: userID,
-            email
-        };
-        const secret = this.config.get('JWT_2FA_SECRET');
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '1d',
-            secret: secret,
-        });
-        return token;
+    @HttpCode(HttpStatus.OK)
+    async login(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
+        const payload = { email: email };
+    
+    return {
+        email: payload.email,
+        access_token: this.jwt.sign(payload)};
     }
-
-	async loginWith2fa(userWithoutPsw: Partial<User>) {
-		const payload = {
-			email: userWithoutPsw.email,
-			is_two_factor_activate: !!userWithoutPsw.is_two_factor_activate,
-			isTwoFactorAuthenticated: true,
-		};
-		return {
-			email: payload.email,
-			token: this.jwt.sign(payload),
-		};
-	}
-
-	async generateTwoFactorAuthenticationSecret(user: User) {
-        const secret = authenticator.generateSecret();
-		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-        try {
-            const updatedUser = await this.prisma.user.update({
-            where: { id: user.id },
-            data: {
-                is_two_factor_activate: true,
-                two_factor_secret: secret },
-            });
-            return { secret, otpAuthUrl, updatedUser };
-        } catch (error) {
-            console.error('Error updating user:', error);
-            throw error; }
-	}
-
-    async generateQrCodeDataURL(otpAuthUrl: string) {
-        console.log({"OTP AuthUrl": otpAuthUrl});
-        return toDataURL(otpAuthUrl);
+    
+    @HttpCode(HttpStatus.OK)
+    async loginWith2fa(userWithoutPsw: Partial<User>) {
+    const payload = {
+        email: userWithoutPsw.email,
+        isTwoFactorAuthenticationEnabled: !!userWithoutPsw.isTwoFactorAuthenticationEnabled,
+        isTwoFactorAuthenticated: true,
+    };
+    
+    
     }
-
-    generateTwoFactorAuthenticationToken(user: User) {
-        return authenticator.generate(user.two_factor_secret);
-    }
-
-	// Method that will verify the authentication code with the user's secret
-	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.two_factor_secret,
-		});
-	}
-
-    // get auth profile
-    // async authMe(id: number, @Res() res: ExpressResponse) {
-    //     try {
-    //         const data = await this.userService.getUser(id);
-    //         if (!data) { 
-    //         return res.status(404).json({ message: "user not found" });
-    //         }
-    //         const ret = pick(data, [
-    //             "id",
-    //             "id42",
-    //             "username",
-    //             "email",
-    //             "first_name",
-    //             "last_name",
-    //             "img_url",
-    //             "created_at",
-    //             "updated_at",
-    //         ]);
-    //         return res.status(200).json(ret);
-    //     } catch (error) {
-    //         return res.status(400).json({
-    //             message: error,
-    //         });
+}
+    // async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
+    //     const user = await this.prisma.user.findUnique({
+    //         where: { email: email }
+    //     });
+    //     if (!user) {
+    //         throw new ForbiddenException('Credentials incorrect: email');
     //     }
+    //     const pwMatch = await argon.verify(user.hash, password);
+    //     if (!pwMatch) {
+    //         throw new ForbiddenException('Credentials incorrect: password');
+    //     }
+    //     res.clearCookie('token');
+    //     const token = await this.signToken(user.id, user.email);
+    //     await this.prisma.user.update({
+    //         where: { id: user.id },
+    //         data: { accessToken: token },
+    //         });
+    //     res.status(200).cookie('token', token, {
+    //         httpOnly: true,
+    //         secure: false,
+    //         sameSite: 'lax',
+    //         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+    //     });
+    // }
+    
+    // @HttpCode(HttpStatus.OK)
+    // async loginWith2fa(userWithoutPsw: Partial<User>) {
+    //     const payload = {
+    //         email: userWithoutPsw.email,
+    //         is_two_factor_activate: !!userWithoutPsw.is_two_factor_activate,
+    //         isTwoFactorAuthenticated: true,
+    //     };
+    //     return {
+    //         email: payload.email,
+    //         token: this.jwt.sign(payload),
+    //     };
     // }
 
-}
+
+
+// 	async generateTwoFactorAuthenticationSecret(user: User) {
+//         const secret = authenticator.generateSecret();
+// 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
+//         try {
+//             const updatedUser = await this.prisma.user.update({
+//             where: { id: user.id },
+//             data: {
+//                 is_two_factor_activate: true,
+//                 two_factor_secret: secret },
+//             });
+//             return { secret, otpAuthUrl, updatedUser };
+//         } catch (error) {
+//             console.error('Error updating user:', error);
+//             throw error; }
+// 	}
+
+//     async generateQrCodeDataURL(otpAuthUrl: string) {
+//         return toDataURL(otpAuthUrl);
+//     }
+
+//     generateTwoFactorAuthenticationToken(user: User) {
+//         return authenticator.generate(user.two_factor_secret);
+//     }
+
+// 	// Method that will verify the authentication code with the user's secret
+// 	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+// 		return authenticator.verify({
+// 		  token: twoFactorAuthenticationCode,
+// 		  secret: user.two_factor_secret,
+// 		});
+// 	}
+// }

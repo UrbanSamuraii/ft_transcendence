@@ -4,7 +4,7 @@ import { PassportStrategy } from "@nestjs/passport"
 import { Request } from "express";
 import { Strategy, ExtractJwt } from "passport-jwt";
 import { PrismaService } from "../../prisma/prisma.service";
-
+import { TokenPayload } from '../entities/token-payload.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') 
@@ -20,15 +20,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 	}
 
 	private static extractJWTFromCookie(req: Request) {
-		console.log({ "COOKIE :": req.cookies });
 		if (req.cookies) {
 			return req.cookies.token;
 		}
 		return null;
 	}	
 
-	async validate(payload: any) {
-		console.log({ "PAYLOAD ": payload });
+	async validate(payload: TokenPayload) {
+		console.log({ "TOKEN_PAYLOAD ": payload });
 		return payload;
 	}
 }
