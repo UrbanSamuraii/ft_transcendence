@@ -82,13 +82,13 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
         navigate("/");
     }
 
-    async function handleSignUp42Click() {
-        try {
-            window.location.href = 'http://localhost:3001/auth/signup42';
-        } catch (error) {
-            console.error('Sign up request error:', error);
-        }
-    }
+    // async function handleSignUp42Click() {
+    //     try {
+    //         window.location.href = 'http://localhost:3001/auth/signup42';
+    //     } catch (error) {
+    //         console.error('Sign up request error:', error);
+    //     }
+    // }
 
     function handleSignUpClick() {
         navigate('/signup');
@@ -117,27 +117,30 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
     //     }
     // };
 
-    const handleSignoutClick = async () => {
-        try {
-            const response = await fetch('http://localhost:3001/auth/signout', {
-                method: 'GET',
-                credentials: 'include'
-            });
-            console.log('Signout successful:', response);
-            navigate('/');
-        } catch (error) {
-            console.error('Signout failed:', error);
-        }
-    }
+    // const handleSignoutClick = async () => {
+    //     try {
+    //         const response = await fetch('http://localhost:3001/auth/signout', {
+    //             method: 'GET',
+    //             credentials: 'include'
+    //         });
+    //         console.log('Signout successful:', response);
+    //         navigate('/');
+    //     } catch (error) {
+    //         console.error('Signout failed:', error);
+    //     }
+    // }
 
     return (
         <Routes>
-            <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
+            {/* <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} /> */}
+            <Route path="/" element={<HomePage handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-            <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} />
+            {/* <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} /> */}
+            <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} />} />
+            {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             {/* <Route path="/2fa-setup" element={<TwoFactorSetup />} /> */}
         </Routes>
     );

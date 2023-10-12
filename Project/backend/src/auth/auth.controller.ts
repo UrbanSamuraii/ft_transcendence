@@ -3,10 +3,11 @@ import { Controller, Post, Get, Res,
 	Req, Request, Response, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
-import { AuthDto } from "./dto";
-import { AuthGuard } from '@nestjs/passport';
+// import { AuthDto } from "./dto";
+// import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guard';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
+import { LocalAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
@@ -15,15 +16,15 @@ import { UserService } from "src/user/user.service";
 export class AuthController {
 	constructor(private authService: AuthService, private userService: UserService) {}
 
-	@Get('signup42')
-	@UseGuards(FortyTwoAuthGuard)
-	async Auth() { }
+	// @Get('signup42')
+	// @UseGuards(FortyTwoAuthGuard)
+	// async Auth() { }
 
-	@Get('sign42')
-	@UseGuards(FortyTwoAuthGuard)
-	async Callback(@Req() req: Request, @Res() res: Response) {
-		return ( await this.authService.forty2signup(req, res));
-	}
+	// @Get('sign42')
+	// @UseGuards(FortyTwoAuthGuard)
+	// async Callback(@Req() req: Request, @Res() res: Response) {
+	// 	return ( await this.authService.forty2signup(req, res));
+	// }
 
 	@IsPublic(true)
 	@Post('signup')
@@ -31,12 +32,13 @@ export class AuthController {
 		return (await this.authService.signup(req, res));
 	}
 
-	@HttpCode(HttpStatus.OK)
-	@IsPublic(true)
-	@Post('login')
+	// @UseGuards(LocalAuthGuard)
 	@UseGuards(Jwt2faAuthGuard)
-	async login(@Body('email') email: string, @Body('password') password: string, @Res() res: Response) {
-		return (await this.authService.login(email, password, res));
+	@Post('login')
+	@HttpCode(200)
+	async login(@Req() req) {
+		console.log({"LOGIN REQUEST": req});
+		return (await this.authService.loginWith2fa(req));
 	}
 
 	// @Post('2fa/token')
@@ -50,9 +52,9 @@ export class AuthController {
 	async register(@Request() request, @Res() response: ExpressResponse) {
 		const email = request.user.email;
         const user = await this.userService.getUser({ email });
-		const { secret, otpAuthUrl, updatedUser } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
 		return response.status(201).json({
-			updatedUser, // Include the updated user object in the response
+			// updatedUser, // Include the updated user object in the response
 			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
 		  });
 	}
@@ -74,9 +76,8 @@ export class AuthController {
 		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
 	}
 
-	@HttpCode(200)
-	@IsPublic(true)
 	@Post('2fa/authenticate')
+	@HttpCode(200)
 	@UseGuards(JwtAuthGuard)
 	async authenticate(@Request() request, @Body() body) {
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
@@ -89,15 +90,15 @@ export class AuthController {
 		return this.authService.loginWith2fa(request.user);
 	}
 
-	@Post("2fa/disable")
-    @UseGuards(JwtAuthGuard)
-    async disableTwoFa(@Request() request, @Res() res: ExpressResponse) {
-        const email = request.user.email;
-        const myUser = await this.userService.getUser({ email });
-		console.log("LETS DISABLE");
-		const myUpdateUser = await this.userService.disableTwoFactorAuthentication(myUser);
-        return res.status(200).json({ myUpdateUser, message: "success disabled 2fa" });
-    }
+	// @Post("2fa/disable")
+    // @UseGuards(JwtAuthGuard)
+    // async disableTwoFa(@Request() request, @Res() res: ExpressResponse) {
+    //     const email = request.user.email;
+    //     const myUser = await this.userService.getUser({ email });
+	// 	console.log("LETS DISABLE");
+	// 	const myUpdateUser = await this.userService.disableTwoFactorAuthentication(myUser);
+    //     return res.status(200).json({ myUpdateUser, message: "success disabled 2fa" });
+    // }
 
 	@Get('signout')
 	@UseGuards(JwtAuthGuard)

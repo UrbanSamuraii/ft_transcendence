@@ -23,11 +23,13 @@ function SigninForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', formData);
+      const response = await axios.post('http://localhost:3001/auth/login', formData, {
+        withCredentials: true,
+      });
       console.log('Registration successful:', response.data);
       navigate('/play');
     } catch (error) {
-      console.error('Sign up request error:', error);
+      console.error('Sign in request error:', error);
       if (axios.isAxiosError(error)) {
         // Check for custom error messages
         const customError = error.response?.data.error;

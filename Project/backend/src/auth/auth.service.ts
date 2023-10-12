@@ -22,9 +22,12 @@ export class AuthService {
 
 
     async signToken(userID: number, email: string): Promise<string> {
+        const user = await this.userService.getUser({ email });
         const payload = {
             sub: userID,
-            email
+            email,
+            is_two_factor_activate: !!user.is_two_factor_activate,
+            isTwoFactorAuthenticated: false,
         };
         const secret = this.config.get('JWT_2FA_SECRET');
         const token = await this.jwt.signAsync(payload, {
@@ -34,65 +37,82 @@ export class AuthService {
         return token;
     }
     
-    async forty2signup(req: any, @Res() res: any) {
-        try {
-            if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
 
-            const id42 = Number(req.user.id);
-            const email = req.user.emails[0]?.value || '';
-            const username = req.user.username;
-            const first_name = req.user.name.givenName;
-            const last_name = req.user.name.familyName;
-            const img_url = req.user.photos[0]?.value || '';
-
-            const existingUser = await this.userService.getUser({ email });
-
-            if (!existingUser) {
-                const user = await this.userService.createUser({
-                    id42,
-                    email,
-                    username,
-                    first_name,
-                    last_name,
-                    img_url,
-                });
-                const accessToken = await this.signToken(user.id, user.email);
-                await this.prisma.user.update({
-                    where: { id: user.id },
-                    data: { accessToken: accessToken },
-                });
-                res.cookie('token', accessToken, {
-                    httpOnly: true,
-                    secure: false,
-                    sameSite: 'lax',
-                    expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                })
-            }
-            else {
-                const user = await this.userService.getUser({ email });
-                const accessToken = await this.signToken(user.id, user.email);
-                await this.prisma.user.update({
-                    where: { id: user.id },
-                    data: { accessToken: accessToken },
-                });
-                res.cookie('token', accessToken, {
-                    httpOnly: true,
-                    secure: false,
-                    sameSite: 'lax',
-                    expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                })
-            }
-            res.redirect('http://localhost:3000/play');
-        }
-        catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                if (error.code === 'P2002') {
-                    throw new ForbiddenException('Credentials taken');
-                }
-                throw error;
-            }
-        }
+    async sign2FAToken(userID: number, email: string): Promise<string> {
+        const user = await this.userService.getUser({ email });
+        const payload = {
+            sub: userID,
+            email,
+            is_two_factor_activate: !!user.is_two_factor_activate,
+            isTwoFactorAuthenticated: true,
+        };
+        const secret = this.config.get('JWT_2FA_SECRET');
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '1d',
+            secret: secret,
+        });
+        return token;
     }
+
+    // async forty2signup(req: any, @Res() res: any) {
+    //     try {
+    //         if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
+
+    //         const id42 = Number(req.user.id);
+    //         const email = req.user.emails[0]?.value || '';
+    //         const username = req.user.username;
+    //         const first_name = req.user.name.givenName;
+    //         const last_name = req.user.name.familyName;
+    //         const img_url = req.user.photos[0]?.value || '';
+
+    //         const existingUser = await this.userService.getUser({ email });
+
+    //         if (!existingUser) {
+    //             const user = await this.userService.createUser({
+    //                 id42,
+    //                 email,
+    //                 username,
+    //                 first_name,
+    //                 last_name,
+    //                 img_url,
+    //             });
+    //             const accessToken = await this.signToken(user.id, user.email);
+    //             await this.prisma.user.update({
+    //                 where: { id: user.id },
+    //                 data: { accessToken: accessToken },
+    //             });
+    //             res.cookie('token', accessToken, {
+    //                 httpOnly: true,
+    //                 secure: false,
+    //                 sameSite: 'lax',
+    //                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+    //             })
+    //         }
+    //         else {
+    //             const user = await this.userService.getUser({ email });
+    //             const accessToken = await this.signToken(user.id, user.email);
+    //             await this.prisma.user.update({
+    //                 where: { id: user.id },
+    //                 data: { accessToken: accessToken },
+    //             });
+    //             res.cookie('token', accessToken, {
+    //                 httpOnly: true,
+    //                 secure: false,
+    //                 sameSite: 'lax',
+    //                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+    //             })
+    //         }
+    //         res.redirect('http://localhost:3000/play');
+    //     }
+    //     catch (error) {
+    //         if (error instanceof PrismaClientKnownRequestError) {
+    //             if (error.code === 'P2002') {
+    //                 throw new ForbiddenException('Credentials taken');
+    //             }
+    //             throw error;
+    //         }
+    //     }
+    // }
 
     async signup(@Req() req, @Res({ passthrough: true }) res: any) {
         const hash = await argon.hash(req.body.password);
@@ -146,30 +166,53 @@ export class AuthService {
         if (!pwMatch) {
             throw new ForbiddenException('Credentials incorrect: password');
         }
-        const { hash: _, ...userWithoutPassword } = user;
+        const userWithoutPassword = { ...user };
+        delete userWithoutPassword.hash;
         return userWithoutPassword;
     }
 
-    @HttpCode(HttpStatus.OK)
-    async login(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
-        const payload = { email: email };
+    // @HttpCode(HttpStatus.OK)
+    // async login(@Req() req) {
+    //     const email = req.body.email;
+    //     const user = await this.userService.getUser({ email });
+    //     const access_token = await this.signToken(user.id, user.email);
     
-    return {
-        email: payload.email,
-        access_token: this.jwt.sign(payload)};
+    //     return { email: email,
+    //         access_token: access_token };
+    // }
+
+    @HttpCode(HttpStatus.OK)
+    async loginWith2fa(@Req() req) {
+        const email = req.body.email;
+        const user = await this.userService.getUser({ email });
+        const access_token = await this.sign2FAToken(user.id, user.email);
+        
+        return { email: email,
+            access_token: access_token };
     }
     
-    @HttpCode(HttpStatus.OK)
-    async loginWith2fa(userWithoutPsw: Partial<User>) {
-    const payload = {
-        email: userWithoutPsw.email,
-        isTwoFactorAuthenticationEnabled: !!userWithoutPsw.isTwoFactorAuthenticationEnabled,
-        isTwoFactorAuthenticated: true,
-    };
-    
-    
+    async generateTwoFactorAuthenticationSecret(user: User) {
+        const secret = authenticator.generateSecret();
+        const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
+        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
+            return { secret, otpAuthUrl };
+        }
+
+    async generateQrCodeDataURL(otpAuthUrl: string) {
+        return toDataURL(otpAuthUrl); 
+    }
+
+    // Method that will verify the authentication code with the user's secret
+	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		return authenticator.verify({
+		  token: twoFactorAuthenticationCode,
+		  secret: user.two_factor_secret,
+		});
     }
 }
+    
+    
+    // }
     // async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
     //     const user = await this.prisma.user.findUnique({
     //         where: { email: email }
@@ -194,51 +237,3 @@ export class AuthService {
     //         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
     //     });
     // }
-    
-    // @HttpCode(HttpStatus.OK)
-    // async loginWith2fa(userWithoutPsw: Partial<User>) {
-    //     const payload = {
-    //         email: userWithoutPsw.email,
-    //         is_two_factor_activate: !!userWithoutPsw.is_two_factor_activate,
-    //         isTwoFactorAuthenticated: true,
-    //     };
-    //     return {
-    //         email: payload.email,
-    //         token: this.jwt.sign(payload),
-    //     };
-    // }
-
-
-
-// 	async generateTwoFactorAuthenticationSecret(user: User) {
-//         const secret = authenticator.generateSecret();
-// 		const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-//         try {
-//             const updatedUser = await this.prisma.user.update({
-//             where: { id: user.id },
-//             data: {
-//                 is_two_factor_activate: true,
-//                 two_factor_secret: secret },
-//             });
-//             return { secret, otpAuthUrl, updatedUser };
-//         } catch (error) {
-//             console.error('Error updating user:', error);
-//             throw error; }
-// 	}
-
-//     async generateQrCodeDataURL(otpAuthUrl: string) {
-//         return toDataURL(otpAuthUrl);
-//     }
-
-//     generateTwoFactorAuthenticationToken(user: User) {
-//         return authenticator.generate(user.two_factor_secret);
-//     }
-
-// 	// Method that will verify the authentication code with the user's secret
-// 	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-// 		return authenticator.verify({
-// 		  token: twoFactorAuthenticationCode,
-// 		  secret: user.two_factor_secret,
-// 		});
-// 	}
-// }

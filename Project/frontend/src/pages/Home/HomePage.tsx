@@ -1,19 +1,20 @@
 import React from 'react';
 
 interface HomePageProps {
-    handleSignUp42Click: () => void;
+    // handleSignUp42Click: () => void;
     handleSignUpClick: () => void;
     handleSignInClick: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ handleSignUp42Click, handleSignUpClick, handleSignInClick }) => {
+// const HomePage: React.FC<HomePageProps> = ({ handleSignUp42Click, handleSignUpClick, handleSignInClick }) => {
+const HomePage: React.FC<HomePageProps> = ({ handleSignUpClick, handleSignInClick }) => {
     return (
         <div>
             <div className="new-user-section">
                 <h2>New User</h2>
-                <button className="signup-button black-shiny-button" onClick={handleSignUp42Click} style={{ marginRight: '10px' }}>
+                {/* <button className="signup-button black-shiny-button" onClick={handleSignUp42Click} style={{ marginRight: '10px' }}>
                     42 SIGNUP
-                </button>
+                </button> */}
                 <button className="signup-button" onClick={handleSignUpClick}>
                     SIGNUP
                 </button>

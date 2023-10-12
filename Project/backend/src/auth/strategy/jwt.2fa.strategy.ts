@@ -19,6 +19,7 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 	}
 
 	private static extractJWTFromCookie(req: Request) {
+		console.log({"JWT 2FA REQUEST": req});
 		if (req.cookies) {
 			return req.cookies.token;
 		}
@@ -33,13 +34,13 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 		console.log({"2fa payload from strategy": payload});
 		if (!user.is_two_factor_activate) {
 			console.log("!user.is_two_factor_activate");
-			// return user;
-			return payload;
+			return user;
+			// return payload;
 		}
 		if (payload.isTwoFactorAuthenticated) {
 			console.log("isTwoFactorAuthenticated");
-			// return user; 
-			return payload;
+			return user; 
+			// return payload;
 		}
 	}
 }

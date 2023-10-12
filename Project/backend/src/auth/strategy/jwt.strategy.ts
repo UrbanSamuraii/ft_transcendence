@@ -1,15 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport"
 import { Request } from "express";
 import { Strategy, ExtractJwt } from "passport-jwt";
-import { PrismaService } from "../../prisma/prisma.service";
 import { TokenPayload } from '../entities/token-payload.entity';
+import { UserService } from "src/user/user.service";
+
+
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') 
 {
-	constructor (private config: ConfigService, private prisma: PrismaService) {
+	constructor (private config: ConfigService, private userService: UserService) {
 		super({
 			jwtFromRequest: ExtractJwt.fromExtractors([
 				JwtStrategy.extractJWTFromCookie,
@@ -28,6 +30,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 
 	async validate(payload: TokenPayload) {
 		console.log({ "TOKEN_PAYLOAD ": payload });
-		return payload;
+		const email = payload.email;
+		const user = await this.userService.getUser({ email });
+	
+		return user;
+		// return payload;
 	}
 }
