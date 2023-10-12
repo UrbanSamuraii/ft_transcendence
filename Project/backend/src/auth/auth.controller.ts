@@ -6,9 +6,9 @@ import { IsPublic } from '../decorator';
 // import { AuthDto } from "./dto";
 // import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guard';
-import { Jwt2faAuthGuard } from 'src/auth/guard';
+// import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { LocalAuthGuard } from 'src/auth/guard';
-import { FortyTwoAuthGuard } from 'src/auth/guard';
+// import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
 
@@ -32,13 +32,25 @@ export class AuthController {
 		return (await this.authService.signup(req, res));
 	}
 
-	// @UseGuards(LocalAuthGuard)
-	@UseGuards(Jwt2faAuthGuard)
+	@UseGuards(LocalAuthGuard)
 	@Post('login')
 	@HttpCode(200)
-	async login(@Req() req) {
+	async login(@Req() req, @Res({ passthrough: true }) res: any) {
 		console.log({"LOGIN REQUEST": req});
-		return (await this.authService.loginWith2fa(req));
+		return (await this.authService.login(req, res));
+	}
+
+	// @UseGuards(LocalAuthGuard)
+	@UseGuards(JwtAuthGuard)
+	@Get('signout')
+	async signout(@Request() request, @Res() res: ExpressResponse) { 
+		try {	
+			res.clearCookie('token');
+			return res.status(200).json({ message: 'Logout successful' });
+	
+		} catch (error) {
+			return res.status(500).json({ error: 'Internal server error' });
+		}
 	}
 
 	// @Post('2fa/token')
@@ -47,48 +59,48 @@ export class AuthController {
 	// 	return response.json( await this.authService.generateTwoFactorAuthenticationToken(request.user));
 	// }
 
-	@Post('2fa/generate')
-	@UseGuards(JwtAuthGuard)
-	async register(@Request() request, @Res() response: ExpressResponse) {
-		const email = request.user.email;
-        const user = await this.userService.getUser({ email });
-		const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
-		return response.status(201).json({
-			// updatedUser, // Include the updated user object in the response
-			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
-		  });
-	}
+	// @Post('2fa/generate')
+	// @UseGuards(JwtAuthGuard)
+	// async register(@Request() request, @Res() response: ExpressResponse) {
+	// 	const email = request.user.email;
+	// 	const user = await this.userService.getUser({ email });
+	// 	const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+	// 	return response.status(201).json({
+	// 		// updatedUser, // Include the updated user object in the response
+	// 		qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
+	// 	});
+	// }
 	
-	// To add the turn on route in the authentication controller
-	@Post('2fa/turn-on')
-  	@UseGuards(JwtAuthGuard)
-	async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
-		const email = request.user.email;
-        const myUser = await this.userService.getUser({ email }); 
-		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-			body.twoFactorAuthenticationCode,
-			myUser,
-		);
-		if (!isCodeValid) {
-			console.log({"CODE INVALIDE": body.twoFactorAuthenticationCode});
-			throw new UnauthorizedException('Wrong authentication code'); 
-		}
-		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
-	}
+	// // To add the turn on route in the authentication controller
+	// @Post('2fa/turn-on')
+	// @UseGuards(JwtAuthGuard)
+	// async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
+	// 	const email = request.user.email;
+	// 	const myUser = await this.userService.getUser({ email }); 
+	// 	const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+	// 		body.twoFactorAuthenticationCode,
+	// 		myUser,
+	// 	);
+	// 	if (!isCodeValid) {
+	// 		console.log({"CODE INVALIDE": body.twoFactorAuthenticationCode});
+	// 		throw new UnauthorizedException('Wrong authentication code'); 
+	// 	}
+	// 	await this.userService.turnOnTwoFactorAuthentication(myUser.id);
+	// }
 
-	@Post('2fa/authenticate')
-	@HttpCode(200)
-	@UseGuards(JwtAuthGuard)
-	async authenticate(@Request() request, @Body() body) {
-		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-			body.twoFactorAuthenticationCode,
-			request.user,
-		);
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentication code');
-		}
-		return this.authService.loginWith2fa(request.user);
-	}
+	// @Post('2fa/authenticate')
+	// @HttpCode(200)
+	// @UseGuards(JwtAuthGuard)
+	// async authenticate(@Request() request, @Body() body) {
+	// 	const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+	// 		body.twoFactorAuthenticationCode,
+	// 		request.user,
+	// 	);
+	// 	if (!isCodeValid) {
+	// 		throw new UnauthorizedException('Wrong authentication code');
+	// 	}
+	// 	return this.authService.loginWith2fa(request.user);
+	// }
 
 	// @Post("2fa/disable")
     // @UseGuards(JwtAuthGuard)
@@ -100,15 +112,4 @@ export class AuthController {
     //     return res.status(200).json({ myUpdateUser, message: "success disabled 2fa" });
     // }
 
-	@Get('signout')
-	@UseGuards(JwtAuthGuard)
-	async signout(@Request() request, @Res() res: ExpressResponse) { 
-		try {	
-			res.clearCookie('token');
-			return res.status(200).json({ message: 'Logout successful' });
-	
-		} catch (error) {
-			return res.status(500).json({ error: 'Internal server error' });
-		}
-	}
 }

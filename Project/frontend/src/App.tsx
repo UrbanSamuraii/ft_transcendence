@@ -117,18 +117,18 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
     //     }
     // };
 
-    // const handleSignoutClick = async () => {
-    //     try {
-    //         const response = await fetch('http://localhost:3001/auth/signout', {
-    //             method: 'GET',
-    //             credentials: 'include'
-    //         });
-    //         console.log('Signout successful:', response);
-    //         navigate('/');
-    //     } catch (error) {
-    //         console.error('Signout failed:', error);
-    //     }
-    // }
+    const handleSignoutClick = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/auth/signout', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            console.log('Signout successful:', response);
+            navigate('/');
+        } catch (error) {
+            console.error('Signout failed:', error);
+        }
+    }
 
     return (
         <Routes>
@@ -139,7 +139,7 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} />} />
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             {/* <Route path="/2fa-setup" element={<TwoFactorSetup />} /> */}
         </Routes>

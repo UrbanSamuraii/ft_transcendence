@@ -46,19 +46,6 @@ export class UserService {
 			};
 	  }
 
-	// async edithUser(userId: number, dto: EdithUserDto) {
-    //     const user = await this.prisma.user.update({
-    //         where: {
-    //             id: userId,
-    //         },
-    //         data: {
-    //             ...dto,
-    //         },
-    //     });
-    //     delete user.hash;
-    //     return user;
-    // }
-
 	async deleteUser(where: Prisma.UserWhereUniqueInput) {
 		try {
 			return await this.prisma.user.delete({
@@ -71,17 +58,17 @@ export class UserService {
 
 	////////////////// 2FA SETTNGS //////////////////
 
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-        const updatedUser = await this.prisma.user.update({
-            where: { id: userId },
-            data: { two_factor_secret: secret }});
-    }
+	// async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    //     const updatedUser = await this.prisma.user.update({
+    //         where: { id: userId },
+    //         data: { two_factor_secret: secret }});
+    // }
 
-	async turnOnTwoFactorAuthentication(userId: number) {
-		const updateUser = await this.prisma.user.update({
-			where: { id: userId },
-			data: { is_two_factor_activate: true }});
-	}
+	// async turnOnTwoFactorAuthentication(userId: number) {
+	// 	const updateUser = await this.prisma.user.update({
+	// 		where: { id: userId },
+	// 		data: { is_two_factor_activate: true }});
+	// }
 	
 	// async disableTwoFactorAuthentication(user: User) {
 	// 	try {

@@ -1,16 +1,16 @@
 import { Injectable, Body, Res, Req, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
-import { AuthDto } from "./dto";
+// import { AuthDto } from "./dto";
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
-import { pick } from 'lodash';
-import * as cookie from 'cookie'; // Import the cookie library
+// import { authenticator } from 'otplib';
+// import { toDataURL } from 'qrcode';
+// import { pick } from 'lodash';
+// import * as cookie from 'cookie'; // Import the cookie library
 
 @Injectable()
 export class AuthService {
@@ -36,23 +36,103 @@ export class AuthService {
         });
         return token;
     }
-    
 
-    async sign2FAToken(userID: number, email: string): Promise<string> {
-        const user = await this.userService.getUser({ email });
-        const payload = {
-            sub: userID,
-            email,
-            is_two_factor_activate: !!user.is_two_factor_activate,
-            isTwoFactorAuthenticated: true,
-        };
-        const secret = this.config.get('JWT_2FA_SECRET');
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '1d',
-            secret: secret,
+    async validateUser(email: string, pass: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { email: email }
         });
-        return token;
+        if (!user) {
+            throw new ForbiddenException('Credentials incorrect: email');
+        }
+        const pwMatch = await argon.verify(user.hash, pass);
+        if (!pwMatch) {
+            throw new ForbiddenException('Credentials incorrect: password');
+        }
+        const userWithoutPassword = { ...user };
+        delete userWithoutPassword.hash;
+        return userWithoutPassword;
     }
+
+    async signup(@Req() req, @Res({ passthrough: true }) res: any) {
+        const hash = await argon.hash(req.body.password);
+        try {
+            const user = await this.prisma.user.create({
+                data: {
+                    email: req.body.email,
+                    username: req.body.username,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
+                    hash,
+                },
+            });
+            const accessToken = await this.signToken(user.id, user.email);
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { accessToken: accessToken },
+            });
+            res.status(200).cookie('token', accessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+            })
+            return {msg:'successfully SIGNUP'};
+        }
+        catch (error: any) { 
+			if (error instanceof PrismaClientKnownRequestError) {
+				if (error.code === 'P2002') {
+					if (Array.isArray(error.meta?.target)) {
+						if (error.meta.target.includes('email')) {
+							res.status(400).json({ error: 'Email already exists' });
+						} else if (error.meta.target.includes('username')) {
+							res.status(400).json({ error: 'Username already exists' });
+						}
+					}
+				}
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
+		}
+	}
+
+    @HttpCode(HttpStatus.OK)
+    async login(@Req() req, @Res({ passthrough: true }) res: any) {
+        const email = req.body.email;
+        const user = await this.userService.getUser({ email });
+        const accesstoken = await this.signToken(user.id, user.email);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { accessToken: accesstoken },
+        });
+        res.status(200).cookie('token', accesstoken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+        });
+        return {msg:'successfully LOGIN'};
+    }
+}
+
+
+
+
+
+    // async sign2FAToken(userID: number, email: string): Promise<string> {
+    //     const user = await this.userService.getUser({ email });
+    //     const payload = {
+    //         sub: userID,
+    //         email,
+    //         is_two_factor_activate: !!user.is_two_factor_activate,
+    //         isTwoFactorAuthenticated: true,
+    //     };
+    //     const secret = this.config.get('JWT_2FA_SECRET');
+    //     const token = await this.jwt.signAsync(payload, {
+    //         expiresIn: '1d',
+    //         secret: secret,
+    //     });
+    //     return token;
+    // }
 
     // async forty2signup(req: any, @Res() res: any) {
     //     try {
@@ -114,103 +194,34 @@ export class AuthService {
     //     }
     // }
 
-    async signup(@Req() req, @Res({ passthrough: true }) res: any) {
-        const hash = await argon.hash(req.body.password);
-        try {
-            const user = await this.prisma.user.create({
-                data: {
-                    email: req.body.email,
-                    username: req.body.username,
-                    first_name: req.body.first_name,
-                    last_name: req.body.last_name,
-                    hash,
-                },
-            });
-            const accessToken = await this.signToken(user.id, user.email);
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { accessToken: accessToken },
-            });
-            res.status(200).cookie('token', accessToken, {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
-                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-            })
-        }
-        catch (error: any) { 
-			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') {
-					if (Array.isArray(error.meta?.target)) {
-						if (error.meta.target.includes('email')) {
-							res.status(400).json({ error: 'Email already exists' });
-						} else if (error.meta.target.includes('username')) {
-							res.status(400).json({ error: 'Username already exists' });
-						}
-					}
-				}
-			} else {
-				res.status(500).json({ error: 'Internal server error' });
-			}
-		}
-	}
-
-    async validateUser(email: string, pass: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: email }
-        });
-        if (!user) {
-            throw new ForbiddenException('Credentials incorrect: email');
-        }
-        const pwMatch = await argon.verify(user.hash, pass);
-        if (!pwMatch) {
-            throw new ForbiddenException('Credentials incorrect: password');
-        }
-        const userWithoutPassword = { ...user };
-        delete userWithoutPassword.hash;
-        return userWithoutPassword;
-    }
-
     // @HttpCode(HttpStatus.OK)
-    // async login(@Req() req) {
+    // async loginWith2fa(@Req() req) {
     //     const email = req.body.email;
     //     const user = await this.userService.getUser({ email });
-    //     const access_token = await this.signToken(user.id, user.email);
-    
+    //     const access_token = await this.sign2FAToken(user.id, user.email);
+        
     //     return { email: email,
     //         access_token: access_token };
     // }
-
-    @HttpCode(HttpStatus.OK)
-    async loginWith2fa(@Req() req) {
-        const email = req.body.email;
-        const user = await this.userService.getUser({ email });
-        const access_token = await this.sign2FAToken(user.id, user.email);
-        
-        return { email: email,
-            access_token: access_token };
-    }
     
-    async generateTwoFactorAuthenticationSecret(user: User) {
-        const secret = authenticator.generateSecret();
-        const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-            return { secret, otpAuthUrl };
-        }
+    // async generateTwoFactorAuthenticationSecret(user: User) {
+    //     const secret = authenticator.generateSecret();
+    //     const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
+    //     await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
+    //         return { secret, otpAuthUrl };
+    //     }
 
-    async generateQrCodeDataURL(otpAuthUrl: string) {
-        return toDataURL(otpAuthUrl); 
-    }
+    // async generateQrCodeDataURL(otpAuthUrl: string) {
+    //     return toDataURL(otpAuthUrl); 
+    // }
 
-    // Method that will verify the authentication code with the user's secret
-	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.two_factor_secret,
-		});
-    }
-}
-    
+    // // Method that will verify the authentication code with the user's secret
+	// isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+	// 	return authenticator.verify({
+	// 	  token: twoFactorAuthenticationCode,
+	// 	  secret: user.two_factor_secret,
+	// 	});
+    // }
     
     // }
     // async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
