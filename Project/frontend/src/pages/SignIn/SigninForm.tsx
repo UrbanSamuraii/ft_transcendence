@@ -26,19 +26,18 @@ function SigninForm() {
       const response = await axios.post('http://localhost:3001/auth/login', formData, {
         withCredentials: true,
       });
-      console.log('Registration successful:', response.data);
+      console.log('Login successful:', response);
       navigate('/play');
     } catch (error) {
       console.error('Sign in request error:', error);
       if (axios.isAxiosError(error)) {
-        // Check for custom error messages
-        const customError = error.response?.data.error;
-        if (customError) {
-          // Display the custom error message to the user
-          alert(`Error: ${customError}`);
+        if (error.response && error.response.data) {
+          const customError = error.response.data.error;
+          if (customError) {
+            alert(`Error: ${customError}`);
+          }
         }
       }
-      navigate('/');
     }
   };
 

@@ -26,24 +26,20 @@ export class AuthController {
 	// 	return ( await this.authService.forty2signup(req, res));
 	// }
 
-	@IsPublic(true)
 	@Post('signup')
-	async signup(@Req() req, @Res({ passthrough: true }) res: Response) { 
+	async signup(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) { 
 		return (await this.authService.signup(req, res));
 	}
 
-	@UseGuards(LocalAuthGuard)
 	@Post('login')
-	@HttpCode(200)
-	async login(@Req() req, @Res({ passthrough: true }) res: any) {
-		console.log({"LOGIN REQUEST": req});
+	async login(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		return (await this.authService.login(req, res));
 	}
 
-	// @UseGuards(LocalAuthGuard)
 	@UseGuards(JwtAuthGuard)
 	@Get('signout')
-	async signout(@Request() request, @Res() res: ExpressResponse) { 
+	async signout(@Req() req, @Res() res: ExpressResponse) { 
+		console.log({"SIGNOUT REQUEST": req})
 		try {	
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });

@@ -12,7 +12,6 @@ async function bootstrap() {
     const port = +process.env.APP_PORT || 3001;
 
     // Initialize Passport
-    // app.use(cookieParser()); // Add cookie parser middleware if needed
     app.use(passport.initialize());
 
     app.enableCors({

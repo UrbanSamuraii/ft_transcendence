@@ -6,7 +6,9 @@ import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
+
 // import { authenticator } from 'otplib';
 // import { toDataURL } from 'qrcode';
 // import { pick } from 'lodash';
@@ -53,7 +55,7 @@ export class AuthService {
         return userWithoutPassword;
     }
 
-    async signup(@Req() req, @Res({ passthrough: true }) res: any) {
+    async signup(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
         const hash = await argon.hash(req.body.password);
         try {
             const user = await this.prisma.user.create({
@@ -76,7 +78,7 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-            return {msg:'successfully SIGNUP'};
+            // return {msg:'successfully SIGNUP'};
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -95,22 +97,30 @@ export class AuthService {
 		}
 	}
 
-    @HttpCode(HttpStatus.OK)
-    async login(@Req() req, @Res({ passthrough: true }) res: any) {
-        const email = req.body.email;
-        const user = await this.userService.getUser({ email });
-        const accesstoken = await this.signToken(user.id, user.email);
+    async login(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+    const email = req.body.email;
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+        throw new ForbiddenException('Credentials incorrect: email');
+    }
+    const pwMatch = await argon.verify(user.hash, req.body.password);
+    if (!pwMatch) {
+        throw new ForbiddenException('Credentials incorrect: password');
+    }
+    else {
+        const accessToken = await this.signToken(user.id, user.email);
         await this.prisma.user.update({
             where: { id: user.id },
-            data: { accessToken: accesstoken },
+            data: { accessToken: accessToken },
         });
-        res.status(200).cookie('token', accesstoken, {
+        res.status(200).cookie('token', accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-        });
-        return {msg:'successfully LOGIN'};
+        })
+        // return {msg:'Successfully LOGIN', token: accessToken};
+        }
     }
 }
 
@@ -134,7 +144,7 @@ export class AuthService {
     //     return token;
     // }
 
-    // async forty2signup(req: any, @Res() res: any) {
+    // async forty2signup(req: any, @Res() res: ExpressResponse) {
     //     try {
     //         if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
 
