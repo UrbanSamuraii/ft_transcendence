@@ -106,18 +106,49 @@ export class AuthService {
         throw new ForbiddenException('Credentials incorrect: password');
     }
     else {
-        const accessToken = await this.signToken(user.id, user.email);
+        console.log({"OLD TOKEN BEFORE SIGNIN": user.accessToken});
+        if (user.is_two_factor_activate) {
+            return ({bool: true, mail: req.body.email, password: req.body.password});
+        }
+        else {
+            const newToken = await this.signToken(user.id, user.email);
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { accessToken: newToken },
+            });
+            console.log({"NEW TOKEN AFTER SIGNIN": user.accessToken});
+            res.status(200).cookie('token', newToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                })
+           }
+        }
+    }
+
+    async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+        const email = req.body.email;
+        const user = await this.userService.getUser({ email });
+        const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+                req.body.twoFactorAuthenticationCode,
+                user,
+            );
+            if (!isCodeValid) {
+                throw new ForbiddenException('Wrong authentication code');
+            }
+        const newToken = await this.sign2FAToken(user.id, user.email);
         await this.prisma.user.update({
             where: { id: user.id },
-            data: { accessToken: accessToken },
+            data: { accessToken: newToken },
         });
-        res.status(200).cookie('token', accessToken, {
+        console.log({"NEW TOKEN AFTER SIGNIN WITH 2FA": user.accessToken});
+        res.status(200).cookie('token', newToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: false,
+            sameSite: 'lax',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         })
-        }
     }
 
     ///////////////////// 2FA settings /////////////////////

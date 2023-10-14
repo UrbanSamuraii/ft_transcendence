@@ -36,6 +36,14 @@ export class AuthController {
 		return (await this.authService.login(req, res));
 	}
 
+	// Out first pass on /login will not generate token but will check credentials only
+	// Local guard ? -> MUST FURNISH THE mail AND PASSWORD in the request
+	// OR PROTECTING THIS ROUTE IN THE FRONT : CAN T ACCESS login/2fa without getting login first
+	@Post('login/2fa')
+	async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		return (await this.authService.loginWith2FA(req, res));
+	}
+
 	@UseGuards(JwtAuthGuard)
 	@Get('signout')
 	async signout(@Req() req, @Res() res: ExpressResponse) { 
@@ -68,6 +76,7 @@ export class AuthController {
 	// }
 	
 	// To add the turn on route in the authentication controller
+	// Here the user is using an SignToken (Not a Sign2FAToken)
 	@UseGuards(JwtAuthGuard)
 	@Post('2fa/turn-on')
 	async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
