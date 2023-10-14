@@ -10,12 +10,14 @@ import { LocalStrategy } from "./strategy";
 import { UserService } from "src/user/user.service";
 import passport from "passport";
 import { PassportModule } from "@nestjs/passport";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Module({
-	imports: [PassportModule.register({defaultStrategy: 'jwt', session:false}),
-		PassportModule.register({defaultStrategy: 'jwt-2fa', session:false}),
-		JwtModule.register({})],
+	imports: [
+	  PassportModule.register({ defaultStrategy: 'jwt', session: false }),
+	  PassportModule.register({ defaultStrategy: 'jwt-2fa', session: false }),
+	  JwtModule.register({})],
 	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy, Auth42Strategy, UserService, Jwt2faStrategy, LocalStrategy],
-})
-export class AuthModule {}
+	providers: [AuthService, PrismaService, JwtStrategy, Auth42Strategy, Jwt2faStrategy, LocalStrategy],
+  })
+  export class AuthModule {}

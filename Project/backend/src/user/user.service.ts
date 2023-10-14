@@ -56,32 +56,35 @@ export class UserService {
 		}
 	}
 
-	////////////////// 2FA SETTNGS //////////////////
+	//////////////// 2FA SETTNGS //////////////////
 
-	// async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-    //     const updatedUser = await this.prisma.user.update({
-    //         where: { id: userId },
-    //         data: { two_factor_secret: secret }});
-    // }
+	// Update our user with the 2FA secret generated in the auth.service
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number, newToken: string) {
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userId },
+            data: { two_factor_secret: secret,
+					accessToken: newToken }});
+    }
 
-	// async turnOnTwoFactorAuthentication(userId: number) {
-	// 	const updateUser = await this.prisma.user.update({
-	// 		where: { id: userId },
-	// 		data: { is_two_factor_activate: true }});
-	// }
-	
-	// async disableTwoFactorAuthentication(user: User) {
-	// 	try {
-	// 		console.log({"USER who want to disable 2FA": user});
-	// 		const updateUser = await this.prisma.user.update({
-	// 			where: { id: user.id },
-	// 			data: { 
-	// 				is_two_factor_activate: false, 
-	// 				two_factor_secret: '' },
-	// 		});
-	// 		return {updateUser};
-	// 		} catch (error) {
-	// 		throw error;
-	// 	}
-	// }
+	// To allow our user to Turn-on the 2FA authentication mode
+	async turnOnTwoFactorAuthentication(userId: number) {
+		const userEnabling2FA = await this.prisma.user.findUnique({
+			where: { id: userId },
+			});
+		const updateUser = await this.prisma.user.update({
+			where: { id: userId },
+			data: { is_two_factor_activate: true}});
+	}
+
+	// To allow our user to Turn-on the 2FA authentication mode
+	async turnOffTwoFactorAuthentication(userId: number) {
+		const userEnabling2FA = await this.prisma.user.findUnique({
+			where: { id: userId },
+			});
+		const updateUser = await this.prisma.user.update({
+			where: { id: userId },
+			data: { is_two_factor_activate: false}});
+	}
+
 }
+

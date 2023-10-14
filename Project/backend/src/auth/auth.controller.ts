@@ -67,22 +67,22 @@ export class AuthController {
 	// 	});
 	// }
 	
-	// // To add the turn on route in the authentication controller
-	// @Post('2fa/turn-on')
-	// @UseGuards(JwtAuthGuard)
-	// async turnOnTwoFactorAuthentication(@Request() request, @Body() body) {
-	// 	const email = request.user.email;
-	// 	const myUser = await this.userService.getUser({ email }); 
-	// 	const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-	// 		body.twoFactorAuthenticationCode,
-	// 		myUser,
-	// 	);
-	// 	if (!isCodeValid) {
-	// 		console.log({"CODE INVALIDE": body.twoFactorAuthenticationCode});
-	// 		throw new UnauthorizedException('Wrong authentication code'); 
-	// 	}
-	// 	await this.userService.turnOnTwoFactorAuthentication(myUser.id);
-	// }
+	// To add the turn on route in the authentication controller
+	@UseGuards(JwtAuthGuard)
+	@Post('2fa/turn-on')
+	async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
+		const email = req.user.email;
+		const myUser = await this.userService.getUser({ email }); 
+		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+			req.body.twoFactorAuthenticationCode,
+			myUser,
+		);
+		if (!isCodeValid) {
+			console.log({"CODE INVALIDE": req.body.twoFactorAuthenticationCode});
+			throw new UnauthorizedException('Wrong authentication code'); 
+		}
+		await this.userService.turnOnTwoFactorAuthentication(myUser.id);
+	}
 
 	// @Post('2fa/authenticate')
 	// @HttpCode(200)

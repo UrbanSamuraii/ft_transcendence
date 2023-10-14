@@ -1,16 +1,15 @@
 import { Injectable, Body, Res, Req, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
-// import { AuthDto } from "./dto";
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
-// import { authenticator } from 'otplib';
-// import { toDataURL } from 'qrcode';
 // import { pick } from 'lodash';
 // import * as cookie from 'cookie'; // Import the cookie library
 
@@ -78,7 +77,6 @@ export class AuthService {
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
-            // return {msg:'successfully SIGNUP'};
         }
         catch (error: any) { 
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -119,30 +117,61 @@ export class AuthService {
             sameSite: 'none',
             expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
         })
-        // return {msg:'Successfully LOGIN', token: accessToken};
         }
+    }
+
+    ///////////////////// 2FA settings /////////////////////
+
+    async sign2FAToken(userID: number, email: string): Promise<string> {
+        const user = await this.userService.getUser({ email });
+        const payload = {
+            sub: userID,
+            email,
+            is_two_factor_activate: !!user.is_two_factor_activate,
+            isTwoFactorAuthenticated: true,
+        };
+        const secret = this.config.get('JWT_2FA_SECRET');
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '1d',
+            secret: secret,
+        });
+        return token;
+    }
+
+    // Generate the "two_factor_secret" AND a new Token !
+    // Update our user in the database
+    // Send back the secret and the otpAuthUrl
+    async generateTwoFactorAuthenticationSecret(user: User) {
+        const secret = authenticator.generateSecret();
+        const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
+        const new2FAToken = await this.sign2FAToken(user.id, user.email);
+        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
+            return { secret, otpAuthUrl };
+    }
+
+    // Annulate the "two_factor_secret" AND a new Token !
+    // Update our user in the database
+    // So when our User turn off this 2fa option -> new token based on traditionnal way to identify
+    async annulationOfTheTwoFactorAuthenticationSecret(user: User) {
+        const secret = '';
+        const new2FAToken = await this.signToken(user.id, user.email);
+        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
+    }
+    
+    // Generate the Qr Code needed by our application
+    async generateQrCodeDataURL(otpAuthUrl: string) {
+        return toDataURL(otpAuthUrl); 
+    }
+
+    // Method that will verify the authentication code with the user's secret
+	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		return authenticator.verify({
+		  token: twoFactorAuthenticationCode,
+		  secret: user.two_factor_secret,
+		});
     }
 }
 
-
-
-
-
-    // async sign2FAToken(userID: number, email: string): Promise<string> {
-    //     const user = await this.userService.getUser({ email });
-    //     const payload = {
-    //         sub: userID,
-    //         email,
-    //         is_two_factor_activate: !!user.is_two_factor_activate,
-    //         isTwoFactorAuthenticated: true,
-    //     };
-    //     const secret = this.config.get('JWT_2FA_SECRET');
-    //     const token = await this.jwt.signAsync(payload, {
-    //         expiresIn: '1d',
-    //         secret: secret,
-    //     });
-    //     return token;
-    // }
 
     // async forty2signup(req: any, @Res() res: ExpressResponse) {
     //     try {
@@ -212,49 +241,4 @@ export class AuthService {
         
     //     return { email: email,
     //         access_token: access_token };
-    // }
-    
-    // async generateTwoFactorAuthenticationSecret(user: User) {
-    //     const secret = authenticator.generateSecret();
-    //     const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-    //     await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-    //         return { secret, otpAuthUrl };
-    //     }
-
-    // async generateQrCodeDataURL(otpAuthUrl: string) {
-    //     return toDataURL(otpAuthUrl); 
-    // }
-
-    // // Method that will verify the authentication code with the user's secret
-	// isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-	// 	return authenticator.verify({
-	// 	  token: twoFactorAuthenticationCode,
-	// 	  secret: user.two_factor_secret,
-	// 	});
-    // }
-    
-    // }
-    // async signin(@Body('email') email: string, @Body('password') password: string, @Res() res: any) {
-    //     const user = await this.prisma.user.findUnique({
-    //         where: { email: email }
-    //     });
-    //     if (!user) {
-    //         throw new ForbiddenException('Credentials incorrect: email');
-    //     }
-    //     const pwMatch = await argon.verify(user.hash, password);
-    //     if (!pwMatch) {
-    //         throw new ForbiddenException('Credentials incorrect: password');
-    //     }
-    //     res.clearCookie('token');
-    //     const token = await this.signToken(user.id, user.email);
-    //     await this.prisma.user.update({
-    //         where: { id: user.id },
-    //         data: { accessToken: token },
-    //         });
-    //     res.status(200).cookie('token', token, {
-    //         httpOnly: true,
-    //         secure: false,
-    //         sameSite: 'lax',
-    //         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-    //     });
     // }
