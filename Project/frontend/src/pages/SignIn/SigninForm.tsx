@@ -38,17 +38,23 @@ function SigninForm() {
           const response = await axios.post('http://localhost:3001/auth/2fa/login', formData, {
           withCredentials: true,
           });
+          navigate('/play'); 
         }
         catch (error) {
           console.error('Sign in 2FA request error:', error);
+          if (axios.isAxiosError(error)) {
+            if (error.response && error.response.data) {
+              const customError = error.response.data.error;
+              if (customError) {
+                alert(`Error: ${customError}`);
+              }
+            }
+          }
         }
       } 
-      // else {
-      //   // If response.data.bool is false, remove the 2FA password field
-      //   delete formData['two_factor_athentication_password'];
-      //   setFormData({ ...formData });
-      // }
-      navigate('/play');
+      else {
+        navigate('/play'); 
+    }
     } catch (error) {
       console.error('Sign in request error:', error);
       if (axios.isAxiosError(error)) {
