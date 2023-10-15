@@ -127,47 +127,47 @@ export class AuthService {
         }
     }
 
-    async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-        const email = req.body.email;
-        const user = await this.userService.getUser({ email });
-        const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-                req.body.twoFactorAuthenticationCode,
-                user,
-            );
-            if (!isCodeValid) {
-                throw new ForbiddenException('Wrong authentication code');
-            }
-        const newToken = await this.sign2FAToken(user.id, user.email);
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { accessToken: newToken },
-        });
-        console.log({"NEW TOKEN AFTER SIGNIN WITH 2FA": user.accessToken});
-        res.status(200).cookie('token', newToken, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-        })
-    }
+    // async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+    //     const email = req.body.email;
+    //     const user = await this.userService.getUser({ email });
+    //     const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+    //             req.body.twoFactorAuthenticationCode,
+    //             user,
+    //         );
+    //         if (!isCodeValid) {
+    //             throw new ForbiddenException('Wrong authentication code');
+    //         }
+    //     const newToken = await this.sign2FAToken(user.id, user.email);
+    //     await this.prisma.user.update({
+    //         where: { id: user.id },
+    //         data: { accessToken: newToken },
+    //     });
+    //     console.log({"NEW TOKEN AFTER SIGNIN WITH 2FA": user.accessToken});
+    //     res.status(200).cookie('token', newToken, {
+    //         httpOnly: true,
+    //         secure: false,
+    //         sameSite: 'lax',
+    //         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+    //     })
+    // }
 
     ///////////////////// 2FA settings /////////////////////
 
-    async sign2FAToken(userID: number, email: string): Promise<string> {
-        const user = await this.userService.getUser({ email });
-        const payload = {
-            sub: userID,
-            email,
-            is_two_factor_activate: !!user.is_two_factor_activate,
-            isTwoFactorAuthenticated: true,
-        };
-        const secret = this.config.get('JWT_2FA_SECRET');
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '1d',
-            secret: secret,
-        });
-        return token;
-    }
+    // async sign2FAToken(userID: number, email: string): Promise<string> {
+    //     const user = await this.userService.getUser({ email });
+    //     const payload = {
+    //         sub: userID,
+    //         email,
+    //         is_two_factor_activate: !!user.is_two_factor_activate,
+    //         isTwoFactorAuthenticated: true,
+    //     };
+    //     const secret = this.config.get('JWT_2FA_SECRET');
+    //     const token = await this.jwt.signAsync(payload, {
+    //         expiresIn: '1d',
+    //         secret: secret,
+    //     });
+    //     return token;
+    // }
 
     // Generate the "two_factor_secret" AND a new Token !
     // Update our user in the database
@@ -175,19 +175,18 @@ export class AuthService {
     async generateTwoFactorAuthenticationSecret(user: User) {
         const secret = authenticator.generateSecret();
         const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
-        const new2FAToken = await this.sign2FAToken(user.id, user.email);
-        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
+        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
             return { secret, otpAuthUrl };
     }
 
     // Annulate the "two_factor_secret" AND a new Token !
     // Update our user in the database
     // So when our User turn off this 2fa option -> new token based on traditionnal way to identify
-    async annulationOfTheTwoFactorAuthenticationSecret(user: User) {
-        const secret = '';
-        const new2FAToken = await this.signToken(user.id, user.email);
-        await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
-    }
+    // async annulationOfTheTwoFactorAuthenticationSecret(user: User) {
+    //     const secret = '';
+    //     const new2FAToken = await this.signToken(user.id, user.email);
+    //     await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
+    // }
     
     // Generate the Qr Code needed by our application
     async generateQrCodeDataURL(otpAuthUrl: string) {
@@ -195,12 +194,12 @@ export class AuthService {
     }
 
     // Method that will verify the authentication code with the user's secret
-	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.two_factor_secret,
-		});
-    }
+	// isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+	// 	return authenticator.verify({
+	// 	  token: twoFactorAuthenticationCode,
+	// 	  secret: user.two_factor_secret,
+	// 	});
+    // }
 }
 
 

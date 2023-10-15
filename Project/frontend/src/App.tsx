@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
-// import TwoFactorSetup from './pages/TwoFactorMenu/2faEnable';
+// import axios from 'axios';
+import TwoFactorSetup from './pages/TwoFactor/2faEnable';
 // import TwoFactorDisable from './pages/2faAuthentication/2faDisable';
 import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
@@ -98,24 +99,18 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
         navigate('/login');
     }
 
-    // function handleEnable2FA() {
-    //     setIsTwoFactorEnabled(true); // enable 2FA
-    // }
-
-    // function handleDisable2FA() {
-    //     setIsTwoFactorEnabled(false); // disable 2FA
-    // }
-
-    // const handleDisable2FA = async () => {
-    //     try {
-    //         const response = await axios.post('http://localhost:3001/auth/2fa/disable', null, {
-    //             withCredentials: true
-    //         });
-    //         console.log(response.status, response.data);
-    //     } catch (error) {
-    //         console.error('Error disabling 2FA:', error);
-    //     }
-    // };
+    const TurnOn2FA = async () => {
+        // try {
+        //     const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', null, {
+        //         withCredentials: true
+        //     });
+        //     console.log('2FA turned on successfully:', response);
+        //     navigate('/play');
+        // } catch (error) {
+        //     console.error('2FA turned on failed:', error);
+        // }
+        navigate('/2fa-enable')
+    }
 
     const handleSignoutClick = async () => {
         try {
@@ -139,9 +134,9 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA}/>} />
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
-            {/* <Route path="/2fa-setup" element={<TwoFactorSetup />} /> */}
+            <Route path="/2fa-enable" element={<TwoFactorSetup />} />
         </Routes>
     );
 }
