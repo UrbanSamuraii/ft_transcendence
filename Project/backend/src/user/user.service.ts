@@ -67,13 +67,14 @@ export class UserService {
     }
 
 	// To allow our user to Turn-on the 2FA authentication mode
-	async turnOnTwoFactorAuthentication(userId: number) {
-		const userEnabling2FA = await this.prisma.user.findUnique({
-			where: { id: userId },
-			});
+	// We need here to UPDATE THE TOKEN with a 2FA SIGNED ONE
+	async turnOnTwoFactorAuthentication(userId: number, new2FAToken: string) {
 		const updateUser = await this.prisma.user.update({
 			where: { id: userId },
-			data: { is_two_factor_activate: true}});
+			data: { is_two_factor_activate: true,
+					accessToken: new2FAToken }
+		});
+		return updateUser;
 	}
 
 	// To allow our user to Turn-on the 2FA authentication mode

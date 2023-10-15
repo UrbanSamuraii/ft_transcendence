@@ -100,15 +100,6 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
     }
 
     const TurnOn2FA = async () => {
-        // try {
-        //     const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', null, {
-        //         withCredentials: true
-        //     });
-        //     console.log('2FA turned on successfully:', response);
-        //     navigate('/play');
-        // } catch (error) {
-        //     console.error('2FA turned on failed:', error);
-        // }
         navigate('/2fa-enable')
     }
 

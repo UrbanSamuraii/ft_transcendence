@@ -35,18 +35,15 @@ export class AuthController {
 		return (await this.authService.login(req, res));
 	}
 
-	// Out first pass on /login will not generate token but will check credentials only
-	// Local guard ? -> MUST FURNISH THE mail AND PASSWORD in the request
-	// OR PROTECTING THIS ROUTE IN THE FRONT : CAN T ACCESS login/2fa without getting login first
-	// @Post('login/2fa')
-	// async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-	// 	return (await this.authService.loginWith2FA(req, res));
-	// }
+	@Post('2fa/login')
+	async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		return (await this.authService.loginWith2FA(req, res));
+	}
 
 	@UseGuards(JwtAuthGuard)
 	@Get('signout')
 	async signout(@Req() req, @Res() res: ExpressResponse) { 
-		console.log({"SIGNOUT REQUEST": req})
+		// console.log({"SIGNOUT REQUEST": req})
 		try {	
 			res.clearCookie('token');
 			return res.status(200).json({ message: 'Logout successful' });
@@ -57,25 +54,11 @@ export class AuthController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('2fa/turn_on')
-	async turnOn2FA(@Req() req, @Res() res: ExpressResponse) { 
-		const user = await this.userService.getUserByToken(req);
-		await this.userService.turnOnTwoFactorAuthentication(user.id);
-		console.log({"TURN_ON 2FA USER ?": user.is_two_factor_activate});
-		res.status(200).json({ message: '2FA option turned on' });
-	}
-
-	// @Post('2fa/token')
-	// @UseGuards(Jwt2faAuthGuard)
-	// async generateToken(@Response() response, @Request() request) {
-	// 	return response.json( await this.authService.generateTwoFactorAuthenticationToken(request.user));
-	// }
-
-	@UseGuards(JwtAuthGuard)
 	@Post('2fa/generate')
 	async register(@Req() req, @Res() res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req);
 		const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+		const userUpdated = await this.userService.getUserByToken(req);
 		return res.status(200).json({
 			user, // Include the updated user object in the response
 			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
@@ -84,21 +67,30 @@ export class AuthController {
 	
 	// To add the turn on route in the authentication controller
 	// Here the user is using an SignToken (Not a Sign2FAToken)
-	// @UseGuards(JwtAuthGuard)
-	// @Post('2fa/turn-on')
-	// async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
-	// 	const email = req.user.email;
-	// 	const myUser = await this.userService.getUser({ email }); 
-	// 	const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-	// 		req.body.twoFactorAuthenticationCode,
-	// 		myUser,
-	// 	);
-	// 	if (!isCodeValid) {
-	// 		console.log({"CODE INVALIDE": req.body.twoFactorAuthenticationCode});
-	// 		throw new UnauthorizedException('Wrong authentication code'); 
-	// 	}
-	// 	await this.userService.turnOnTwoFactorAuthentication(myUser.id);
-	// }
+	@UseGuards(JwtAuthGuard)
+	@Post('2fa/turn_on')
+	async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req);
+		console.log({"STANDARD TOKEN": user.accessToken});
+		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+			req.body.twoFactorAuthenticationCode,
+			user,
+		);
+		if (!isCodeValid) {
+			console.log({"CODE INVALIDE": req.body.twoFactorAuthenticationCode});
+			throw new UnauthorizedException('Wrong authentication code'); 
+		}
+		const new2FAToken = await this.authService.sign2FAToken(user.id, user.email);
+		const new2FAUser = await this.userService.turnOnTwoFactorAuthentication(user.id, new2FAToken);
+		console.log({"NEW 2FA TOKEN": new2FAUser.accessToken});
+		res.clearCookie('token');
+		return res.status(200).cookie('token', new2FAToken, {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'lax',
+			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+		}).json({ new2FAUser });;
+	}
 
 	// @Post('2fa/authenticate')
 	// @HttpCode(200)

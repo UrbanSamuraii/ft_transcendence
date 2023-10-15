@@ -14,15 +14,28 @@ function TwoFactorSetup() {
       const response = await axios.post('http://localhost:3001/auth/2fa/generate', null, {
         withCredentials: true,
       });
-      const { updatedUser, qrCodeUrl } = response.data;
+      const updatedUser = response.data.user; 
+      const qrCodeUrl  = response.data.qrCodeUrl;
       if (updatedUser) {
         setQrCodeUrl(qrCodeUrl);
       } else { console.error('User not updated in response.'); }
     } catch (error) {
       console.error('Error setting up 2FA:', error);
-    }
-  };
+    } 
+  }
 
+  const handleEnableClick = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', { twoFactorAuthenticationCode: authenticationCode }, {
+        withCredentials: true,
+      });
+      console.log({"RESPONSE FROM ENABLING 2FA": response});
+      navigate('/play');
+    }
+    catch (error) {
+      console.error('Error enabling up 2FA:', error);
+    } 
+}
   // const handleEnableClick = async () => {
   //   try {
   //     axios
@@ -52,7 +65,7 @@ function TwoFactorSetup() {
       {!qrCodeUrl && (
         <button onClick={handleSetupClick}>Start 2FA Setup</button>
       )}
-      {/* {qrCodeUrl && (
+      {qrCodeUrl && (
         <div>
           <img src={qrCodeUrl} alt="QR Code" />
           <input
@@ -63,7 +76,7 @@ function TwoFactorSetup() {
           />
           <button onClick={handleEnableClick}>Enable 2FA</button>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

@@ -106,7 +106,7 @@ export class AuthService {
         throw new ForbiddenException('Credentials incorrect: password');
     }
     else {
-        console.log({"OLD TOKEN BEFORE SIGNIN": user.accessToken});
+        // console.log({"OLD TOKEN BEFORE SIGNIN": user.accessToken});
         if (user.is_two_factor_activate) {
             return ({bool: true, mail: req.body.email, password: req.body.password});
         }
@@ -116,7 +116,7 @@ export class AuthService {
                 where: { id: user.id },
                 data: { accessToken: newToken },
             });
-            console.log({"NEW TOKEN AFTER SIGNIN": user.accessToken});
+            // console.log({"NEW TOKEN AFTER SIGNIN": user.accessToken});
             res.status(200).cookie('token', newToken, {
                 httpOnly: true,
                 secure: false,
@@ -127,50 +127,48 @@ export class AuthService {
         }
     }
 
-    // async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-    //     const email = req.body.email;
-    //     const user = await this.userService.getUser({ email });
-    //     const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-    //             req.body.twoFactorAuthenticationCode,
-    //             user,
-    //         );
-    //         if (!isCodeValid) {
-    //             throw new ForbiddenException('Wrong authentication code');
-    //         }
-    //     const newToken = await this.sign2FAToken(user.id, user.email);
-    //     await this.prisma.user.update({
-    //         where: { id: user.id },
-    //         data: { accessToken: newToken },
-    //     });
-    //     console.log({"NEW TOKEN AFTER SIGNIN WITH 2FA": user.accessToken});
-    //     res.status(200).cookie('token', newToken, {
-    //         httpOnly: true,
-    //         secure: false,
-    //         sameSite: 'lax',
-    //         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-    //     })
-    // }
+    async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+        const email = req.body.email;
+        const user = await this.userService.getUser({ email });
+        const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+                    req.body.two_factor_athentication_password,
+                    user,
+        );
+        if (!isCodeValid) {
+            throw new ForbiddenException('Wrong authentication code');
+        }
+        const newToken = await this.sign2FAToken(user.id, user.email);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { accessToken: newToken },
+        });
+        res.status(200).cookie('2fatoken', newToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+        })
+    }
 
     ///////////////////// 2FA settings /////////////////////
 
-    // async sign2FAToken(userID: number, email: string): Promise<string> {
-    //     const user = await this.userService.getUser({ email });
-    //     const payload = {
-    //         sub: userID,
-    //         email,
-    //         is_two_factor_activate: !!user.is_two_factor_activate,
-    //         isTwoFactorAuthenticated: true,
-    //     };
-    //     const secret = this.config.get('JWT_2FA_SECRET');
-    //     const token = await this.jwt.signAsync(payload, {
-    //         expiresIn: '1d',
-    //         secret: secret,
-    //     });
-    //     return token;
-    // }
+    async sign2FAToken(userID: number, email: string): Promise<string> {
+        const user = await this.userService.getUser({ email });
+        const payload = {
+            sub: userID,
+            email,
+            is_two_factor_activate: !!user.is_two_factor_activate,
+            isTwoFactorAuthenticated: true,
+        };
+        const secret = this.config.get('JWT_2FA_SECRET');
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '1d',
+            secret: secret,
+        });
+        return token;
+    }
 
-    // Generate the "two_factor_secret" AND a new Token !
-    // Update our user in the database
+    // Generate the "two_factor_secret" and Update our user in the database
     // Send back the secret and the otpAuthUrl
     async generateTwoFactorAuthenticationSecret(user: User) {
         const secret = authenticator.generateSecret();
@@ -194,12 +192,12 @@ export class AuthService {
     }
 
     // Method that will verify the authentication code with the user's secret
-	// isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-	// 	return authenticator.verify({
-	// 	  token: twoFactorAuthenticationCode,
-	// 	  secret: user.two_factor_secret,
-	// 	});
-    // }
+	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		return authenticator.verify({
+		  token: twoFactorAuthenticationCode,
+		  secret: user.two_factor_secret,
+		});
+    }
 }
 
 
@@ -263,12 +261,3 @@ export class AuthService {
     //     }
     // }
 
-    // @HttpCode(HttpStatus.OK)
-    // async loginWith2fa(@Req() req) {
-    //     const email = req.body.email;
-    //     const user = await this.userService.getUser({ email });
-    //     const access_token = await this.sign2FAToken(user.id, user.email);
-        
-    //     return { email: email,
-    //         access_token: access_token };
-    // }
