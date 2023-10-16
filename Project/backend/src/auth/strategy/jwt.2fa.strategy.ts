@@ -19,7 +19,6 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 	}
 
 	private static extractJWTFromCookie(req: Request) {
-		console.log({"JWT 2FA REQUEST": req});
 		if (req.cookies) {
 			return req.cookies.token;
 		}
@@ -27,19 +26,14 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 	}
 
 	async validate(payload: any) {
-		console.log({"PAYLOAD VALIDATE": payload});
 		const user = await this.prisma.user.findUnique({
 			where: { email: payload.email },
 		});
 		console.log({ "USER IN STRATEGY": user });
 		if (!user.is_two_factor_activate) {
-			console.log("!user.is_two_factor_activate");
-			// return user;
 			return payload;
 		}
 		if (payload.isTwoFactorAuthenticated) {
-			console.log("isTwoFactorAuthenticated");
-			// return user; 
 			return payload;
 		}
 	}

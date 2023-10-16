@@ -215,24 +215,29 @@ export class AuthService {
     }
 
     async turnOffTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse, user: User) {
-        const newUser = await this.prisma.user.update({
-            where: { id: user.id },
-            data: { is_two_factor_activate: false,
-                two_factor_secret: '' }
-        });
-        console.log({"USER TURNING OFF": newUser});
-        const newSimpleToken = await this.signToken(newUser.id, newUser.email);
-        const newSimpleUser = await this.prisma.user.update({
-            where: { id: user.id },
-            data: { accessToken: newSimpleToken },
-        });
-        res.clearCookie('token');
-		return res.status(200).cookie('token turned off', newSimpleToken, {
-			httpOnly: true,
-			secure: false,
-			sameSite: 'lax',
-			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-		}).json({ newSimpleUser });;
+        if (user.is_two_factor_activate == false) {
+            return res.status(200).json({ user });
+        }
+        else {
+            const newUser = await this.prisma.user.update({
+                where: { id: user.id },
+                data: { is_two_factor_activate: false,
+                    two_factor_secret: '' }
+            });
+            console.log({"USER TURNING OFF": newUser});
+            const newSimpleToken = await this.signToken(newUser.id, newUser.email);
+            const newSimpleUser = await this.prisma.user.update({
+                where: { id: user.id },
+                data: { accessToken: newSimpleToken },
+            });
+            res.clearCookie('token');
+            return res.status(200).cookie('token', newSimpleToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+            }).json({ newSimpleUser });;
+        }
     }
 }
 
