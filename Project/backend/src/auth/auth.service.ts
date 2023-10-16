@@ -1,4 +1,5 @@
-import { Injectable, Body, Res, Req, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
+import { Injectable, Body, Res, Req, ForbiddenException, 
+    UnauthorizedException, HttpStatus, HttpCode } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import * as argon from 'argon2'
@@ -176,15 +177,6 @@ export class AuthService {
         await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
             return { secret, otpAuthUrl };
     }
-
-    // Annulate the "two_factor_secret" AND a new Token !
-    // Update our user in the database
-    // So when our User turn off this 2fa option -> new token based on traditionnal way to identify
-    // async annulationOfTheTwoFactorAuthenticationSecret(user: User) {
-    //     const secret = '';
-    //     const new2FAToken = await this.signToken(user.id, user.email);
-    //     await this.userService.setTwoFactorAuthenticationSecret(secret, user.id, new2FAToken);
-    // }
     
     // Generate the Qr Code needed by our application
     async generateQrCodeDataURL(otpAuthUrl: string) {
@@ -197,6 +189,50 @@ export class AuthService {
 		  token: twoFactorAuthenticationCode,
 		  secret: user.two_factor_secret,
 		});
+    }
+
+    // To add the turn on route in the authentication controller after our user scanned the qrCode
+	// Here the user is using an SignToken (Not a Sign2FAToken) 
+    // We are setting a 2FA token in the answer after a successfull authentication
+    async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse, user: User) {
+		const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+			req.body.twoFactorAuthenticationCode,
+			user,
+		);
+		if (!isCodeValid) {
+			console.log({"CODE INVALIDE": req.body.twoFactorAuthenticationCode});
+			throw new UnauthorizedException('Wrong authentication code'); 
+		}
+		const new2FAToken = await this.sign2FAToken(user.id, user.email);
+		const new2FAUser = await this.userService.turnOnTwoFactorAuthentication(user.id, new2FAToken);
+		res.clearCookie('token');
+		return res.status(200).cookie('token', new2FAToken, {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'lax',
+			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+		}).json({ new2FAUser });;
+    }
+
+    async turnOffTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse, user: User) {
+        const newUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: { is_two_factor_activate: false,
+                two_factor_secret: '' }
+        });
+        console.log({"USER TURNING OFF": newUser});
+        const newSimpleToken = await this.signToken(newUser.id, newUser.email);
+        const newSimpleUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: { accessToken: newSimpleToken },
+        });
+        res.clearCookie('token');
+		return res.status(200).cookie('token', newSimpleToken, {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'lax',
+			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+		}).json({ newSimpleUser });;
     }
 }
 
