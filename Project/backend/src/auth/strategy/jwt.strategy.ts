@@ -27,7 +27,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 	}
 
 	private static extractJWTFromCookie(@Req() req) {
-		// console.log({"REQ JWT": req});
 		if (req.cookies) {
 			return req.cookies.token;
 		}
@@ -35,8 +34,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
 	}	
 
 	async validate(@Req() req, payload: any) {
-		// console.log({"REQ VALIDATE": req});
-		// console.log({"PAYLOAD VALIDATE": payload});
 		return payload;
     }
 }

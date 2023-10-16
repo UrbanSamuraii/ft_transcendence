@@ -5,7 +5,7 @@ import { AuthService } from "./auth.service";
 import { IsPublic } from '../decorator';
 // import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guard';
-// import { Jwt2faAuthGuard } from 'src/auth/guard';
+import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { LocalAuthGuard } from 'src/auth/guard';
 // import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
@@ -40,7 +40,7 @@ export class AuthController {
 		return (await this.authService.loginWith2FA(req, res));
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
 	@Get('signout')
 	async signout(@Req() req, @Res() res: ExpressResponse) { 
 		// console.log({"SIGNOUT REQUEST": req})
@@ -53,7 +53,7 @@ export class AuthController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
 	@Post('2fa/generate')
 	async register(@Req() req, @Res() res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req);
@@ -67,7 +67,7 @@ export class AuthController {
 	
 	// To add the turn on route in the authentication controller
 	// Here the user is using an SignToken (Not a Sign2FAToken)
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
 	@Post('2fa/turn_on')
 	async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req);
@@ -91,20 +91,6 @@ export class AuthController {
 			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
 		}).json({ new2FAUser });;
 	}
-
-	// @Post('2fa/authenticate')
-	// @HttpCode(200)
-	// @UseGuards(JwtAuthGuard)
-	// async authenticate(@Request() request, @Body() body) {
-	// 	const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-	// 		body.twoFactorAuthenticationCode,
-	// 		request.user,
-	// 	);
-	// 	if (!isCodeValid) {
-	// 		throw new UnauthorizedException('Wrong authentication code');
-	// 	}
-	// 	return this.authService.loginWith2fa(request.user);
-	// }
 
 	// @Post("2fa/disable")
     // @UseGuards(JwtAuthGuard)

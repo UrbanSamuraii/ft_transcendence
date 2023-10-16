@@ -142,7 +142,7 @@ export class AuthService {
             where: { id: user.id },
             data: { accessToken: newToken },
         });
-        res.status(200).cookie('2fatoken', newToken, {
+        res.status(200).cookie('token', newToken, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
