@@ -12,6 +12,7 @@ import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
+import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -19,8 +20,6 @@ const defaultBackgroundStyle = {
 
 interface ContentProps {
     setBackgroundStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
-    isTwoFactorEnabled: boolean; 
-    setIsTwoFactorEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface RouteBackgroundStyles {
@@ -36,22 +35,19 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
 
 function App() {
     const [backgroundStyle, setBackgroundStyle] = useState<CSSProperties>(defaultBackgroundStyle);
-    const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false); // Add 2FA state
 
     return (
         <Router>
             <div className="App" style={backgroundStyle}>
                 <Content
                     setBackgroundStyle={setBackgroundStyle}
-                    isTwoFactorEnabled={isTwoFactorEnabled} // Pass 2FA state to Content component
-                    setIsTwoFactorEnabled={setIsTwoFactorEnabled} // Pass 2FA state setter to Content component
                 />
             </div>
         </Router>
     );
 }
 
-function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled }: ContentProps) {
+function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
@@ -103,6 +99,10 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
         navigate('/2fa-enable')
     }
 
+    const TurnOff2FA = async () => {
+        navigate('/2fa-disable')
+    }
+
     const handleSignoutClick = async () => {
         try {
             const response = await fetch('http://localhost:3001/auth/signout', {
@@ -125,9 +125,10 @@ function Content({ setBackgroundStyle, isTwoFactorEnabled, setIsTwoFactorEnabled
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA}/>} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA}/>} />
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             <Route path="/2fa-enable" element={<TwoFactorSetup />} />
+            <Route path="/2fa-disable" element={<TwoFactorDisable />} />
         </Routes>
     );
 }

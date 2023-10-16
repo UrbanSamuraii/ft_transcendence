@@ -227,7 +227,7 @@ export class AuthService {
             data: { accessToken: newSimpleToken },
         });
         res.clearCookie('token');
-		return res.status(200).cookie('token', newSimpleToken, {
+		return res.status(200).cookie('token turned off', newSimpleToken, {
 			httpOnly: true,
 			secure: false,
 			sameSite: 'lax',

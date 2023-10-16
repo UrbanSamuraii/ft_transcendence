@@ -36,28 +36,7 @@ function TwoFactorSetup() {
       console.error('Error enabling up 2FA:', error);
     } 
 }
-  // const handleEnableClick = async () => {
-  //   try {
-  //     axios
-  //       .post(
-  //         'http://localhost:3001/auth/2fa/turn-on',
-  //         { twoFactorAuthenticationCode: authenticationCode },
-  //         { withCredentials: true }
-  //       )
-  //       .then((response) => { console.log(response.status, response.data);
-  //         navigate('/play'); })
-  //       .catch((error) => {
-  //         console.error('Error enabling 2FA:', error);
-  //         setError('Wrong authentication code. Please try again.'); 
-  //       });
-  //       const responseBoolActivate = await axios.post('http://localhost:3001/auth/2fa/turn_on', null, {
-  //               withCredentials: true
-  //       });
-  //   } catch (error) {
-  //     console.error('Error enabling 2FA:', error);
-  //   }
-  // };
-
+  
   return (
     <div>
       <h2>Two-Factor Authentication Setup</h2>

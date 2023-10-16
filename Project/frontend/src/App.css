@@ -253,35 +253,6 @@ button:hover {
     background-color: darkgreen; /* Define the hover color for the setup 2FA button */
   }
 
-
-
-
-
-
-
-
-
-
-
-  
-.setup-2fa-button {
-    background-color: green; /* Define the background color for the setup 2FA button */
-    color: white;
-    padding: 10px 20px; /* Adjust padding as needed */
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 50px; /* Adjust the top position to place it below the SIGNOUT button */
-    right: 10px; /* Adjust the right position to align with the SIGNOUT button */
-    z-index: 999; /* Ensure it's above other elements */
-  }
-  
-  .setup-2fa-button:hover {
-    background-color: darkgreen; /* Define the hover color for the setup 2FA button */
-  }
-
   .disable-2fa-button {
     background-color: blueviolet; /* Define the background color for the disable 2FA button */
     color: white;

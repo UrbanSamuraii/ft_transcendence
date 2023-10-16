@@ -72,7 +72,7 @@ export class AuthController {
 	}
 
     @UseGuards(Jwt2faAuthGuard)
-	@Post("2fa/disable")
+	@Post("2fa/turn_off")
     async disableTwoFa(@Request() req, @Res() res: ExpressResponse) {
         const user = await this.userService.getUserByToken(req);
 		return (await this.authService.turnOffTwoFactorAuthentication(req, res, user));
