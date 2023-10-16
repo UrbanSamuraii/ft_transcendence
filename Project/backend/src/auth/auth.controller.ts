@@ -2,12 +2,11 @@ import { Controller, Post, Get, Res,
 	Body, HttpCode, HttpStatus, UseGuards, 
 	Req, Request, Response, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { IsPublic } from '../decorator';
 // import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/auth/guard';
+// import { JwtAuthGuard } from 'src/auth/guard';
+// import { LocalAuthGuard } from 'src/auth/guard';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
-import { LocalAuthGuard } from 'src/auth/guard';
-// import { FortyTwoAuthGuard } from 'src/auth/guard';
+import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
 
@@ -15,15 +14,15 @@ import { UserService } from "src/user/user.service";
 export class AuthController {
 	constructor(private authService: AuthService, private userService: UserService) {}
 
-	// @Get('signup42')
-	// @UseGuards(FortyTwoAuthGuard)
-	// async Auth() { }
+	@UseGuards(FortyTwoAuthGuard)
+	@Get('signup42')
+	async Auth() { }
 
-	// @Get('sign42')
-	// @UseGuards(FortyTwoAuthGuard)
-	// async Callback(@Req() req: Request, @Res() res: Response) {
-	// 	return ( await this.authService.forty2signup(req, res));
-	// }
+	@UseGuards(FortyTwoAuthGuard)
+	@Get('sign42')
+	async Callback(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		return ( await this.authService.forty2signup(req, res));
+	}
 
 	@Post('signup')
 	async signup(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) { 

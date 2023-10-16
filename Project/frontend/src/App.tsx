@@ -79,13 +79,16 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate("/");
     }
 
-    // async function handleSignUp42Click() {
-    //     try {
-    //         window.location.href = 'http://localhost:3001/auth/signup42';
-    //     } catch (error) {
-    //         console.error('Sign up request error:', error);
-    //     }
-    // }
+    async function handleSignUp42Click() {
+        try {
+            window.location.href = 'http://localhost:3001/auth/signup42';
+            navigate('/');
+            console.log('Signin42 pending:', window.location.href);
+        } 
+        catch (error) {
+            console.error('Sign up request error:', error);
+        }
+    }
 
     function handleSignUpClick() {
         navigate('/signup');
@@ -118,10 +121,9 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
     return (
         <Routes>
-            {/* <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} /> */}
-            <Route path="/" element={<HomePage handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
+            <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
+            {/* <Route path="/" element={<HomePage handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} /> */}
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-            {/* <Route path="/select-mode" element={<SelectModePage startGame={startGame} handleSignoutClick={handleSignoutClick} />} /> */}
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
