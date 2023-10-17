@@ -16,6 +16,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 	imports: [
 	  PassportModule.register({ defaultStrategy: 'jwt', session: false }),
 	  PassportModule.register({ defaultStrategy: 'jwt-2fa', session: false }),
+	  PassportModule.register({ defaultStrategy: '42', session: false }),
 	  JwtModule.register({})],
 	controllers: [AuthController],
 	providers: [AuthService, PrismaService, JwtStrategy, Auth42Strategy, Jwt2faStrategy, LocalStrategy],

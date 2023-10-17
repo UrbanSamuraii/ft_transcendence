@@ -13,7 +13,6 @@ async function bootstrap() {
 
     // Initialize Passport
     app.use(passport.initialize());
-
     app.enableCors({
         origin: 'http://localhost:3000', // Update with your frontend URL
         credentials: true, // If needed

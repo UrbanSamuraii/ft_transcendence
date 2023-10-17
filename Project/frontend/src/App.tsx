@@ -4,15 +4,16 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
-// import axios from 'axios';
+import axios from 'axios';
 import TwoFactorSetup from './pages/TwoFactor/2faEnable';
-// import TwoFactorDisable from './pages/2faAuthentication/2faDisable';
 import Play from './pages/Play/Play';
 import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import TwoFactorDisable from './pages/TwoFactor/2faDisable';
+import TwoFactorCode from './pages/TwoFactor/2faCode';
+
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -82,8 +83,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
     async function handleSignUp42Click() {
         try {
             window.location.href = 'http://localhost:3001/auth/signup42';
-            navigate('/');
-            console.log('Signin42 pending:', window.location.href);
         } 
         catch (error) {
             console.error('Sign up request error:', error);
@@ -131,6 +130,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             <Route path="/2fa-enable" element={<TwoFactorSetup />} />
             <Route path="/2fa-disable" element={<TwoFactorDisable />} />
+            <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
         </Routes>
     );
 }

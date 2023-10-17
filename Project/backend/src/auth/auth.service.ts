@@ -272,7 +272,8 @@ export class AuthService {
                     secure: false,
                     sameSite: 'lax',
                     expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                }).json({ user });
+                });
+                res.redirect('http://localhost:3000/play');
             }
             else {
                 const user = await this.userService.getUser({ email });
@@ -287,13 +288,13 @@ export class AuthService {
                         secure: false,
                         sameSite: 'lax',
                         expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                    }).json({ user });
+                    });
+                    res.redirect('http://localhost:3000/play');
                 }
                 else {
-                    res.status(201).json({ user });
+                    res.status(201).redirect(`http://localhost:3000/FortyTwoFA?userEmail=${user.email}`);
                 }         
             }
-            // res.redirect('http://localhost:3000/play');
         }
         catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {

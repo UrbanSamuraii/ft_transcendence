@@ -1,10 +1,6 @@
-import { Controller, Post, Get, Res,
-	Body, HttpCode, HttpStatus, UseGuards, 
-	Req, Request, Response, UnauthorizedException } from "@nestjs/common";
+import { Controller, Post, Get, Res, UseGuards, 
+	Req, Request } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-// import { AuthGuard } from '@nestjs/passport';
-// import { JwtAuthGuard } from 'src/auth/guard';
-// import { LocalAuthGuard } from 'src/auth/guard';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
@@ -16,11 +12,11 @@ export class AuthController {
 
 	@UseGuards(FortyTwoAuthGuard)
 	@Get('signup42')
-	async Auth() { }
+	async FortyTwoLogin() { }
 
 	@UseGuards(FortyTwoAuthGuard)
 	@Get('sign42')
-	async Callback(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+	async FortyTwoRedirect(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		return ( await this.authService.forty2signup(req, res));
 	}
 
@@ -36,6 +32,7 @@ export class AuthController {
 
 	@Post('2fa/login')
 	async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log({"REQ.BODY for 2FA login": req.body});
 		return (await this.authService.loginWith2FA(req, res));
 	}
 
