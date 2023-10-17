@@ -2,6 +2,8 @@ import { OnModuleInit } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, OnGatewayInit, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SquareGameService } from './game.square.service';
+import { UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 const clientInputs = {};
 
@@ -17,7 +19,9 @@ export class GameGateway implements OnGatewayInit {
 
     private gameLoop: NodeJS.Timeout;
 
-    constructor(private gameService: SquareGameService) { }  // <-- Inject the service
+    constructor(private gameService: SquareGameService,
+        private readonly jwtService: JwtService  // <-- Inject the JwtService
+    ) { }  // <-- Inject the service
 
     afterInit(server: Server) {
         console.log('Socket.io initialized');
@@ -26,7 +30,26 @@ export class GameGateway implements OnGatewayInit {
         });
     }
 
-    handleConnection(client: Socket) {
+    handleConnection(client: Socket, ...args: any[]) {
+        const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
+
+        if (!token) {
+            console.log('No token provided');
+            client.disconnect(true);  // Disconnect the client
+            return;
+        }
+
+        // Validate the token
+        try {
+            const decoded = this.jwtService.verify(token);
+            // Optionally, store the decoded data on the socket for future use
+            client.data.user = decoded;
+        } catch (e) {
+            console.log('Invalid token', e);
+            client.disconnect(true);  // Disconnect the client
+            return;
+        }
+
         console.log('Client connected:', client.id);
 
         // Listen for disconnect
@@ -55,6 +78,13 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('startGame')
     handleStartGame(client: Socket) {
+        const userId = client.data.user.userId;
+        const sub = client.data.user.sub;
+        const email = client.data.user.email;
+
+        console.log("userId = ", userId);
+        console.log("sub = ", sub);
+        console.log("email = ", email);
         if (this.gameService.isGameOver) {
             this.gameService.resetGame();
         }
