@@ -4,6 +4,8 @@ import { Server, Socket } from 'socket.io';
 import { SquareGameService } from './game.square.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from '@nestjs/common';
+import { UserService } from '../user/user.service';
 
 const clientInputs = {};
 
@@ -20,7 +22,8 @@ export class GameGateway implements OnGatewayInit {
     private gameLoop: NodeJS.Timeout;
 
     constructor(private gameService: SquareGameService,
-        private readonly jwtService: JwtService  // <-- Inject the JwtService
+        private readonly jwtService: JwtService,  // <-- Inject the JwtService
+        private readonly userService: UserService // <-- Inject the UserService
     ) { }  // <-- Inject the service
 
     afterInit(server: Server) {
@@ -30,7 +33,7 @@ export class GameGateway implements OnGatewayInit {
         });
     }
 
-    handleConnection(client: Socket, ...args: any[]) {
+    async handleConnection(client: Socket, ...args: any[]) {
         const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
 
         if (!token) {
@@ -44,6 +47,9 @@ export class GameGateway implements OnGatewayInit {
             const decoded = this.jwtService.verify(token);
             // Optionally, store the decoded data on the socket for future use
             client.data.user = decoded;
+            const userInfo = await this.userService.getUserByToken(token);
+            console.log(userInfo);
+
         } catch (e) {
             console.log('Invalid token', e);
             client.disconnect(true);  // Disconnect the client
@@ -82,9 +88,11 @@ export class GameGateway implements OnGatewayInit {
         const sub = client.data.user.sub;
         const email = client.data.user.email;
 
-        console.log("userId = ", userId);
-        console.log("sub = ", sub);
-        console.log("email = ", email);
+        // console.log("userId = ", userId);
+        // console.log("sub = ", sub);
+        // console.log("email = ", email);
+        console.log(JSON.stringify(client.data.user, null, 2));
+
         if (this.gameService.isGameOver) {
             this.gameService.resetGame();
         }
