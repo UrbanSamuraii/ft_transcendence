@@ -22,9 +22,9 @@ export class GameGateway implements OnGatewayInit {
     private gameLoop: NodeJS.Timeout;
 
     constructor(private gameService: SquareGameService,
-        private readonly jwtService: JwtService,  // <-- Inject the JwtService
-        private readonly userService: UserService // <-- Inject the UserService
-    ) { }  // <-- Inject the service
+        private readonly jwtService: JwtService,
+        private readonly userService: UserService
+    ) { }
 
     afterInit(server: Server) {
         console.log('Socket.io initialized');
