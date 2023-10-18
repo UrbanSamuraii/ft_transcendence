@@ -28,7 +28,7 @@ function SigninForm() {
       const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password:formData.password }, {
         withCredentials: true,
       });
-      console.log({"SIGNIN AXIOS RESPONSE": response});
+      // console.log({"SIGNIN AXIOS RESPONSE": response});
       if (response.status == 200)
         navigate('/play'); 
       else 

@@ -32,7 +32,7 @@ export class AuthController {
 
 	@Post('2fa/login')
 	async loginWith2FA(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		console.log({"REQ.BODY for 2FA login": req.body});
+		// console.log({"REQ.BODY for 2FA login": req.body});
 		return (await this.authService.loginWith2FA(req, res));
 	}
 
@@ -55,7 +55,7 @@ export class AuthController {
 		const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
 		const userUpdated = await this.userService.getUserByToken(req);
 		return res.status(200).json({
-			user, // Include the updated user object in the response
+			user,
 			qrCodeUrl: await this.authService.generateQrCodeDataURL(otpAuthUrl)
 		});
 	}
