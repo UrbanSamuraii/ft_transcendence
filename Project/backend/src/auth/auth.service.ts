@@ -107,9 +107,8 @@ export class AuthService {
         throw new ForbiddenException('Credentials incorrect: password');
     }
     else {
-        // console.log({"OLD TOKEN BEFORE SIGNIN": user.accessToken});
         if (user.is_two_factor_activate) {
-            return ({bool: true, mail: req.body.email, password: req.body.password});
+            res.status(201).json({user});
         }
         else {
             const newToken = await this.signToken(user.id, user.email);
@@ -117,13 +116,13 @@ export class AuthService {
                 where: { id: user.id },
                 data: { accessToken: newToken },
             });
-            // console.log({"NEW TOKEN AFTER SIGNIN": user.accessToken});
             res.status(200).cookie('token', newToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-                })
+                });
+            // res.redirect('http://localhost:3000/play');
            }
         }
     }
@@ -224,7 +223,7 @@ export class AuthService {
                 data: { is_two_factor_activate: false,
                     two_factor_secret: '' }
             });
-            console.log({"USER TURNING OFF": newUser});
+            // console.log({"USER TURNING OFF": newUser});
             const newSimpleToken = await this.signToken(newUser.id, newUser.email);
             const newSimpleUser = await this.prisma.user.update({
                 where: { id: user.id },

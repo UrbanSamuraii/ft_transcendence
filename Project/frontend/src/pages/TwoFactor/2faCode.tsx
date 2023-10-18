@@ -11,7 +11,6 @@ function TwoFactorCode() {
 
   const [user, setUser] = useState({ email: '' });
   useEffect(() => {
-    // Parse user data from query parameters
     const searchParams = new URLSearchParams(location.search);
     const userEmail = searchParams.get('userEmail');
     if (userEmail) {
@@ -24,7 +23,6 @@ function TwoFactorCode() {
       const response = await axios.post('http://localhost:3001/auth/2fa/login', { two_factor_athentication_password: TwoFACode, email: user.email }, {
         withCredentials: true,
       });
-      console.log({"RESPONSE FROM ENTERING 2FA CODE": response});
       navigate('/play');
     }
     catch (error) {
