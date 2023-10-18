@@ -1,5 +1,7 @@
-import { Injectable, Body, Res, Req, ForbiddenException, 
-    UnauthorizedException, HttpStatus, HttpCode } from "@nestjs/common";
+import {
+    Injectable, Body, Res, Req, ForbiddenException,
+    UnauthorizedException, HttpStatus, HttpCode
+} from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import * as argon from 'argon2'
@@ -79,50 +81,50 @@ export class AuthService {
                 expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
             })
         }
-        catch (error: any) { 
-			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') {
-					if (Array.isArray(error.meta?.target)) {
-						if (error.meta.target.includes('email')) {
-							res.status(400).json({ error: 'Email already exists' });
-						} else if (error.meta.target.includes('username')) {
-							res.status(400).json({ error: 'Username already exists' });
-						}
-					}
-				}
-			} else {
-				res.status(500).json({ error: 'Internal server error' });
-			}
-		}
-	}
+        catch (error: any) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    if (Array.isArray(error.meta?.target)) {
+                        if (error.meta.target.includes('email')) {
+                            res.status(400).json({ error: 'Email already exists' });
+                        } else if (error.meta.target.includes('username')) {
+                            res.status(400).json({ error: 'Username already exists' });
+                        }
+                    }
+                }
+            } else {
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        }
+    }
 
     async login(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-    const email = req.body.email;
-    const user = await this.userService.getUser({ email });
-    if (!user) {
-        throw new ForbiddenException('Credentials incorrect: email');
-    }
-    const pwMatch = await argon.verify(user.hash, req.body.password);
-    if (!pwMatch) {
-        throw new ForbiddenException('Credentials incorrect: password');
-    }
-    else {
-        if (user.is_two_factor_activate) {
-            res.status(201).json({user});
+        const email = req.body.email;
+        const user = await this.userService.getUser({ email });
+        if (!user) {
+            throw new ForbiddenException('Credentials incorrect: email');
+        }
+        const pwMatch = await argon.verify(user.hash, req.body.password);
+        if (!pwMatch) {
+            throw new ForbiddenException('Credentials incorrect: password');
         }
         else {
-            const newToken = await this.signToken(user.id, user.email);
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { accessToken: newToken },
-            });
-            res.status(200).cookie('token', newToken, {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
-                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+            if (user.is_two_factor_activate) {
+                res.status(201).json({ user });
+            }
+            else {
+                const newToken = await this.signToken(user.id, user.email);
+                await this.prisma.user.update({
+                    where: { id: user.id },
+                    data: { accessToken: newToken },
                 });
-           }
+                res.status(200).cookie('token', newToken, {
+                    httpOnly: true,
+                    secure: false,
+                    sameSite: 'lax',
+                    expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                });
+            }
         }
     }
 
@@ -130,8 +132,8 @@ export class AuthService {
         const email = req.body.email;
         const user = await this.userService.getUser({ email });
         const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-                    req.body.two_factor_athentication_password,
-                    user,
+            req.body.two_factor_athentication_password,
+            user,
         );
         if (!isCodeValid) {
             throw new ForbiddenException('Wrong authentication code');
@@ -173,43 +175,43 @@ export class AuthService {
         const secret = authenticator.generateSecret();
         const otpAuthUrl = authenticator.keyuri(user.email, this.config.get<string>('AUTH_APP_NAME') as string, secret);
         await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
-            return { secret, otpAuthUrl };
+        return { secret, otpAuthUrl };
     }
-    
+
     // Generate the Qr Code needed by our application
     async generateQrCodeDataURL(otpAuthUrl: string) {
-        return toDataURL(otpAuthUrl); 
+        return toDataURL(otpAuthUrl);
     }
 
     // Method that will verify the authentication code with the user's secret
-	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.two_factor_secret,
-		});
+    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+        return authenticator.verify({
+            token: twoFactorAuthenticationCode,
+            secret: user.two_factor_secret,
+        });
     }
 
     // To add the turn on route in the authentication controller after our user scanned the qrCode
-	// Here the user is using an SignToken (Not a Sign2FAToken) 
+    // Here the user is using an SignToken (Not a Sign2FAToken) 
     // We are setting a 2FA token in the answer after a successfull authentication
     async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse, user: User) {
-		const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-			req.body.twoFactorAuthenticationCode,
-			user,
-		);
-		if (!isCodeValid) {
-			console.log({"CODE INVALIDE": req.body.twoFactorAuthenticationCode});
-			throw new UnauthorizedException('Wrong authentication code'); 
-		}
-		const new2FAToken = await this.sign2FAToken(user.id, user.email);
-		const new2FAUser = await this.userService.turnOnTwoFactorAuthentication(user.id, new2FAToken);
-		res.clearCookie('token');
-		return res.status(200).cookie('token', new2FAToken, {
-			httpOnly: true,
-			secure: false,
-			sameSite: 'lax',
-			expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-		}).json({ new2FAUser });;
+        const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+            req.body.twoFactorAuthenticationCode,
+            user,
+        );
+        if (!isCodeValid) {
+            console.log({ "CODE INVALIDE": req.body.twoFactorAuthenticationCode });
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+        const new2FAToken = await this.sign2FAToken(user.id, user.email);
+        const new2FAUser = await this.userService.turnOnTwoFactorAuthentication(user.id, new2FAToken);
+        res.clearCookie('token');
+        return res.status(200).cookie('token', new2FAToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+        }).json({ new2FAUser });;
     }
 
     async turnOffTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse, user: User) {
@@ -219,8 +221,10 @@ export class AuthService {
         else {
             const newUser = await this.prisma.user.update({
                 where: { id: user.id },
-                data: { is_two_factor_activate: false,
-                    two_factor_secret: '' }
+                data: {
+                    is_two_factor_activate: false,
+                    two_factor_secret: ''
+                }
             });
             // console.log({"USER TURNING OFF": newUser});
             const newSimpleToken = await this.signToken(newUser.id, newUser.email);
@@ -291,7 +295,7 @@ export class AuthService {
                 }
                 else {
                     res.status(201).redirect(`http://localhost:3000/FortyTwoFA?userEmail=${user.email}`);
-                }         
+                }
             }
         }
         catch (error) {
@@ -302,5 +306,5 @@ export class AuthService {
                 throw error;
             }
         }
-    } 
+    }
 }

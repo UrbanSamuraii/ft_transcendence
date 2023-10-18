@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './SquareGame.css';
 import { drawGrid } from '../../Utils.js';
-
+import { getCookie } from '../../utils/cookies'
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 945;
@@ -34,10 +34,20 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [activeKeys]);
 
     useEffect(() => {
+        const token = getCookie('token'); // Get the JWT token from cookies
+
         const serverAddress = window.location.hostname === 'localhost' ?
             'http://localhost:3002' :
             `http://${window.location.hostname}:3002`;
-        const socketConnection = io.connect(serverAddress); // this is not fit for prod
+        // const socketConnection = io.connect(serverAddress); // this is not fit for prod
+
+        // const socketConnection = io.connect(serverAddress);
+
+        const socketConnection = io.connect(serverAddress, {
+            withCredentials: true
+        });
+
+        console.log("token ==", token);
 
         socketConnection.on("updateGameData", (data) => {
             console.log('Received game update from socket.');
