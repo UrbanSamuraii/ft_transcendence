@@ -57,10 +57,6 @@ function SigninForm() {
         Password:
         <input type="password" name="password" value={formData.password} onChange={handleChange} />
       </label>
-      {/* <label>
-        2faAuthentication Password:
-        <input type="password" name="two_factor_athentication_password" value={formData.two_factor_athentication_password} onChange={handleChange} />
-      </label> */}
       <button type="submit">Sign In</button>
     </form>
   );
