@@ -5,13 +5,15 @@ import { Link } from 'react-router-dom';
 import './RegisterForm.css';
 
 export const RegisterForm = () => {
+
+	const {} = userForm();
 	
 	const onSubmit = (event:React.ChangeEvent<HTMLInputElement>) => {
 		event.preventDefault();
 	};
 
 	return (
-		<div className="form-container">
+		<div className="form-container" onSubmit={onSubmit}>
 			<InputContainer>
 				<InputLabel htmlFor="email">Email</InputLabel>
 				<InputField type="email" id="email"/>
