@@ -1,0 +1,59 @@
+/* RegisterForm*/
+
+.form-container {
+	width: 700px;
+	margin-right: 10px;
+}
+
+.nameFieldRow {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 0;
+}
+
+.nameFieldContainerFirst {
+	flex: 1; 
+	margin-right: 3px;
+}
+
+.nameFieldContainerLast {
+	flex: 1; 
+	margin-left: 3px;
+}
+
+.button {
+	margin: 10px 0;
+}
+
+.button42 {
+	margin: 20px 0;
+	transition: background-color 0.2s ease; 
+  	cursor: pointer;
+	font-weight: bold;
+	background-color: #000;
+	color: #fff;
+  	border: none;
+  	outline: none;
+  	width: 100%;
+  	height: 90px;
+
+	&:hover {
+		background-color: #111; /* Darker color on hover */
+	}
+}
+
+.existingUserOrNot {
+	margin: 20px 0;
+	text-align: center;
+	width: 100%;
+	
+	font-style: italic;
+    font-size: 80%; 
+	
+	& :last-child {
+		text-decoration: underline;
+		color: white;
+	}
+}
+

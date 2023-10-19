@@ -13,7 +13,8 @@ import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 import TwoFactorCode from './pages/TwoFactor/2faCode';
-
+import { AuthenticationPage } from './pages/AuthenticationPage';
+import { LoginPage } from './pages/LoginPage';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -32,6 +33,8 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
     '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
     '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
+    '/AuthenticationPage': { background: '#1a1a1a'},
+    '/LoginPage': { background: '#1a1a1a'},
 };
 
 function App() {
@@ -131,6 +134,9 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/2fa-enable" element={<TwoFactorSetup />} />
             <Route path="/2fa-disable" element={<TwoFactorDisable />} />
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
+            <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
+            <Route path="/LoginPage" element={<LoginPage />} />
+                  
         </Routes>
     );
 }
