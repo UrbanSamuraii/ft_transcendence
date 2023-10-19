@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { Button, Button42, InputContainer, InputField, InputLabel } from '../../utils/styles';
-import './RegisterForm.css';
+import './GlobalForms.css';
 
 export const RegisterForm = () => {
   const {

@@ -15,6 +15,7 @@ import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 import TwoFactorCode from './pages/TwoFactor/2faCode';
 import { AuthenticationPage } from './pages/AuthenticationPage';
 import { LoginPage } from './pages/LoginPage';
+import { ConversationPage } from './pages/ConversationPage';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -35,6 +36,8 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
     '/AuthenticationPage': { background: '#1a1a1a'},
     '/LoginPage': { background: '#1a1a1a'},
+    '/ConversationPage': { background: '#1a1a1a'},
+
 };
 
 function App() {
@@ -136,6 +139,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
             <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
             <Route path="/LoginPage" element={<LoginPage />} />
+            <Route path="/ConversationPage" element={<ConversationPage />} />
                   
         </Routes>
     );
