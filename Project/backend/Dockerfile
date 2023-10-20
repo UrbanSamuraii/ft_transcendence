@@ -2,19 +2,17 @@ FROM node:lts
 
 WORKDIR /app
 
+COPY entrypointBackend.sh /entrypointBackend.sh
+# COPY package*.json ./
+# COPY prisma ./prisma/
+# COPY . .
 
-COPY package*.json ./
-COPY prisma ./prisma/
-# COPY entrypoint.sh /app/entrypoint.sh
-COPY . .
+# RUN npm i -g @nestjs/cli
+# RUN npm install
 
-RUN npm i -g @nestjs/cli
-RUN npm install
-# RUN npx prisma generate
-
-# RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /entrypointBackend.sh
 
 EXPOSE 3001 3002 5555
-# ENTRYPOINT [ "/app/entrypoint.sh" ]
 
-ENTRYPOINT [ "npm", "run", "start:dev" ]
+ENTRYPOINT [ "/entrypointBackend.sh" ]
+CMD [ "npm", "run", "start:dev" ]
