@@ -3,7 +3,7 @@ import { Page } from "../utils/styles"
 
 export const AuthenticationPage = () => {
 	return( 
-		<Page>
+		<Page display="flex" justifyContent="center" alignItems="center">
 			<RegisterForm/>
 		</Page>
 	);

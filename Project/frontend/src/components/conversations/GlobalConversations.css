@@ -1,0 +1,21 @@
+
+.conversationAvatar {
+	background-color: rgb(134, 170, 202);
+	height: 48px;
+	width: 48px;
+	border-radius: 50%;
+	display: block;
+}
+
+.conversationName {
+	display: block;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.conversationLastMessage {
+	display: block;
+	font-style: italic;
+	font-size: 15px;
+	color: rgb(213, 229, 241);
+}

@@ -1,4 +1,38 @@
-export const ConversationSidebar = () => {
-	return <aside>Aside</aside>;
-  };
+import { ConversationSidebarContainer, ConversationSidebarItem, ConversationSidebarStyle, ConversationSidebarTexts } from '../../utils/styles';
+import { MdPostAdd } from 'react-icons/md';  
+import { ConversationType } from '../../utils/types';
+import { FC } from 'react';
+import './GlobalConversations.css';
+
+type Props = {
+	conversations: ConversationType[];
+}
+
+export const ConversationSidebar: FC<Props> = ({ conversations }) => {
+	return (
+	<ConversationSidebarStyle>
+		<header>
+			<div className="header-content">
+				<h2>Conversations</h2>
+					<MdPostAdd size={30} />
+			</div>
+		</header>
+		<ConversationSidebarContainer>
+			{conversations.map((conversation) => (
+			<ConversationSidebarItem>
+				<div className='conversationAvatar'>
+				</ div>
+				<ConversationSidebarTexts>
+					<div className="conversationName">
+						<div> <span>{conversation.name}</span> </div>
+					</div>
+					<div className="conversationLastMessage">
+						<div><span>{conversation.lastMessage}</span> </div>
+					</div>
+				</ConversationSidebarTexts>
+			</ ConversationSidebarItem>))}
+		</ConversationSidebarContainer>
+	</ConversationSidebarStyle>
+	);
+};
   

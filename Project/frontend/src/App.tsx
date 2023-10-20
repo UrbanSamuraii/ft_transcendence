@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import SignupForm from './pages/SignUp/SignupForm';
@@ -16,6 +16,7 @@ import TwoFactorCode from './pages/TwoFactor/2faCode';
 import { AuthenticationPage } from './pages/AuthenticationPage';
 import { LoginPage } from './pages/LoginPage';
 import { ConversationPage } from './pages/ConversationPage';
+import { ConversationChannelPage } from './pages/ConversationChannelPage';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -37,6 +38,7 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/AuthenticationPage': { background: '#1a1a1a'},
     '/LoginPage': { background: '#1a1a1a'},
     '/ConversationPage': { background: '#1a1a1a'},
+    '/ConversationChannelPage': { background: '#1a1a1a'},
 
 };
 
@@ -139,8 +141,11 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
             <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
             <Route path="/LoginPage" element={<LoginPage />} />
-            <Route path="/ConversationPage" element={<ConversationPage />} />
-                  
+            <Route path="/ConversationPage" element=
+            {<ConversationPage />}>
+                <Route path="channel/:id" element=
+                {<ConversationChannelPage />} />
+            </Route>    
         </Routes>
     );
 }

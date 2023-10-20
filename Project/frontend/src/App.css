@@ -255,7 +255,7 @@ button:hover {
 
   .disable-2fa-button {
     background-color: blueviolet; /* Define the background color for the disable 2FA button */
-    color: white;
+    color: #636060;
     padding: 10px 20px; /* Adjust padding as needed */
     font-size: 16px;
     border: none;
@@ -271,3 +271,14 @@ button:hover {
     background-color: darkslateblue; /* Define the hover color for the disable 2FA button */
   }
   
+body,
+html {
+  background-color: #1a1a1a;
+  font-family: 'Inter';
+  color: #fff;
+}
+
+h2 {
+  margin: 0;
+  color: #fff;
+}
