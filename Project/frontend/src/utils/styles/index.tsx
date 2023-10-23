@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { PageProps } from './styleType';
 
+export const CSB_WIDTH: number = 350;
+
 export const InputField = styled.input`
   font-family: 'Inter';
   background-color: inherit;
@@ -57,31 +59,32 @@ export const Page = styled.div<PageProps> `
 `;
 
 export const ConversationSidebarStyle = styled.aside`
-  position: absolute;
+  position: fixed;
   left: 0;
-  top: 0;
+  top: 75px;
   height: 100%;
   background-color: #1a1a1a;
-  width: 350px;
+  width: ${CSB_WIDTH}px;
   border-right: 1px solid #606060;
   overflow-y: scroll;
-  overflow-x: hidden; /* Use "hidden" for horizontal overflow */
+  overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #606060 #1a1a1a;
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-  scrollbar-width: none; /* For Internet Explorer and Edge */
+  scrollbar-color: #606060 #1a1a1a;  
+
   &::-webkit-scrollbar {
-    width: 6px; /* For WebKit browsers (e.g., Chrome and Safari) */
+    width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #606060; /* Color of the scroll thumb */
+    background-color: #606060;
   }
   &::-webkit-scrollbar-track {
-    background-color: #1a1a1a; /* Color of the track */
+    background-color: #1a1a1a;
   }
 
   & header {
+    position: fixed;
     display: flex;
+    top:0;
     justify-content: space-between;
     padding: 0 18px;
     background-color: #151515;
@@ -108,7 +111,7 @@ export const ConversationChannelPageStyle = styled.div`
   bottom: 0;
   width: 100%;
   height: 100%;
-  margin-left: 350px; 
+  margin-left: ${CSB_WIDTH}px;; 
   background-color: #1f1f1f;
 `;
 
@@ -119,12 +122,13 @@ export const ConversationPannelStyle = styled.div`
   bottom: 0;
   width: 100%;
   height: 100%;
-  margin-left: 350px; 
+  margin-left: ${CSB_WIDTH}px;; 
   background-color: #1f1f1f;
 `;
 
 export const ConversationSidebarContainer = styled.div`
   padding: 0px;
+  width: ${CSB_WIDTH}px;;
 `;
 
 export const ConversationSidebarItem = styled.div`
@@ -134,8 +138,8 @@ export const ConversationSidebarItem = styled.div`
   margin-bottom: 10px;
   margin-top: 10px;
   margin-left: 10px;
+  width: ${CSB_WIDTH}px;;
   border-bottom: 1px solid #606060;
-
 `;
 
 export const ConversationSidebarTexts = styled.div`

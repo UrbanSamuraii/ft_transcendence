@@ -3,12 +3,16 @@ import { MdPostAdd } from 'react-icons/md';
 import { ConversationType } from '../../utils/types';
 import { FC } from 'react';
 import './GlobalConversations.css';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
 	conversations: ConversationType[];
 }
 
 export const ConversationSidebar: FC<Props> = ({ conversations }) => {
+	
+	const navigate = useNavigate();
+
 	return (
 	<ConversationSidebarStyle>
 		<header>
@@ -19,7 +23,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 		</header>
 		<ConversationSidebarContainer>
 			{conversations.map((conversation) => (
-			<ConversationSidebarItem>
+			<ConversationSidebarItem onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
 				<div className='conversationAvatar'>
 				</ div>
 				<ConversationSidebarTexts>
