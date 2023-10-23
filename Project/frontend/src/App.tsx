@@ -39,7 +39,6 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/LoginPage': { background: '#1a1a1a'},
     '/ConversationPage': { background: '#1a1a1a'},
     '/ConversationChannelPage': { background: '#1a1a1a'},
-
 };
 
 function App() {
@@ -126,6 +125,10 @@ function Content({ setBackgroundStyle }: ContentProps) {
         }
     }
 
+    const GoToConversations = async () => {
+        navigate('/ConversationPage')
+    }
+
     return (
         <Routes>
             <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
@@ -134,7 +137,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA}/>} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>} />
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             <Route path="/2fa-enable" element={<TwoFactorSetup />} />
             <Route path="/2fa-disable" element={<TwoFactorDisable />} />

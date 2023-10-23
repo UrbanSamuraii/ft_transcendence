@@ -41,6 +41,15 @@ export const RegisterForm = () => {
     }));
   };
 
+  async function handleSignUp42Click() {
+    try {
+        window.location.href = 'http://localhost:3001/auth/signup42';
+    } 
+    catch (error) {
+        console.error('Sign up request error:', error);
+    }
+  }
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Partial<FormData> = {};
@@ -145,8 +154,7 @@ export const RegisterForm = () => {
         <Link to="/LoginPage">Login</Link>
       </div>
 
-      <Button42 className="button42">42 Identification</Button42>
-      <div className="existingUserOrNot"></div>
+      <Button42 className="button42" onClick={handleSignUp42Click}>42 Identification</Button42>
     </form>
   );
 };

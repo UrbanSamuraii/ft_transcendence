@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function TwoFactorCode() {
+  
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,13 +27,13 @@ function TwoFactorCode() {
       navigate('/play');
     }
     catch (error) {
-      console.error('Error disabling up 2FA:', error);
+      console.error('Error login with 2FA:', error);
     } 
 }
   
   return (
     <div>
-      <h2>Please enter you  Two-Factor Authentication code</h2>
+      <h2>Please enter your Two-Factor Authentication code</h2>
 	  	<input
             type="text"
             placeholder="Authentication Code"
