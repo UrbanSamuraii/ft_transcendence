@@ -6,11 +6,19 @@
 	margin-right: 10px;
 }
 
+.input-login-container {
+	margin-bottom: 10px;
+}
+
+.button-login-container {
+	margin-top: 20px;
+}
+
 .nameFieldRow {
 	width: 100%;
 	display: flex;
 	justify-content: space-between;
-	padding: 12px 0;
+	padding: 10px 0;
 }
 
 .nameFieldContainerFirst {

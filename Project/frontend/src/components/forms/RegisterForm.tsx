@@ -86,12 +86,14 @@ export const RegisterForm = () => {
 
   return (
     <form className="form-container" onSubmit={handleSignUp}>
-      <InputContainer>
-        <InputLabel htmlFor="email">Email</InputLabel>
-        <InputField
-          type="email" name="email" value={formData.email} onChange={handleInputChange} />
-        {formErrors.email && <div className="error-message">{formErrors.email}</div>}
-      </InputContainer>
+      <section className="nameFieldRow">
+        <InputContainer>
+          <InputLabel htmlFor="email">Email</InputLabel>
+          <InputField
+            type="email" name="email" value={formData.email} onChange={handleInputChange} />
+          {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+        </InputContainer>
+      </section>
 
       <section className="nameFieldRow">
         <div className="nameFieldContainerFirst">
@@ -128,14 +130,15 @@ export const RegisterForm = () => {
           <InputContainer>
             <InputLabel htmlFor="password">Password</InputLabel>
             <InputField
-              type="password" name="password" value={formData.password} onChange={handleInputChange}
-           />
+              type="password" name="password" value={formData.password} onChange={handleInputChange} />
           {formErrors.password && <div className="error-message">{formErrors.password}</div>}
           </InputContainer>
         </div>
       </section>
-
-      <Button type="submit" >Create My Account</Button>
+      
+      <section className="nameFieldRow">
+        <Button type="submit" >Create My Account</Button>
+      </section>
 
       <div className="existingUserOrNot">
         <span>Already have an account? </span>

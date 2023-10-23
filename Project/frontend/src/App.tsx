@@ -120,7 +120,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 credentials: 'include'
             });
             console.log('Signout successful:', response);
-            navigate('/');
+            navigate('/AuthenticationPage');
         } catch (error) {
             console.error('Signout failed:', error);
         }

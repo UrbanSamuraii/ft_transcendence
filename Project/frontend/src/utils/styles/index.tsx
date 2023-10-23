@@ -14,6 +14,11 @@ export const InputField = styled.input`
   box-sizing: border-box;
   padding: 0 !important;
   margin: 4px 0 !important;
+
+  ::placeholder {
+    color: #fff !important;
+    background-color: inherit !important;
+  }
 `;
 
 export const InputContainer = styled.div`
