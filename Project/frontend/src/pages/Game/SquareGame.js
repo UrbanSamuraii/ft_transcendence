@@ -14,12 +14,12 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
-function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
+function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
     const canvasRef = useRef(null);
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
     const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
-    const [socket, setSocket] = useState(null);
+    // const [socket, setSocket] = useState(null);
     const [isGameActive, setIsGameActive] = useState(true);
     const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
@@ -33,23 +33,57 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         activeKeysRef.current = activeKeys;
     }, [activeKeys]);
 
+    // useEffect(() => {
+    //     const token = getCookie('token'); // Get the JWT token from cookies
+
+    //     const serverAddress = window.location.hostname === 'localhost' ?
+    //         'http://localhost:3002' :
+    //         `http://${window.location.hostname}:3002`;
+    //     // const socketConnection = io.connect(serverAddress); // this is not fit for prod
+
+    //     // const socketConnection = io.connect(serverAddress);
+
+    //     const socketConnection = io.connect(serverAddress, {
+    //         withCredentials: true
+    //     });
+
+    //     console.log("token ==", token);
+
+    //     socketConnection.on("updateGameData", (data) => {
+    //         console.log('Received game update from socket.');
+
+    //         setGameData(data);
+    //         drawGame(data);
+
+    //         if (data.isGameOver) {
+    //             console.log('Game over detected.');
+    //             setIsGameActive(false); // Game is no longer active
+    //             onGameOver();
+    //         }
+
+    //     });
+
+    //     setSocket(socketConnection);
+
+    //     socketConnection.emit('startGame');  // Use the ref here
+
+    //     // Emit paddle movements every 100ms
+    //     const intervalId = setInterval(() => {
+    //         socketConnection.emit('paddleMovements', activeKeysRef.current);  // Use the ref here
+    //     }, 100 / 60);
+
+    //     return () => {
+    //         clearInterval(intervalId);
+    //         socketConnection.close();
+    //     };
+    // }, []);  // Empty dependency array
+
     useEffect(() => {
-        const token = getCookie('token'); // Get the JWT token from cookies
+        if (!socket) return;  // Ensure socket exists
 
-        const serverAddress = window.location.hostname === 'localhost' ?
-            'http://localhost:3002' :
-            `http://${window.location.hostname}:3002`;
-        // const socketConnection = io.connect(serverAddress); // this is not fit for prod
+        console.log("Using passed socket for game.");
 
-        // const socketConnection = io.connect(serverAddress);
-
-        const socketConnection = io.connect(serverAddress, {
-            withCredentials: true
-        });
-
-        console.log("token ==", token);
-
-        socketConnection.on("updateGameData", (data) => {
+        socket.on("updateGameData", (data) => {
             console.log('Received game update from socket.');
 
             setGameData(data);
@@ -60,23 +94,21 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
                 setIsGameActive(false); // Game is no longer active
                 onGameOver();
             }
-
         });
 
-        setSocket(socketConnection);
+        // setSocket(socket);
 
-        socketConnection.emit('startGame');  // Use the ref here
+        socket.emit('startGame');
 
-        // Emit paddle movements every 100ms
         const intervalId = setInterval(() => {
-            socketConnection.emit('paddleMovements', activeKeysRef.current);  // Use the ref here
+            socket.emit('paddleMovements', activeKeysRef.current);
         }, 100 / 60);
 
         return () => {
             clearInterval(intervalId);
-            socketConnection.close();
+            // Don't close the socket here; it will be managed by Matchmaking component
         };
-    }, []);  // Empty dependency array
+    }, [socket]);  // Depend on socket
 
     const startGame = () => {
         if (socket) {
@@ -332,5 +364,4 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', display: 'block' }} />
     );
 }
-
 export default SquareGame;

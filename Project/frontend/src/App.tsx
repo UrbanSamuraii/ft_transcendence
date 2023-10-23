@@ -13,6 +13,7 @@ import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 import TwoFactorCode from './pages/TwoFactor/2faCode';
+import Matchmaking from './pages/Matchmaking/Matchmaking';
 
 
 const defaultBackgroundStyle = {
@@ -83,7 +84,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     async function handleSignUp42Click() {
         try {
             window.location.href = 'http://localhost:3001/auth/signup42';
-        } 
+        }
         catch (error) {
             console.error('Sign up request error:', error);
         }
@@ -121,15 +122,14 @@ function Content({ setBackgroundStyle }: ContentProps) {
     return (
         <Routes>
             <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
-            {/* <Route path="/" element={<HomePage handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} /> */}
-            <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-            <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<SignupForm />} />
-            <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA}/>} />
-            {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
             <Route path="/2fa-enable" element={<TwoFactorSetup />} />
             <Route path="/2fa-disable" element={<TwoFactorDisable />} />
+            <Route path="/login" element={<SigninForm />} />
+            <Route path="/game" element={<SquareGame key={gameKey} socket={location.state?.socket} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
+            <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
+            <Route path="/matchmaking" element={<Matchmaking />} />
+            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} />} />
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
         </Routes>
     );

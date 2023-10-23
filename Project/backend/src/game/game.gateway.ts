@@ -18,13 +18,17 @@ const clientInputs = {};
 })
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
-
+    private queue: Socket[] = [];
     private gameLoop: NodeJS.Timeout;
 
     constructor(private gameService: SquareGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService
     ) { }
+
+    private addUserToQueue(client: Socket) {
+        this.queue.push(client);
+    }
 
     afterInit(server: Server) {
         console.log('Socket.io initialized');
@@ -42,13 +46,26 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        // Validate the token
         try {
             const decoded = this.jwtService.verify(token);
             // Optionally, store the decoded data on the socket for future use
             client.data.user = decoded;
             const userInfo = await this.userService.getUserByToken(token);
+            this.addUserToQueue(client);
             console.log(userInfo);
+
+            if (this.queue.length >= 2) {  // if there are at least two users in the queue
+                const player1 = this.queue.shift();  // remove the first user from the queue
+                const player2 = this.queue.shift();  // remove the second user from the queue
+
+                // Notify both users that a match has been found
+                player1.emit('matchFound', { opponent: player2.data.user });
+                player2.emit('matchFound', { opponent: player1.data.user });
+
+                // Here you could initialize game-related data or perform any other setup for the matched game
+
+                console.log(`Matched ${player1.id} with ${player2.id}`);
+            }
 
         } catch (e) {
             console.log('Invalid token', e);
@@ -59,8 +76,15 @@ export class GameGateway implements OnGatewayInit {
         console.log('Client connected:', client.id);
 
         // Listen for disconnect
-        client.on('disconnect', () => {
-            console.log('Client disconnected:', client.id);
+        client.on('disconnect', (reason) => {
+            // console.log('Client disconnected:', client.id);
+            console.log('Client disconnected:', client.id, 'Reason:', reason);
+
+            const index = this.queue.indexOf(client);
+            if (index !== -1) {
+                this.queue.splice(index, 1);
+            }
+
             delete clientInputs[client.id];
         });
     }
