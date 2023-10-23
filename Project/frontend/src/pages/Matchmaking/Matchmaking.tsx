@@ -1,30 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Matchmaking.css';
+import { useSocket } from './SocketContext';
 
 function Matchmaking() {
+    console.log("Matchmaking component rendered/mounted\n");
+
+    const { socket, startSocketConnection } = useSocket();
     const navigate = useNavigate();
+    const hasAddedListeners = useRef(false);  // To track if listeners have been added
 
     useEffect(() => {
-        const serverAddress = window.location.hostname === 'localhost' ?
-            'http://localhost:3002' :
-            `http://${window.location.hostname}:3002`;
+        startSocketConnection();
 
-        const socketConnection = io(serverAddress, {
-            withCredentials: true
-        });
+        if (socket && !hasAddedListeners.current) {
+            const handleMatchFound = (data: any) => {
+                console.log('Match found!', data);
+                navigate("/game");
+            };
+            socket.on('matchFound', handleMatchFound);
+            hasAddedListeners.current = true;  // Set the ref to true after adding the listeners
 
-        socketConnection.on('matchFound', (data: any) => {
-            console.log('Match found!', data);
-            // navigate("/game");  // Navigate to the game when a match is found
-            navigate("/game", { state: { socket: socketConnection } });
-        });
-
-        return () => {
-            socketConnection.close();
-        };
-    }, [navigate]);
+            return () => {
+                socket.off('matchFound', handleMatchFound);
+                hasAddedListeners.current = false;  // Reset the ref during cleanup
+            };
+        }
+    }, [socket]);
 
     return (
         <div className="paddle-container">
