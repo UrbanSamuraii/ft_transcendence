@@ -26,7 +26,6 @@ export class UserService {
     }
 
     async getUserByToken(token: string) {
-        console.log("token = ", token);
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },

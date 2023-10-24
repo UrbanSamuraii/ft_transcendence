@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button2FA, Button42, InputContainer, InputField, InputLabel, Text2FA } from '../../utils/styles';
+import React, { useState } from 'react';
+import { Button2FA, Text2FA } from '../../utils/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
@@ -30,7 +30,8 @@ const navigate = useNavigate();
 
   const handleEnableClick = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', { twoFactorAuthenticationCode: authenticationCode }, {
+		console.log({"Enabling code": authenticationCode});
+        const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', { twoFactorAuthenticationCode: authenticationCode }, {
         withCredentials: true,
       });
       console.log({"RESPONSE FROM ENABLING 2FA": response});
@@ -45,7 +46,7 @@ return (
     <form className="TwoFA-form-container">
       <div className="TwoFA-content-container">
         <Text2FA>Two-Factor Authentication Setup</Text2FA>
-		{error && <div className="error-message">{error}</div>}
+		{error && <div className="error-message">{error}</div>} {/* Display error message */}
 		{!qrCodeUrl && ( 
 			<Button2FA type="button" onClick={handleSetupClick}>Start 2FA Setup</Button2FA>
 		)}
@@ -57,9 +58,9 @@ return (
 				placeholder="Authentication Code"
 				value={authenticationCode}
 				onChange={(e) => setAuthenticationCode(e.target.value)}/>
+			<Button2FA type="button" onClick={handleEnableClick}>Enable 2FA</Button2FA>
         	</div>
         )}
-		<Button2FA type="button" onClick={handleEnableClick}>Enable 2FA</Button2FA>
       </div>
     </form>
   );

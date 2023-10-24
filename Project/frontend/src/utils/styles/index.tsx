@@ -159,7 +159,7 @@ export const ConversationSidebarTexts = styled.div`
 `;
 
 export const Button2FA = styled.button `
-width: 40%;
+width: 60%;
 height: 50px;
 background-color: #2b09ff;
 color: #fff;
@@ -172,6 +172,7 @@ export const Text2FA = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   width: 100%;
   background-color: #1a1a1a;
   height: 130px;

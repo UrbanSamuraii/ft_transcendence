@@ -226,7 +226,6 @@ export class AuthService {
                     two_factor_secret: ''
                 }
             });
-            // console.log({"USER TURNING OFF": newUser});
             const newSimpleToken = await this.signToken(newUser.id, newUser.email);
             const newSimpleUser = await this.prisma.user.update({
                 where: { id: user.id },

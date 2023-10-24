@@ -54,9 +54,7 @@ export class AuthController {
     @UseGuards(Jwt2faAuthGuard)
     @Post('2fa/generate')
     async register(@Req() req, @Res() res: ExpressResponse) {
-        // console.log("req = ", req);
         const user = await this.userService.getUserByToken(req.cookies.token);
-        // console.log("user = ", user);
         const { secret, otpAuthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
         const userUpdated = await this.userService.getUserByToken(req.cookies.token);
         return res.status(200).json({
@@ -68,21 +66,21 @@ export class AuthController {
     @UseGuards(Jwt2faAuthGuard)
     @Post('2fa/turn_on')
     async turnOnTwoFactorAuthentication(@Req() req, @Res() res: ExpressResponse) {
-        const user = await this.userService.getUserByToken(req);
+        const user = await this.userService.getUserByToken(req.cookies.token);
         return (await this.authService.turnOnTwoFactorAuthentication(req, res, user));
     }
 
     @UseGuards(Jwt2faAuthGuard)
     @Post("2fa/turn_off")
     async disableTwoFa(@Request() req, @Res() res: ExpressResponse) {
-        const user = await this.userService.getUserByToken(req);
+        const user = await this.userService.getUserByToken(req.cookies.token);
         return (await this.authService.turnOffTwoFactorAuthentication(req, res, user));
     }
 
-    // @UseGuards(JwtAuthGuard) // Make sure the user is authenticated
-    // @Get('me')
-    // async getMe(@Req() req) {
-    //     return await this.userService.getUserByToken(req);
-    // }
+    @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated
+    @Get('me')
+    async getMe(@Request() req) {
+        return (await this.userService.getUserByToken(req.cookies.token));
+    }
 
 }
