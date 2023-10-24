@@ -46,21 +46,50 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
+        // const isUserInQueue = (userEmail: string) => {
+        //     return this.queue.some(client => client.data.user.email === userEmail);
+        // };
+
+        const userIndexInQueue = (userEmail: string) => {
+            return this.queue.findIndex(client => client.data.user.email === userEmail);
+        };
+
         try {
             const decoded = this.jwtService.verify(token);
             // Optionally, store the decoded data on the socket for future use
             client.data.user = decoded;
             const userInfo = await this.userService.getUserByToken(token);
-            this.addUserToQueue(client);
-            console.log(userInfo);
+            console.log("decoded.email = ", decoded.email);
+            // console.log("client.data.user.id = ", client.data.user.email);
+            console.log(this.queue.length);
 
+            // if (!isUserInQueue(decoded.email)) {
+            //     console.log("here");
+            //     this.addUserToQueue(client);
+            // }
+
+            const index = userIndexInQueue(decoded.email);
+            // if (index !== -1) {
+            // console.log("Replacing user's old socket with new socket:", decoded.email);
+            // this.queue[index] = client;  // Replace the old socket with the new one
+            // } else {
+            // console.log("Adding new user to queue:", decoded.email);
+            this.addUserToQueue(client);
+            // }
+
+            console.log('Client connected:', client.id);
+            // console.log(userInfo);
+
+            console.log(this.queue.length);
             if (this.queue.length >= 2) {  // if there are at least two users in the queue
                 const player1 = this.queue.shift();  // remove the first user from the queue
                 const player2 = this.queue.shift();  // remove the second user from the queue
 
                 // Notify both users that a match has been found
                 player1.emit('matchFound', { opponent: player2.data.user });
+                player1.emit('matchFound', { you: player1.data.user });
                 player2.emit('matchFound', { opponent: player1.data.user });
+                player2.emit('matchFound', { you: player2.data.user });
 
                 // Here you could initialize game-related data or perform any other setup for the matched game
 
@@ -72,8 +101,6 @@ export class GameGateway implements OnGatewayInit {
             client.disconnect(true);  // Disconnect the client
             return;
         }
-
-        console.log('Client connected:', client.id);
 
         // Listen for disconnect
         client.on('disconnect', (reason) => {

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 // import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
 import './SquareGame.css';
 import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
+import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 945;
@@ -14,7 +14,7 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
-function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
+function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     const canvasRef = useRef(null);
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
@@ -23,6 +23,7 @@ function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
     const [isGameActive, setIsGameActive] = useState(true);
     const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
+    const { socket } = useSocket();  // Get the socket from context
 
     useEffect(() => {
         isGameActiveRef.current = isGameActive;
@@ -33,55 +34,10 @@ function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
         activeKeysRef.current = activeKeys;
     }, [activeKeys]);
 
-    // useEffect(() => {
-    //     const token = getCookie('token'); // Get the JWT token from cookies
-
-    //     const serverAddress = window.location.hostname === 'localhost' ?
-    //         'http://localhost:3002' :
-    //         `http://${window.location.hostname}:3002`;
-    //     // const socketConnection = io.connect(serverAddress); // this is not fit for prod
-
-    //     // const socketConnection = io.connect(serverAddress);
-
-    //     const socketConnection = io.connect(serverAddress, {
-    //         withCredentials: true
-    //     });
-
-    //     console.log("token ==", token);
-
-    //     socketConnection.on("updateGameData", (data) => {
-    //         console.log('Received game update from socket.');
-
-    //         setGameData(data);
-    //         drawGame(data);
-
-    //         if (data.isGameOver) {
-    //             console.log('Game over detected.');
-    //             setIsGameActive(false); // Game is no longer active
-    //             onGameOver();
-    //         }
-
-    //     });
-
-    //     setSocket(socketConnection);
-
-    //     socketConnection.emit('startGame');  // Use the ref here
-
-    //     // Emit paddle movements every 100ms
-    //     const intervalId = setInterval(() => {
-    //         socketConnection.emit('paddleMovements', activeKeysRef.current);  // Use the ref here
-    //     }, 100 / 60);
-
-    //     return () => {
-    //         clearInterval(intervalId);
-    //         socketConnection.close();
-    //     };
-    // }, []);  // Empty dependency array
-
     useEffect(() => {
         if (!socket) return;  // Ensure socket exists
 
-        console.log("Using passed socket for game.");
+        console.log("Using socket from context for game.");
 
         socket.on("updateGameData", (data) => {
             console.log('Received game update from socket.');
@@ -96,8 +52,6 @@ function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
             }
         });
 
-        // setSocket(socket);
-
         socket.emit('startGame');
 
         const intervalId = setInterval(() => {
@@ -106,7 +60,7 @@ function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
 
         return () => {
             clearInterval(intervalId);
-            // Don't close the socket here; it will be managed by Matchmaking component
+            // Don't close the socket here; it will be managed by the SocketProvider
         };
     }, [socket]);  // Depend on socket
 
@@ -257,8 +211,10 @@ function SquareGame({ socket, onStartGame, onGoBackToMainMenu, onGameOver }) {
     }
 
     const drawGame = (data) => {
+        if (!canvasRef.current) return;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
 
         const canvasAspectRatio = canvas.width / canvas.height;
