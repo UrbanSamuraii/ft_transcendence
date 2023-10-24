@@ -55,12 +55,13 @@ export const Button42 = styled.button `
   cursor: pointer;
 `;
 
-export const Page = styled.div<PageProps> `
+export const Page = styled.div`
+  width: 100%;
   background-color: #1a1a1a;
   height: 100%;
-  display: ${(props) => props.display};
-  justify-content: ${(props) => props.justifycontent};
-  align-items: ${(props) => props.alignitems};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ConversationSidebarStyle = styled.aside`
@@ -157,3 +158,23 @@ export const ConversationSidebarTexts = styled.div`
   border-bottom: 1px
 `;
 
+export const Button2FA = styled.button `
+width: 40%;
+height: 50px;
+background-color: #2b09ff;
+color: #fff;
+display: block;
+margin: 0 auto;
+text-align: center;
+`;
+
+export const Text2FA = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: #1a1a1a;
+  height: 130px;
+  color: #fff;
+  font-size: 2em;
+`;

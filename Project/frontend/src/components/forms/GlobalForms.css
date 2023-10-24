@@ -6,6 +6,23 @@
 	margin-right: 10px;
 }
 
+.TwoFA-form-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 700px;
+	height: 100vh;
+	margin: 0 auto;
+}
+
+.TwoFA-content-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 .input-login-container {
 	margin-bottom: 10px;
 }
@@ -32,6 +49,12 @@
 }
 
 .button {
+	margin-top: 20px;
+	margin: 10px 0;
+}
+
+.button2FA {
+	margin-top: 20px;
 	margin: 10px 0;
 }
 
@@ -48,7 +71,7 @@
   	height: 90px;
 
 	&:hover {
-		background-color: #111; /* Darker color on hover */
+		background-color: #111; 
 	}
 }
 

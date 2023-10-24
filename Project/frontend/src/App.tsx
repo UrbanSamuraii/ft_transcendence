@@ -17,6 +17,7 @@ import { AuthenticationPage } from './pages/AuthenticationPage';
 import { LoginPage } from './pages/LoginPage';
 import { ConversationPage } from './pages/ConversationPage';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
+import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -39,6 +40,7 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/LoginPage': { background: '#1a1a1a'},
     '/ConversationPage': { background: '#1a1a1a'},
     '/ConversationChannelPage': { background: '#1a1a1a'},
+    '/TwoFAEnablingPage': { background: '#1a1a1a'},
 };
 
 function App() {
@@ -139,7 +141,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/login" element={<SigninForm />} />
             <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>} />
             {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} handleSetup2FA={handleSetup2FA} handleDisable2FA={handleDisable2FA} />} /> */}
-            <Route path="/2fa-enable" element={<TwoFactorSetup />} />
+            {/* <Route path="/2fa-enable" element={<TwoFactorSetup />} /> */}
+            <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
             <Route path="/2fa-disable" element={<TwoFactorDisable />} />
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
             <Route path="/AuthenticationPage" element={<AuthenticationPage />} />

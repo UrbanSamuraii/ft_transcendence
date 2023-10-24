@@ -23,7 +23,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 		</header>
 		<ConversationSidebarContainer>
 			{conversations.map((conversation) => (
-			<ConversationSidebarItem onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
+			<ConversationSidebarItem key={conversation.id} onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
 				<div className='conversationAvatar'>
 				</ div>
 				<ConversationSidebarTexts>
