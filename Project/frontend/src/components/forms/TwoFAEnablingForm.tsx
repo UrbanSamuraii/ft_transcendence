@@ -50,17 +50,16 @@ return (
 			<Button2FA type="button" onClick={handleSetupClick}>Start 2FA Setup</Button2FA>
 		)}
 		{qrCodeUrl && (
-			<div>
+			<div className="TwoFA-content-container-QR">
 				<img src={qrCodeUrl} alt="QR Code" />
 				<input
 				type="text"
 				placeholder="Authentication Code"
 				value={authenticationCode}
-				onChange={(e) => setAuthenticationCode(e.target.value)}
-				/>
-            <button onClick={handleEnableClick}>Enable 2FA</button>
-          </div>
+				onChange={(e) => setAuthenticationCode(e.target.value)}/>
+        	</div>
         )}
+		<Button2FA type="button" onClick={handleEnableClick}>Enable 2FA</Button2FA>
       </div>
     </form>
   );

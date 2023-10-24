@@ -23,6 +23,17 @@
 	justify-content: center;
 }
 
+.TwoFA-content-container-QR {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.TwoFA-content-container-QR > * {
+	margin: 20px 0;
+}
+
 .input-login-container {
 	margin-bottom: 10px;
 }
