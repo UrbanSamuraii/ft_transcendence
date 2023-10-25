@@ -5,6 +5,8 @@ import './SquareGame.css';
 import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
 import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
+import { useNavigate, useLocation } from 'react-router-dom';
+
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 945;
@@ -63,6 +65,13 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             // Don't close the socket here; it will be managed by the SocketProvider
         };
     }, [socket]);  // Depend on socket
+
+    // const stopSocketConnection = () => {
+    //     if (socket) {
+    //         socket.close();
+    //         setSocket(null);
+    //     }
+    // };
 
     const startGame = () => {
         if (socket) {
@@ -228,7 +237,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             gameWidth = canvas.width;
             gameHeight = gameWidth / targetAspectRatio;
         }
-
 
         const offsetX = (canvas.width - gameWidth) / 2;
         const offsetY = (canvas.height - gameHeight) / 2;

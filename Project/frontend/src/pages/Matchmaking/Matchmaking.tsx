@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Matchmaking.css';
 import { useSocket } from './SocketContext';
 
 function Matchmaking() {
     console.log("Matchmaking component rendered/mounted\n");
 
-    const { socket, startSocketConnection } = useSocket();
+    const { socket, startSocketConnection, stopSocketConnection } = useSocket();
     const navigate = useNavigate();
     const hasAddedListeners = useRef(false);  // To track if listeners have been added
+
 
     useEffect(() => {
         startSocketConnection();

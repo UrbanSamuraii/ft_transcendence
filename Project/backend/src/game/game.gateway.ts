@@ -21,6 +21,7 @@ export class GameGateway implements OnGatewayInit {
     private queue: Socket[] = [];
     private gameLoop: NodeJS.Timeout;
 
+
     constructor(private gameService: SquareGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService
@@ -61,7 +62,6 @@ export class GameGateway implements OnGatewayInit {
             const userInfo = await this.userService.getUserByToken(token);
             console.log("decoded.email = ", decoded.email);
             // console.log("client.data.user.id = ", client.data.user.email);
-            console.log(this.queue.length);
 
             // if (!isUserInQueue(decoded.email)) {
             //     console.log("here");
@@ -77,7 +77,7 @@ export class GameGateway implements OnGatewayInit {
             this.addUserToQueue(client);
             // }
 
-            console.log('Client connected:', client.id);
+            // console.log('Client connected:', client.id);
             // console.log(userInfo);
 
             console.log(this.queue.length);
@@ -87,9 +87,9 @@ export class GameGateway implements OnGatewayInit {
 
                 // Notify both users that a match has been found
                 player1.emit('matchFound', { opponent: player2.data.user });
-                player1.emit('matchFound', { you: player1.data.user });
+                // player1.emit('matchFound', { you: player1.data.user });
                 player2.emit('matchFound', { opponent: player1.data.user });
-                player2.emit('matchFound', { you: player2.data.user });
+                // player2.emit('matchFound', { you: player2.data.user });
 
                 // Here you could initialize game-related data or perform any other setup for the matched game
 
@@ -142,7 +142,7 @@ export class GameGateway implements OnGatewayInit {
         // console.log("userId = ", userId);
         // console.log("sub = ", sub);
         // console.log("email = ", email);
-        console.log(JSON.stringify(client.data.user, null, 2));
+        // console.log(JSON.stringify(client.data.user, null, 2));
 
         if (this.gameService.isGameOver) {
             this.gameService.resetGame();
