@@ -33,22 +33,34 @@ model User {
   
   status  status_t? @default(OFFLINE)
 
-  member  Channel[] @relation("member")
+  member      Channel[] @relation("member")
+  messages    Message[] @relation("author")
 
   @@unique([id, email, username])
 	@@map("users")
 }
 
 model Channel {
-  id  Int   @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
+  name  String  @unique 
 
   createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
 
-  members User[]  @relation("member")
+  members   User[]    @relation("member")
+  messages  Message[]
 
   @@unique([id])
   @@map("channels")
+}
+
+model Message {
+  id              Int          @id @default(autoincrement())
+  message         String?
+  author          User         @relation("author", fields: [authorName], references: [username])
+  authorName      String
+  channel         Channel      @relation(fields: [channel_id], references:[id])
+  channel_id      Int
 }
 
 enum status_t {

@@ -117,7 +117,7 @@ export const ConversationChannelPageStyle = styled.div`
   bottom: 0;
   width: 100%;
   height: 100%;
-  margin-left: ${CSB_WIDTH}px;; 
+  margin-left: ${CSB_WIDTH}px; 
   background-color: #1f1f1f;
 `;
 
@@ -128,13 +128,13 @@ export const ConversationPannelStyle = styled.div`
   bottom: 0;
   width: 100%;
   height: 100%;
-  margin-left: ${CSB_WIDTH}px;; 
+  margin-left: ${CSB_WIDTH}px;
   background-color: #1f1f1f;
 `;
 
 export const ConversationSidebarContainer = styled.div`
   padding: 0px;
-  width: ${CSB_WIDTH}px;;
+  width: ${CSB_WIDTH}px;
 `;
 
 export const ConversationSidebarItem = styled.div`
@@ -144,7 +144,7 @@ export const ConversationSidebarItem = styled.div`
   margin-bottom: 10px;
   margin-top: 10px;
   margin-left: 10px;
-  width: ${CSB_WIDTH}px;;
+  width: ${CSB_WIDTH}px;
   border-bottom: 1px solid #606060;
 `;
 
@@ -159,13 +159,13 @@ export const ConversationSidebarTexts = styled.div`
 `;
 
 export const Button2FA = styled.button `
-width: 60%;
-height: 50px;
-background-color: #2b09ff;
-color: #fff;
-display: block;
-margin: 0 auto;
-text-align: center;
+  width: 60%;
+  height: 50px;
+  background-color: #2b09ff;
+  color: #fff;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 `;
 
 export const Text2FA = styled.div`
@@ -178,4 +178,31 @@ export const Text2FA = styled.div`
   height: 130px;
   color: #fff;
   font-size: 2em;
+`;
+
+export const OverlayStyle = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin-left: ${CSB_WIDTH}px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+`;
+
+export const OverlayContent = styled.div`
+  margin-right: ${CSB_WIDTH}px;
+`;
+
+export const ButtonOverlay = styled.button`
+background-color: #1a1a1a;
+  color: #fff; 
+  border: none;
+  padding: 0px 0px; 
+  font-size: 16px; 
+  border-radius: 5px;
 `;

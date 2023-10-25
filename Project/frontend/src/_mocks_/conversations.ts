@@ -17,68 +17,12 @@ export default [
 	lastMessage: "Top a toute !",
 },
 {
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
-},{
-	id: 3,
-	name: "Pierre Bizien",
-	lastMessage: "Top a toute !",
+	id: 4,
+	name: "Jeanne de Leusse",
+	lastMessage: "J arrive ! T as du cash ?",
+},
+{
+	name: "Antoine de Leusse",
+	lastMessage: "J arrive ! T as du cash ?",
 },
 ] as ConversationType[];

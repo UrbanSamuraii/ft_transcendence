@@ -3,12 +3,6 @@ FROM node:lts
 WORKDIR /app
 
 COPY entrypointBackend.sh /entrypointBackend.sh
-# COPY package*.json ./
-# COPY prisma ./prisma/
-# COPY . .
-
-# RUN npm i -g @nestjs/cli
-# RUN npm install
 
 RUN chmod +x /entrypointBackend.sh
 
