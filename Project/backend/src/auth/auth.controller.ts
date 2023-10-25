@@ -80,7 +80,10 @@ export class AuthController {
     @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated
     @Get('me')
     async getMe(@Request() req) {
-        return (await this.userService.getUserByToken(req.cookies.token));
+        const me = await this.userService.getUserByToken(req.cookies.token);
+        delete me.hash;
+        delete me.accessToken;
+        return me;
     }
 
 }

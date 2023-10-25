@@ -16,9 +16,7 @@ import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
-import { useAuth } from './utils/hooks/useAuth';
-import { User } from './utils/types';
-
+import { AuthenticatedRoute } from './components/routes/AuthenticatedRoutes'
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -59,19 +57,6 @@ function App() {
         </Router>
     );
 }
-
-// type Props = { children: React.ReactNode};
-
-// const RequireAuth: FC<Props> = ({ children }) => {
-//     const auth = useAuth();
-//     const [user, setUser] = useState<User | undefined>();
-//     const location = useLocation();
-//     console.log({"Auth navigating": auth});
-//     if (!auth.user) {
-//         return <Navigate to="/AuthenticationPage" state={{ from: location }} replace />;
-//     }
-//     return <> {children} </>;
-// }
 
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
@@ -152,17 +137,17 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
-            <Route path="/signup" element={<SignupForm />} />
-            <Route path="/login" element={<SigninForm />} />
-            <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>} />
-            <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
-            <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
-            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
+            <Route path="/play" element={<AuthenticatedRoute>
+                                        <Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>
+                                         </AuthenticatedRoute>} />
+            <Route path="/2fa-enable" element={<AuthenticatedRoute><TwoFAEnablingPage /></AuthenticatedRoute>} />
+            <Route path="/2fa-disable" element={<AuthenticatedRoute><TwoFADisablingPage /></AuthenticatedRoute>} />
+            <Route path="/FortyTwoFA" element={<AuthenticatedRoute><TwoFACodePage /></AuthenticatedRoute>} />
             <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
             <Route path="/LoginPage" element={<LoginPage />} />
-            <Route path="/ConversationPage" element= {<ConversationPage />} >
+            <Route path="/ConversationPage" element= {<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >
                 <Route path="channel/:id" element=
-                {<ConversationChannelPage />} />
+                {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
             </Route>    
         </Routes>
     );
