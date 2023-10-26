@@ -44,6 +44,7 @@ export const Button = styled.button `
   outline: none !important;
   border: none !important;
 `;
+
 export const Button42 = styled.button `
   width: 100%;
   height: 90px; !important;
@@ -199,10 +200,21 @@ export const OverlayContent = styled.div`
 `;
 
 export const ButtonOverlay = styled.button`
-background-color: #1a1a1a;
+  background-color: #1a1a1a;
   color: #fff; 
   border: none;
   padding: 0px 0px; 
   font-size: 16px; 
   border-radius: 5px;
+`;
+
+export const ButtonCreateConv = styled.button`
+  background-color: #1c1c1c;
+  color: #fff; 
+  border: none;
+  padding: 0px 0px; 
+  font-size: 16px; 
+  border-radius: 5px;
+  height: 30px;
+  width: 200px;
 `;

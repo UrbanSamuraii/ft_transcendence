@@ -55,15 +55,24 @@ export const RegisterForm = () => {
     const newErrors: Partial<FormData> = {};
     if (!formData.email) {
       newErrors.email = 'Email is required';
-    }
+    } 
     if (!formData.username) {
       newErrors.username = 'Username is required';
+    }
+    if (/[.,;!?'"<>]|\s/.test(formData.username)) {
+      newErrors.username = 'Username cannot contain spaces or punctuation marks';
     }
     if (!formData.first_name) {
       newErrors.first_name = 'First name is required';
     }
+    if (/[.,;!?'"<>]|\s/.test(formData.first_name)) {
+      newErrors.first_name = 'First name cannot contain spaces or punctuation marks';
+    }
     if (!formData.last_name) {
       newErrors.last_name = 'Last name is required';
+    }
+    if (/[.,;!?'"<>]/.test(formData.last_name)) {
+      newErrors.last_name = 'Last name cannot contain spaces or punctuation marks';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
