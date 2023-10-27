@@ -209,12 +209,12 @@ export const ButtonOverlay = styled.button`
 `;
 
 export const ButtonCreateConv = styled.button`
-  background-color: #1c1c1c;
+  background-color: #3c3c9c;
   color: #fff; 
   border: none;
   padding: 0px 0px; 
   font-size: 16px; 
   border-radius: 5px;
-  height: 30px;
+  height: 40px;
   width: 200px;
 `;

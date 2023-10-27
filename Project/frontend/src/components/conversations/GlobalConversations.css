@@ -22,8 +22,8 @@
 
 .form-Create-Conversation {
 	display: block;
-	width: 500px;
-	height: 300px;
+	width: 530px;
+	height: 330px;
 	background-color: rgb(33, 34, 36);
 	text-align: center; 
 	display: flex;
@@ -39,11 +39,11 @@
 }
 
 .input-createConv-container {
-	padding: 10px;
+	padding: 8px;
 }
 
 .button-createConv-container {
-	padding: 10px;
+	padding: 15px;
 	height: 90px;
 }
 
