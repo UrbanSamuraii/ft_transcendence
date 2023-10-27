@@ -11,10 +11,21 @@ export class MembersService implements IMembersService {
 	constructor(private prisma: PrismaService,
 				private userService: UserService) {};
 
-	async findMember(id: string): Promise<User | null> {
-		const user_id = parseInt(id);
-		const memberToFind = await this.userService.getUserById(user_id);
-		return memberToFind;
+	async findMemberInConversation(conversationId: number, userId: string): Promise<User | null> {
+		const conversation = await this.prisma.conversation.findUnique({
+			where: {
+			  id: conversationId,
+			},
+			include: {
+			  members: true,
+			},
+		  });
+		
+		  if (!conversation) { return null; }
+		
+		  const memberFinded = conversation.members.find((member) => member.id === parseInt(userId));
+		
+		  return memberFinded || null; // Return the found member or null if not found
 	}
 
 	addMember(): Promise<User | null> {
