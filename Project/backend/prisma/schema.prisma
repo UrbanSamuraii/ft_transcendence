@@ -4,6 +4,7 @@
 generator client {
     provider      = "prisma-client-js"
     binaryTargets = ["native", "debian-openssl-3.0.x"]
+    port          = 5555
 }
 
 datasource db {
@@ -48,19 +49,19 @@ model Conversation {
 	updatedAt	DateTime	@updatedAt
 
   members   User[]    @relation("member")
-  messages  Message[]
+  messages  Message[] 
 
   @@unique([id])
   @@map("conversations")
 }
 
 model Message {
-  id              Int          @id @default(autoincrement())
-  message         String?
-  author          User         @relation("author", fields: [authorName], references: [username])
-  authorName      String
-  conversation         Conversation      @relation(fields: [conversation_id], references:[id])
-  conversation_id      Int
+  id                    Int          @id @default(autoincrement())
+  message               String?
+  author                User         @relation("author", fields: [authorName], references: [username])
+  authorName            String
+  conversation          Conversation      @relation(fields: [conversation_id], references:[id])
+  conversation_id       Int
 }
 
 enum status_t {

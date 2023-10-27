@@ -25,6 +25,14 @@ export class UserService {
         });
     }
 
+    async getUserById(id: number): Promise<User | null> {
+        return await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+    }
+
     async getUserByToken(token: string) {
         try {
             const user = await this.prisma.user.findFirst({
