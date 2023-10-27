@@ -1,5 +1,6 @@
 .navbar {
     display: flex;
+    flex-wrap: wrap;
     height: 50px;
     justify-content: space-between;
     align-items: center;
@@ -23,4 +24,28 @@
 .navbar-logo {
     font-weight: bold;
     font-size: 1.5rem;
+}
+
+/* Media Query for small screens */
+@media screen and (max-width: 600px) {
+    .navbar {
+        padding: 0.5rem 1rem;
+        /* Reduce padding */
+    }
+
+    .navbar a {
+        font-size: 14px;
+        /* Reduce font size */
+        margin: 0 0.5rem;
+        /* Reduce margin */
+        padding: 0.1rem 0.3rem;
+        /* Reduce padding */
+    }
+
+    .navbar-logo {
+        font-size: 1.2rem;
+        /* Reduce logo size */
+    }
+
+    /* Optional: Code for hamburger menu goes here */
 }

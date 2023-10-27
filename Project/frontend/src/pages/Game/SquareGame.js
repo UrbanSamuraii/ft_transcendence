@@ -292,30 +292,38 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             const navbar = document.querySelector('.navbar');  // Get the navbar element
             const navbarHeight = navbar ? navbar.offsetHeight : 50;  // Use navbar's height or default to 50px if not found
 
-            const containerWidth = window.innerWidth;
+            console.log("navbar == ", navbarHeight);
+            let containerWidth = window.innerWidth;
             let containerHeight = window.innerHeight - navbarHeight;  // Deducting the navbar's height
 
             let newCanvasWidth, newCanvasHeight;
 
-            if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
-                newCanvasHeight = containerHeight;
-                newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+            if (containerWidth <= 500 && containerHeight <= 440 - navbarHeight) {
+                // Set canvas to exact appearance at 500x440px
+                newCanvasWidth = 500;
+                // newCanvasHeight = 440;
+                // newCanvasHeight = 440 - navbarHeight;
+                newCanvasHeight = 441;
             } else {
-                newCanvasWidth = containerWidth;
-                newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+                // Proceed with normal resizing
+                if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
+                    newCanvasHeight = containerHeight;
+                    newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+                } else {
+                    newCanvasWidth = containerWidth;
+                    newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+                }
+
+                // Ensure the canvas doesn't exceed the container's dimensions
+                newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
+                newCanvasHeight = Math.min(newCanvasHeight, containerHeight);
             }
-
-            // Ensure the canvas doesn't exceed the container's dimensions
-            newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
-            newCanvasHeight = Math.min(newCanvasHeight, containerHeight);
-
-            // Set minimum canvas size
-            newCanvasWidth = Math.max(newCanvasWidth, 500);
-            newCanvasHeight = Math.max(newCanvasHeight, 440);
 
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
 
+            console.log(canvas.width);
+            console.log(canvas.height);
             if (gameData) {
                 drawGame(gameData);
             }
@@ -324,9 +332,8 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-
-
     }, [gameData]);
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
