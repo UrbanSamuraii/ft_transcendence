@@ -23,12 +23,23 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "channels" (
+CREATE TABLE "conversations" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "channels_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "conversations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" SERIAL NOT NULL,
+    "message" TEXT,
+    "authorName" TEXT NOT NULL,
+    "conversation_id" INTEGER NOT NULL,
+
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -50,7 +61,10 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_id_email_username_key" ON "users"("id", "email", "username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "channels_id_key" ON "channels"("id");
+CREATE UNIQUE INDEX "conversations_name_key" ON "conversations"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "conversations_id_key" ON "conversations"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_member_AB_unique" ON "_member"("A", "B");
@@ -59,7 +73,13 @@ CREATE UNIQUE INDEX "_member_AB_unique" ON "_member"("A", "B");
 CREATE INDEX "_member_B_index" ON "_member"("B");
 
 -- AddForeignKey
-ALTER TABLE "_member" ADD CONSTRAINT "_member_A_fkey" FOREIGN KEY ("A") REFERENCES "channels"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Message" ADD CONSTRAINT "Message_authorName_fkey" FOREIGN KEY ("authorName") REFERENCES "users"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_member" ADD CONSTRAINT "_member_A_fkey" FOREIGN KEY ("A") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_member" ADD CONSTRAINT "_member_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

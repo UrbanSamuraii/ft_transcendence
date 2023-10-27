@@ -24,7 +24,6 @@ export class AuthService {
         private config: ConfigService,
         private userService: UserService) { }
 
-
     async signToken(userID: number, email: string): Promise<string> {
         const user = await this.userService.getUser({ email });
         const payload = {

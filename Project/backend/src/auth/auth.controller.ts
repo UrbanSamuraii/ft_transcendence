@@ -3,8 +3,6 @@ import {
     Req, Request
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-// import { AuthGuard } from '@nestjs/passport';
-// import { LocalAuthGuard } from 'src/auth/guard';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';

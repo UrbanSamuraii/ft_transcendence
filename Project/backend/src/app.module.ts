@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-// import { ChatModule } from './chat/chat.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { UserModule } from './user/user.module';
@@ -8,10 +7,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { GameGateway } from './game/game.gateway';
 import { SquareGameService } from './game/game.square.service';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
     imports: [
-        AuthModule, 
+        AuthModule,
+        ConversationsModule,
         UserModule, 
         PrismaModule, 
         ConfigModule.forRoot({ isGlobal: true }), 

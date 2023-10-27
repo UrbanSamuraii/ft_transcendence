@@ -33,14 +33,14 @@ model User {
   
   status  status_t? @default(OFFLINE)
 
-  member      Channel[] @relation("member")
+  member      Conversation[] @relation("member")
   messages    Message[] @relation("author")
 
   @@unique([id, email, username])
 	@@map("users")
 }
 
-model Channel {
+model Conversation {
   id    Int     @id @default(autoincrement())
   name  String  @unique 
 
@@ -51,7 +51,7 @@ model Channel {
   messages  Message[]
 
   @@unique([id])
-  @@map("channels")
+  @@map("conversations")
 }
 
 model Message {
@@ -59,8 +59,8 @@ model Message {
   message         String?
   author          User         @relation("author", fields: [authorName], references: [username])
   authorName      String
-  channel         Channel      @relation(fields: [channel_id], references:[id])
-  channel_id      Int
+  conversation         Conversation      @relation(fields: [conversation_id], references:[id])
+  conversation_id      Int
 }
 
 enum status_t {
