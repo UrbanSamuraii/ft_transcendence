@@ -309,6 +309,10 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
             newCanvasHeight = Math.min(newCanvasHeight, containerHeight);
 
+            // Set minimum canvas size
+            newCanvasWidth = Math.max(newCanvasWidth, 500);
+            newCanvasHeight = Math.max(newCanvasHeight, 440);
+
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
 
@@ -320,6 +324,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+
 
     }, [gameData]);
 
