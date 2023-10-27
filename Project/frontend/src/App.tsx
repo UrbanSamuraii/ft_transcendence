@@ -15,6 +15,7 @@ import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 import TwoFactorCode from './pages/TwoFactor/2faCode';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
+import Navbar from './components/Navbar/Navbar';
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -41,6 +42,7 @@ function App() {
     return (
         <Router>
             <div className="App" style={backgroundStyle}>
+                <Navbar /> {/* This ensures the navbar is always visible */}
                 <SocketProvider>
                     <Content
                         setBackgroundStyle={setBackgroundStyle}
@@ -70,7 +72,14 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
         console.log(previousPathname)
         console.log(location.pathname)
-        if (previousPathname === "/game" && location.pathname !== "/game") {
+        if (previousPathname === "/game" && location.pathname === "/matchmaking") {
+            console.log("User left the game page!");
+            // If you want to stop the socket connection, you can do so here:
+            stopSocketConnection();
+            navigate("/play"); // Redirect to play page
+
+        }
+        else if (previousPathname === "/game" && location.pathname !== "/game") {
             console.log("User left the game page!");
             // If you want to stop the socket connection, you can do so here:
             stopSocketConnection();

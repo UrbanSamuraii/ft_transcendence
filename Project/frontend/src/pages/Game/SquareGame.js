@@ -287,6 +287,9 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         const canvas = canvasRef.current;
 
         function handleResize() {
+            const navbar = document.querySelector('.navbar');  // Get the navbar element
+            const navbarHeight = navbar ? navbar.offsetHeight : 50;  // Use navbar's height or default to 50px if not found
+
             const containerWidth = window.innerWidth;
             const containerHeight = window.innerHeight;
 
@@ -301,10 +304,12 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
                 // Adjust width based on height
                 newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
             }
+            console.log(navbarHeight);
 
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
 
+            console.log(newCanvasHeight)
             if (gameData) {
                 drawGame(gameData);
             }
