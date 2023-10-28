@@ -300,27 +300,33 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
 
             if (containerWidth <= 500 && containerHeight <= 440 - navbarHeight) {
                 // Set canvas to exact appearance at 500x440px
-                newCanvasWidth = 500;
+                // newCanvasWidth = 500;
+                // containerWidth = 500;
                 // newCanvasHeight = 440;
                 // newCanvasHeight = 440 - navbarHeight;
-                newCanvasHeight = 441;
-            } else {
-                // Proceed with normal resizing
-                if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
-                    newCanvasHeight = containerHeight;
-                    newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
-                } else {
-                    newCanvasWidth = containerWidth;
-                    newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
-                }
-
-                // Ensure the canvas doesn't exceed the container's dimensions
-                newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
-                newCanvasHeight = Math.min(newCanvasHeight, containerHeight);
+                // newCanvasHeight = 440;
+                containerHeight = 440;
             }
+            if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
+                newCanvasHeight = containerHeight;
+                newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+            } else {
+                newCanvasWidth = containerWidth;
+                newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+            }
+
+            // Ensure the canvas doesn't exceed the container's dimensions
+            console.log("containerWidth =", containerWidth);
+            console.log("containerHeight =", containerHeight);
+            console.log("navbarHeight =", navbarHeight);
+            newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
+            newCanvasHeight = Math.min(newCanvasHeight, containerHeight - navbarHeight);
+
 
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
+            // canvas.width = 550;
+            // canvas.height = 550;
 
             console.log(canvas.width);
             console.log(canvas.height);
@@ -345,7 +351,12 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [buttons]);
 
     return (
-        <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', display: 'block' }} />
+        // <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', display: 'block' }} />
+        <div style={{ display: 'block' }}>
+            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
+        </div>
+
     );
+
 }
 export default SquareGame;
