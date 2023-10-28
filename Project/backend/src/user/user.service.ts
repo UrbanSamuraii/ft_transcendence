@@ -1,4 +1,3 @@
-import { EdithUserDto } from "./dto";
 import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode } from "@nestjs/common";
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
@@ -87,5 +86,11 @@ export class UserService {
         });
         return updateUser;
     }
+
+    // To get a user's conversations
+    // const userConversations = await prisma.user.findUnique({
+    //     where: { id: userId },
+    //   }).conversations();
+      
 }
 

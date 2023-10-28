@@ -11,3 +11,4 @@ import { AuthService } from '../auth/auth.service';
     exports: [UserService]
 })
 export class UserModule { }
+

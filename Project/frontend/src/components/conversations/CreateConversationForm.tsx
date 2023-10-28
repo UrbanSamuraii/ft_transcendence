@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalConversations.css'
+import axios from 'axios';
+import { resolvePath } from "react-router-dom";
+
 
 interface ConvDataInput {
 	name: string;
@@ -39,21 +42,35 @@ export const CreateConversationForm = () => {
 		if (!ConvDataInput.name) {
 		  newErrors.name = 'Name is required';
 		}
-		if (!ConvDataInput.users) {
-			newErrors.users = 'At least one user is required';
-		}
+		// if (!ConvDataInput.users) {
+		// 	newErrors.users = 'At least one user is required';
+		// }
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
 		} 
 		else {
 			try {
 				console.log({"DATA" : ConvDataInput});
+				const response = await axios.post('http://localhost:3001/conversations/create', ConvDataInput, {
+					withCredentials: true });
+				console.log({"RESPONSE from creating CONVERSATION": response}); 
+				if (response.status === 202) {
+					const customWarning = response.data.message;
+					alert(`Warning: ${customWarning}`);
 				}
-			catch (error) {
-				console.error('Sign in request error:', error);
+			} catch (error) {
+				console.error('Creating conversation error:', error);
+				if (axios.isAxiosError(error)) {
+					if (error.response && error.response.data) {
+						const customError = error.response.data.message;
+						if (customError) {
+							alert(`Error: ${customError}`);
+						}
+					}
+				}
 			}
 		}
-	  };
+	};
 
 	return (
 		<form className="form-Create-Conversation" onSubmit={handleCreateConversation}>

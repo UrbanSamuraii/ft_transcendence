@@ -14,8 +14,39 @@ export class ConversationsService {
 				private configService: ConfigService,
 				private membersService: MembersService) {}
 
-	async getConversation(id: string) {
+	async getConversationByName(convName: string): Promise<Conversation | null> {
+		return await this.prismaService.conversation.findUnique({
+			where: { name: convName },
+		});
 	}
+
+	async createConversation(convName: string, userMember: User, firstInviteMember: User | null) {
+		
+		const existingConversation = await this.getConversationByName(convName);
+	
+		if (existingConversation) { return null; }
+		
+		const membersToConnect: { id: number }[] = [];
+		membersToConnect.push({ id: userMember.id });
+		if (firstInviteMember) { membersToConnect.push({ id: firstInviteMember.id }); }
+		
+		const conversationData: Prisma.ConversationCreateInput = {
+			name: convName,
+			members: { connect: membersToConnect },
+		};
+
+		const createdConversation = await this.prismaService.conversation.create({
+			data: conversationData,
+			include: { members: true },
+		  });
+		return createdConversation;
+	}
+
+	// To find all members of a conversation
+	// const conversationMembers = await prisma.conversation.findUnique({
+	// 	where: { id: conversationId },
+	//   }).members();
+	  
 
 }
 
