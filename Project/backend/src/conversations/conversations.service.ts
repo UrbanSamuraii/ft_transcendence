@@ -61,15 +61,26 @@ export class ConversationsService {
 	
 		if (existingConversation) { return null; }
 		
-		const conversationData: Prisma.ConversationCreateInput = {
-			name: convName, };
+		const conversationData: Prisma.ConversationCreateInput = { name: convName };
 		
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
 
 		await this.membersService.addConversationInMembership(userMember.id, createdConversation.id);
+
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: createdConversation.id },
+			include: { members: true },
+		  });
+		console.log({"Created Conversation members": conversation.members});
+
 		
 		if (firstInviteMember) {await this.membersService.addConversationInMembership(firstInviteMember.id, createdConversation.id);}
 
+		// const conversation = await this.prismaService.conversation.findUnique({
+		// 	where: { id: createdConversation.id },
+		// 	include: { members: true },
+		//   });
+		// console.log({"Created Conversation members": conversation.members});
 		return createdConversation;
 	}
 

@@ -25,19 +25,21 @@ export class MembersService implements IMembersService {
 
 	async addConversationInMembership(userId: number, conversationId: number) {
 		const existingUser = await this.prismaService.user.findUnique({
-			where: { id: userId },
-			include: { conversations: true },
+		  where: { id: userId },
+		  include: { conversations: true },
 		});
 	  
 		if (existingUser) {
-			const updatedConversations = [...existingUser.conversations, { id: conversationId }];
-		
-			await this.prismaService.user.update({
-				where: { id: userId },
-				data: { conversations: { set: updatedConversations } },
-			});
+			const updatedConversations = [
+				...existingUser.conversations.map((conv) => ({ id: conv.id })),
+				{ id: conversationId }];
+	  
+		  await this.prismaService.user.update({
+			where: { id: userId },
+			data: { conversations: { set: updatedConversations } },
+		  });
 		}
-	}
+	  }
 
 	async removeConversationFromMembership(userId: number, conversationId: number) {
 		const existingUser = await this.prismaService.user.findUnique({
