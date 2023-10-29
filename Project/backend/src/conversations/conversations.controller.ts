@@ -1,48 +1,33 @@
-import { Controller, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Res, UseGuards, Req, Param } from '@nestjs/common';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
 import { User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
+import { MembersService } from 'src/members/members.service';
 
 @UseGuards(Jwt2faAuthGuard)
 @Controller('conversations')
 export class ConversationsController {
 
 	constructor(private convService: ConversationsService,
-				private userService: UserService) { }
+				private userService: UserService,
+				private memberService: MembersService) { }
 	
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		// Get the first invited member
-		const usersInput = req.body.users;
-		const usersArray = usersInput.split(/[.,;!?'"<>]|\s/);
-		const email = usersArray[0];
-		let firstUser = null;
+		
+		// Get the first invited member if there is one
+		let invitedMember = null;
 		let userFound = true;
-		if (usersArray[0] !== "") {userFound = false;}
-
-		const firstUserByEmail = usersArray[0] !== "" ? await this.userService.getUser({ email }) : null;
-		if (firstUserByEmail) {
-			firstUser = firstUserByEmail;
-			userFound = true;
-		} else {
-			const username = usersArray[0];
-			const firstUserByUsername = usersArray[0] !== "" ? await this.userService.getUser({ username }) : null;
-			if (firstUserByUsername) { 
-				firstUser = firstUserByUsername;
-				userFound = true;
-			}
-		}
-
+		({ invitedMember, userFound } = await this.convService.getNewMemberInvited(req.body.users));
+		
 		// Get the name of the conversation
-		const nameInput = req.body.name;
-		const name = nameInput.split(/[,;'"<>]|\s/);
-		const convName = name[0];
+		const convName = await this.convService.establishConvName(req.body.name);
 		
 		// Creating the conversation
-		const createdConversation = await this.convService.createConversation(convName, user, firstUser);
+		const createdConversation = await this.convService.createConversation(convName, user, invitedMember);
 		
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
@@ -54,5 +39,47 @@ export class ConversationsController {
 			}
 		}
 	}
-}		
+
+	@Post('add_member')
+	async AddMemberToConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let invitedMember = null;
+		let userFound = true;
+		let added = false;
+		({ invitedMember, userFound } = await this.convService.getNewMemberInvited(req.body.userToAdd));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = invitedMember.id;
+			added = await this.convService.addUserToConversation(userId, req.body.conversationId)
+			if (!added) {
+				res.status(201).json({ message: "Conversation created." });}
+			else {
+				res.status(403).json({ message: "User is already in the conversation." });}
+		}
+	}
+
+	@Post('remove_member')
+	async RemoveMemberFromConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let removed = false;
+		removed = await this.convService.removeMemberFromConversation(req.body.memberToRemoveId, req.body.conversationId)
+		if (removed) {
+			res.status(201).json({ message: "The member has been removed from the conversation." });}
+		else {
+			res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
+	}
+
+	@Get()
+	async GetConversations(@Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
+		return (userWithConversations.conversations);
+	}
+
+	@Get(':id')
+	async GetConversationById(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		return (this.convService.getConversationById(idConv));
+	}
+}
+
 
