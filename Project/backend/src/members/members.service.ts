@@ -10,17 +10,17 @@ export class MembersService implements IMembersService {
 	constructor(private prismaService: PrismaService,
 				private userService: UserService) {};
 
-	async findMemberInConversation(conversationId: number, userId: string): Promise<User | null> {
+	async findMemberInConversation(conversationId: number, userId: number): Promise<User | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
 			include: { members: true },
-		  });
+		});
 		
-		  if (!conversation) { return null; }
+		if (!conversation) { return null; }
 		
-		  const memberFinded = conversation.members.find((member) => member.id === parseInt(userId));
+		const memberFinded = conversation.members.find((member) => member.id === userId);
 		
-		  return memberFinded || null; // Return the found member or null if not found
+		return memberFinded || null; // Return the found member or null if not found
 	}
 
 	async addConversationInMembership(userId: number, conversationId: number) {
@@ -56,7 +56,9 @@ export class MembersService implements IMembersService {
 			});
 		}
 	}
-	  
+	
+	// To return the conversations into the profil 
+	// Not sure if it s very usefull -> allow to then call user.conversations
 	async getMemberWithConversationsHeIsMemberOf(user: User) {
 		const userWithConversations = await this.prismaService.user.findUnique({
 			where: { id: user.id },
