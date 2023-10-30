@@ -62,7 +62,9 @@ export class MembersService implements IMembersService {
 	async getMemberWithConversationsHeIsMemberOf(user: User) {
 		const userWithConversations = await this.prismaService.user.findUnique({
 			where: { id: user.id },
-			include: { conversations: { } }
+			include: { conversations: { 
+				include: { members: true },
+			} }
 		});
 		return userWithConversations;
 	}
