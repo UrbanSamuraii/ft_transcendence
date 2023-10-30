@@ -4,10 +4,14 @@ export type ConversationType = {
 	lastMessage: string;
 }
 
-// export type User = {
-// 	id: number;
-// 	email: string;
-// 	first_name: string;
-// 	last_name: string;
-// 	username: string;
-// }
+export type User = {
+	id: number;
+	username: string;
+	first_name: string;
+	last_name: string;
+}
+
+export type Conversation = {
+	id: number;
+	members: User[];
+}
