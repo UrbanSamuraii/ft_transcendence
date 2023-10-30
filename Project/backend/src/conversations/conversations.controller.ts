@@ -17,11 +17,12 @@ export class ConversationsController {
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		
+		console.log({"USER CREATING THE CONV": user});
 		// Get the first invited member if there is one
 		let invitedMember = null;
 		let userFound = true;
 		({ invitedMember, userFound } = await this.convService.getNewMemberInvited(req.body.users));
+		console.log({"INVITED MEMBER": invitedMember});
 		
 		// Get the name of the conversation
 		const convName = await this.convService.establishConvName(req.body.name);
@@ -71,7 +72,9 @@ export class ConversationsController {
 	@Get()
 	async GetConversations(@Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
+		console.log({"My user": user.conversations});
 		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
+		console.log({"My user's conversations": userWithConversations.conversations});
 		return (userWithConversations.conversations);
 	}
 

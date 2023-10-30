@@ -58,29 +58,14 @@ export class ConversationsService {
 	async createConversation(convName: string, userMember: User, firstInviteMember: User | null) {
 		
 		const existingConversation = await this.getConversationByName(convName);
-	
 		if (existingConversation) { return null; }
 		
 		const conversationData: Prisma.ConversationCreateInput = { name: convName };
-		
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
 
-		await this.membersService.addConversationInMembership(userMember.id, createdConversation.id);
+		await this.addUserToConversation(userMember.id, createdConversation.id);
+		if (firstInviteMember) {await this.addUserToConversation(firstInviteMember.id, createdConversation.id);}
 
-		const conversation = await this.prismaService.conversation.findUnique({
-			where: { id: createdConversation.id },
-			include: { members: true },
-		  });
-		console.log({"Created Conversation members": conversation.members});
-
-		
-		if (firstInviteMember) {await this.membersService.addConversationInMembership(firstInviteMember.id, createdConversation.id);}
-
-		// const conversation = await this.prismaService.conversation.findUnique({
-		// 	where: { id: createdConversation.id },
-		// 	include: { members: true },
-		//   });
-		// console.log({"Created Conversation members": conversation.members});
 		return createdConversation;
 	}
 
@@ -98,26 +83,29 @@ export class ConversationsService {
 	}
 
 	async addUserToConversation(userId: number, conversationId: number): Promise<boolean> {
+		const existingUser = await this.prismaService.user.findUnique({
+			where: { id: userId },
+		});
 		const existingConversation = await this.prismaService.conversation.findUnique({
 		  where: { id: conversationId },
 		  include: { members: true },
 		});
-	  
-		if (existingConversation) {
-		  const isMember = existingConversation.members.some((member) => member.id === userId);
-		  if (!isMember) {
-			const updatedMembers = [...existingConversation.members, { id: userId }];
+		if (!existingUser || !existingConversation) { return false; }
+
+		const isMember = existingConversation.members.some((member) => member.id === userId);
+		if (!isMember) {
 			await this.prismaService.conversation.update({
 				where: { id: conversationId },
-				data: { members: { set: updatedMembers } },
-			});
+				data: {
+				  members: {
+					connect: [{ id: userId }],
+				  },
+				},
+			  });
 			await this.membersService.addConversationInMembership(userId, existingConversation.id);
 			return true; // The user has been added
-		  } else {
-			return false; // The user was already in
-		  }
 		} else {
-		  return false; // We haven t found the conversation
+			return false; // The user was already in
 		}
 	}
 
