@@ -35,6 +35,8 @@ CREATE TABLE "conversations" (
 -- CreateTable
 CREATE TABLE "Message" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "message" TEXT,
     "authorName" TEXT NOT NULL,
     "conversation_id" INTEGER NOT NULL,
@@ -64,7 +66,7 @@ CREATE UNIQUE INDEX "users_id_email_username_key" ON "users"("id", "email", "use
 CREATE UNIQUE INDEX "conversations_name_key" ON "conversations"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "conversations_id_key" ON "conversations"("id");
+CREATE UNIQUE INDEX "conversations_id_name_key" ON "conversations"("id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_member_AB_unique" ON "_member"("A", "B");

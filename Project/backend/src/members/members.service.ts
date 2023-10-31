@@ -58,14 +58,33 @@ export class MembersService implements IMembersService {
 	}
 	
 	// To return the conversations into the profil 
-	// Not sure if it s very usefull -> allow to then call user.conversations
 	async getMemberWithConversationsHeIsMemberOf(user: User) {
 		const userWithConversations = await this.prismaService.user.findUnique({
 			where: { id: user.id },
-			include: { conversations: { 
-				include: { members: true },
-			} }
+			include: {
+			  conversations: {
+				include: {
+				  members: {
+					where: {
+					  id: {
+						not: user.id, // Exclude the current user in the return but not from the conversations -> only way for displaying properly the conv
+					  }
+					},
+					select: {
+					  username: true, // Select only the 'username' field of the members
+					}
+				  },
+				  messages: {
+					orderBy: {
+					  createdAt: 'desc', // Order messages by createdAt in descending order
+					},
+					take: 1, // Take the first message = the newest one
+				  }
+				}
+			  }
+			}
 		});
+		
 		return userWithConversations;
 	}
 }
