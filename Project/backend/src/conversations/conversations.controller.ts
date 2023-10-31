@@ -31,9 +31,9 @@ export class ConversationsController {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			if (userFound) {
-				res.status(201).json({ message: "Conversation created" });
+				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
 			} else {
-				res.status(202).json({ message: "Conversation created, but the user was not found." });
+				res.status(202).json({ message: "Conversation created, but the user was not found.", conversationId: createdConversation.id  });
 			}
 		}
 	}

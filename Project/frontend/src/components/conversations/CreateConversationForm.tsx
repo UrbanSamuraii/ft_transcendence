@@ -3,6 +3,7 @@ import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../
 import './GlobalConversations.css'
 import axios from 'axios';
 import { resolvePath } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 interface ConvDataInput {
@@ -36,6 +37,8 @@ export const CreateConversationForm = () => {
 		}));
 	};
 
+	const navigate = useNavigate();
+
 	const handleCreateConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
@@ -54,9 +57,13 @@ export const CreateConversationForm = () => {
 				const response = await axios.post('http://localhost:3001/conversations/create', ConvDataInput, {
 					withCredentials: true });
 				console.log({"RESPONSE from creating CONVERSATION": response}); 
-				if (response.status === 202) {
+				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
+				} else if (response.status === 201) {
+					// Successfully created a conversation, navigate to it
+					const conversationId = response.data.conversationId;
+					navigate(`channel/${conversationId}`);
 				}
 			} catch (error) {
 				console.error('Creating conversation error:', error);
