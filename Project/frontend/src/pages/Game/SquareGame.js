@@ -289,47 +289,35 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         const canvas = canvasRef.current;
 
         function handleResize() {
-            const navbar = document.querySelector('.navbar');  // Get the navbar element
-            const navbarHeight = navbar ? navbar.offsetHeight : 50;  // Use navbar's height or default to 50px if not found
+            const navbar = document.querySelector('.navbar');
+            const navbarHeight = navbar ? navbar.offsetHeight : 50;
 
-            console.log("navbar == ", navbarHeight);
             let containerWidth = window.innerWidth;
-            let containerHeight = window.innerHeight - navbarHeight;  // Deducting the navbar's height
+            let containerHeight = window.innerHeight - navbarHeight;
 
             let newCanvasWidth, newCanvasHeight;
 
             if (containerWidth <= 500 && containerHeight <= 440 - navbarHeight) {
                 // Set canvas to exact appearance at 500x440px
-                // newCanvasWidth = 500;
-                // containerWidth = 500;
-                // newCanvasHeight = 440;
-                // newCanvasHeight = 440 - navbarHeight;
-                // newCanvasHeight = 440;
-                containerHeight = 440;
-            }
-            if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
-                newCanvasHeight = containerHeight;
-                newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+                newCanvasWidth = 500;
+                newCanvasHeight = 440;
             } else {
-                newCanvasWidth = containerWidth;
-                newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+                if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
+                    newCanvasHeight = Math.min(containerHeight, TARGET_HEIGHT);
+                    newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+                } else {
+                    newCanvasWidth = Math.min(containerWidth, TARGET_WIDTH);
+                    newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+                }
             }
 
-            // Ensure the canvas doesn't exceed the container's dimensions
-            console.log("containerWidth =", containerWidth);
-            console.log("containerHeight =", containerHeight);
-            console.log("navbarHeight =", navbarHeight);
-            newCanvasWidth = Math.min(newCanvasWidth, containerWidth);
-            newCanvasHeight = Math.min(newCanvasHeight, containerHeight - navbarHeight);
-
+            // Ensure the canvas doesn't exceed the container's dimensions or its original size
+            newCanvasWidth = Math.min(newCanvasWidth, TARGET_WIDTH, containerWidth);
+            newCanvasHeight = Math.min(newCanvasHeight, TARGET_HEIGHT, containerHeight - navbarHeight);
 
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
-            // canvas.width = 550;
-            // canvas.height = 550;
 
-            console.log(canvas.width);
-            console.log(canvas.height);
             if (gameData) {
                 drawGame(gameData);
             }
@@ -341,6 +329,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [gameData]);
 
 
+
     useEffect(() => {
         const canvas = canvasRef.current;
         canvas.addEventListener('click', handleCanvasClick);
@@ -350,13 +339,26 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         };
     }, [buttons]);
 
-    return (
-        // <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', display: 'block' }} />
-        <div style={{ display: 'block' }}>
-            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
-        </div>
+    // return (
+    //     <div style={{ display: 'block' }}>
+    //         <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
+    //     </div>
 
+    // );
+
+    return (
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            width: '100vw',
+            position: 'relative'
+        }}>
+            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', position: 'absolute' }} />
+        </div>
     );
+
 
 }
 export default SquareGame;
