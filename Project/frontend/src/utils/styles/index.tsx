@@ -142,10 +142,11 @@ export const ConversationSidebarItem = styled.div`
   display: flex;
   align-items: center; 
   gap: 15px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 8px;
+  margin-top: 8px;
   margin-left: 10px;
   width: ${CSB_WIDTH}px;
+  height: 90px;
   border-bottom: 1px solid #606060;
 `;
 
@@ -153,9 +154,9 @@ export const ConversationSidebarTexts = styled.div`
   display: flex;
   flex-direction: column; 
   align-items: flex-start; 
-  gap: 2px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  gap: 5px;
+  margin-bottom: 12px;
+  margin-top: 0px;
   border-bottom: 1px
 `;
 
