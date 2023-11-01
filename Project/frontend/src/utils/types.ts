@@ -2,10 +2,11 @@ export type User = {
 	username: string;
 }
 
+
 export type ConversationType = {
 	id: number;
 	name: string;
-	messages: string[];
+	messages: { message: string }[];
 	members: User[];
 }
 

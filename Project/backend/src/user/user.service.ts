@@ -18,6 +18,7 @@ export class UserService {
         }
     }
 
+    // USE IT LIKE : const user = await this.userService.getUser({ email or username });
     async getUser(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where,

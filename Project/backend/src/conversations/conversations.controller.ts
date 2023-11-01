@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Res, UseGuards, Req, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
@@ -48,7 +48,10 @@ export class ConversationsController {
 	@Get(':id')
 	async GetConversationById(@Param('id') id: string) {
 		const idConv = parseInt(id);
-		return (this.convService.getConversationById(idConv));
+		const conversation = await this.convService.getConversationWithAllMessagesById(idConv);
+
+		if (conversation) { return conversation; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
 

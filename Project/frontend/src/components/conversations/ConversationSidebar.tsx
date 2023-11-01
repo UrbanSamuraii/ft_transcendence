@@ -38,7 +38,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 								<div> <span>{conversation.name || conversation.members[0].username}</span> </div>
 							</div>
 							<div className="conversationLastMessage">
-								<div><span>{conversation.messages[0] || 'Test'}</span> </div>
+								<div><span>{conversation.messages[0]?.message}</span> </div>
 							</div>
 						</ConversationSidebarTexts>
 					</ ConversationSidebarItem>))}

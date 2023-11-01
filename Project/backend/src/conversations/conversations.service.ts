@@ -111,17 +111,37 @@ export class ConversationsService {
 
 	/////////////////// GETTERS /////////////////// 
 
-	async getConversationByName(convName: string): Promise<Conversation | null> {
+	async getConversationByName(convName: string) {
 		return await this.prismaService.conversation.findUnique({
 			where: { name: convName },
 			include: { members: true },
 		});
 	}
 	
-	async getConversationById(convId: number): Promise<Conversation | null> {
+	async getConversationWithAllMessagesById(convId: number) {
 		return await this.prismaService.conversation.findUnique({
 			where: { id: convId },
-			include: { members: true },
+			include: { members: { select : {
+				id: true,
+          		first_name: true,
+          		last_name: true,
+          		email: true,
+          		username: true,
+          		img_url: true,
+				isRegistered: true,
+				status: true,
+					}, 
+				},
+				messages: { orderBy: { updatedAt: 'desc' },
+				include: {
+					author: {
+					  select: {
+						id: true
+					  }
+					}
+				  }
+				},
+			},
 		});
 	}
 

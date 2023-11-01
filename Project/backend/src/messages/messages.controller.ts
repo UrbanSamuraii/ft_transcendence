@@ -13,7 +13,8 @@ export class MessagesController {
 
 	constructor(private prismaService: PrismaService,
 		private userService: UserService,
-		private messagesService: MessagesService) { }
+		private messagesService: MessagesService,
+		private conversationsService: ConversationsService) { }
 
 	@Post()
 	async createMessage(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
@@ -30,5 +31,15 @@ export class MessagesController {
 
 		const newMessage = await this.messagesService.createMessage(user, content, conversation);
 		if (newMessage) {res.status(200).json({ message: "Message created", messageCreated: newMessage });}
+	}
+
+	@Get(':conversationId')
+	async getMessagesFromConversationId(@Param('conversationId') conversationId: string) {
+		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId));
+		const messagesInTheConversationId = conversation.messages;
+		// const authorId = messagesInTheConversationId[0]?messagesInTheConversationId[0].author.id:null;
+		// const author = await this.userService.getUserById(authorId);
+		// console.log({"LATEST MESSAGE AUTHOR": author})
+		return messagesInTheConversationId;
 	}
 }
