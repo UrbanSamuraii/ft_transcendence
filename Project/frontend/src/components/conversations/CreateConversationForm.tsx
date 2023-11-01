@@ -11,18 +11,17 @@ interface ConvDataInput {
 	users: string;
 }
 
-interface ConvData {
-	name: string;
-	users: string[];
-}
+type CreateConversationFormProps = {
+    setShowModal: (show: boolean) => void;
+};
 
-export const CreateConversationForm = () => {
+export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ setShowModal }) => {
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		name: '',
 		users: '',
 	  });
-	
+
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,9 +59,10 @@ export const CreateConversationForm = () => {
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
-				} else if (response.status === 201) {
-					// Successfully created a conversation, navigate to it
+				} else {
+					// Successfully created a conversation, we close the modal and navigate to the conv'
 					const conversationId = response.data.conversationId;
+					setShowModal(false);
 					navigate(`channel/${conversationId}`);
 				}
 			} catch (error) {

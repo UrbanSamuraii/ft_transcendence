@@ -15,7 +15,7 @@ export const ConversationPage = () => {
       try {
         const prismaConversations = await getConversations();
         // console.log({"prisma Conversations": prismaConversations});
-		setPrismaConversations(prismaConversations); // Store the prismaConversations directly in the state
+		    setPrismaConversations(prismaConversations); // Store the prismaConversations directly in the state
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }

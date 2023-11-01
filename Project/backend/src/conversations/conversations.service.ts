@@ -137,6 +137,24 @@ export class ConversationsService {
 			return [];
 		}
 	}
+
+	async addMessageToConversation(conversationId: number, newMessageId: number) {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, messages: true },
+		});
+
+		const updatedConversation = await this.prismaService.conversation.update({
+			where: { id: conversation.id },
+			data: {
+			messages: {
+				connect: {
+				id: newMessageId,
+				},
+			},
+			},
+		});
+	}
 }	  
 	  
 	  

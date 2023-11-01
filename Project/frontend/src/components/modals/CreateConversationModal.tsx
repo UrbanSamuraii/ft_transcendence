@@ -9,23 +9,14 @@ type CreateConversationModalProps = {
 
 export const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ setShowModal }) => {
 
-	// const ref = createRef<HTMLDivElement>();
-
 	return (
-	// <OverlayStyle ref={ref} onClick={(e) => {
-	// 	const { current } = ref;
-	// 	if (current === e.target) {
-	// 		console.log('Close Modal');
-	// 		setShowModal(false);
-	// 		}
-	// 	}}>
 		<OverlayStyle>
 			<OutsideClickHandler onOutsideClick={() => {
-			console.log('Close Modal');
-			setShowModal(false);
+				console.log('Close Modal');
+				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<CreateConversationForm />
+					<CreateConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>

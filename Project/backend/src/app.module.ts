@@ -8,11 +8,13 @@ import { ConfigModule } from '@nestjs/config';
 import { GameGateway } from './game/game.gateway';
 import { SquareGameService } from './game/game.square.service';
 import { ConversationsModule } from './conversations/conversations.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
     imports: [
         AuthModule,
         ConversationsModule,
+        MessagesModule,
         UserModule, 
         PrismaModule, 
         ConfigModule.forRoot({ isGlobal: true }), 
