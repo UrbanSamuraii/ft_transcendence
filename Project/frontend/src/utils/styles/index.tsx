@@ -219,3 +219,27 @@ export const ButtonCreateConv = styled.button`
   height: 40px;
   width: 200px;
 `;
+
+export const MessageContainerStyle = styled.div `
+  background: inherit;
+  border: 1px solid #e0e0e0; 
+  border-radius: 5px;
+  padding: 8px;
+  margin: 5px 0;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+  height: 80px;
+  width: 400px;
+  margin-left: 50px;
+`;
+
+export const MessageContainerPersonnalStyle = styled.div `
+  background: inherit;
+  border: 1px solid #e0e0e0; 
+  border-radius: 5px;
+  padding: 8px;
+  margin: 5px 0;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+  height: 80px;
+  width: 400px;
+  margin-left: 500px;
+`;

@@ -18,8 +18,8 @@ export class MessagesService implements IMessagesService {
 	async createMessage(author: User, content: string, conversation: Conversation): Promise<Message> {
 		
 		// We will have to implement a lot of this kind of verif to check if the user is banned, muted etc etc ....
-		const isMember = this.membersService.findMemberInConversation(conversation.id, author.id);
-		
+		const isMember = await this.membersService.findMemberInConversation(conversation.id, author.id);
+
 		if (!isMember) {throw new HttpException("Conversation member not identified", HttpStatus.FORBIDDEN)}
 		else {
 			const newMessageData: Prisma.MessageCreateInput = { message: content,

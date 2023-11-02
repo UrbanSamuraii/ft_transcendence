@@ -34,7 +34,7 @@ export class AuthService {
         };
         const secret = this.config.get('JWT_2FA_SECRET');
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '1d',
+            expiresIn: '5d',
             secret: secret,
         });
         return token;
@@ -77,7 +77,7 @@ export class AuthService {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
-                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
             })
         }
         catch (error: any) {
@@ -121,7 +121,7 @@ export class AuthService {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'lax',
-                    expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                    expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
                 });
             }
         }
@@ -146,7 +146,7 @@ export class AuthService {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
-            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+            expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
         })
     }
 
@@ -162,7 +162,7 @@ export class AuthService {
         };
         const secret = this.config.get('JWT_2FA_SECRET');
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '1d',
+            expiresIn: '5d',
             secret: secret,
         });
         return token;
@@ -209,7 +209,7 @@ export class AuthService {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
-            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+            expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
         }).json({ new2FAUser });;
     }
 
@@ -235,7 +235,7 @@ export class AuthService {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
-                expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
             }).json({ newSimpleUser });;
         }
     }
@@ -271,7 +271,7 @@ export class AuthService {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'lax',
-                    expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                    expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
                 });
                 res.redirect('http://localhost:3000/play');
             }
@@ -287,7 +287,7 @@ export class AuthService {
                         httpOnly: true,
                         secure: false,
                         sameSite: 'lax',
-                        expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+                        expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
                     });
                     res.redirect('http://localhost:3000/play');
                 }

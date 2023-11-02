@@ -6,7 +6,7 @@ export async function getConversationsIdentified(id: any) {
 	  const config: AxiosRequestConfig = { withCredentials: true };
   
 	  const response = await axios.get(`${API_URL}/${id}`, config);
-	  console.log({"RESPONSE FROM AXIOS.GET": response.data});
+	//   console.log({"RESPONSE FROM AXIOS.GET": response.data});
 	  return response.data;
 	} catch (error) {
 	  console.error('Error getting messages from the conversation:', error);
