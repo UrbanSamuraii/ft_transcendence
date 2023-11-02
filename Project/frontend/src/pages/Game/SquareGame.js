@@ -339,13 +339,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         };
     }, [buttons]);
 
-    // return (
-    //     <div style={{ display: 'block' }}>
-    //         <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
-    //     </div>
-
-    // );
-
     return (
         <div style={{
             display: 'flex',

@@ -48,6 +48,26 @@ export class UserService {
         }
     }
 
+    async getUserByUsername(username: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { username: username },
+            });
+            if (!user) {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: "Error: User not found"
+                }, HttpStatus.BAD_REQUEST);
+            }
+            return user;
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: "Error: Unable to retrieve user"
+            }, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     async deleteUser(where: Prisma.UserWhereUniqueInput) {
         try {
             return await this.prisma.user.delete({

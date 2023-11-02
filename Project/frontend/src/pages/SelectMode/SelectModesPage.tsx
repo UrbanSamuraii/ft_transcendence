@@ -6,7 +6,6 @@ interface SelectModePageProps {
     // handleSignoutClick: () => void;
 }
 
-// const SelectModePage: React.FC<SelectModePageProps> = ({ startGame, handleSignoutClick }) => {
 const SelectModePage: React.FC<SelectModePageProps> = ({ startGame }) => {
 
     const navigate = useNavigate();

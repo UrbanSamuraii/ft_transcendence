@@ -14,6 +14,7 @@ import { CSSProperties } from 'react';
 import TwoFactorDisable from './pages/TwoFactor/2faDisable';
 import TwoFactorCode from './pages/TwoFactor/2faCode';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
+import Profile from './pages/Profile/Profile';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Navbar from './components/Navbar/Navbar';
 
@@ -165,6 +166,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/matchmaking" element={<Matchmaking />} />
             <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} />} />
             <Route path="/FortyTwoFA" element={<TwoFactorCode />} />
+            <Route path="/@/:username" element={<Profile />} />
         </Routes>
     );
 }
