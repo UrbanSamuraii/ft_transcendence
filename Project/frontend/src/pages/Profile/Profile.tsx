@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import './Profile.css'
 
 function Profile() {
     const [userInfo, setUserInfo] = useState({ username: '', email: '' });
@@ -30,11 +31,20 @@ function Profile() {
     }, [username]); // Dependency array includes username to refetch if it changes
 
     return (
-        <div>
-            <h1>Profile Page</h1>
-            <p>Username: {userInfo.username}</p>
-            <p>Email: {userInfo.email}</p>
-            {/* Display other user info as needed */}
+        <div className="profile-container">
+            <div className="profile-header">
+                <h1>Profile: {userInfo.username}</h1>
+            </div>
+            <div className="profile-content">
+                <div className="profile-info">
+                    <p><strong>Username:</strong> {userInfo.username}</p>
+                    <p><strong>Email:</strong> {userInfo.email}</p>
+                    {/* Display other user info as needed */}
+                </div>
+                <div className="profile-actions">
+                    {/* Add buttons or actions related to the profile here */}
+                </div>
+            </div>
         </div>
     );
 }
