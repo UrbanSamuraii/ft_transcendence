@@ -4,6 +4,7 @@ import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
 import { ConversationMessage } from "../utils/types";
 import { MessageContainer } from "../components/messages/MessageContainer";
+import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { useAuth } from '../utils/hooks/useAuth';
 
 export const ConversationChannelPage = () => {
@@ -24,13 +25,15 @@ export const ConversationChannelPage = () => {
 
 	  return (
 		<ConversationChannelPageStyle>
-		  {conversationsArray.length > 0 ? (
-			conversationsArray.slice().reverse().map((conversation, index) => (
-				<MessageContainer key={index} message={conversation}  isCurrentUser={user.username === conversation.authorName}/>
-			))
-		  ) : (
-			<div>No message in the conversation</div>
-		  )}
+			<ScrollableContainer>
+			{conversationsArray.length > 0 ? (
+				conversationsArray.slice().reverse().map((conversation, index) => (
+					<MessageContainer key={index} message={conversation}  isCurrentUser={user.username === conversation.authorName}/>
+				))
+			) : (
+				<div>No message in the conversation</div>
+			)}
+			</ScrollableContainer>
 		</ConversationChannelPageStyle>
 	  );
 	};

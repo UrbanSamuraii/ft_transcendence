@@ -227,9 +227,9 @@ export const MessageContainerStyle = styled.div `
   padding: 8px;
   margin: 5px 0;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-  height: 80px;
-  width: 400px;
-  margin-left: 50px;
+  height: auto;
+  width: calc(40% - 100px); /* 50% of screen width minus 50px */
+  margin-left: 50px; /* Add right margin */
 `;
 
 export const MessageContainerPersonnalStyle = styled.div `
@@ -239,7 +239,8 @@ export const MessageContainerPersonnalStyle = styled.div `
   padding: 8px;
   margin: 5px 0;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-  height: 80px;
-  width: 400px;
-  margin-left: 500px;
+  height: auto;
+  width: calc(40% - 100px); /* 50% of screen width minus 50px */
+  margin-left: 40%;
+  margin-right: 100px; /* Add right margin */
 `;
