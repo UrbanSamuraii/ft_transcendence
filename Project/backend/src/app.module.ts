@@ -9,13 +9,15 @@ import { GameGateway } from './game/game.gateway';
 import { SquareGameService } from './game/game.square.service';
 import { ConversationsModule } from './conversations/conversations.module';
 import { MessagesModule } from './messages/messages.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
     imports: [
         AuthModule,
         ConversationsModule,
         MessagesModule,
-        UserModule, 
+        UserModule,
+        GatewayModule, 
         PrismaModule, 
         ConfigModule.forRoot({ isGlobal: true }), 
         ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', '..', 'dist', 'client') }),
@@ -23,6 +25,3 @@ import { MessagesModule } from './messages/messages.module';
     providers: [GameGateway, SquareGameService],
 })
 export class AppModule { }
-
-// Similar to Prisma - making our ConfigModule global
-
