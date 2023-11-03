@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 // import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
 import './SquareGame.css';
 import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
+import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
+import { useNavigate, useLocation } from 'react-router-dom';
+
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 945;
@@ -19,10 +21,11 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
     const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
-    const [socket, setSocket] = useState(null);
+    // const [socket, setSocket] = useState(null);
     const [isGameActive, setIsGameActive] = useState(true);
     const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
+    const { socket } = useSocket();  // Get the socket from context
 
     useEffect(() => {
         isGameActiveRef.current = isGameActive;
@@ -34,22 +37,11 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [activeKeys]);
 
     useEffect(() => {
-        const token = getCookie('token'); // Get the JWT token from cookies
+        if (!socket) return;  // Ensure socket exists
 
-        const serverAddress = window.location.hostname === 'localhost' ?
-            'http://localhost:3002' :
-            `http://${window.location.hostname}:3002`;
-        // const socketConnection = io.connect(serverAddress); // this is not fit for prod
+        console.log("Using socket from context for game.");
 
-        // const socketConnection = io.connect(serverAddress);
-
-        const socketConnection = io.connect(serverAddress, {
-            withCredentials: true
-        });
-
-        console.log("token ==", token);
-
-        socketConnection.on("updateGameData", (data) => {
+        socket.on("updateGameData", (data) => {
             console.log('Received game update from socket.');
 
             setGameData(data);
@@ -60,23 +52,26 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
                 setIsGameActive(false); // Game is no longer active
                 onGameOver();
             }
-
         });
 
-        setSocket(socketConnection);
+        socket.emit('startGame');
 
-        socketConnection.emit('startGame');  // Use the ref here
-
-        // Emit paddle movements every 100ms
         const intervalId = setInterval(() => {
-            socketConnection.emit('paddleMovements', activeKeysRef.current);  // Use the ref here
+            socket.emit('paddleMovements', activeKeysRef.current);
         }, 100 / 60);
 
         return () => {
             clearInterval(intervalId);
-            socketConnection.close();
+            // Don't close the socket here; it will be managed by the SocketProvider
         };
-    }, []);  // Empty dependency array
+    }, [socket]);  // Depend on socket
+
+    // const stopSocketConnection = () => {
+    //     if (socket) {
+    //         socket.close();
+    //         setSocket(null);
+    //     }
+    // };
 
     const startGame = () => {
         if (socket) {
@@ -218,15 +213,19 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         ctx.fillStyle = 'white';
 
         for (let i = 0; i < numberOfSquares; i++) {
-            const x = offsetX + (canvas.width / 2) - (pixelSize / 2); // Center it
+            // const x = offsetX + (gameWidth.width / 2) - (pixelSize / 2); // Center it
+            const x = offsetX + (gameWidth / 2) - (pixelSize / 2); // Center it within the game area
+            // const x = offsetX + (canvas.width / 2) - (pixelSize / 2); // Center it
             const y = offsetY + i * (pixelSize + gap);
             ctx.fillRect(x, y, pixelSize, pixelSize);
         }
     }
 
     const drawGame = (data) => {
+        if (!canvasRef.current) return;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
 
         const canvasAspectRatio = canvas.width / canvas.height;
@@ -240,7 +239,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             gameWidth = canvas.width;
             gameHeight = gameWidth / targetAspectRatio;
         }
-
 
         const offsetX = (canvas.width - gameWidth) / 2;
         const offsetY = (canvas.height - gameHeight) / 2;
@@ -291,20 +289,31 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         const canvas = canvasRef.current;
 
         function handleResize() {
-            const containerWidth = window.innerWidth;
-            const containerHeight = window.innerHeight;
+            const navbar = document.querySelector('.navbar');
+            const navbarHeight = navbar ? navbar.offsetHeight : 50;
 
-            let newCanvasWidth = containerWidth * widthRatio;
-            let newCanvasHeight = containerHeight * heightRatio;
+            let containerWidth = window.innerWidth;
+            let containerHeight = window.innerHeight - navbarHeight;
 
-            // Ensure it maintains the target aspect ratio
-            if (containerWidth / containerHeight < (TARGET_WIDTH / TARGET_HEIGHT)) {
-                // Adjust height based on width
-                newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+            let newCanvasWidth, newCanvasHeight;
+
+            if (containerWidth <= 500 && containerHeight <= 440 - navbarHeight) {
+                // Set canvas to exact appearance at 500x440px
+                newCanvasWidth = 500;
+                newCanvasHeight = 440;
             } else {
-                // Adjust width based on height
-                newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+                if (containerWidth / containerHeight < TARGET_WIDTH / TARGET_HEIGHT) {
+                    newCanvasHeight = Math.min(containerHeight, TARGET_HEIGHT);
+                    newCanvasWidth = newCanvasHeight * (TARGET_WIDTH / TARGET_HEIGHT);
+                } else {
+                    newCanvasWidth = Math.min(containerWidth, TARGET_WIDTH);
+                    newCanvasHeight = newCanvasWidth / (TARGET_WIDTH / TARGET_HEIGHT);
+                }
             }
+
+            // Ensure the canvas doesn't exceed the container's dimensions or its original size
+            newCanvasWidth = Math.min(newCanvasWidth, TARGET_WIDTH, containerWidth);
+            newCanvasHeight = Math.min(newCanvasHeight, TARGET_HEIGHT, containerHeight - navbarHeight);
 
             canvas.width = newCanvasWidth;
             canvas.height = newCanvasHeight;
@@ -319,6 +328,8 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         return () => window.removeEventListener('resize', handleResize);
     }, [gameData]);
 
+
+
     useEffect(() => {
         const canvas = canvasRef.current;
         canvas.addEventListener('click', handleCanvasClick);
@@ -329,8 +340,18 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     }, [buttons]);
 
     return (
-        <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', display: 'block' }} />
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            width: '100vw',
+            position: 'relative'
+        }}>
+            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', position: 'absolute' }} />
+        </div>
     );
-}
 
+
+}
 export default SquareGame;

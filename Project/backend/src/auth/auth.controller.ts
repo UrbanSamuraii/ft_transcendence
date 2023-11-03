@@ -1,6 +1,6 @@
 import {
     Controller, Post, Get, Res, UseGuards,
-    Req, Request
+    Req, Request, Param
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Jwt2faAuthGuard } from 'src/auth/guard';
@@ -83,5 +83,40 @@ export class AuthController {
         delete me.accessToken;
         return me;
     }
+    
+    // @UseGuards(Jwt2faAuthGuard)
+    @Get('user-info')
+    async getUserInfo(@Req() req, @Res() res: ExpressResponse) {
+        try {
+            const user = await this.userService.getUserByToken(req.cookies.token);
+            // Send back only the necessary user information
+            return res.status(200).json({
+                username: user.username,
+                email: user.email,
+                // other fields you want to include 
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    @Get('user-info/:username')
+    async getUserInfoDynamic(@Param('username') username: string, @Res() res: ExpressResponse) {
+        try {
+            const user = await this.userService.getUserByUsername(username); // Assuming you have a method to get user by username
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            // Send back only the necessary user information
+            return res.status(200).json({
+                username: user.username,
+                email: user.email,
+                // other fields you want to include
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
 
 }

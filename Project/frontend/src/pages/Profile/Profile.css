@@ -1,0 +1,31 @@
+.profile-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.profile-header {
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.profile-info {
+    flex-basis: 60%;
+}
+
+.profile-actions {
+    flex-basis: 35%;
+    text-align: right;
+}
+
+/* You can add more styles as needed */

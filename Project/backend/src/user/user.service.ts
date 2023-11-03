@@ -34,6 +34,7 @@ export class UserService {
     }
 
     async getUserByToken(token: string) {
+        // console.log("token = ", token);
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },
@@ -52,6 +53,26 @@ export class UserService {
             throw new HttpException({
                 status: HttpStatus.BAD_REQUEST,
                 error: "Error to get the user by token"
+            }, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async getUserByUsername(username: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { username: username },
+            });
+            if (!user) {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: "Error: User not found"
+                }, HttpStatus.BAD_REQUEST);
+            }
+            return user;
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: "Error: Unable to retrieve user"
             }, HttpStatus.BAD_REQUEST);
         }
     }

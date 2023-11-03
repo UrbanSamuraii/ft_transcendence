@@ -1,0 +1,52 @@
+.paddle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 320px;
+    height: 100px;
+    position: relative;
+    margin: 100px auto;
+}
+
+.paddle {
+    width: 5%;
+    height: 60%;
+    background-color: #333;
+    min-width: 20px;
+}
+
+.ball {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%);
+    animation: moveBall 2s linear infinite;
+}
+
+@keyframes moveBall {
+    0% {
+        left: 5%;
+    }
+
+    50% {
+        left: 90%;
+    }
+
+    100% {
+        left: 5%;
+    }
+}
+
+.searching-text {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+}

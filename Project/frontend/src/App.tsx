@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useRef } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes, useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
@@ -17,6 +17,11 @@ import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
 import { AuthenticatedRoute } from './components/routes/AuthenticatedRoutes'
+import Navbar from './components/Navbar/Navbar';
+import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
+import Matchmaking from './pages/Matchmaking/Matchmaking';
+import Profile from './pages/Profile/Profile';
+
 
 const defaultBackgroundStyle = {
     background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
@@ -50,13 +55,17 @@ function App() {
     return (
         <Router>
             <div className="App" style={backgroundStyle}>
-                <Content
-                    setBackgroundStyle={setBackgroundStyle}
-                />
+                <Navbar /> {/* This ensures the navbar is always visible */}
+                <SocketProvider>
+                    <Content
+                        setBackgroundStyle={setBackgroundStyle}
+                    />
+                </SocketProvider>
             </div>
         </Router>
     );
 }
+
 
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
@@ -64,10 +73,35 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const [gameOver, setGameOver] = useState(false);
     const [gameKey, setGameKey] = useState(0);
     const navigate = useNavigate();
+    const prevPathnameRef = useRef(location.pathname);
+    const { stopSocketConnection } = useSocket();  // Get the socket from context
 
     useEffect(() => {
         setBackgroundStyle(routeBackgroundStyles[location.pathname] || defaultBackgroundStyle);
     }, [location.pathname, setBackgroundStyle]);
+
+    useEffect(() => {
+        const previousPathname = prevPathnameRef.current;
+
+        console.log(previousPathname)
+        console.log(location.pathname)
+        if (previousPathname === "/game" && location.pathname === "/matchmaking") {
+            console.log("User left the game page!");
+            // If you want to stop the socket connection, you can do so here:
+            stopSocketConnection();
+            navigate("/play"); // Redirect to play page
+
+        }
+        else if (previousPathname === "/game" && location.pathname !== "/game") {
+            console.log("User left the game page!");
+            // If you want to stop the socket connection, you can do so here:
+            stopSocketConnection();
+        }
+
+        // Now update the ref after the check
+        prevPathnameRef.current = location.pathname;
+    }, [location.pathname]);
+
 
     function handlePlayClick() {
         navigate("/select-mode");
@@ -93,7 +127,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     async function handleSignUp42Click() {
         try {
             window.location.href = 'http://localhost:3001/auth/signup42';
-        } 
+        }
         catch (error) {
             console.error('Sign up request error:', error);
         }
@@ -131,6 +165,9 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const GoToConversations = async () => {
         navigate('/ConversationPage')
     }
+    useEffect(() => {
+        console.log('Content component rendered');
+    });
 
     return (
         <Routes>
@@ -149,6 +186,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 <Route path="channel/:id" element=
                 {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
             </Route>    
+            <Route path="/matchmaking" element={<Matchmaking />} />
+            <Route path="/@/:username" element={<Profile />} />
         </Routes>
     );
 }
