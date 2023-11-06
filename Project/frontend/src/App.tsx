@@ -179,7 +179,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                                          </AuthenticatedRoute>} />
             <Route path="/2fa-enable" element={<AuthenticatedRoute><TwoFAEnablingPage /></AuthenticatedRoute>} />
             <Route path="/2fa-disable" element={<AuthenticatedRoute><TwoFADisablingPage /></AuthenticatedRoute>} />
-            <Route path="/FortyTwoFA" element={<AuthenticatedRoute><TwoFACodePage /></AuthenticatedRoute>} />
+            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
             <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
             <Route path="/LoginPage" element={<LoginPage />} />
             <Route path="/ConversationPage" element= {<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >

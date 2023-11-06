@@ -3,7 +3,6 @@ import { Prisma, User, Conversation, Message} from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { HttpException } from '@nestjs/common';
 import { UserService } from "src/user/user.service";
-import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
 import { IMessagesService } from "./messages";
 import { ConversationsService } from "src/conversations/conversations.service";

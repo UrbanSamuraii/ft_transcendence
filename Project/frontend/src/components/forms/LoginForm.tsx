@@ -49,13 +49,15 @@ export const LoginForm = () => {
     else {
       try {
         // console.log("DATA: ", formData);
-        const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password:formData.password }, {
+          const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password:formData.password }, {
           withCredentials: true,
         });
         if (response.status == 200)
           navigate('/play'); 
-        else 
+        else {
+          console.log({"User using 2FA authentication": response.data.user.email});
           navigate(`/FortyTwoFA?userEmail=${response.data.user.email}`)
+        }
       } catch (error) {
         console.error('Sign in request error:', error);
         if (axios.isAxiosError(error)) {

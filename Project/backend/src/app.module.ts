@@ -9,6 +9,7 @@ import { GameGateway } from './game/game.gateway';
 import { SquareGameService } from './game/game.square.service';
 import { ConversationsModule } from './conversations/conversations.module';
 import { MessagesModule } from './messages/messages.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
@@ -18,7 +19,8 @@ import { GatewayModule } from './gateway/gateway.module';
         MessagesModule,
         UserModule,
         GatewayModule, 
-        PrismaModule, 
+        PrismaModule,
+        EventEmitterModule.forRoot(),
         ConfigModule.forRoot({ isGlobal: true }), 
         ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', '..', 'dist', 'client') }),
     ],
