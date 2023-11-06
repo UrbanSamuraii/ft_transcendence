@@ -26,7 +26,8 @@ services:
       - ./backend/.env
     ports:
       - 3001:3001 # Expose your NestJS app's port
-      - 3002:3002 # Websockets
+      - 3002:3002 # Game Websockets
+      # - 3003:3003 # Chat Websockets
       - 5555:5555 # Expose a port for Prisma Studio
     depends_on:
       - postgres

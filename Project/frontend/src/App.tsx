@@ -3,9 +3,7 @@ import { useState, useEffect, FC, useRef } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes, useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
-import SignupForm from './pages/SignUp/SignupForm';
 import Play from './pages/Play/Play';
-import SigninForm from './pages/SignIn/SigninForm';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
@@ -21,6 +19,7 @@ import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
+import { chatSocket, chatSocketContext } from './utils/context/chatSocketContext';
 
 
 const defaultBackgroundStyle = {
@@ -56,11 +55,13 @@ function App() {
         <Router>
             <div className="App" style={backgroundStyle}>
                 <Navbar /> {/* This ensures the navbar is always visible */}
-                <SocketProvider>
-                    <Content
-                        setBackgroundStyle={setBackgroundStyle}
-                    />
-                </SocketProvider>
+                    <chatSocketContext.Provider value={chatSocket}>
+                    <SocketProvider>
+                        <Content
+                            setBackgroundStyle={setBackgroundStyle}
+                        />
+                    </SocketProvider>
+                    </chatSocketContext.Provider>
             </div>
         </Router>
     );
