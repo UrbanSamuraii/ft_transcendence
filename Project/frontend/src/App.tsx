@@ -19,7 +19,7 @@ import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-import { chatSocket, chatSocketContext } from './utils/context/chatSocketContext';
+import { chatSocket, ChatSocketProvider } from './utils/context/chatSocketContext';
 
 
 const defaultBackgroundStyle = {
@@ -55,18 +55,17 @@ function App() {
         <Router>
             <div className="App" style={backgroundStyle}>
                 <Navbar /> {/* This ensures the navbar is always visible */}
-                    <chatSocketContext.Provider value={chatSocket}>
+                    <ChatSocketProvider>
                     <SocketProvider>
                         <Content
                             setBackgroundStyle={setBackgroundStyle}
                         />
                     </SocketProvider>
-                    </chatSocketContext.Provider>
+                    </ChatSocketProvider>
             </div>
         </Router>
     );
 }
-
 
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();

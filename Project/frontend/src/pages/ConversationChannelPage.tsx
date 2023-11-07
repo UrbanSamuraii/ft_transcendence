@@ -8,22 +8,13 @@ import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { useAuth } from '../utils/hooks/useAuth';
 import { chatSocketContext } from "../utils/context/chatSocketContext";
 
-// interface SocketMessage {
-// 	authorName: string;
-// 	conversationId: number;
-// 	createdAt: Date;
-// 	messageId: number;
-// 	message: string;
-// 	updatedAt: Date;
-// }
-
 export const ConversationChannelPage = () => {
 	
 	const conversationId  = useParams().id;
 	const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
 	const { user } = useAuth();
-	const chatSocket = useContext(chatSocketContext);
-
+	const chatSocketContextData = useContext(chatSocketContext);
+	
 	useEffect(() => {
 		const fetchConversations = async () => {
 		  const conversations = await getConversationsIdentified(conversationId);
@@ -34,16 +25,17 @@ export const ConversationChannelPage = () => {
 	  }, [conversationId]); // To implement dependencies ! That s how useEffect works
 
 	useEffect(() => {
-		chatSocket.on('connected', () => console.log('connected'));
-		chatSocket.on('onMessage', (payload: ConversationMessage) => {
+		chatSocketContextData?.chatSocket?.on('connected', () => console.log('connected'));
+		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			console.log({'Message received': payload});
 			setConversationsArray(prevConversations => [payload, ...prevConversations]);
+			chatSocketContextData.setNewMessageReceived(true);
 		});
 		return() => {
-			chatSocket.off('connected');
-			chatSocket.off('onMessage');
+			chatSocketContextData?.chatSocket?.off('connected');
+			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
-	}, []);
+	}, [[chatSocketContextData]]);
 
 	  return (
 		<ConversationChannelPageStyle>
