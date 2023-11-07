@@ -17,6 +17,7 @@ export const ConversationChannelPage = () => {
 	
 	useEffect(() => {
 		const fetchConversations = async () => {
+		  console.log({"CONV ID" :conversationId});
 		  const conversations = await getConversationsIdentified(conversationId);
 		  setConversationsArray(conversations);
 		};
@@ -27,9 +28,11 @@ export const ConversationChannelPage = () => {
 	useEffect(() => {
 		chatSocketContextData?.chatSocket?.on('connected', () => console.log('connected'));
 		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
-			console.log({'Message received': payload});
-			setConversationsArray(prevConversations => [payload, ...prevConversations]);
 			chatSocketContextData.setNewMessageReceived(true);
+			const payloadConversationId = Number(payload.conversation_id);
+			if (payloadConversationId === Number(conversationId)) {
+				setConversationsArray(prevConversations => [payload, ...prevConversations]);
+			}
 		});
 		return() => {
 			chatSocketContextData?.chatSocket?.off('connected');
