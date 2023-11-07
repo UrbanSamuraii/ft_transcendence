@@ -8,6 +8,15 @@ import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { useAuth } from '../utils/hooks/useAuth';
 import { chatSocketContext } from "../utils/context/chatSocketContext";
 
+// interface SocketMessage {
+// 	authorName: string;
+// 	conversationId: number;
+// 	createdAt: Date;
+// 	messageId: number;
+// 	message: string;
+// 	updatedAt: Date;
+// }
+
 export const ConversationChannelPage = () => {
 	
 	const conversationId  = useParams().id;
@@ -26,9 +35,13 @@ export const ConversationChannelPage = () => {
 
 	useEffect(() => {
 		chatSocket.on('connected', () => console.log('connected'));
-
+		chatSocket.on('onMessage', (payload: ConversationMessage) => {
+			console.log({'Message received': payload});
+			setConversationsArray(prevConversations => [payload, ...prevConversations]);
+		});
 		return() => {
 			chatSocket.off('connected');
+			chatSocket.off('onMessage');
 		};
 	}, []);
 
