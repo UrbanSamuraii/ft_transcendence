@@ -6,6 +6,7 @@ import { ConversationMessage } from "../utils/types";
 import { MessageContainer } from "../components/messages/MessageContainer";
 import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
+import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuth';
 import { chatSocketContext } from "../utils/context/chatSocketContext";
 
@@ -51,6 +52,7 @@ export const ConversationChannelPage = () => {
 					) : (
 						<div>No message in the conversation</div>
 						)}
+					<MessageInputField conversationId={Number(conversationId)} />
 			</ScrollableContainer>
 		</ConversationChannelPageStyle>
 	);

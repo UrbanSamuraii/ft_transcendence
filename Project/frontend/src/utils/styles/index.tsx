@@ -221,6 +221,7 @@ export const ButtonCreateConv = styled.button`
 `;
 
 export const MessageContainerStyle = styled.div `
+  flex-grow: 1;
   background: inherit;
   border: 1px solid #e0e0e0; 
   border-radius: 5px;
@@ -246,9 +247,38 @@ export const MessageContainerPersonnalStyle = styled.div `
 `;
 
 export const MessageContainerHeaderStyle = styled.div `
-  background: inherit;
+  flex-grow: 1;
+  background: black;
   width: 100%;
-  height: 80 px;
-  padding: 8px;
-  margin: 5px 0;
+  height: 80px;
+  border-bottom: 1px solid #606060;
+  border-left: 1px solid #606060;
 `;
+
+export const MessageInputFieldStyle = styled.div`
+  flex-grow: 1;
+  display: flex;
+  position: fixed;
+  bottom: 10px;
+  left: calc(10px + ${CSB_WIDTH}px);
+  right: 10px;
+  padding: 10px;
+  border: 1px solid #606060;
+  border-radius: 5px;
+`;
+
+export const MessageInputTextArea = styled.textarea`
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  resize: none;
+  overflow: hidden;
+  height: auto;
+  width: 100%;
+  min-height: 54px; /* Minimum height for 3 lines */
+  max-height: 162px; /* Maximum height for 9 lines */
+  overflow-y: auto; /* Add scrollbar when content exceeds max-height */
+`;
+
+

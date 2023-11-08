@@ -29,8 +29,8 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	
 	return (
 		<MessageContainerHeaderStyle>
-			<div className="messagePanelHeader">
-				{conversationName}:
+			<div className="messagePanelTitle">
+				{conversationName}
 			</div>
 		</MessageContainerHeaderStyle>
 	);

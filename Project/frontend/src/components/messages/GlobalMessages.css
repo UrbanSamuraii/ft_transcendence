@@ -31,10 +31,51 @@
 	scroll-padding: 0 10px;
 }
 
-.messagePanelHeader {
-	display: block;
-	font-size: 30px;
-	margin-top: 8px;
-	margin-left: 20px;
+.messagePanelTitle {
+	font-style: italic;
+	padding: 10px;
+	background-color: rgb(0, 0, 0);
+	font-size: 50px;
+	margin-left: 60px;
 	color: rgb(255, 255, 255);
+}
+
+.MessageInputContainer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between; /* Add this line to space elements apart */
+}
+
+.MessageInputTextArea {
+	background: transparent;
+	border: none;
+	color: white;
+	font-size: 16px;
+	resize: none;
+	overflow: hidden;
+	height: auto;
+	width: 100%;
+	min-height: 54px; 
+	max-height: 162px;
+	overflow-y: auto; 
+} 
+  
+.MessageSendButton {
+	background: #2c333d;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	margin-top: 5px;
+	margin-left: 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+  
+.MessageSendIcon {
+	font-size: 20px;
+	line-height: 1;
 }
