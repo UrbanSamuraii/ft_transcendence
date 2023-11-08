@@ -13,20 +13,19 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
 	const updatedAtDate = new Date(message.updatedAt);
 	const updatedAtFormatted = `${updatedAtDate.getFullYear()}-${(updatedAtDate.getMonth() + 1).toString().padStart(2, '0')}-${updatedAtDate.getDate()} at ${updatedAtDate.getHours()}:${updatedAtDate.getMinutes()}:${updatedAtDate.getSeconds()}`;
 
-	
 	if (isCurrentUser === true) {
 		return (
 			<MessageContainerPersonnalStyle>
-		<div className="messageAuthorName">
-			{message.authorName}:
-		</div>
-		<div className="messageText">
-			{message.message}
-		</div>
-		<div className="dateMessage">
-			{updatedAtFormatted}
-		</div>
-		</MessageContainerPersonnalStyle>
+			<div className="messageAuthorName">
+				{message.authorName}:
+			</div>
+			<div className="messageText">
+				{message.message}
+			</div>
+			<div className="dateMessage">
+				{updatedAtFormatted}
+			</div>
+			</MessageContainerPersonnalStyle>
 		);
 	}
 	else {

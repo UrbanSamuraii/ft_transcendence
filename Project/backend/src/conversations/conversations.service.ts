@@ -111,6 +111,13 @@ export class ConversationsService {
 
 	/////////////////// GETTERS /////////////////// 
 
+	async getConversationNameById(convId: number) {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: convId },
+		});
+		return conversation?.name;
+	}
+	
 	async getConversationByName(convName: string) {
 		return await this.prismaService.conversation.findUnique({
 			where: { name: convName },

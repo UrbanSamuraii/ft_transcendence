@@ -8,10 +8,10 @@ import { getConversations } from '../utils/hooks/getConversations';
 import { chatSocketContext } from "../utils/context/chatSocketContext";
 
 export const ConversationPage = () => {
+  
   const { id } = useParams();
   const [prismaConversations, setPrismaConversations] = useState<any[]>([]); // Define the state to store prismaConversations
 	const chatSocketContextData = useContext(chatSocketContext);
-
 
   useEffect(() => {
     const fetchConversations = async () => {

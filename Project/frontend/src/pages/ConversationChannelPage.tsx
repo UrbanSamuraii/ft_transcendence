@@ -5,6 +5,7 @@ import { getConversationsIdentified } from "../utils/hooks/getConversationsIdent
 import { ConversationMessage } from "../utils/types";
 import { MessageContainer } from "../components/messages/MessageContainer";
 import { ScrollableContainer } from "../components/messages/MessagePanel";
+import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { useAuth } from '../utils/hooks/useAuth';
 import { chatSocketContext } from "../utils/context/chatSocketContext";
 
@@ -17,7 +18,6 @@ export const ConversationChannelPage = () => {
 	
 	useEffect(() => {
 		const fetchConversations = async () => {
-		  console.log({"CONV ID" :conversationId});
 		  const conversations = await getConversationsIdentified(conversationId);
 		  setConversationsArray(conversations);
 		};
@@ -40,17 +40,18 @@ export const ConversationChannelPage = () => {
 		};
 	}, [[chatSocketContextData]]);
 
-	  return (
+	return (
 		<ConversationChannelPageStyle>
+			<MessagePanelHeader conversationId={Number(conversationId)} />
 			<ScrollableContainer>
 			{conversationsArray.length > 0 ? (
 				conversationsArray.slice().reverse().map((conversation, index) => (
 					<MessageContainer key={index} message={conversation} isCurrentUser={user.username === conversation.authorName}/>
-				))
-			) : (
-				<div>No message in the conversation</div>
-			)}
+					))
+					) : (
+						<div>No message in the conversation</div>
+						)}
 			</ScrollableContainer>
 		</ConversationChannelPageStyle>
-	  );
-	};
+	);
+};
