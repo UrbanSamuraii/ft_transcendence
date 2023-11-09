@@ -112,6 +112,7 @@ export const ConversationSidebarStyle = styled.aside`
 `;
 
 export const ConversationChannelPageStyle = styled.div`
+  min-width: 400px;
   position: fixed;
   left: 0;
   top: 0;
@@ -222,6 +223,7 @@ export const ButtonCreateConv = styled.button`
 
 export const MessageContainerStyle = styled.div `
   flex-grow: 1;
+  position: fixed;
   background: inherit;
   border: 1px solid #e0e0e0; 
   border-radius: 5px;
@@ -241,7 +243,7 @@ export const MessageContainerPersonnalStyle = styled.div `
   margin: 5px 0;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
   height: auto;
-  width: calc(40% - 100px); 
+  width: calc(40% - 100px);
   margin-left: 40%;
   margin-right: 100px;
 `;
@@ -257,6 +259,7 @@ export const MessageContainerHeaderStyle = styled.div `
 
 export const MessageInputFieldStyle = styled.div`
   flex-grow: 1;
+  min-width: 300px;   
   display: flex;
   position: fixed;
   bottom: 10px;
@@ -267,7 +270,13 @@ export const MessageInputFieldStyle = styled.div`
   border-radius: 5px;
 `;
 
+export const MessageInputContainer = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
 export const MessageInputTextArea = styled.textarea`
+  min-width: 200px;   
   background: transparent;
   border: none;
   color: white;
@@ -275,10 +284,29 @@ export const MessageInputTextArea = styled.textarea`
   resize: none;
   overflow: hidden;
   height: auto;
-  width: 100%;
-  min-height: 54px; /* Minimum height for 3 lines */
-  max-height: 162px; /* Maximum height for 9 lines */
-  overflow-y: auto; /* Add scrollbar when content exceeds max-height */
+  width: 85%; /* Adjust as needed */
+  min-height: 54px;
+  max-height: 162px;
+  overflow-y: auto;
 `;
 
+export const MessageSendButton = styled.button`
+  background: #2c333d;
+  color: white;
+  border: none;
+  border-radius: 50%; 
+  margin-top: 5px;
+  margin-left: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px; /* Fixed width for MessageSendButton to keep it a circle */
+  min-width: 45px; /* Minimum width for MessageSendButton */
+  height: 45px; /* Fixed height for MessageSendButton to keep it a circle */
+`;
 
+export const MessageSendIcon = styled.span`
+  font-size: 100%;
+  line-height: 1;
+`;

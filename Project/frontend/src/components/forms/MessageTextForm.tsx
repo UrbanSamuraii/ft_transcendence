@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { MessageInputFieldProps } from '../messages/MessageInputField';
-import './GlobalForms.css'; // Import your CSS file
+import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton, MessageSendIcon } from '../../utils/styles';
 
 interface FormMessageTextData {
   content: string;
@@ -12,7 +12,16 @@ export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps)
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(event.target.value);
+    const text = event.target.value;
+    const newValue = text.replace(/\r?\n/g, '\n');
+    setContent(newValue);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      setContent((prevContent) => prevContent + "\n");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,18 +51,22 @@ export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps)
 
   return (
     <form onSubmit={handleSubmit}>
-      <textarea
-        id="message-input"
-        rows={3}
-        placeholder="Type your message..."
-        spellCheck={false}
-        className="MessageInputTextArea"
-        value={content}
-        onChange={handleInputChange}
-      />
-      <button type="submit" disabled={loading} className="MessageSendButton">
-        <span className="MessageSendIcon">📨</span>
-      </button>
+      <MessageInputFieldStyle>
+       <MessageInputContainer>
+        <MessageInputTextArea
+          id="message-input"
+          rows={3}
+          placeholder="Type your message..."
+          spellCheck={false}
+          value={content}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyPress}
+        />
+        <MessageSendButton type="submit" disabled={loading}>
+      <MessageSendIcon>📨</MessageSendIcon>
+    </MessageSendButton>
+  </MessageInputContainer>
+</MessageInputFieldStyle>
     </form>
   );
 };
