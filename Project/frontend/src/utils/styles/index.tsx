@@ -223,7 +223,6 @@ export const ButtonCreateConv = styled.button`
 
 export const MessageContainerStyle = styled.div `
   flex-grow: 1;
-  position: fixed;
   background: inherit;
   border: 1px solid #e0e0e0; 
   border-radius: 5px;
