@@ -19,7 +19,7 @@ import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-import { chatSocket, ChatSocketProvider } from './utils/context/chatSocketContext';
+import { ChatSocketProvider } from './utils/context/chatSocketContext';
 
 
 const defaultBackgroundStyle = {

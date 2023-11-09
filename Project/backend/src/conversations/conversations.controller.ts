@@ -5,6 +5,8 @@ import { ConversationsService } from './conversations.service';
 import { User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { MembersService } from 'src/members/members.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 
 @UseGuards(Jwt2faAuthGuard)
 @Controller('conversations')
@@ -12,7 +14,8 @@ export class ConversationsController {
 
 	constructor(private convService: ConversationsService,
 				private userService: UserService,
-				private memberService: MembersService) { }
+				private memberService: MembersService,
+				private eventEmitter: EventEmitter2) { }
 	
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
@@ -31,8 +34,10 @@ export class ConversationsController {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			if (userFound) {
+				this.eventEmitter.emit('message.create', '');
 				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
 			} else {
+				this.eventEmitter.emit('message.create', '');
 				res.status(202).json({ message: "Conversation created, but the user was not found.", conversationId: createdConversation.id  });
 			}
 		}

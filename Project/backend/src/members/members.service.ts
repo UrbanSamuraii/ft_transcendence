@@ -63,6 +63,9 @@ export class MembersService implements IMembersService {
 			where: { id: user.id },
 			include: {
 			  conversations: {
+				orderBy: {
+                    updatedAt: 'desc', // Order conversations by updatedAt in descending order
+                },
 				include: {
 				  members: {
 					where: {

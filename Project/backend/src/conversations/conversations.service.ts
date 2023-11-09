@@ -109,6 +109,33 @@ export class ConversationsService {
 		}
 	}
 
+	/////////////////// MESSAGE SERVICE ///////////////////
+
+	async addMessageToConversation(conversationId: number, newMessageId: number) {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, messages: true },
+		});
+
+		const updatedConversation = await this.prismaService.conversation.update({
+			where: { id: conversation.id },
+			data: {
+			messages: {
+				connect: {
+				id: newMessageId,
+				},
+			},
+			},
+		});
+	}
+
+	async updateConversationDate(conversationId: number) {
+		await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { updatedAt: new Date() },
+        });
+	}
+
 	/////////////////// GETTERS /////////////////// 
 
 	async getConversationNameById(convId: number) {
@@ -165,23 +192,7 @@ export class ConversationsService {
 		}
 	}
 
-	async addMessageToConversation(conversationId: number, newMessageId: number) {
-		const conversation = await this.prismaService.conversation.findUnique({
-			where: { id: conversationId },
-			include: { members: true, messages: true },
-		});
-
-		const updatedConversation = await this.prismaService.conversation.update({
-			where: { id: conversation.id },
-			data: {
-			messages: {
-				connect: {
-				id: newMessageId,
-				},
-			},
-			},
-		});
-	}
+	
 }	  
 	  
 	  

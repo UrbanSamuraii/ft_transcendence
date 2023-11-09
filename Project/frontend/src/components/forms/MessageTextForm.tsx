@@ -3,10 +3,6 @@ import axios from 'axios';
 import { MessageInputFieldProps } from '../messages/MessageInputField';
 import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton, MessageSendIcon } from '../../utils/styles';
 
-interface FormMessageTextData {
-  content: string;
-}
-
 export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);

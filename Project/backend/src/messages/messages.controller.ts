@@ -33,6 +33,7 @@ export class MessagesController {
 
 		const newMessage = await this.messagesService.createMessage(user, content, conversation);
 		if (newMessage) {
+			this.conversationsService.updateConversationDate(convId);
 			this.eventEmitter.emit('message.create', newMessage);
 			res.status(200).json({ message: "Message created", messageCreated: newMessage });}
 	}
