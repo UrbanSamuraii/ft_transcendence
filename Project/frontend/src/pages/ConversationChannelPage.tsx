@@ -8,14 +8,14 @@ import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuth';
-import { chatSocketContext } from "../utils/context/chatSocketContext";
+import { useChatSocket } from "../utils/context/chatSocketContext";
 
 export const ConversationChannelPage = () => {
 	
 	const conversationId  = useParams().id;
 	const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
 	const { user } = useAuth();
-	const chatSocketContextData = useContext(chatSocketContext);
+	const chatSocketContextData = useChatSocket();
 	
 	useEffect(() => {
 		const fetchConversations = async () => {
@@ -24,10 +24,10 @@ export const ConversationChannelPage = () => {
 		};
 		
 		fetchConversations();
-	  }, [conversationId]); // To implement dependencies ! That s how useEffect works
+	  }, [conversationId]); // To implement dependencies ! That s how useEffect works mtf !
 
 	useEffect(() => {
-		chatSocketContextData?.chatSocket?.on('connected', () => console.log('connected'));
+		// chatSocketContextData?.chatSocket?.on('connected', () => console.log('connected'));
 		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			chatSocketContextData.setNewMessageReceived(true);
 			const payloadConversationId = Number(payload.conversation_id);
@@ -36,8 +36,8 @@ export const ConversationChannelPage = () => {
 			}
 		});
 		return() => {
-			chatSocketContextData?.chatSocket?.off('connected');
 			chatSocketContextData?.chatSocket?.off('onMessage');
+			// chatSocketContextData?.chatSocket?.off('connected');
 		};
 	}, [[chatSocketContextData]]);
 

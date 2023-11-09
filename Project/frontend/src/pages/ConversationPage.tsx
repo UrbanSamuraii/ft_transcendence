@@ -19,13 +19,20 @@ export const ConversationPage = () => {
         const prismaConversations = await getConversations();
         setPrismaConversations(prismaConversations); // Store the prismaConversations directly in the state
         chatSocketContextData?.setNewMessageReceived(false)
+        // Start the chat socket connection when the component mounts
+        chatSocketContextData?.startChatSocketConnection();
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }
     };
 
     fetchConversations();
-  }, [chatSocketContextData?.newMessageReceived]);
+
+    // return () => {
+    //   // Stop the chat socket connection when the component unmounts
+    //   chatSocketContextData?.stopChatSocketConnection();
+    // };
+  }, [chatSocketContextData?.newMessageReceived, chatSocketContextData]);
 
   useEffect(() => {
       chatSocketContextData?.chatSocket?.on('onMessage', (payload: any) => {
@@ -35,7 +42,7 @@ export const ConversationPage = () => {
 		return() => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
-	}, []);
+	}, [chatSocketContextData?.chatSocket]);
 
   return (
     <Page>

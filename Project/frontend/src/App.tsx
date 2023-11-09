@@ -19,7 +19,7 @@ import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-import { ChatSocketProvider } from './utils/context/chatSocketContext';
+import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
 
 
 const defaultBackgroundStyle = {
@@ -75,6 +75,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
     const { stopSocketConnection } = useSocket();  // Get the socket from context
+    const { stopChatSocketConnection } = useChatSocket();
 
     useEffect(() => {
         setBackgroundStyle(routeBackgroundStyles[location.pathname] || defaultBackgroundStyle);
@@ -97,7 +98,14 @@ function Content({ setBackgroundStyle }: ContentProps) {
             // If you want to stop the socket connection, you can do so here:
             stopSocketConnection();
         }
-
+        else if (
+            previousPathname === "/ConversationPage" &&
+            !location.pathname.startsWith("/ConversationPage")
+        ) {
+            console.log("User left the conversation page!");
+            stopChatSocketConnection();
+        }
+        
         // Now update the ref after the check
         prevPathnameRef.current = location.pathname;
     }, [location.pathname]);
