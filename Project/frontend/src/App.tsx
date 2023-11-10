@@ -20,6 +20,7 @@ import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
 import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
+import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 
 
 const defaultBackgroundStyle = {
@@ -53,16 +54,18 @@ function App() {
 
     return (
         <Router>
-            <div className="App" style={backgroundStyle}>
-                <Navbar /> {/* This ensures the navbar is always visible */}
-                <ChatSocketProvider>
-                    <SocketProvider>
-                        <Content
-                            setBackgroundStyle={setBackgroundStyle}
-                        />
-                    </SocketProvider>
-                </ChatSocketProvider>
-            </div>
+            <AuthProvider>
+                <div className="App" style={backgroundStyle}>
+                    <Navbar />
+                    <ChatSocketProvider>
+                        <SocketProvider>
+                            <Content
+                                setBackgroundStyle={setBackgroundStyle}
+                            />
+                        </SocketProvider>
+                    </ChatSocketProvider>
+                </div>
+            </AuthProvider>
         </Router>
     );
 }
@@ -76,6 +79,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const prevPathnameRef = useRef(location.pathname);
     const { stopSocketConnection } = useSocket();  // Get the socket from context
     const { stopChatSocketConnection } = useChatSocket();
+    const { user } = useAuth();
 
     useEffect(() => {
         setBackgroundStyle(routeBackgroundStyles[location.pathname] || defaultBackgroundStyle);
@@ -176,6 +180,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
     return (
         <Routes>
+            {/* Public routes */}
             <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
@@ -191,8 +196,14 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 <Route path="channel/:id" element=
                     {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
             </Route>
-            <Route path="/matchmaking" element={<Matchmaking />} />
-            <Route path="/@/:username" element={<Profile />} />
+
+            {/* Protected routes */}
+            {user && (
+                <>
+                    <Route path="/@/:username" element={<Profile />} />
+                    <Route path="/matchmaking" element={<Matchmaking />} />
+                </>
+            )}
         </Routes>
     );
 }

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../utils/hooks/useAuth';
+import { useAuth } from '../../utils/hooks/useAuthHook';
 
 export const AuthenticatedRoute: FC<React.PropsWithChildren> = ({ children }) => {
 
