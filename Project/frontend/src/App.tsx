@@ -181,7 +181,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<Signup />} />

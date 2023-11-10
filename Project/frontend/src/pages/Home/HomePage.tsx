@@ -1,12 +1,6 @@
 import React from 'react';
 
-interface HomePageProps {
-    handleSignUp42Click: () => void;
-    handleSignUpClick: () => void;
-    handleSignInClick: () => void;
-}
-
-const HomePage: React.FC<HomePageProps> = ({ handleSignUp42Click, handleSignUpClick, handleSignInClick }) => {
+const HomePage = () => {
     return (
         <div>
             {/* <div className="new-user-section">
