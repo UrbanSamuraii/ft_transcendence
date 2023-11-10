@@ -4,11 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import * as passport from "passport";
+import { WebsocketAdapter } from './gateway/gateway.adapter';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
     const port = +process.env.APP_PORT || 3001;
+
+    const adapter = new WebsocketAdapter(app);
+    app.useWebSocketAdapter(adapter);
 
     app.use(passport.initialize());
     app.enableCors({

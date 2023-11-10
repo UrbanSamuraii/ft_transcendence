@@ -1,5 +1,4 @@
 import React from 'react';
-import TwoFactorEnable from '../TwoFactor/2faEnable' 
 
 interface PlayProps {
     onPlayClick: () => void;
