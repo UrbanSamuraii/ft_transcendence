@@ -27,7 +27,6 @@ export const ConversationChannelPage = () => {
 	  }, [conversationId]); // To implement dependencies ! That s how useEffect works mtf !
 
 	useEffect(() => {
-		// chatSocketContextData?.chatSocket?.on('connected', () => console.log('connected'));
 		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			chatSocketContextData.setNewMessageReceived(true);
 			const payloadConversationId = Number(payload.conversation_id);
@@ -37,7 +36,6 @@ export const ConversationChannelPage = () => {
 		});
 		return() => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
-			// chatSocketContextData?.chatSocket?.off('connected');
 		};
 	}, [[chatSocketContextData]]);
 

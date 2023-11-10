@@ -10,17 +10,21 @@ import { chatSocketContext } from "../utils/context/chatSocketContext";
 export const ConversationPage = () => {
   
   const { id } = useParams();
-  const [prismaConversations, setPrismaConversations] = useState<any[]>([]); // Define the state to store prismaConversations
+  const [prismaConversations, setPrismaConversations] = useState<any[]>([]); 
 	const chatSocketContextData = useContext(chatSocketContext);
+
+  useEffect(() => {
+    chatSocketContextData?.startChatSocketConnection();
+    return () => { };
+  }, []);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
+        // chatSocketContextData?.startChatSocketConnection();
         const prismaConversations = await getConversations();
-        setPrismaConversations(prismaConversations); // Store the prismaConversations directly in the state
+        setPrismaConversations(prismaConversations); 
         chatSocketContextData?.setNewMessageReceived(false)
-        // Start the chat socket connection when the component mounts
-        chatSocketContextData?.startChatSocketConnection();
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }
@@ -28,10 +32,6 @@ export const ConversationPage = () => {
 
     fetchConversations();
 
-    // return () => {
-    //   // Stop the chat socket connection when the component unmounts
-    //   chatSocketContextData?.stopChatSocketConnection();
-    // };
   }, [chatSocketContextData?.newMessageReceived, chatSocketContextData]);
 
   useEffect(() => {

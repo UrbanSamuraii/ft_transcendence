@@ -14,10 +14,10 @@ import { OnEvent } from "@nestjs/event-emitter";
 
 export class MessagingGateway implements OnGatewayConnection{
 	
-	// From OnGatewayConnection : a ,ethod that will be executed when a new WebSocket connection is established
+	// From OnGatewayConnection : a method that will be executed when a new WebSocket connection is established
 	handleConnection(client:Socket, ...args: any[]) {
 		console.log("New incoming connection !");
-		console.log(client.handshake);
+		console.log(client.id);
 		client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED'});
 	}
 

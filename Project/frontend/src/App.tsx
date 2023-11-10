@@ -98,10 +98,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             // If you want to stop the socket connection, you can do so here:
             stopSocketConnection();
         }
-        else if (
-            previousPathname === "/ConversationPage" &&
-            !location.pathname.startsWith("/ConversationPage")
-        ) {
+        else if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
             console.log("User left the conversation page!");
             stopChatSocketConnection();
         }

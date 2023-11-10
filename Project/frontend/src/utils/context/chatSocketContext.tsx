@@ -15,45 +15,39 @@ type chatSocketProviderProps = {
 
 export const chatSocketContext = createContext<chatSocketContextType | null>(null);
 
-// const serverAddress = window.location.hostname === 'localhost' ?
-//                 'http://localhost:3001' :
-//                 `http://${window.location.hostname}:3001`;
-
-// export const chatSocket = io(serverAddress, {
-// 	withCredentials: true
-// });
-
 export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ children }) => {
     
   const chatSocketRef = useRef<Socket | null>(null);
-    const [newMessageReceived, setNewMessageReceived] = useState(false);
+    
+  const [newMessageReceived, setNewMessageReceived] = useState(false);
 
-    const startChatSocketConnection = () => {
-      if (!chatSocketRef.current) {
-          const serverAddress = window.location.hostname === 'localhost' ?
-              'http://localhost:3001' :
-              `http://${window.location.hostname}:3001`;
+  const startChatSocketConnection = () => {
+    if (!chatSocketRef.current) {
+        const serverAddress = window.location.hostname === 'localhost' ?
+            'http://localhost:3001' :
+            `http://${window.location.hostname}:3001`;
 
-              const chatSocket = io(serverAddress, {
-                withCredentials: true
-              });
+            const chatSocket = io(serverAddress, {
+              withCredentials: true
+            });
 
-              chatSocketRef.current = chatSocket;  // Store the socket connection in the ref
-        }
-    };
-
-    const stopChatSocketConnection = () => {
-      if (chatSocketRef.current) {
-        chatSocketRef.current.close();
-        chatSocketRef.current = null;
+            chatSocketRef.current = chatSocket;  // Store the socket connection in the ref
+            console.log("NEW CLIENT SOCKET LISTENING");
       }
   };
 
-    return (
-        <chatSocketContext.Provider value={{ chatSocket: chatSocketRef.current, newMessageReceived, setNewMessageReceived, startChatSocketConnection, stopChatSocketConnection }}>
-          {children}
-        </chatSocketContext.Provider>
-    );
+  const stopChatSocketConnection = () => {
+    if (chatSocketRef.current) {
+      chatSocketRef.current.close();
+      chatSocketRef.current = null;
+    }
+  };
+
+  return (
+      <chatSocketContext.Provider value={{ chatSocket: chatSocketRef.current, newMessageReceived, setNewMessageReceived, startChatSocketConnection, stopChatSocketConnection }}>
+        {children}
+      </chatSocketContext.Provider>
+  );
 };
 
 export const useChatSocket = () => {
