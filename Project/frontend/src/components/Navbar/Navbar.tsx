@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
     const [username, setUsername] = useState('');
+    const navigate = useNavigate();
+
+    const handleSignInClick = () => {
+        navigate('/login');
+    };
 
     const fetchUserInfo = async () => {
         try {
@@ -41,6 +46,7 @@ function Navbar() {
             <div className="navbar-right">
                 <Link to={username ? `/@/${username}` : '/'} onClick={handleProfileClick}>My Profile</Link>
                 <Link to="/settings">Settings</Link>
+                <button onClick={handleSignInClick}>SIGN IN</button>
             </div>
         </div>
     );
