@@ -184,28 +184,26 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
-            <Route path="/play" element={<AuthenticatedRoute>
-                <Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />
-            </AuthenticatedRoute>} />
-            <Route path="/2fa-enable" element={<AuthenticatedRoute><TwoFAEnablingPage /></AuthenticatedRoute>} />
-            <Route path="/2fa-disable" element={<AuthenticatedRoute><TwoFADisablingPage /></AuthenticatedRoute>} />
-            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/Login" element={<Login />} />
-            <Route path="/ConversationPage" element={<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >
-                <Route path="channel/:id" element=
-                    {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/ConversationPage" element={<ConversationPage />} >
+                <Route path="channel/:id" element={<ConversationChannelPage />} />
             </Route>
+            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
 
             {/* Protected routes */}
             {user && (
                 <>
+                    <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
+                    <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
+                    <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
                     <Route path="/@/:username" element={<Profile />} />
                     <Route path="/matchmaking" element={<Matchmaking />} />
                 </>
             )}
         </Routes>
     );
+
 }
 
 export default App;
