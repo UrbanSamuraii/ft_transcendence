@@ -7,8 +7,8 @@ import Play from './pages/Play/Play';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
-import { AuthenticationPage } from './pages/AuthenticationPage';
-import { LoginPage } from './pages/LoginPage';
+import { Signup } from './pages/Signup';
+import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
@@ -39,13 +39,13 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
     '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
     '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
-    '/AuthenticationPage': { background: '#1a1a1a'},
-    '/LoginPage': { background: '#1a1a1a'},
-    '/ConversationPage': { background: '#1a1a1a'},
-    '/ConversationChannelPage': { background: '#1a1a1a'},
-    '/TwoFAEnablingPage': { background: '#1a1a1a'},
-    '/TwoFADisablingPage': { background: '#1a1a1a'},
-    '/TwoFACodePage': { background: '#1a1a1a'},
+    '/signup': { background: '#1a1a1a' },
+    '/Login': { background: '#1a1a1a' },
+    '/ConversationPage': { background: '#1a1a1a' },
+    '/ConversationChannelPage': { background: '#1a1a1a' },
+    '/TwoFAEnablingPage': { background: '#1a1a1a' },
+    '/TwoFADisablingPage': { background: '#1a1a1a' },
+    '/TwoFACodePage': { background: '#1a1a1a' },
 };
 
 function App() {
@@ -55,13 +55,13 @@ function App() {
         <Router>
             <div className="App" style={backgroundStyle}>
                 <Navbar /> {/* This ensures the navbar is always visible */}
-                    <ChatSocketProvider>
+                <ChatSocketProvider>
                     <SocketProvider>
                         <Content
                             setBackgroundStyle={setBackgroundStyle}
                         />
                     </SocketProvider>
-                    </ChatSocketProvider>
+                </ChatSocketProvider>
             </div>
         </Router>
     );
@@ -102,7 +102,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
             console.log("User left the conversation page!");
             stopChatSocketConnection();
         }
-        
+
         // Now update the ref after the check
         prevPathnameRef.current = location.pathname;
     }, [location.pathname]);
@@ -161,7 +161,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 credentials: 'include'
             });
             console.log('Signout successful:', response);
-            navigate('/AuthenticationPage');
+            navigate('/signup');
         } catch (error) {
             console.error('Signout failed:', error);
         }
@@ -180,17 +180,17 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/play" element={<AuthenticatedRoute>
-                                        <Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>
-                                         </AuthenticatedRoute>} />
+                <Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />
+            </AuthenticatedRoute>} />
             <Route path="/2fa-enable" element={<AuthenticatedRoute><TwoFAEnablingPage /></AuthenticatedRoute>} />
             <Route path="/2fa-disable" element={<AuthenticatedRoute><TwoFADisablingPage /></AuthenticatedRoute>} />
             <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
-            <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
-            <Route path="/LoginPage" element={<LoginPage />} />
-            <Route path="/ConversationPage" element= {<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/ConversationPage" element={<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >
                 <Route path="channel/:id" element=
-                {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
-            </Route>    
+                    {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
+            </Route>
             <Route path="/matchmaking" element={<Matchmaking />} />
             <Route path="/@/:username" element={<Profile />} />
         </Routes>

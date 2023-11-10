@@ -21,7 +21,7 @@ const HomePage: React.FC<HomePageProps> = ({ handleSignUp42Click, handleSignUpCl
             <div className="welcome-back-section">
                 <h2>Welcome Back</h2>
                 <button className="login-button" onClick={handleSignInClick}>
-                    SIGNIN
+                    SIGN IN
                 </button>
             </div>
         </div>
