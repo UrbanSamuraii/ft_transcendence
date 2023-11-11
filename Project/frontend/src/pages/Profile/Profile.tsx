@@ -32,21 +32,13 @@ function Profile() {
 
     return (
         <div className="profile-container">
-            <div className="profile-header">
-                <h1>Profile: {userInfo.username}</h1>
-            </div>
-            <div className="profile-content">
-                <div className="profile-info">
-                    <p><strong>Username:</strong> {userInfo.username}</p>
-                    <p><strong>Email:</strong> {userInfo.email}</p>
-                    {/* Display other user info as needed */}
-                </div>
-                <div className="profile-actions">
-                    {/* Add buttons or actions related to the profile here */}
-                </div>
-            </div>
+            <p>Username: {userInfo.username}</p>
+            <p>Email: {userInfo.email}</p>
+            {/* More user info here */}
+            <button className="profile-button">Edit Profile</button>
         </div>
     );
+
 }
 
 export default Profile;

@@ -24,7 +24,7 @@ import { AuthProvider, useAuth } from './AuthContext'; // Update the path accord
 
 
 const defaultBackgroundStyle = {
-    background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
+    background: '#1a1a1a',
 };
 
 interface ContentProps {
@@ -36,10 +36,16 @@ interface RouteBackgroundStyles {
 }
 
 const routeBackgroundStyles: RouteBackgroundStyles = {
-    '/': { background: 'linear-gradient(45deg, #ff0000, #ff7700, #ff00cc)' },
-    '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
-    '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
-    '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
+    '/': {
+        background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
+        // backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+        backgroundColor: '#1a1a1a',
+    },
+    '/select-mode': { background: '#1a1a1a' },
+    '/game': { background: '#1a1a1a' },
+    '/add-user': { background: '#1a1a1a)' },
     '/signup': { background: '#1a1a1a' },
     '/Login': { background: '#1a1a1a' },
     '/ConversationPage': { background: '#1a1a1a' },

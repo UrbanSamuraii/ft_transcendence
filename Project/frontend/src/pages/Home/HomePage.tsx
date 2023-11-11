@@ -1,23 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
+    const navigate = useNavigate();
+
+    const handlePlayClick = () => {
+        navigate('/select-mode'); // Make sure this path matches your route
+    };
+
     return (
-        <div>
-            {/* <div className="new-user-section">
-                <h2>New User</h2>
-                <button className="signup-button black-shiny-button" onClick={handleSignUp42Click} style={{ marginRight: '10px' }}>
-                    42 SIGNUP
-                </button>
-                <button className="signup-button" onClick={handleSignUpClick}>
-                    SIGNUP
-                </button>
-            </div>
-            <div className="welcome-back-section">
-                <h2>Welcome Back</h2>
-                <button className="login-button" onClick={handleSignInClick}>
-                    SIGN IN
-                </button>
-            </div> */}
+        <div className="homepage">
+            {/* Other content */}
+            <button className="play-button" onClick={handlePlayClick}>Play</button>
         </div>
     );
 };
