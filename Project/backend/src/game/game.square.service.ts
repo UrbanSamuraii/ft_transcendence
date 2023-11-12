@@ -159,7 +159,7 @@ export class SquareGameService {
 
         }
 
-        if (this.leftScore >= 10000 || this.rightScore >= 10000) {
+        if (this.leftScore >= 10 || this.rightScore >= 10) {
             this.isGameOver = true;
             clearInterval(this.gameLoop); // Clear the game loop to stop the game
         }

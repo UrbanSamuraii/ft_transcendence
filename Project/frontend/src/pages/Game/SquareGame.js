@@ -66,13 +66,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         };
     }, [socket]);  // Depend on socket
 
-    // const stopSocketConnection = () => {
-    //     if (socket) {
-    //         socket.close();
-    //         setSocket(null);
-    //     }
-    // };
-
     const startGame = () => {
         if (socket) {
             socket.emit('startGame');

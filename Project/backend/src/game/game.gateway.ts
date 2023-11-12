@@ -21,7 +21,6 @@ export class GameGateway implements OnGatewayInit {
     private queue: Socket[] = [];
     private gameLoop: NodeJS.Timeout;
 
-
     constructor(private gameService: SquareGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService
@@ -29,6 +28,10 @@ export class GameGateway implements OnGatewayInit {
 
     private addUserToQueue(client: Socket) {
         this.queue.push(client);
+    }
+
+    private removeFromQueue(clientToRemove: Socket) {
+        this.queue = this.queue.filter(client => client !== clientToRemove);
     }
 
     afterInit(server: Server) {
@@ -47,10 +50,6 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        // const isUserInQueue = (userEmail: string) => {
-        //     return this.queue.some(client => client.data.user.email === userEmail);
-        // };
-
         const userIndexInQueue = (userEmail: string) => {
             return this.queue.findIndex(client => client.data.user.email === userEmail);
         };
@@ -61,24 +60,9 @@ export class GameGateway implements OnGatewayInit {
             client.data.user = decoded;
             const userInfo = await this.userService.getUserByToken(token);
             console.log("decoded.email = ", decoded.email);
-            // console.log("client.data.user.id = ", client.data.user.email);
-
-            // if (!isUserInQueue(decoded.email)) {
-            //     console.log("here");
-            //     this.addUserToQueue(client);
-            // }
 
             const index = userIndexInQueue(decoded.email);
-            // if (index !== -1) {
-            // console.log("Replacing user's old socket with new socket:", decoded.email);
-            // this.queue[index] = client;  // Replace the old socket with the new one
-            // } else {
-            // console.log("Adding new user to queue:", decoded.email);
             this.addUserToQueue(client);
-            // }
-
-            // console.log('Client connected:', client.id);
-            // console.log(userInfo);
 
             console.log(this.queue.length);
             if (this.queue.length >= 2) {  // if there are at least two users in the queue
@@ -114,6 +98,13 @@ export class GameGateway implements OnGatewayInit {
 
             delete clientInputs[client.id];
         });
+    }
+
+    @SubscribeMessage('leaveMatchmaking')
+    handleLeaveMatchmaking(client: Socket) {
+        console.log("handleLeaveMatchmaking");
+        this.removeFromQueue(client);
+        client.disconnect();
     }
 
     @SubscribeMessage('paddleMovements')

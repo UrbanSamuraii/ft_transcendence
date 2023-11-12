@@ -30,6 +30,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 console.log('Match found!', data);
             });
 
+            socketConnection.on('disconnect', () => {
+                socketRef.current = null;
+            });
+
             socketRef.current = socketConnection;  // Store the socket connection in the ref
         }
     };
