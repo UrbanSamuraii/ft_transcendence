@@ -57,7 +57,7 @@ export class ConversationsService {
 		return createdConversation;
 	}
 
-	/////////////////// ADD / REMOVE MEMBER ///////////////////
+	/////////////////// ADD / REMOVE MEMBER - ADMIN ///////////////////
 	
 	async addUserToConversation(userId: number, conversationId: number): Promise<boolean> {
 		const existingConversation = await this.prismaService.conversation.findUnique({
@@ -77,6 +77,33 @@ export class ConversationsService {
 				});
 				await this.membersService.addConversationInMembership(userId, existingConversation.id);
 				return true; // The user has been added
+			} else { return false; // The user was already in
+			}
+		}
+		else {return false;}
+	}
+
+	async upgrateUserToAdmin(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, admins: true },
+		});
+		if (existingConversation) {
+			const isMember = existingConversation.members.some((member) => member.id === userId);
+			if (isMember) {
+				const isAdmin = existingConversation.admins.some((admin) => admin.id === userId);
+				if (!isAdmin) {
+					await this.prismaService.conversation.update({
+						where: { id: conversationId },
+						data: {
+							admins: {
+								connect: [{ id: userId }],
+							},
+						},
+					});
+				};
+				await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
+				return true; // The user has been added to the admin list
 			} else { return false; // The user was already in
 			}
 		}
@@ -106,6 +133,92 @@ export class ConversationsService {
 			}
 		} else {
 			return false; // We haven t found the conversation
+		}
+	}
+
+	async downgradeAdminStatus(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { members: true, admins: true },
+		});
+		if (existingConversation) {
+			const isMember = existingConversation.members.some((member) => member.id === userId);
+			if (isMember) {
+				const isAdmin = existingConversation.admins.some((admin) => admin.id === userId);
+				if (isAdmin) {
+					await this.prismaService.conversation.update({
+						where: { id: conversationId },
+						data: {
+							admins: {
+								disconnect: [{ id: userId }],
+							},
+						},
+					});
+					await this.membersService.removeAdminStatus(userId, existingConversation.id);
+					return true; // The user has been removed from the admin List
+				}
+			} else {
+				return false; // The user was not an admin of this conversation
+			}
+		} else {
+			return false; // We haven t found the conversation
+		}
+	}
+
+	/////////////////// ADD / REMOVE MUTED - BANNED ///////////////////
+
+	async muteMemberFromConversation(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, muted: true },
+		});
+		if (existingConversation) {
+			const isMember = existingConversation.members.some((member) => member.id === userId);
+			if (isMember) {
+				const isMuted = existingConversation.muted.some((muted) => muted.id === userId);
+				if (!isMuted) {	
+					await this.prismaService.conversation.update({
+						where: { id: conversationId },
+						data: {
+							muted: {
+								connect: [{ id: userId }],
+							},
+						},
+					});
+					await this.membersService.addMemberToMutedList(userId, existingConversation.id);
+					return true;
+				}
+			} else { return false; }
+		}
+		else {return false;}
+	}
+
+	async removeMemberFromMutedList(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, muted: true },
+		});
+		if (existingConversation) {
+			const isMember = existingConversation.members.some((member) => member.id === userId);
+			if (isMember) {
+				const isMuted = existingConversation.muted.some((muted) => muted.id === userId);
+				if (isMuted) {
+					await this.prismaService.conversation.update({
+						where: { id: conversationId },
+						data: {
+							muted: {
+								disconnect: [{ id: userId }],
+							},
+						},
+					});
+					await this.membersService.removeMutedStatus(userId, existingConversation.id);
+					return true;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
 		}
 	}
 
