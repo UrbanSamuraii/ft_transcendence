@@ -5,6 +5,8 @@ import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
 import { UserService } from "src/user/user.service";
 import { GatewaySessionManager } from "./gateway.session";
+import { AuthenticatedSocket } from "../utils/interfaces";
+import { User } from "@prisma/client";
 
 @WebSocketGateway({
 	cors: {
@@ -16,10 +18,10 @@ import { GatewaySessionManager } from "./gateway.session";
 
 export class MessagingGateway implements OnGatewayConnection{
 	constructor(private readonly userService: UserService,
-		private readonly sessionManager: GatewaySessionManager) {}
+		private readonly sessions: GatewaySessionManager) {}
 	
 	// From OnGatewayConnection : a method that will be executed when a new WebSocket connection is established
-	async handleConnection(client:Socket, ...args: any[]) {
+	async handleConnection(client:AuthenticatedSocket, ...args: any[]) {
 		console.log("New incoming connection !");
 		const cookie  = client.handshake.headers.cookie;
 		const token = cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
@@ -28,20 +30,31 @@ export class MessagingGateway implements OnGatewayConnection{
             client.disconnect(true);
             return;
         }
-		const userId = this.extractUserIdFromSocket(client);
+
 		const identifiedUser = await this.userService.getUserByToken(token);
-		if (userId) {
-			this.sessionManager.setUserSocket(userId, client);
+		if (identifiedUser) {
+			client = this.associateUserToAuthSocket(client, identifiedUser);
+			this.sessions.setUserSocket(identifiedUser.id, client);
 		}
+		console.log({"SOCKET ASSOCIATED USER": client.user});
+		console.log({"SESSIONS": this.sessions});
 		client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED'});
 	}
 
-	private extractUserIdFromSocket(socket: Socket): string | null {
-		const userId = socket.id;
+	////////////////////// PRIVATE METHODE //////////////////////
+	
+	private associateUserToAuthSocket(socket: AuthenticatedSocket, identifiedUser:User ): AuthenticatedSocket {
+		socket.user = identifiedUser;
+		return socket;
+	}
+
+	private extractUserIdFromSocket(socket: AuthenticatedSocket): Number | null {
+		const userId = socket.user.id;
 		return userId ? userId : null;
 	}
-	
 
+	//////////////////////////////////////////////////////////////
+	
 	// To inject the WebSocket server instance provided by socket.io
 	@WebSocketServer() server: Server;
 
@@ -58,7 +71,16 @@ export class MessagingGateway implements OnGatewayConnection{
 	@OnEvent('message.create')
 	handleMessageCreatedEvent(payload: any) {
 		console.log({"Message created in PAYLOAD": payload});
-		this.server.emit('onMessage', payload)
+		const authorSocket = this.sessions.getUserSocket(payload.author.id);
+		const recipientSockets = this.sessions.getSockets();
+		recipientSockets.forEach((recipientSocket, userId) => {
+			if (userId !== payload.author.id) {
+				recipientSocket.emit('onMessage', payload);
+			}
+		});
+		// console.log({"Author's socket": authorSocket});
+		authorSocket.emit('onMessage', payload);
+		// this.server.emit('onMessage', payload);
 	}
 
 }

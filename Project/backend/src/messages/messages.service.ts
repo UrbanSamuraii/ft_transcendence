@@ -7,10 +7,23 @@ import { MembersService } from "src/members/members.service";
 import { IMessagesService } from "./messages";
 import { ConversationsService } from "src/conversations/conversations.service";
 
+type SocketMessage = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    message: string | null;
+    author: {
+        id: number;
+    };
+    authorName: string;
+    conversation_id: number;
+};
+
 @Injectable()
 export class MessagesService implements IMessagesService {
 
 	constructor(private prismaService: PrismaService,
+				private userService: UserService,
 				private membersService: MembersService,
 				private conversationsService: ConversationsService) {};
 
@@ -21,16 +34,22 @@ export class MessagesService implements IMessagesService {
 
 		if (!isMember) {throw new HttpException("Conversation member not identified", HttpStatus.FORBIDDEN)}
 		else {
+
 			const newMessageData: Prisma.MessageCreateInput = { message: content,
 																author: { connect: { id: author.id } },
 																conversation: { connect: { id: conversation.id } },}
 			const createdMessage = await this.prismaService.message.create({
 				data: newMessageData,
 			});
+
+			const fullMessage: SocketMessage = {
+				...createdMessage,
+				author: { id: author.id },
+			};
 			// To update the conversation to include the new message 
 			// Be carefull, the new message is added at the end of the array
 			await this.conversationsService.addMessageToConversation(conversation.id, createdMessage.id);
-			return createdMessage;
+			return fullMessage;
 		}
 	}
 

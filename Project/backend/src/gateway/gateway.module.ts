@@ -3,7 +3,10 @@ import { MessagingGateway } from "./websocket.gateway";
 import { GatewaySessionManager } from "./gateway.session";
 
 @Module({
-	providers: [MessagingGateway, GatewaySessionManager]
+	providers: [MessagingGateway, {
+		provide : GatewaySessionManager,
+		useClass: GatewaySessionManager
+	}]
 })
 export class GatewayModule {}
 
