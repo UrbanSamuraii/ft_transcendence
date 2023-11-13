@@ -34,8 +34,11 @@ model User {
   
   status  status_t? @default(OFFLINE)
 
-  conversations Conversation[] @relation("member")
   messages      Message[] @relation("author")
+  conversations       Conversation[] @relation("member")
+  conversationsAdmin  Conversation[] @relation("admin")
+  bannedFrom          Conversation[] @relation("banned")
+  mutedFrom           Conversation[] @relation("muted")
 
   @@unique([id, email, username])
 	@@map("users")
@@ -49,6 +52,10 @@ model Conversation {
 	updatedAt	DateTime	@updatedAt
 
   members   User[]    @relation("member")
+  admins    User[]    @relation("admin")
+  banned    User[]    @relation("banned")
+  muted     User[]    @relation("muted")
+  
   messages  Message[] 
 
   @@unique([id, name])
