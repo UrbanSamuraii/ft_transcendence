@@ -6,6 +6,8 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from '@nestjs/common';
 import { UserService } from '../user/user.service';
+import { PrismaService } from "src/prisma/prisma.service";
+import { v4 as uuidv4 } from 'uuid';
 
 const clientInputs = {};
 
@@ -23,7 +25,9 @@ export class GameGateway implements OnGatewayInit {
 
     constructor(private gameService: SquareGameService,
         private readonly jwtService: JwtService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private prisma: PrismaService // Inject Prisma service here
+
     ) { }
 
     private addUserToQueue(client: Socket) {
@@ -35,10 +39,8 @@ export class GameGateway implements OnGatewayInit {
     }
 
     afterInit(server: Server) {
-        console.log('Socket.io initialized');
-        this.gameService.updateGameState(clientInputs, (data) => {
-            this.server.emit('updateGameData', data);
-        });
+        console.log("Socket.io initialized");
+
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -69,13 +71,31 @@ export class GameGateway implements OnGatewayInit {
                 const player1 = this.queue.shift();  // remove the first user from the queue
                 const player2 = this.queue.shift();  // remove the second user from the queue
 
+                console.log("player1.data.user.id = ", player1.data.user.id);
+                console.log("player2.data.user.id = ", player2.data.user.id);
+
+                const newGame = await this.prisma.game.create({
+                    data: {
+                        uniqueId: uuidv4(), // Generate a UUID for uniqueId
+                        player1Id: player1.data.user.id,
+                        player2Id: player2.data.user.id,
+                        // other game data if necessary
+                    }
+                });
+
+                const gameId = newGame.id;
+
                 // Notify both users that a match has been found
-                player1.emit('matchFound', { opponent: player2.data.user });
+                player1.emit('matchFound', { opponent: player2.data.user, gameId });
                 // player1.emit('matchFound', { you: player1.data.user });
-                player2.emit('matchFound', { opponent: player1.data.user });
+                player2.emit('matchFound', { opponent: player1.data.user, gameId });
                 // player2.emit('matchFound', { you: player2.data.user });
 
                 // Here you could initialize game-related data or perform any other setup for the matched game
+
+                this.gameService.updateGameState(gameId, clientInputs, (data) => {
+                    this.server.emit('updateGameData', data);
+                });
 
                 console.log(`Matched ${player1.id} with ${player2.id}`);
             }
@@ -136,6 +156,7 @@ export class GameGateway implements OnGatewayInit {
         // console.log(JSON.stringify(client.data.user, null, 2));
 
         if (this.gameService.isGameOver) {
+            console.log("hererere");
             this.gameService.resetGame();
         }
     }

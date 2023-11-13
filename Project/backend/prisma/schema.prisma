@@ -31,11 +31,24 @@ model User {
     status  status_t? @default(OFFLINE)
     conversations Conversation[] @relation("member")
     messages      Message[] @relation("author")
-    gamesWon                Int       @default(0)
     eloRating               Int       @default(1000)
+    gamesWon          Game[] @relation("WinnerRelation")
 
     @@unique([id, email, username])
 	@@map("users")
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  uniqueId  String   @unique
+  player1Id Int
+  player2Id Int
+  winnerId  Int?
+  createdAt DateTime @default(now())
+
+  winner    User? @relation("WinnerRelation", fields: [winnerId], references: [id])
+
+  @@map("games")
 }
 
 model Conversation {

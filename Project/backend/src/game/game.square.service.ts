@@ -17,6 +17,8 @@ const squareDx = 1.25;
 @Injectable()
 export class SquareGameService {
 
+    private gameStates = new Map<string, any>(); // Using 'any' for simplicity, define a proper type for game state
+
     private squares = Array.from({ length: nbrOfSquares }, (_, index) => {
         const ySpacing = 100 / nbrOfSquares;
         return {
@@ -77,12 +79,30 @@ export class SquareGameService {
 
     }
 
+    private initializeGameState() {
+        return {
+            squares: [/* initial squares data */],
+            leftPaddle: {/* initial left paddle data */ },
+            rightPaddle: {/* initial right paddle data */ },
+            leftScore: 0,
+            rightScore: 0,
+            isGameOver: false,
+            // any other game-related initial state
+        };
+    }
+
     adjustDyOnCollision(distanceFromCenter, paddleHeight) {
         const relativeDistance = distanceFromCenter / paddleHeight;
         return (relativeDistance) * this.angleFactor;
     }
 
-    updateGameState(clientInputs, callback: Function) {
+    updateGameState(gameId: any, clientInputs: any, callback: Function) {
+        let gameState = this.gameStates.get(gameId);
+        if (!gameState) {
+            // Initialize game state for new gameId
+            gameState = this.initializeGameState();
+            this.gameStates.set(gameId, gameState);
+        }
 
         const clientIds = Object.keys(clientInputs);
 
@@ -174,7 +194,7 @@ export class SquareGameService {
         });
 
         if (!this.isGameOver) {
-            setTimeout(() => this.updateGameState(clientInputs, callback), 1000 / 60);
+            setTimeout(() => this.updateGameState(gameId, clientInputs, callback), 1000 / 60);
         }
     }
 

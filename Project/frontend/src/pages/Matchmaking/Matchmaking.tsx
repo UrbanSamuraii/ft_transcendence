@@ -24,7 +24,8 @@ function Matchmaking() {
             const handleMatchFound = (data: any) => {
                 console.log('Match found!', data);
                 matchFoundRef.current = true;
-                navigate("/game");
+                // navigate("/game");
+                navigate(`/game/${data.gameId}`); // Navigate to the game route with the game ID
             };
             socket.on('matchFound', handleMatchFound);
             hasAddedListeners.current = true;  // Set the ref to true after adding the listeners

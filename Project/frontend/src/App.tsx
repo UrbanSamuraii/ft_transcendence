@@ -117,7 +117,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
         prevPathnameRef.current = location.pathname;
     }, [location.pathname]);
 
-
     function handlePlayClick() {
         navigate("/select-mode");
     }
@@ -188,7 +187,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
         <Routes>
             {/* Public routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
+            {/* <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} /> */}
+            <Route path="/game/:id" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
             <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />

@@ -6,6 +6,7 @@ import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
 import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
@@ -25,7 +26,8 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     const [isGameActive, setIsGameActive] = useState(true);
     const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
-    const { socket } = useSocket();  // Get the socket from context
+    const { socket, stopSocketConnection } = useSocket();  // Get the socket from context
+    const { id: gameId } = useParams(); // Get the game ID from the URL
 
     useEffect(() => {
         isGameActiveRef.current = isGameActive;
@@ -39,10 +41,10 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
     useEffect(() => {
         if (!socket) return;  // Ensure socket exists
 
-        console.log("Using socket from context for game.");
+        console.log("Using socket from context for game with ID:", gameId);
 
         socket.on("updateGameData", (data) => {
-            console.log('Received game update from socket.');
+            console.log('Received game update from socket for game ID:', gameId);
 
             setGameData(data);
             drawGame(data);
@@ -50,11 +52,13 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             if (data.isGameOver) {
                 console.log('Game over detected.');
                 setIsGameActive(false); // Game is no longer active
+                stopSocketConnection();
                 onGameOver();
+                // data.isGameOver = false;
             }
         });
 
-        socket.emit('startGame');
+        socket.emit('startGame', { gameId });
 
         const intervalId = setInterval(() => {
             socket.emit('paddleMovements', activeKeysRef.current);
@@ -64,13 +68,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             clearInterval(intervalId);
             // Don't close the socket here; it will be managed by the SocketProvider
         };
-    }, [socket]);  // Depend on socket
-
-    const startGame = () => {
-        if (socket) {
-            socket.emit('startGame');
-        }
-    };
+    }, [socket, gameId]);  // Depend on socket
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -320,8 +318,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [gameData]);
-
-
 
     useEffect(() => {
         const canvas = canvasRef.current;
