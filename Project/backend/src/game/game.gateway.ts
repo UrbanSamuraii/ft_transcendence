@@ -71,21 +71,28 @@ export class GameGateway implements OnGatewayInit {
                 const player1 = this.queue.shift();  // remove the first user from the queue
                 const player2 = this.queue.shift();  // remove the second user from the queue
 
-                console.log("player1.data.user.id = ", player1.data.user.id);
-                console.log("player2.data.user.id = ", player2.data.user.id);
+                console.log("player1.data.user.id = ", player1.data.user.sub);
+                console.log("player2.data.user.id = ", player2.data.user.sub);
+
+                //this "sub" shit is so annoying and so random need to change that garbage ass shit
 
                 const newGame = await this.prisma.game.create({
                     data: {
                         uniqueId: uuidv4(), // Generate a UUID for uniqueId
-                        player1Id: player1.data.user.id,
-                        player2Id: player2.data.user.id,
+                        player1Id: player1.data.user.sub,
+                        // player1Id: player1.data.user.id,
+                        player2Id: player2.data.user.sub,
+                        // player2Id: player2.data.user.id,
                         // other game data if necessary
                     }
                 });
 
                 const gameId = newGame.id;
+                player1.join(gameId.toString());
+                player2.join(gameId.toString());
 
                 // Notify both users that a match has been found
+
                 player1.emit('matchFound', { opponent: player2.data.user, gameId });
                 // player1.emit('matchFound', { you: player1.data.user });
                 player2.emit('matchFound', { opponent: player1.data.user, gameId });
@@ -94,7 +101,8 @@ export class GameGateway implements OnGatewayInit {
                 // Here you could initialize game-related data or perform any other setup for the matched game
 
                 this.gameService.updateGameState(gameId, clientInputs, (data) => {
-                    this.server.emit('updateGameData', data);
+                    // this.server.emit('updateGameData', data);
+                    this.server.to(gameId.toString()).emit('updateGameData', data);
                 });
 
                 console.log(`Matched ${player1.id} with ${player2.id}`);
