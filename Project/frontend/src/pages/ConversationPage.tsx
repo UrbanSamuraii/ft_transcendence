@@ -14,7 +14,13 @@ export const ConversationPage = () => {
 	const chatSocketContextData = useContext(chatSocketContext);
 
   useEffect(() => {
-    chatSocketContextData?.startChatSocketConnection();
+    const initializeSocket = async () => {
+      await chatSocketContextData?.startChatSocketConnection();
+    };
+  
+    initializeSocket();
+    console.log({"ChatSocketContextData": chatSocketContextData});
+    
     return () => { };
   }, []);
 
@@ -32,7 +38,7 @@ export const ConversationPage = () => {
 
     fetchConversations();
 
-  }, [chatSocketContextData?.newMessageReceived, chatSocketContextData]);
+  }, [chatSocketContextData]);
 
   useEffect(() => {
       chatSocketContextData?.chatSocket?.on('onMessage', (payload: any) => {
@@ -42,7 +48,7 @@ export const ConversationPage = () => {
 		return() => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
-	}, [chatSocketContextData?.chatSocket]);
+	}, [chatSocketContextData]);
 
   return (
     <Page>

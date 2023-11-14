@@ -36,11 +36,9 @@ export class ConversationsController {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			if (userFound) {
-				// this.messagesService.createMessage(user, "", createdConversation);
 				this.eventEmitter.emit('message.create', '');
 				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
 			} else {
-				// this.messagesService.createMessage(user, "", createdConversation);
 				this.eventEmitter.emit('message.create', '');
 				res.status(202).json({ message: "Conversation created, but the user was not found.", conversationId: createdConversation.id  });
 			}

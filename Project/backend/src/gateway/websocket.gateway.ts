@@ -36,6 +36,7 @@ export class MessagingGateway implements OnGatewayConnection{
 			client = this.associateUserToAuthSocket(client, identifiedUser);
 			this.sessions.setUserSocket(identifiedUser.id, client);
 		}
+		console.log({"SOCKET id of our user": client.id});
 		console.log({"SOCKET ASSOCIATED USER": client.user});
 		console.log({"SESSIONS": this.sessions});
 		client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED'});
@@ -74,13 +75,16 @@ export class MessagingGateway implements OnGatewayConnection{
 		if (payload.author) {
 			const authorSocket = this.sessions.getUserSocket(payload.author.id);
 			const recipientSockets = this.sessions.getSockets();
+			// console.log({"AUTHOR SOCKET": authorSocket});
+			
 			recipientSockets.forEach((recipientSocket, userId) => {
 				if (userId !== payload.author.id) {
+					// console.log({"RECIPIENT SOCKET": recipientSocket});
 					recipientSocket.emit('onMessage', payload);
 				}
 			});
 			authorSocket.emit('onMessage', payload);
-			// this.server.emit('onMessage', payload);
+			// this.server.emit('onMessage', "update");
 		}
 		else {
 			this.server.emit('onMessage', payload); // VA FALOIR FEINTER

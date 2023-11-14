@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode,  Dispatch, SetStateAction, useRef, useContext } from 'react';
+import { createContext, useState, ReactNode,  Dispatch, SetStateAction, useRef, useContext, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 type chatSocketContextType = {
@@ -21,8 +21,9 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
     
   const [newMessageReceived, setNewMessageReceived] = useState(false);
 
-  const startChatSocketConnection = () => {
-    if (!chatSocketRef.current) {
+  const startChatSocketConnection = async () => {
+    return new Promise<void>((resolve) => {
+      if (!chatSocketRef.current) {
         const serverAddress = window.location.hostname === 'localhost' ?
             'http://localhost:3001' :
             `http://${window.location.hostname}:3001`;
@@ -32,8 +33,20 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
             });
 
             chatSocketRef.current = chatSocket;  // Store the socket connection in the ref
-            console.log("NEW CLIENT SOCKET LISTENING");
-      }
+            console.log({"NEW CLIENT SOCKET LISTENING": chatSocket});
+
+            chatSocket.on('connect', () => {
+              console.log({"Socket connected": chatSocket.id});
+              resolve();
+            });
+        
+            chatSocket.on('disconnect', () => {
+              console.log("Socket disconnected");
+            });
+          } else {
+            resolve();
+          }
+        });
   };
 
   const stopChatSocketConnection = () => {
@@ -42,6 +55,11 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
       chatSocketRef.current = null;
     }
   };
+
+  useEffect(() => {
+    startChatSocketConnection();
+  }, []);
+
 
   return (
       <chatSocketContext.Provider value={{ chatSocket: chatSocketRef.current, newMessageReceived, setNewMessageReceived, startChatSocketConnection, stopChatSocketConnection }}>
