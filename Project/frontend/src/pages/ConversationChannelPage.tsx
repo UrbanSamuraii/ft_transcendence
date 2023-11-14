@@ -29,7 +29,7 @@ export const ConversationChannelPage = () => {
 	useEffect(() => {
 		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			chatSocketContextData.setNewMessageReceived(true);
-			console.log({"NOUVEAU MESSAGE DANS LA CONV !": payload});
+			// console.log({"NOUVEAU MESSAGE DANS LA CONV !": payload});
 			const payloadConversationId = Number(payload.conversation_id);
 			if (payloadConversationId === Number(conversationId)) {
 				setConversationsArray(prevConversations => [payload, ...prevConversations]);

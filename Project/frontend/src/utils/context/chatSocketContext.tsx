@@ -33,10 +33,11 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
             });
 
             chatSocketRef.current = chatSocket;  // Store the socket connection in the ref
-            console.log({"NEW CLIENT SOCKET LISTENING": chatSocket});
+            // console.log({"NEW CLIENT SOCKET LISTENING": chatSocket});
 
             chatSocket.on('connect', () => {
-              console.log({"Socket connected": chatSocket.id});
+              // console.log({"Socket connected": chatSocket.id});
+              console.log("Socket connected");
               resolve();
             });
         

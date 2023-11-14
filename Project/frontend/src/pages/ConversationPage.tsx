@@ -19,7 +19,7 @@ export const ConversationPage = () => {
     };
   
     initializeSocket();
-    console.log({"ChatSocketContextData": chatSocketContextData});
+    // console.log({"ChatSocketContextData": chatSocketContextData});
     
     return () => { };
   }, []);

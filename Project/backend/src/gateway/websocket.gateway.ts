@@ -75,19 +75,17 @@ export class MessagingGateway implements OnGatewayConnection{
 		if (payload.author) {
 			const authorSocket = this.sessions.getUserSocket(payload.author.id);
 			const recipientSockets = this.sessions.getSockets();
-			// console.log({"AUTHOR SOCKET": authorSocket});
 			
 			recipientSockets.forEach((recipientSocket, userId) => {
-				if (userId !== payload.author.id) {
+				if (userId !== payload.author.id && recipientSocket) {
 					// console.log({"RECIPIENT SOCKET": recipientSocket});
 					recipientSocket.emit('onMessage', payload);
 				}
 			});
-			authorSocket.emit('onMessage', payload);
-			// this.server.emit('onMessage', "update");
+			if (authorSocket) authorSocket.emit('onMessage', payload);
 		}
 		else {
-			this.server.emit('onMessage', payload); // VA FALOIR FEINTER
+			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
 		}
 	}
 }
