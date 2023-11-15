@@ -48,6 +48,18 @@ export class GameGateway implements OnGatewayInit {
 
     }
 
+    private async handleGameOver(winnerId: number, gameId: number) {
+        // Fetch the winner's username based on their ID
+        const winner = await this.userService.getUserById(winnerId);
+        if (winner) {
+            // Emit gameOver event with the winner's username
+            this.server.to(gameId.toString()).emit('gameOver', { winnerUsername: winner.username });
+        }
+
+        // Increment the winner's total games won
+        this.userService.incrementGamesWon(winnerId);
+    }
+
     async handleConnection(client: Socket, ...args: any[]) {
         const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
 
@@ -114,12 +126,17 @@ export class GameGateway implements OnGatewayInit {
                 // player2.emit('matchFound', { you: player2.data.user });
 
                 this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
-                    this.server.to(gameId.toString()).emit('updateGameData', data);
+                    this.server.to(gameId.toString()).emit('updateGameData', {
+                        ...data,
+                        winnerId: undefined // Remove winnerId before emitting for privary reasons
+                        //maybe we should just pass the winner id some other way besides the callback probably
+                    });
+
                     if (data.isGameOver && data.winnerId) {
-                        this.userService.incrementGamesWon(data.winnerId);
+                        // Handle the winner update in a separate asynchronous function
+                        this.handleGameOver(data.winnerId, gameId);
                     }
                 });
-
 
                 console.log(`Matched ${player1.id} with ${player2.id}`);
             }

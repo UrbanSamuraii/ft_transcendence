@@ -48,17 +48,11 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
 
             setGameData(data);
             drawGame(data);
-
-            if (data.isGameOver) {
-                console.log('Game over detected.');
-                setIsGameActive(false); // Game is no longer active
-                stopSocketConnection();
-                onGameOver();
-                // data.isGameOver = false;
-            }
         });
 
-        // socket.emit('startGame', { gameId });
+        socket.on('gameOver', (data) => {
+            handleGameOver(data.winnerUsername || null);
+        });
 
         const intervalId = setInterval(() => {
             socket.emit('paddleMovements', activeKeysRef.current);
@@ -212,6 +206,19 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         }
     }
 
+    function handleGameOver(winnerUsername, canvasRef, gameData, onGoBackToMainMenu, onStartGame, setIsGameActive, stopSocketConnection, onGameOver) {
+        if (!canvasRef.current || !gameData.isGameOver) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Continue your existing logic here
+        // You can use winnerUsername, ctx, and other parameters
+        // to draw the end of game screen, including the winner's name and buttons
+    }
+
+
     const drawGame = (data) => {
         if (!canvasRef.current) return;
         const canvas = canvasRef.current;
@@ -254,16 +261,38 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             ctx.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
         });
 
-        if (data.isGameOver) {
-            const buttonWidth = gameWidth * 0.1; // 10% of game width
-            const buttonHeight = gameHeight * 0.05; // 5% of game height
-            const buttonOffsetX = gameWidth - buttonWidth - gameWidth * 0.45; // 10% from the right edge
-            const buttonOffsetY = gameHeight * 0.1; // 10% from the top edge
+        function handleGameOver(winnerUsername) {
+            if (data.isGameOver) {
+                const buttonWidth = gameWidth * 0.1; // 10% of game width
+                const buttonHeight = gameHeight * 0.05; // 5% of game height
+                const buttonOffsetX = gameWidth - buttonWidth - gameWidth * 0.45; // 10% from the right edge
+                const buttonOffsetY = gameHeight * 0.1; // 10% from the top edge
 
-            drawButton(offsetX + buttonOffsetX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu, gameWidth, gameHeight, offsetX, offsetY);
-            drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
+                drawButton(offsetX + buttonOffsetX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu, gameWidth, gameHeight, offsetX, offsetY);
+                drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
+                if (data.winnerUsername) {
+                    const winnerNameFontSize = 24; // or any other appropriate size
+                    const winnerNameColor = 'white';
+                    const winnerNameFontFamily = 'Arial';
+
+                    // Calculate position for the winner's name
+                    const winnerNameX = offsetX + gameWidth / 2; // Center horizontally
+                    const winnerNameY = offsetY + gameHeight * 0.3; // Adjust vertical position as needed
+
+                    // Set font properties and color for drawing text
+                    ctx.font = `${winnerNameFontSize}px ${winnerNameFontFamily}`;
+                    ctx.fillStyle = winnerNameColor;
+                    ctx.textAlign = 'center';
+
+                    // Draw the winner's name
+                    ctx.fillText(`Winner: ${data.winnerUsername}`, winnerNameX, winnerNameY);
+                }
+                setIsGameActive(false); // Game is no longer active
+                stopSocketConnection();
+                onGameOver();
+                console.log('Game over detected.');
+            }
         }
-
         drawNet(data);
 
         const fontSize = 100 * gameWidth / 1920; // Adjust font size based on gameWidth
