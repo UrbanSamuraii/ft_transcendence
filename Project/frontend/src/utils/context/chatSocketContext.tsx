@@ -36,9 +36,9 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
             // console.log({"NEW CLIENT SOCKET LISTENING": chatSocket});
 
             chatSocket.on('connect', () => {
-              // console.log({"Socket connected": chatSocket.id});
               console.log("Socket connected");
               resolve();
+              console.log({"Socket connected": chatSocket.id});
             });
         
             chatSocket.on('disconnect', () => {
