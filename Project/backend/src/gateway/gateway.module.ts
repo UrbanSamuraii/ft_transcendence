@@ -1,6 +1,7 @@
-import { Module } from "@nestjs/common";
+import { Module, UseGuards } from "@nestjs/common";
 import { MessagingGateway } from "./websocket.gateway";
 import { GatewaySessionManager } from "./gateway.session";
+import { ChatWebSocketGuard } from './gateway.guard'
 
 @Module({
 	providers: [MessagingGateway, {
@@ -8,5 +9,7 @@ import { GatewaySessionManager } from "./gateway.session";
 		useClass: GatewaySessionManager
 	}]
 })
+
+@UseGuards(ChatWebSocketGuard)
 export class GatewayModule {}
 
