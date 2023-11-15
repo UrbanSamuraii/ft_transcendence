@@ -9,7 +9,11 @@ import { UserService } from '../user/user.service';
 import { PrismaService } from "src/prisma/prisma.service";
 import { v4 as uuidv4 } from 'uuid';
 
-const clientInputs = {};
+export interface PlayerInfo {
+    id: number; // or number, depending on your user ID type
+    score: number;
+    activeKeys: string[]; // array of keys currently being pressed
+}
 
 @WebSocketGateway(3002, {
     cors: {
@@ -21,6 +25,7 @@ const clientInputs = {};
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
     private queue: Socket[] = [];
+    private playerInfoMap = new Map<number, PlayerInfo>();
     private gameLoop: NodeJS.Timeout;
 
     constructor(private gameService: SquareGameService,
@@ -51,6 +56,7 @@ export class GameGateway implements OnGatewayInit {
             client.disconnect(true);  // Disconnect the client
             return;
         }
+        //add a condition here if user ilaready in the queue to disconnect
 
         const userIndexInQueue = (userEmail: string) => {
             return this.queue.findIndex(client => client.data.user.email === userEmail);
@@ -65,6 +71,15 @@ export class GameGateway implements OnGatewayInit {
 
             const index = userIndexInQueue(decoded.email);
             this.addUserToQueue(client);
+
+
+            const playerInfo: PlayerInfo = {
+                id: client.data.user.sub, // or appropriate user ID
+                score: 0,
+                activeKeys: []
+            };
+
+            this.playerInfoMap.set(client.data.user.sub, playerInfo);
 
             console.log(this.queue.length);
             if (this.queue.length >= 2) {  // if there are at least two users in the queue
@@ -98,16 +113,13 @@ export class GameGateway implements OnGatewayInit {
                 player2.emit('matchFound', { opponent: player1.data.user, gameId });
                 // player2.emit('matchFound', { you: player2.data.user });
 
-
-                this.gameService.updateGameState(gameId, clientInputs, (data) => {
+                this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
                     this.server.to(gameId.toString()).emit('updateGameData', data);
-                    if (data.isGameOver && data.winner) {
-                        if (data.winner === 'leftPlayer')
-                            this.userService.incrementGamesWon(player1.data.user.sub);
-                        else
-                            this.userService.incrementGamesWon(player2.data.user.sub);
+                    if (data.isGameOver && data.winnerId) {
+                        this.userService.incrementGamesWon(data.winnerId);
                     }
                 });
+
 
                 console.log(`Matched ${player1.id} with ${player2.id}`);
             }
@@ -121,14 +133,14 @@ export class GameGateway implements OnGatewayInit {
         // Listen for disconnect
         client.on('disconnect', (reason) => {
             // console.log('Client disconnected:', client.id);
-            console.log('Client disconnected:', client.id, 'Reason:', reason);
+            console.log('Client disconnected:', client.data.user.sub, 'Reason:', reason);
 
             const index = this.queue.indexOf(client);
             if (index !== -1) {
                 this.queue.splice(index, 1);
             }
 
-            delete clientInputs[client.id];
+            this.playerInfoMap.delete(client.data.user.sub);
         });
     }
 
@@ -141,9 +153,11 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('paddleMovements')
     handlePaddleMovements(client: Socket, activeKeys: string[]) {
-        const clientId = client.id;
-        clientInputs[clientId] = activeKeys;
-
+        const clientId = client.data.user.sub;
+        const playerInfo = this.playerInfoMap.get(clientId);
+        if (playerInfo) {
+            playerInfo.activeKeys = activeKeys;
+        }
     }
 
     @SubscribeMessage('pauseGame')

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
+import { PlayerInfo } from './game.gateway';
 
 const nbrOfSquares = 1;
 const aspectRatio = 1318 / 807;
@@ -77,11 +78,9 @@ export class SquareGameService {
         return (relativeDistance) * this.angleFactor;
     }
 
-    determineWinner(leftPlayerScore, rightPlayerScore) {
-        return leftPlayerScore > rightPlayerScore ? 'leftPlayer' : 'rightPlayer';
-    }
+    // updateGameState(gameId: any, clientInputs: any, callback: Function) {
+    updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
 
-    updateGameState(gameId: any, clientInputs: any, callback: Function) {
         let gameState = this.gameStates.get(gameId);
         if (!gameState) {
             // Initialize game state for new gameId
@@ -89,25 +88,29 @@ export class SquareGameService {
             this.gameStates.set(gameId, gameState);
         }
 
-        const clientIds = Object.keys(clientInputs);
 
         // Assuming 2 players for left and right paddle
-        if (clientIds.length >= 2 && !gameState.isGamePaused) {
-            const leftClientActiveKeys = clientInputs[clientIds[0]];
-            const rightClientActiveKeys = clientInputs[clientIds[1]];
+        const playerInfos = Array.from(playerInfoMap.values());
 
-            if (leftClientActiveKeys.includes("w")) {
+        // Assuming 2 players for left and right paddle
+        if (playerInfos.length >= 2 && !gameState.isGamePaused) {
+            const leftPlayerInfo = playerInfos[0];
+            const rightPlayerInfo = playerInfos[1];
+
+            // Handle left player paddle movement
+            if (leftPlayerInfo.activeKeys.includes("w")) {
                 const potentialY = gameState.leftPaddle.y - gameState.paddleMoveAmount;
                 gameState.leftPaddle.y = Math.max(potentialY, 0);
-            } else if (leftClientActiveKeys.includes("s")) {
+            } else if (leftPlayerInfo.activeKeys.includes("s")) {
                 const potentialY = gameState.leftPaddle.y + gameState.paddleMoveAmount;
                 gameState.leftPaddle.y = Math.min(potentialY, 100 - gameState.leftPaddle.height);
             }
 
-            if (rightClientActiveKeys.includes("ArrowUp")) {
+            // Handle right player paddle movement
+            if (rightPlayerInfo.activeKeys.includes("ArrowUp")) {
                 const potentialY = gameState.rightPaddle.y - gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.max(potentialY, 0);
-            } else if (rightClientActiveKeys.includes("ArrowDown")) {
+            } else if (rightPlayerInfo.activeKeys.includes("ArrowDown")) {
                 const potentialY = gameState.rightPaddle.y + gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.min(potentialY, 100 - gameState.rightPaddle.height);
             }
@@ -139,10 +142,8 @@ export class SquareGameService {
                 // Check for wall intersections
                 if (square.x + square.size < 0 || square.x > gameState.width) {
                     // Reset square position to the center
-                    if (square.x > gameState.width)
-                        gameState.leftScore++;
-                    if (square.x + square.size < 0)
-                        gameState.rightScore++;
+                    if (square.x > gameState.width) leftPlayerInfo.score++;
+                    if (square.x + square.size < 0) rightPlayerInfo.score++;
                     square.x = gameState.width / 2;
                     square.y = gameState.height / 2;
 
@@ -162,33 +163,36 @@ export class SquareGameService {
 
             });
 
-        }
+            gameState.leftScore = leftPlayerInfo.score;
+            gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
 
-        if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
-            gameState.isGameOver = true;
-            clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
-            callback({
-                squares: gameState.squares,
-                leftPaddle: gameState.leftPaddle,
-                rightPaddle: gameState.rightPaddle,
-                leftScore: gameState.leftScore,
-                rightScore: gameState.rightScore,
-                isGameOver: gameState.isGameOver,
-                winner: this.determineWinner(gameState.leftScore, gameState.rightScore)
+            if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
+                gameState.isGameOver = true;
+                clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
+                const winnerId = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.id : rightPlayerInfo.id;
 
-            });
-        } else {
-            callback({
-                squares: gameState.squares,
-                leftPaddle: gameState.leftPaddle,
-                rightPaddle: gameState.rightPaddle,
-                leftScore: gameState.leftScore,
-                rightScore: gameState.rightScore,
-                isGameOver: gameState.isGameOver
-            });
+                callback({
+                    squares: gameState.squares,
+                    leftPaddle: gameState.leftPaddle,
+                    rightPaddle: gameState.rightPaddle,
+                    leftScore: gameState.leftScore,
+                    rightScore: gameState.rightScore,
+                    isGameOver: gameState.isGameOver,
+                    winnerId: winnerId
+                });
+            } else {
+                callback({
+                    squares: gameState.squares,
+                    leftPaddle: gameState.leftPaddle,
+                    rightPaddle: gameState.rightPaddle,
+                    leftScore: gameState.leftScore,
+                    rightScore: gameState.rightScore,
+                    isGameOver: gameState.isGameOver
+                });
 
-            if (!gameState.isGameOver) {
-                setTimeout(() => this.updateGameState(gameId, clientInputs, callback), 1000 / 60);
+                if (!gameState.isGameOver) {
+                    setTimeout(() => this.updateGameState(gameId, playerInfoMap, callback), 1000 / 60);
+                }
             }
         }
     }
