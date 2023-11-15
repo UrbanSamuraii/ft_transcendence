@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
 
 const nbrOfSquares = 1;
 const aspectRatio = 1318 / 807;
@@ -19,65 +20,11 @@ export class SquareGameService {
 
     private gameStates = new Map<string, any>(); // Using 'any' for simplicity, define a proper type for game state
 
-    private squares = Array.from({ length: nbrOfSquares }, (_, index) => {
-        const ySpacing = 100 / nbrOfSquares;
-        return {
-            x: 50,  // Positioning each square in the middle, minus half the size
-            y: 50,
-            // dx: index % 2 === 0 ? 1.8 : -0.5,  // Alternate directions: right for even indices, left for odd
-            dx: squareDx,  // Alternate directions: right for even indices, left for odd
-            dy: squareDy,  // No vertical movement
-            // dy: 0.1,
-            // size: 2.2
-            size: squareSize
-        };
-    });
+    constructor(private userService: UserService) { }
 
-    private width = 100;
-    private height = 100;
-    private leftPaddle = { x: leftPaddleX, y: leftPaddleY, width: paddleWidth, height: paddleHeight };
-    private rightPaddle = { x: rightPaddleX, y: rightPaddleY, width: paddleWidth, height: paddleHeight };
-    private rightScore = 0;
-    private leftScore = 0;
     public isGameOver = false;
-    private rightWall = { x: 0, y: 0, width: 0, height: 100 };
-    private leftWall = { x: 100, y: 0, width: 0, height: 100 };
-    private topWall = { x: 0, y: 0, width: 100, height: 0 };
-    private BottomWall = { x: 0, y: 100, width: 100, height: 0 };
-    private gameLoop: NodeJS.Timeout;
-    private moveLeftPaddleDirection: 'up' | 'down' | null = null;
-    private moveRightPaddleDirection: 'up' | 'down' | null = null;
-    private paddleMoveAmount = 2;
-    private desiredLeftPaddleMovement: 'up' | 'down' | null = null;
-    private desiredRightPaddleMovement: 'up' | 'down' | null = null;
-    private maxDyValue = 5;
-    private maxDxValue = 5;
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
     public isGamePaused = false; // To keep track of the paused state
-
-    resetGame() {
-        this.leftScore = 0;
-        this.rightScore = 0;
-        this.isGameOver = false;
-
-        this.leftPaddle = { x: leftPaddleX, y: leftPaddleY, width: paddleWidth, height: paddleHeight };
-        this.rightPaddle = { x: rightPaddleX, y: rightPaddleY, width: paddleWidth, height: paddleHeight };
-
-        // Reset squares to their initial state
-        this.squares = Array.from({ length: nbrOfSquares }, (_, index) => {
-            const ySpacing = 100 / nbrOfSquares;
-            return {
-                x: 50,  // Positioning each square in the middle, minus half the size
-                y: index * ySpacing,
-                // dx: index % 2 === 0 ? 1.8 : -0.5,  // Alternate directions: right for even indices, left for odd
-                dx: squareDx,  // Alternate directions: right for even indices, left for odd
-                dy: squareDy,  // No vertical movement
-                // dy: 0.1,
-                size: squareSize
-            };
-        });
-
-    }
 
     private initializeGameState() {
         return {
@@ -128,6 +75,10 @@ export class SquareGameService {
     adjustDyOnCollision(distanceFromCenter, paddleHeight) {
         const relativeDistance = distanceFromCenter / paddleHeight;
         return (relativeDistance) * this.angleFactor;
+    }
+
+    determineWinner(leftPlayerScore, rightPlayerScore) {
+        return leftPlayerScore > rightPlayerScore ? 'leftPlayer' : 'rightPlayer';
     }
 
     updateGameState(gameId: any, clientInputs: any, callback: Function) {
@@ -213,22 +164,32 @@ export class SquareGameService {
 
         }
 
-        if (gameState.leftScore >= 100 || gameState.rightScore >= 100) {
+        if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
             gameState.isGameOver = true;
             clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
-        }
+            callback({
+                squares: gameState.squares,
+                leftPaddle: gameState.leftPaddle,
+                rightPaddle: gameState.rightPaddle,
+                leftScore: gameState.leftScore,
+                rightScore: gameState.rightScore,
+                isGameOver: gameState.isGameOver,
+                winner: this.determineWinner(gameState.leftScore, gameState.rightScore)
 
-        callback({
-            squares: gameState.squares,
-            leftPaddle: gameState.leftPaddle,
-            rightPaddle: gameState.rightPaddle,
-            leftScore: gameState.leftScore,
-            rightScore: gameState.rightScore,
-            isGameOver: gameState.isGameOver
-        });
+            });
+        } else {
+            callback({
+                squares: gameState.squares,
+                leftPaddle: gameState.leftPaddle,
+                rightPaddle: gameState.rightPaddle,
+                leftScore: gameState.leftScore,
+                rightScore: gameState.rightScore,
+                isGameOver: gameState.isGameOver
+            });
 
-        if (!gameState.isGameOver) {
-            setTimeout(() => this.updateGameState(gameId, clientInputs, callback), 1000 / 60);
+            if (!gameState.isGameOver) {
+                setTimeout(() => this.updateGameState(gameId, clientInputs, callback), 1000 / 60);
+            }
         }
     }
 

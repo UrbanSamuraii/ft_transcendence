@@ -83,7 +83,7 @@ export class AuthController {
         delete me.accessToken;
         return me;
     }
-    
+
     // @UseGuards(Jwt2faAuthGuard)
     @Get('user-info')
     async getUserInfo(@Req() req, @Res() res: ExpressResponse) {
@@ -111,12 +111,12 @@ export class AuthController {
             return res.status(200).json({
                 username: user.username,
                 email: user.email,
+                totalGamesWon: user.totalGamesWon
+
                 // other fields you want to include
             });
         } catch (error) {
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
-
-
 }

@@ -33,6 +33,7 @@ model User {
     messages      Message[] @relation("author")
     eloRating               Int       @default(1000)
     gamesWon          Game[] @relation("WinnerRelation")
+    totalGamesWon           Int       @default(0)
 
     @@unique([id, email, username])
 	@@map("users")

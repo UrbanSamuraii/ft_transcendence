@@ -98,11 +98,15 @@ export class GameGateway implements OnGatewayInit {
                 player2.emit('matchFound', { opponent: player1.data.user, gameId });
                 // player2.emit('matchFound', { you: player2.data.user });
 
-                // Here you could initialize game-related data or perform any other setup for the matched game
 
                 this.gameService.updateGameState(gameId, clientInputs, (data) => {
-                    // this.server.emit('updateGameData', data);
                     this.server.to(gameId.toString()).emit('updateGameData', data);
+                    if (data.isGameOver && data.winner) {
+                        if (data.winner === 'leftPlayer')
+                            this.userService.incrementGamesWon(player1.data.user.sub);
+                        else
+                            this.userService.incrementGamesWon(player2.data.user.sub);
+                    }
                 });
 
                 console.log(`Matched ${player1.id} with ${player2.id}`);
@@ -152,20 +156,4 @@ export class GameGateway implements OnGatewayInit {
         this.gameService.isGamePaused = false;
     }
 
-    @SubscribeMessage('startGame')
-    handleStartGame(client: Socket) {
-        const userId = client.data.user.userId;
-        const sub = client.data.user.sub;
-        const email = client.data.user.email;
-
-        // console.log("userId = ", userId);
-        // console.log("sub = ", sub);
-        // console.log("email = ", email);
-        // console.log(JSON.stringify(client.data.user, null, 2));
-
-        if (this.gameService.isGameOver) {
-            console.log("hererere");
-            this.gameService.resetGame();
-        }
-    }
 }

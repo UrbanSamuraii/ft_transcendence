@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import './Profile.css'
 
 function Profile() {
-    const [userInfo, setUserInfo] = useState({ username: '', email: '' });
+    const [userInfo, setUserInfo] = useState({ username: '', email: '', totalGamesWon: 0 });
     const { username } = useParams(); // Extract the username from the URL
 
     useEffect(() => {
@@ -34,6 +34,7 @@ function Profile() {
         <div className="profile-container">
             <p>Username: {userInfo.username}</p>
             <p>Email: {userInfo.email}</p>
+            <p>Games Won: {userInfo.totalGamesWon}</p> {/* Display games won */}
             {/* More user info here */}
             <button className="profile-button">Edit Profile</button>
         </div>

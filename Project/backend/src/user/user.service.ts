@@ -61,6 +61,9 @@ export class UserService {
         try {
             const user = await this.prisma.user.findUnique({
                 where: { username: username },
+                include: {
+                    gamesWon: true // Include the related games
+                }
             });
             if (!user) {
                 throw new HttpException({
@@ -84,6 +87,25 @@ export class UserService {
             });
         } catch (error) {
             return error;
+        }
+    }
+
+    //UPDATE GAME RELATED DATABASE
+
+    async incrementGamesWon(userId: number): Promise<void> {
+        try {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    totalGamesWon: {
+                        increment: 1 // Increment the gamesWon field by 1
+                    }
+                }
+            });
+        } catch (error) {
+            // Handle errors, possibly throw a custom error or log it
+            console.error("Error incrementing games won:", error);
+            throw error;
         }
     }
 
@@ -114,6 +136,6 @@ export class UserService {
     // const userConversations = await prisma.user.findUnique({
     //     where: { id: userId },
     //   }).conversations();
-      
+
 }
 

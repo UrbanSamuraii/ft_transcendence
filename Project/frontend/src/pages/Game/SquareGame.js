@@ -58,7 +58,7 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             }
         });
 
-        socket.emit('startGame', { gameId });
+        // socket.emit('startGame', { gameId });
 
         const intervalId = setInterval(() => {
             socket.emit('paddleMovements', activeKeysRef.current);
