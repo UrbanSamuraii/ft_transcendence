@@ -11,7 +11,7 @@ export function useAuth() {
   useEffect(() => {
     axios.get(`${API_URL}/auth/me`, config)
       .then(({ data }) => {
-        console.log({ "DATA from getAuthUser": data });
+        // console.log({ "DATA from getAuthUser": data });
         setUser(data);
         setTimeout(() => setLoading(false), 1000);
       })

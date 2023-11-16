@@ -11,7 +11,6 @@ export interface IGatewaySessionManager {
 
 @Injectable()
 export class GatewaySessionManager implements IGatewaySessionManager {
-	// set to map our user id to the socket and the data associated
 	
 	private readonly sessions: Map<Number, AuthenticatedSocket> = new Map();
 	

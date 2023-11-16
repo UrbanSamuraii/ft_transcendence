@@ -25,6 +25,8 @@ export class MessagingGateway implements OnGatewayConnection{
 		console.log("New incoming connection !");
 		const cookie  = client.handshake.headers.cookie;
 		const token = cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
+		
+		// Check if the client is identified
 		if (!token) {
             console.log('No token provided');
             client.disconnect(true);

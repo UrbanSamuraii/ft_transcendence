@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
 import { ConversationMessage } from "../utils/types";
@@ -27,9 +27,9 @@ export const ConversationChannelPage = () => {
 	  }, [conversationId]); // To implement dependencies ! That s how useEffect works mtf !
 
 	useEffect(() => {
-		chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
+			chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			chatSocketContextData.setNewMessageReceived(true);
-			// console.log({"NOUVEAU MESSAGE DANS LA CONV !": payload});
+			console.log({"NOUVEAU MESSAGE DANS LA CONV !": payload});
 			const payloadConversationId = Number(payload.conversation_id);
 			if (payloadConversationId === Number(conversationId)) {
 				setConversationsArray(prevConversations => [payload, ...prevConversations]);
