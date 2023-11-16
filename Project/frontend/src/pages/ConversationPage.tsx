@@ -22,7 +22,7 @@ export const ConversationPage = () => {
     console.log({"ChatSocketContextData": chatSocketContextData});
     
     return () => { };
-  }, [chatSocketContextData]);
+  }, []);
 
   useEffect(() => {
     const fetchConversations = async () => {

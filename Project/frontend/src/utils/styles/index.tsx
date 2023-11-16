@@ -309,3 +309,14 @@ export const MessageSendIcon = styled.span`
   font-size: 100%;
   line-height: 1;
 `;
+
+export const DarkRedButton = styled.button`
+background-color: darkred;
+color: white;
+font-style: italic;
+font-size: 12px;
+padding: 8px 16px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+`;

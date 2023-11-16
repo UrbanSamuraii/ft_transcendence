@@ -11,7 +11,7 @@ import { User } from "@prisma/client";
 @WebSocketGateway({
 	cors: {
 		origin: ["http://localhost:3000", "*"],
-		methods: ["GET", "POST"],
+		methods: ["GET", "POST", "DELETE"],
         credentials: true,
 	}
 })
@@ -26,7 +26,6 @@ export class MessagingGateway implements OnGatewayConnection{
 		const cookie  = client.handshake.headers.cookie;
 		const token = cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
 		
-		// Check if the client is identified
 		if (!token) {
             console.log('No token provided');
             client.disconnect(true);
@@ -88,6 +87,26 @@ export class MessagingGateway implements OnGatewayConnection{
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
+		}
+	}
+
+	@OnEvent('message.deleted')
+	handleMessageDeletedEvent(payload: any) {
+		console.log({"When deleting a message": payload});
+		if (payload.author) {
+			const authorSocket = this.sessions.getUserSocket(payload.author.id);
+			const recipientSockets = this.sessions.getSockets();
+			
+			recipientSockets.forEach((recipientSocket, userId) => {
+				if (userId !== payload.author.id && recipientSocket) {
+					// console.log({"RECIPIENT SOCKET": recipientSocket});
+					recipientSocket.emit('onDeleteMessage', payload);
+				}
+			});
+			if (authorSocket) authorSocket.emit('onDeleteMessage', payload);
+		}
+		else {
+			this.server.emit('onDeleteMessage', payload); // WHEN CREATING THE CONVERSATION - 
 		}
 	}
 }

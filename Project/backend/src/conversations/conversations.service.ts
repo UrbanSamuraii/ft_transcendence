@@ -249,6 +249,14 @@ export class ConversationsService {
         });
 	}
 
+	async deleteMessageFromConversation(conversationId: number, messageToDeleteId: number) {
+		await this.prismaService.message.delete({
+		  where: {
+			id: messageToDeleteId,
+		  	},
+		});
+	}
+
 	/////////////////// GETTERS /////////////////// 
 
 	async getConversationNameById(convId: number) {

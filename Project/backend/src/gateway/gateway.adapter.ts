@@ -15,7 +15,6 @@ export class WebsocketAdapter extends IoAdapter {
 				return next(new Error('Not Authenticated'));
 			}
 			const token = cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
-			// console.log(token);
 			next();
 		});
 

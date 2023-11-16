@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Delete, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { MessagesService } from './messages.service';
@@ -43,5 +43,16 @@ export class MessagesController {
 		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId));
 		const messagesInTheConversationId = conversation.messages;
 		return messagesInTheConversationId;
+	}
+
+	@Post('deleteMessage')
+	async deleteMessageFromConversationId(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const messageToDelete = req.body.messageToDelete;
+		const conversationId = messageToDelete.conversation_id;
+		const messageId = messageToDelete.id;
+
+		await this.conversationsService.deleteMessageFromConversation(conversationId, messageId);
+		this.eventEmitter.emit('message.deleted', messageToDelete);
+		res.status(200).json({ message: "Message deleted", messageDeleted: messageToDelete });
 	}
 }

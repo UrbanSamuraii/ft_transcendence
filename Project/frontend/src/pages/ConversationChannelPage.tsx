@@ -24,7 +24,7 @@ export const ConversationChannelPage = () => {
 		};
 		
 		fetchConversations();
-	  }, [conversationId]); // To implement dependencies ! That s how useEffect works mtf !
+	  }, [conversationId]);
 
 	useEffect(() => {
 			chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
@@ -39,6 +39,21 @@ export const ConversationChannelPage = () => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
 	}, [[chatSocketContextData]]);
+
+	useEffect(() => {
+		chatSocketContextData?.chatSocket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
+		const isMessageInConversation = deletedMessage.conversation_id === Number(conversationId);
+		
+		if (isMessageInConversation) {
+			setConversationsArray(prevConversations => {
+			return prevConversations.filter(message => message.id !== deletedMessage.id);
+			});
+		}
+		});
+		return () => {
+		  chatSocketContextData?.chatSocket?.off('onDeleteMessage');
+		};
+	}, [chatSocketContextData, conversationId]);
 
 	return (
 		<ConversationChannelPageStyle>
