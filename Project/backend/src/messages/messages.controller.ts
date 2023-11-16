@@ -49,10 +49,21 @@ export class MessagesController {
 	async deleteMessageFromConversationId(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const messageToDelete = req.body.messageToDelete;
 		const conversationId = messageToDelete.conversation_id;
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { messages: true },
+		});
 		const messageId = messageToDelete.id;
 
+		let isLastMessageDeleted = false;
+		const numberOfMessages = existingConversation.messages.length;
+		if (messageId === existingConversation.messages[numberOfMessages - 1].id) { 
+			isLastMessageDeleted = true; 
+		}
+		
 		await this.conversationsService.deleteMessageFromConversation(conversationId, messageId);
+		
 		this.eventEmitter.emit('message.deleted', messageToDelete);
-		res.status(200).json({ message: "Message deleted", messageDeleted: messageToDelete });
+		res.status(200).json({ message: "Message deleted", messageDeleted: messageToDelete, isLastMessageDeleted: isLastMessageDeleted });
 	}
 }

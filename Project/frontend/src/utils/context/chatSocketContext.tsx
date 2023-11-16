@@ -5,6 +5,10 @@ type chatSocketContextType = {
     chatSocket: Socket | null;
     newMessageReceived: boolean;
     setNewMessageReceived: Dispatch<SetStateAction<boolean>>;
+    isLastMessageDeleted: boolean;
+    setLastMessageDeleted: Dispatch<SetStateAction<boolean>>;
+    conversationId: number | null,
+    setConversationId: Dispatch<SetStateAction<number | null>>;
     startChatSocketConnection: () => void;
     stopChatSocketConnection: () => void;
 };
@@ -20,6 +24,8 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
   const chatSocketRef = useRef<Socket | null>(null);
     
   const [newMessageReceived, setNewMessageReceived] = useState(false);
+  const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
+  const [conversationId, setConversationId] = useState<number | null>(null);
 
   const startChatSocketConnection = async () => {
     return new Promise<void>((resolve) => {
@@ -63,7 +69,19 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
 
 
   return (
-      <chatSocketContext.Provider value={{ chatSocket: chatSocketRef.current, newMessageReceived, setNewMessageReceived, startChatSocketConnection, stopChatSocketConnection }}>
+    <chatSocketContext.Provider
+    value={{
+        chatSocket: chatSocketRef.current,
+        newMessageReceived,
+        setNewMessageReceived,
+        isLastMessageDeleted,
+        setLastMessageDeleted,
+        startChatSocketConnection,
+        stopChatSocketConnection,
+        conversationId,
+        setConversationId,
+    }}
+>
         {children}
       </chatSocketContext.Provider>
   );

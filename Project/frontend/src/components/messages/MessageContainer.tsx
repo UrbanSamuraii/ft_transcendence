@@ -1,8 +1,8 @@
 import { MessageContainerStyle, MessageContainerPersonnalStyle, DarkRedButton } from '../../utils/styles';
 import { ConversationMessage } from '../../utils/types';
-import { FC, useState } from 'react';
+import { FC, useState, useContext } from 'react';
 import axios from 'axios';
-
+import { chatSocketContext } from "../../utils/context/chatSocketContext";
 
 import './GlobalMessages.css'
 
@@ -16,6 +16,7 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
 	const updatedAtDate = new Date(message.updatedAt);
 	const updatedAtFormatted = `${updatedAtDate.getFullYear()}-${(updatedAtDate.getMonth() + 1).toString().padStart(2, '0')}-${updatedAtDate.getDate()} at ${updatedAtDate.getHours()}:${updatedAtDate.getMinutes()}:${updatedAtDate.getSeconds()}`;
 	const [showDeleteButton, setShowDeleteButton] = useState(false);
+	const chatSocketContextData = useContext(chatSocketContext);
 
 	const handleContextMenu = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -27,6 +28,10 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
 		const response = await axios.post('http://localhost:3001/messages/deleteMessage', { messageToDelete: messageToDelete }, {
           withCredentials: true,
         });
+		if (response.data.isLastMessageDeleted === true) {
+			chatSocketContextData?.setLastMessageDeleted(true);
+			chatSocketContextData?.setConversationId(messageToDelete.conversation_id);
+		}
 		setShowDeleteButton(false);
 	};
 

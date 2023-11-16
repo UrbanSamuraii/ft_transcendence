@@ -29,6 +29,7 @@ export const ConversationChannelPage = () => {
 	useEffect(() => {
 			chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
 			chatSocketContextData.setNewMessageReceived(true);
+			chatSocketContextData.setLastMessageDeleted(false);
 			console.log({"NOUVEAU MESSAGE DANS LA CONV !": payload});
 			const payloadConversationId = Number(payload.conversation_id);
 			if (payloadConversationId === Number(conversationId)) {
