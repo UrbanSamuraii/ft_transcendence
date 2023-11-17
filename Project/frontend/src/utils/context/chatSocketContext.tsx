@@ -1,5 +1,6 @@
 import { createContext, useState, ReactNode,  Dispatch, SetStateAction, useRef, useContext, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
+import axios from 'axios';
 
 type chatSocketContextType = {
     chatSocket: Socket | null;
@@ -26,10 +27,11 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
   const [newMessageReceived, setNewMessageReceived] = useState(false);
   const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(null);
-
+  
   const startChatSocketConnection = async () => {
     return new Promise<void>((resolve) => {
       if (!chatSocketRef.current) {
+        
         const serverAddress = window.location.hostname === 'localhost' ?
             'http://localhost:3001' :
             `http://${window.location.hostname}:3001`;
@@ -38,34 +40,42 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
               withCredentials: true
             });
 
-            chatSocketRef.current = chatSocket;  // Store the socket connection in the ref
-            // console.log({"NEW CLIENT SOCKET LISTENING": chatSocket});
+            chatSocketRef.current = chatSocket; 
 
             chatSocket.on('connect', () => {
-              console.log("Socket connected");
-              resolve();
               console.log({"Socket connected": chatSocket.id});
+              resolve();
             });
-        
-            chatSocket.on('disconnect', () => {
-              console.log("Socket disconnected");
-            });
+
+          //   const handleDisconnect = async () => {
+          //     // try {
+          //       // await leaveRooms();
+          //     // } catch (error) {
+          //     //     console.error('Leaving rooms failed:', error);
+          //     // }
+          //     console.log('Socket disconnected');
+          // };
+
+          //  chatSocket.on('disconnect', handleDisconnect);
           } else {
             resolve();
           }
         });
   };
 
-  const stopChatSocketConnection = () => {
+  // const leaveRooms = async () => {
+		// console.log("LET S DECONNECT SOCKETS FROM THE ROOMS")
+    // const response = await axios.post('http://localhost:3001/conversations/socketLeavesRooms', {
+    //         withCredentials: true });
+    // console.log('Socket left rooms successfully:', response);
+  // };
+
+  const stopChatSocketConnection = async () => {
     if (chatSocketRef.current) {
       chatSocketRef.current.close();
       chatSocketRef.current = null;
     }
   };
-
-  useEffect(() => {
-    startChatSocketConnection();
-  }, []);
 
 
   return (

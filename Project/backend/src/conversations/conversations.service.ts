@@ -5,6 +5,8 @@ import { HttpException } from '@nestjs/common';
 import { UserService } from "src/user/user.service";
 import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
+import { GatewaySessionManager } from "src/gateway/gateway.session";
+
 
 @Injectable()
 export class ConversationsService {
@@ -12,7 +14,9 @@ export class ConversationsService {
 	constructor(private prismaService: PrismaService,
 				private userService: UserService,
 				private configService: ConfigService,
-				private membersService: MembersService) {}
+				private membersService: MembersService,
+				private sessionManager: GatewaySessionManager
+				) {}
 
 	// To get the Conversation Name at the creation
 	async establishConvName(inputDataConvName: string): Promise<string | null> {
@@ -76,7 +80,14 @@ export class ConversationsService {
 					},
 				});
 				await this.membersService.addConversationInMembership(userId, existingConversation.id);
-				return true; // The user has been added
+				
+				const userSocket = this.sessionManager.getUserSocket(userId);
+				if (userSocket) {
+					// Join the conversation room
+					userSocket.join(conversationId.toString());
+				  }
+				
+				return true;
 			} else { return false; // The user was already in
 			}
 		}
@@ -127,9 +138,15 @@ export class ConversationsService {
 					},
 				});
 				await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
+				
+				const userSocket = this.sessionManager.getUserSocket(userId);
+				if (userSocket) {
+				  // Leave the conversation room
+				  userSocket.leave(conversationId.toString());
+				}
+
 				return true; // The user has been removed
-			} else {
-				return false; // The user was not a member of this conversation
+			} else { return false; // The user was not a member of this conversation
 			}
 		} else {
 			return false; // We haven t found the conversation

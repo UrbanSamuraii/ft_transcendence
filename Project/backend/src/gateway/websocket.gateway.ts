@@ -4,6 +4,7 @@ import { Res, Req } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
 import { UserService } from "src/user/user.service";
+import { MembersService } from "src/members/members.service";
 import { GatewaySessionManager } from "./gateway.session";
 import { AuthenticatedSocket } from "../utils/interfaces";
 import { User } from "@prisma/client";
@@ -18,6 +19,7 @@ import { User } from "@prisma/client";
 
 export class MessagingGateway implements OnGatewayConnection{
 	constructor(private readonly userService: UserService,
+		private readonly memberService: MembersService,
 		private readonly sessions: GatewaySessionManager) {}
 	
 	// From OnGatewayConnection : a method that will be executed when a new WebSocket connection is established
@@ -37,13 +39,28 @@ export class MessagingGateway implements OnGatewayConnection{
 			client = this.associateUserToAuthSocket(client, identifiedUser);
 			this.sessions.setUserSocket(identifiedUser.id, client);
 		}
+
+		// To make my userSocket join all the room the user is member of
+		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
+		for (const conversation of userWithConversations.conversations) {
+			client.join(conversation.id.toString());
+		}
+
 		console.log({"SOCKET id of our user": client.id});
 		console.log({"SOCKET ASSOCIATED USER": client.user});
 		console.log({"SESSIONS": this.sessions});
 		client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED'});
-	}
+
+		client.on('disconnect', (reason) => {
+            // console.log('Client disconnected:', client.id);
+            console.log('Client disconnected:', client.id, 'Reason:', reason);
+
+        });
+	} 
 
 	////////////////////// PRIVATE METHODE //////////////////////
+	
+
 	
 	private associateUserToAuthSocket(socket: AuthenticatedSocket, identifiedUser:User ): AuthenticatedSocket {
 		socket.user = identifiedUser;
@@ -74,16 +91,17 @@ export class MessagingGateway implements OnGatewayConnection{
 	handleMessageCreatedEvent(payload: any) {
 		console.log({"Message created in PAYLOAD": payload});
 		if (payload.author) {
-			const authorSocket = this.sessions.getUserSocket(payload.author.id);
-			const recipientSockets = this.sessions.getSockets();
+			// const authorSocket = this.sessions.getUserSocket(payload.author.id);
+			// const recipientSockets = this.sessions.getSockets();
 			
-			recipientSockets.forEach((recipientSocket, userId) => {
-				if (userId !== payload.author.id && recipientSocket) {
-					// console.log({"RECIPIENT SOCKET": recipientSocket});
-					recipientSocket.emit('onMessage', payload);
-				}
-			});
-			if (authorSocket) authorSocket.emit('onMessage', payload);
+			// recipientSockets.forEach((recipientSocket, userId) => {
+			// 	if (userId !== payload.author.id && recipientSocket) {
+			// 		// console.log({"RECIPIENT SOCKET": recipientSocket});
+			// 		recipientSocket.emit('onMessage', payload);
+			// 	}
+			// });
+			// if (authorSocket) authorSocket.emit('onMessage', payload);
+			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 

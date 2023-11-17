@@ -22,12 +22,11 @@ export const ConversationPage = () => {
     console.log({"ChatSocketContextData": chatSocketContextData});
     
     return () => { };
-  }, []);
+  }, [chatSocketContextData?.chatSocket]);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        // chatSocketContextData?.startChatSocketConnection();
         const prismaConversations = await getConversations();
         setPrismaConversations(prismaConversations); 
         chatSocketContextData?.setNewMessageReceived(false)

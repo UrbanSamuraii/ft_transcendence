@@ -7,6 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagesService } from 'src/messages/messages.service';
+import { GatewaySessionManager } from 'src/gateway/gateway.session';
 
 
 @UseGuards(Jwt2faAuthGuard)
@@ -17,6 +18,7 @@ export class ConversationsController {
 				private userService: UserService,
 				private memberService: MembersService,
 				private messagesService: MessagesService,
+				private sessionManager: GatewaySessionManager,
 				private eventEmitter: EventEmitter2) { }
 	
 	@Post('create')
@@ -97,6 +99,20 @@ export class ConversationsController {
 			else {
 				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
 		}
+	}
+
+	@Post('socketLeavesRooms')
+	async MakeSocketLeaveRooms(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log("LET S DECONNECT SOCKETS FROM THE ROOMS")
+		// console.log({"SOCKET TO HANDLE": req.body.socket});
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
+		const userSocket = await this.sessionManager.getUserSocket(user.id);
+		console.log({"Socket of the user leaving the conv": userSocket});
+		for (const conversation of userWithConversations.conversations) {
+			userSocket.leave(conversation.id.toString());
+		}
+		res.status(201).json({ message: "The member has been removed from the conversation." });
 	}
 }
 

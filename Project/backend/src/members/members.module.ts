@@ -4,7 +4,7 @@ import { MembersService } from './members.service';
 
 @Global()
 @Module({
-    providers: [MembersService],
+    providers: [MembersService, PrismaService],
     exports: [MembersService]
 })
 
