@@ -245,35 +245,39 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         });
 
         if (data.isGameOver) {
-            const buttonWidth = gameWidth * 0.1; // 10% of game width
-            const buttonHeight = gameHeight * 0.05; // 5% of game height
-            const buttonOffsetX = gameWidth - buttonWidth - gameWidth * 0.45; // 10% from the right edge
-            const buttonOffsetY = gameHeight * 0.1; // 10% from the top edge
+            // Constants for layout
+            const buttonWidth = gameWidth * 0.3;
+            const buttonHeight = gameHeight * 0.1;
+            const winnerNameFontSize = gameHeight * 0.06;
+            const buttonOffsetY = gameHeight * 0.6;
+            const textOffsetY = buttonOffsetY - winnerNameFontSize * 2;
 
-            drawButton(offsetX + buttonOffsetX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu, gameWidth, gameHeight, offsetX, offsetY);
-            drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
-            if (data.winnerUsername) {
-                const winnerNameFontSize = 24; // or any other appropriate size
-                const winnerNameColor = 'white';
-                const winnerNameFontFamily = 'Arial';
+            // Determine the winner's side for X positioning
+            const winnerSideX = data.leftScore > data.rightScore ? gameWidth * 0.25 : gameWidth * 0.75;
 
-                // Calculate position for the winner's name
-                const winnerNameX = offsetX + gameWidth / 2; // Center horizontally
-                const winnerNameY = offsetY + gameHeight * 0.3; // Adjust vertical position as needed
+            // Set up font and style for the winner's name
+            ctx.font = `${winnerNameFontSize}px 'Press Start 2P', cursive`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
 
-                // Set font properties and color for drawing text   
-                ctx.font = `${winnerNameFontSize}px ${winnerNameFontFamily}`;
-                ctx.fillStyle = winnerNameColor;
-                ctx.textAlign = 'center';
+            // Calculate positions based on winner's side
+            const textX = offsetX + winnerSideX;
+            const buttonX = textX - buttonWidth / 2; // Center the button on the winner's side
 
-                // Draw the winner's name
-                ctx.fillText(`Winner: ${data.winnerUsername}`, winnerNameX, winnerNameY);
-            }
-            setIsGameActive(false); // Game is no longer active
+            // Draw winner message
+            ctx.fillText(`Winner: ${data.winnerUsername}`, textX, offsetY + textOffsetY);
+
+            // Draw buttons
+            drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu);
+            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame);
+
+            // Other game over logic
+            setIsGameActive(false);
             stopSocketConnection();
             onGameOver();
             console.log('Game over detected.');
         }
+
 
         drawNet(data);
 
