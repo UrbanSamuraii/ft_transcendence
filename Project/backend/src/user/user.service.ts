@@ -80,6 +80,14 @@ export class UserService {
         }
     }
 
+    async getUserIdByUsername(username: string): Promise<number | null> {
+        const user = await this.prisma.user.findUnique({
+            where: { username },
+            select: { id: true } // Select only the ID
+        });
+        return user?.id || null;
+    }
+
     async deleteUser(where: Prisma.UserWhereUniqueInput) {
         try {
             return await this.prisma.user.delete({

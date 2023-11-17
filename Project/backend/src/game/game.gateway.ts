@@ -10,7 +10,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { v4 as uuidv4 } from 'uuid';
 
 export interface PlayerInfo {
-    id: number; // or number, depending on your user ID type
+    username: string;
     score: number;
     activeKeys: string[]; // array of keys currently being pressed
 }
@@ -48,17 +48,23 @@ export class GameGateway implements OnGatewayInit {
 
     }
 
-    private async handleGameOver(winnerId: number, gameId: number) {
-        // Fetch the winner's username based on their ID
-        const winner = await this.userService.getUserById(winnerId);
-        if (winner) {
-            // Emit gameOver event with the winner's username
-            this.server.to(gameId.toString()).emit('gameOver', { winnerUsername: winner.username });
-        }
+    private async handleGameOver(winnerUsername: string, gameId: number): Promise<void> {
+        try {
+            // Fetch the winner's ID based on the username
+            const winnerId = await this.userService.getUserIdByUsername(winnerUsername);
+            if (winnerId) {
+                // Increment the winner's total games won
+                await this.userService.incrementGamesWon(winnerId);
 
-        // Increment the winner's total games won
-        this.userService.incrementGamesWon(winnerId);
+                // Optionally, you can also emit an event to all clients in the game room about the game over
+                this.server.to(gameId.toString()).emit('gameOver', { winnerUsername });
+            }
+        } catch (error) {
+            console.error('Error in handleGameOver:', error);
+            // Handle errors appropriately
+        }
     }
+
 
     async handleConnection(client: Socket, ...args: any[]) {
         const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
@@ -67,7 +73,8 @@ export class GameGateway implements OnGatewayInit {
             console.log('No token provided');
             client.disconnect(true);  // Disconnect the client
             return;
-        }
+        } // check if the token is auth
+
         //add a condition here if user ilaready in the queue to disconnect
 
         const userIndexInQueue = (userEmail: string) => {
@@ -83,15 +90,18 @@ export class GameGateway implements OnGatewayInit {
 
             const index = userIndexInQueue(decoded.email);
             this.addUserToQueue(client);
-
+            client.data.user.username = userInfo.username;
 
             const playerInfo: PlayerInfo = {
-                id: client.data.user.sub, // or appropriate user ID
+                // id: client.data.user.sub, // or appropriate user ID
+                // username: client.data.user.username,
+                username: userInfo.username,
                 score: 0,
                 activeKeys: []
             };
 
-            this.playerInfoMap.set(client.data.user.sub, playerInfo);
+            // this.playerInfoMap.set(client.data.user.username, playerInfo);
+            this.playerInfoMap.set(client.data.user.username, playerInfo);
 
             console.log(this.queue.length);
             if (this.queue.length >= 2) {  // if there are at least two users in the queue
@@ -100,6 +110,8 @@ export class GameGateway implements OnGatewayInit {
 
                 console.log("player1.data.user.id = ", player1.data.user.sub);
                 console.log("player2.data.user.id = ", player2.data.user.sub);
+                console.log("player1.data.user.username = ", player1.data.user.username);
+                console.log("player2.data.user.username = ", player2.data.user.username);
 
                 //this "sub" shit is so annoying and so random need to change that garbage ass shit
 
@@ -128,13 +140,13 @@ export class GameGateway implements OnGatewayInit {
                 this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
                     this.server.to(gameId.toString()).emit('updateGameData', {
                         ...data,
-                        winnerId: undefined // Remove winnerId before emitting for privary reasons
-                        //maybe we should just pass the winner id some other way besides the callback probably
                     });
 
-                    if (data.isGameOver && data.winnerId) {
-                        // Handle the winner update in a separate asynchronous function
-                        this.handleGameOver(data.winnerId, gameId);
+                    if (data.isGameOver && data.winnerUsername) {
+                        this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
+                            console.error('Error handling game over:', error);
+                            // Handle any errors that occur in the game over handling
+                        });
                     }
                 });
 
@@ -170,8 +182,8 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('paddleMovements')
     handlePaddleMovements(client: Socket, activeKeys: string[]) {
-        const clientId = client.data.user.sub;
-        const playerInfo = this.playerInfoMap.get(clientId);
+        const playerUsername = client.data.user.username;
+        const playerInfo = this.playerInfoMap.get(playerUsername);
         if (playerInfo) {
             playerInfo.activeKeys = activeKeys;
         }

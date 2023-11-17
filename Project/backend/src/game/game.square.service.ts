@@ -81,6 +81,7 @@ export class SquareGameService {
     // updateGameState(gameId: any, clientInputs: any, callback: Function) {
     updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
 
+        console.log("inside updatgamestate");
         let gameState = this.gameStates.get(gameId);
         if (!gameState) {
             // Initialize game state for new gameId
@@ -169,7 +170,7 @@ export class SquareGameService {
             if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
-                const winnerId = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.id : rightPlayerInfo.id;
+                const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
 
                 callback({
                     squares: gameState.squares,
@@ -178,7 +179,7 @@ export class SquareGameService {
                     leftScore: gameState.leftScore,
                     rightScore: gameState.rightScore,
                     isGameOver: gameState.isGameOver,
-                    winnerId: winnerId
+                    winnerUsername: winnerUsername
                 });
             } else {
                 callback({
@@ -190,6 +191,7 @@ export class SquareGameService {
                     isGameOver: gameState.isGameOver
                 });
 
+                console.log("is game over =", gameState.isGameOver);
                 if (!gameState.isGameOver) {
                     setTimeout(() => this.updateGameState(gameId, playerInfoMap, callback), 1000 / 60);
                 }
