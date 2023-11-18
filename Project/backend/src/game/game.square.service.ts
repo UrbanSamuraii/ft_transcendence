@@ -191,7 +191,6 @@ export class SquareGameService {
                     isGameOver: gameState.isGameOver
                 });
 
-                console.log("is game over =", gameState.isGameOver);
                 if (!gameState.isGameOver) {
                     setTimeout(() => this.updateGameState(gameId, playerInfoMap, callback), 1000 / 60);
                 }

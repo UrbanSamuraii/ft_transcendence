@@ -62,7 +62,7 @@ export class UserService {
             const user = await this.prisma.user.findUnique({
                 where: { username: username },
                 include: {
-                    gamesWon: true // Include the related games
+                    gamesWon: true
                 }
             });
             if (!user) {
