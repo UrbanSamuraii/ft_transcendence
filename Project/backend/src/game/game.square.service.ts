@@ -81,7 +81,6 @@ export class SquareGameService {
     // updateGameState(gameId: any, clientInputs: any, callback: Function) {
     updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
 
-        console.log("inside updatgamestate");
         let gameState = this.gameStates.get(gameId);
         if (!gameState) {
             // Initialize game state for new gameId
