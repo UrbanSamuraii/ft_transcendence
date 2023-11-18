@@ -25,6 +25,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
             const socketConnection = io(serverAddress, {
                 withCredentials: true
             });
+            console.log("new socket connection");
 
             socketConnection.on('matchFound', (data) => {
                 console.log('Match found!', data);

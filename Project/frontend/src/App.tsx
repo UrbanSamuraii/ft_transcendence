@@ -14,7 +14,6 @@ import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
-import { AuthenticatedRoute } from './components/routes/AuthenticatedRoutes'
 import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
@@ -79,7 +78,6 @@ function App() {
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
-    const [gameOver, setGameOver] = useState(false);
     const [gameKey, setGameKey] = useState(0);
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
@@ -121,40 +119,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate("/select-mode");
     }
 
-    function startGame() {
-        setGameStarted(true);
-        setGameOver(false);
-        setGameKey(prevKey => prevKey + 1);
-        navigate("/game");
-    }
-
-    function handleGameOver() {
-        setGameOver(true);
-    }
-
-    function goBackToMainMenu() {
-        setGameStarted(false);
-        setGameOver(false);
-        navigate("/");
-    }
-
-    async function handleSignUp42Click() {
-        try {
-            window.location.href = 'http://localhost:3001/auth/signup42';
-        }
-        catch (error) {
-            console.error('Sign up request error:', error);
-        }
-    }
-
-    function handleSignUpClick() {
-        navigate('/signup');
-    }
-
-    function handleSignInClick() {
-        navigate('/login');
-    }
-
     const TurnOn2FA = async () => {
         navigate('/2fa-enable')
     }
@@ -187,9 +151,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
         <Routes>
             {/* Public routes */}
             <Route path="/" element={<HomePage />} />
-            {/* <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} /> */}
-            <Route path="/game/:id" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-            <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
+            <Route path="/game/:id" element={<SquareGame />} />
+            <Route path="/select-mode" element={<SelectModePage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/ConversationPage" element={<ConversationPage />} >

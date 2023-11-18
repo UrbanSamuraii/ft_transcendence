@@ -17,26 +17,29 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
-function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
+function SquareGame({ }) {
     const canvasRef = useRef(null);
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
     const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
     // const [socket, setSocket] = useState(null);
-    const [isGameActive, setIsGameActive] = useState(true);
-    const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
     const { socket, stopSocketConnection } = useSocket();  // Get the socket from context
     const { id: gameId } = useParams(); // Get the game ID from the URL
-
-    useEffect(() => {
-        isGameActiveRef.current = isGameActive;
-    }, [isGameActive]);
+    const navigate = useNavigate();
 
     // Update the ref every time activeKeys changes
     useEffect(() => {
         activeKeysRef.current = activeKeys;
     }, [activeKeys]);
+
+    function goBackToMainMenu() {
+        navigate("/");
+    }
+
+    function goBackToMatchmaking() {
+        navigate("/matchmaking");
+    }
 
     useEffect(() => {
         if (!socket) return;  // Ensure socket exists
@@ -62,7 +65,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
-            if (!isGameActiveRef.current) return;
 
             console.log(`Key down: ${event.key}`);
 
@@ -93,7 +95,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         };
 
         const handleKeyUp = (event) => {
-            if (!isGameActiveRef.current) return;
 
             console.log(`Key up: ${event.key}`);
 
@@ -244,6 +245,8 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             ctx.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
         });
 
+        // console.log("cl17: ", data.isGameOver)
+        // console.log("cl18: ", data.winnerUsername)
         if (data.isGameOver) {
             // Constants for layout
             const buttonWidth = gameWidth * 0.3;
@@ -268,13 +271,11 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             ctx.fillText(`Winner: ${data.winnerUsername}`, textX, offsetY + textOffsetY);
 
             // Draw buttons
-            drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu);
-            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame);
+            drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', goBackToMainMenu);
+            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToMatchmaking);
 
             // Other game over logic
-            setIsGameActive(false);
             stopSocketConnection();
-            onGameOver();
             console.log('Game over detected.');
         }
 

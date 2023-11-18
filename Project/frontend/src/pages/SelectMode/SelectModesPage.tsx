@@ -1,12 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface SelectModePageProps {
-    startGame: () => void;
-    // handleSignoutClick: () => void;
-}
+interface SelectModePageProps { }
 
-const SelectModePage: React.FC<SelectModePageProps> = ({ startGame }) => {
+const SelectModePage: React.FC<SelectModePageProps> = ({ }) => {
 
     const navigate = useNavigate();
     const handleClassicModeClick = () => {

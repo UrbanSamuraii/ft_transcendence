@@ -23,7 +23,6 @@ export class SquareGameService {
 
     constructor(private userService: UserService) { }
 
-    public isGameOver = false;
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
     public isGamePaused = false; // To keep track of the paused state
 
@@ -171,6 +170,8 @@ export class SquareGameService {
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
                 const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
 
+                // console.log("cl15: ", winnerUsername);
+                // console.log("cl15: ", gameState.isGameOver);
                 callback({
                     squares: gameState.squares,
                     leftPaddle: gameState.leftPaddle,

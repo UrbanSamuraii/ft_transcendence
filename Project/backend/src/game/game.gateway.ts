@@ -77,6 +77,8 @@ export class GameGateway implements OnGatewayInit {
 
         //add a condition here if user ilaready in the queue to disconnect
 
+        console.log("new socket connection");
+
         const userIndexInQueue = (userEmail: string) => {
             return this.queue.findIndex(client => client.data.user.email === userEmail);
         };
