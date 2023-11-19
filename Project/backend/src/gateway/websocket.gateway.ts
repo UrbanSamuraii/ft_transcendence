@@ -47,14 +47,17 @@ export class MessagingGateway implements OnGatewayConnection{
 		}
 
 		console.log({"SOCKET id of our user": client.id});
-		console.log({"SOCKET ASSOCIATED USER": client.user});
-		console.log({"SESSIONS": this.sessions});
+		// console.log({"SOCKET ASSOCIATED USER": client.user});
+		// console.log({"SESSIONS": this.sessions});
 		client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED'});
 
 		client.on('disconnect', (reason) => {
             // console.log('Client disconnected:', client.id);
             console.log('Client disconnected:', client.id, 'Reason:', reason);
-
+			if (reason === 'transport close') {
+				client.disconnect();
+				client = null;
+			}
         });
 	} 
 
@@ -89,9 +92,10 @@ export class MessagingGateway implements OnGatewayConnection{
 	// When user will create a message -> "this.eventEmitter.emit('message.create', message);"
 	@OnEvent('message.create')
 	handleMessageCreatedEvent(payload: any) {
-		console.log({"Message created in PAYLOAD": payload});
+		// console.log({"Message created in PAYLOAD": payload});
 		if (payload.author) {
-			// const authorSocket = this.sessions.getUserSocket(payload.author.id);
+			const authorSocket = this.sessions.getUserSocket(payload.author.id);
+			console.log({"AUTHOR SOCKET": authorSocket.id});
 			// const recipientSockets = this.sessions.getSockets();
 			
 			// recipientSockets.forEach((recipientSocket, userId) => {
@@ -100,8 +104,8 @@ export class MessagingGateway implements OnGatewayConnection{
 			// 		recipientSocket.emit('onMessage', payload);
 			// 	}
 			// });
-			// if (authorSocket) authorSocket.emit('onMessage', payload);
-			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
+			if (authorSocket) authorSocket.emit('onMessage', payload);
+			// this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 

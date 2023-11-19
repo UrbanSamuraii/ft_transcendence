@@ -1,6 +1,7 @@
 import { createContext, useState, ReactNode,  Dispatch, SetStateAction, useRef, useContext, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import axios from 'axios';
+import { ConversationMessage } from "../types";
+
 
 type chatSocketContextType = {
     chatSocket: Socket | null;
@@ -47,14 +48,9 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
               resolve();
             });
 
-          //   const handleDisconnect = async () => {
-          //     // try {
-          //       // await leaveRooms();
-          //     // } catch (error) {
-          //     //     console.error('Leaving rooms failed:', error);
-          //     // }
-          //     console.log('Socket disconnected');
-          // };
+            chatSocket.on('onMessage', (payload: ConversationMessage) => {
+              console.log({"Nouveau message": payload});
+            });
 
           //  chatSocket.on('disconnect', handleDisconnect);
           } else {
@@ -62,13 +58,6 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
           }
         });
   };
-
-  // const leaveRooms = async () => {
-		// console.log("LET S DECONNECT SOCKETS FROM THE ROOMS")
-    // const response = await axios.post('http://localhost:3001/conversations/socketLeavesRooms', {
-    //         withCredentials: true });
-    // console.log('Socket left rooms successfully:', response);
-  // };
 
   const stopChatSocketConnection = async () => {
     if (chatSocketRef.current) {

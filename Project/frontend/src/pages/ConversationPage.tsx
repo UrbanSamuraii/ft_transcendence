@@ -14,9 +14,9 @@ export const ConversationPage = () => {
 	const chatSocketContextData = useContext(chatSocketContext);
 
   useEffect(() => {
-    const initializeSocket = async () => {
-      await chatSocketContextData?.startChatSocketConnection();
-    };
+      const initializeSocket = async () => {
+        await chatSocketContextData?.startChatSocketConnection();
+      };
   
     initializeSocket();
     console.log({"ChatSocketContextData": chatSocketContextData});
@@ -29,7 +29,8 @@ export const ConversationPage = () => {
       try {
         const prismaConversations = await getConversations();
         setPrismaConversations(prismaConversations); 
-        chatSocketContextData?.setNewMessageReceived(false)
+        chatSocketContextData?.setNewMessageReceived(false);
+        // console.log('Type of prismaConversations:', typeof prismaConversations);
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }
@@ -41,7 +42,7 @@ export const ConversationPage = () => {
 
   useEffect(() => {
       chatSocketContextData?.chatSocket?.on('onMessage', (payload: any) => {
-			console.log('Update de la page');
+			// console.log('Update de la page');
       chatSocketContextData?.setNewMessageReceived(true); 
 		});
 		return() => {
@@ -51,7 +52,7 @@ export const ConversationPage = () => {
 
   return (
     <Page>
-      <ConversationSidebar conversations={prismaConversations} />
+      {prismaConversations.length > 0 && <ConversationSidebar conversations={prismaConversations} />}
         {!id && <ConversationPanel />}
       <Outlet />
     </Page>

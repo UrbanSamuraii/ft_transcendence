@@ -175,7 +175,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
     useEffect(() => {
-        console.log('Content component rendered');
+        // console.log('Content component rendered');
     });
 
     return (
