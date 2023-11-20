@@ -49,7 +49,7 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
             });
 
             chatSocket.on('onMessage', (payload: ConversationMessage) => {
-              console.log({"Nouveau message": payload});
+              console.log({"Nouveau message dans la config startChatSocketConnection": payload});
             });
 
           //  chatSocket.on('disconnect', handleDisconnect);
