@@ -16,7 +16,7 @@ export const ConversationChannelPage = () => {
 	const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
 	const { user } = useAuth();
 	const chatSocketContextData = useChatSocket();
-	
+
 	useEffect(() => {
 		const fetchConversations = async () => {
 		  const conversations = await getConversationsIdentified(conversationId);

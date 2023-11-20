@@ -52,7 +52,7 @@ export const ConversationPage = () => {
 
   return (
     <Page>
-      {prismaConversations.length > 0 && <ConversationSidebar conversations={prismaConversations} />}
+      <ConversationSidebar conversations={prismaConversations} />
         {!id && <ConversationPanel />}
       <Outlet />
     </Page>
