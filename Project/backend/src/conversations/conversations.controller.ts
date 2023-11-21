@@ -100,6 +100,24 @@ export class ConversationsController {
 				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
 		}
 	}
+
+	@Post(':id/get_member_mute')
+	async muteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let muted = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToMute));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
+			if (muted) {
+				res.status(201).json({ message: "User muted from the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already in mute." });}
+		}
+	}
 }
 
 

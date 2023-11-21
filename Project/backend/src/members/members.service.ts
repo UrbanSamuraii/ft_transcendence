@@ -164,5 +164,19 @@ export class MembersService implements IMembersService {
 			});
 		}
 	}
+
+	async isMuteMember(conversationId: number, userId: number): Promise<boolean | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { muted: true },
+		});
+		
+		if (!conversation) { return null; }
+		
+		const memberMuteFinded = conversation.muted.find((member) => member.id === userId);
+		if (memberMuteFinded) { return true; }
+		else { return false; }
+	}
+
 }
 

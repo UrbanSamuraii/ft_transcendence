@@ -74,14 +74,6 @@ export class MessagingGateway implements OnGatewayConnection{
 	// To inject the WebSocket server instance provided by socket.io
 	@WebSocketServer() server: Server;
 
-	// To define methods that handle specific WebSocket events.
-	// The client send a message to the server : "socket.emit('createMessage', { OBJET });"
-	@SubscribeMessage('createMessage')
-	handleCreateMessage(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		console.log({"REQ handling creation of the message": req});
-		console.log('Create Message');
-	}
-
 	@OnEvent('join.room')
 	joinSpecificConversation(user: User, conversationId: number) {
 		const userSocket = this.sessions.getUserSocket(user.id);
@@ -96,16 +88,16 @@ export class MessagingGateway implements OnGatewayConnection{
 		console.log({"User socket left to the room !": userSocket.id});
 	}
 
-	// Can be triggered from various parts of the application - not necessary a websocket event
-	// When user will create a message -> "this.eventEmitter.emit('message.create', message);"
 	@OnEvent('message.create')
-	handleMessageCreatedEvent(payload: any) {
+	async handleMessageCreatedEvent(payload: any) {
 		if (payload.author) {
-			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
+			const isMute = await this.memberService.isMuteMember(payload.author.id, payload.conversation_id);
+			console.log({"Mute author ?": isMute});
+			if (isMute === false) {
+			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload); }
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
-			// this.server.emit('onNewRoom', payload); 
 		}
 	}
 
