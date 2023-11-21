@@ -22,7 +22,6 @@ export class MessagingGateway implements OnGatewayConnection{
 		private readonly memberService: MembersService,
 		private readonly sessions: GatewaySessionManager) {}
 	
-	// From OnGatewayConnection : a method that will be executed when a new WebSocket connection is established
 	async handleConnection(client:AuthenticatedSocket, ...args: any[]) {
 		console.log("New incoming connection !");
 		const cookie  = client.handshake.headers.cookie;
@@ -106,7 +105,7 @@ export class MessagingGateway implements OnGatewayConnection{
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
-			this.server.emit('onNewRoom', payload); 
+			// this.server.emit('onNewRoom', payload); 
 		}
 	}
 

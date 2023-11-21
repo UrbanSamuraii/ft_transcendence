@@ -12,8 +12,8 @@ type chatSocketContextType = {
     setLastMessageDeleted: Dispatch<SetStateAction<boolean>>;
     isFirstConnection: boolean;
     setFirstConnection: Dispatch<SetStateAction<boolean>>;
-    isNewRoom: boolean;
-    setNewRoom: Dispatch<SetStateAction<boolean>>;
+    // isNewRoom: boolean;
+    // setNewRoom: Dispatch<SetStateAction<boolean>>;
     conversationId: number | null,
     setConversationId: Dispatch<SetStateAction<number | null>>;
     startChatSocketConnection: () => void;
@@ -34,7 +34,7 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
   const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [isFirstConnection, setFirstConnection] = useState(false);
-  const [isNewRoom, setNewRoom] = useState(false);
+  // const [isNewRoom, setNewRoom] = useState(false);
   
   const startChatSocketConnection = async () => {
     return new Promise<void>((resolve) => {
@@ -63,11 +63,11 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
               resolve();
             });
 
-            chatSocket.on('onNewRoom', (payload: ConversationMessage) => {
-              console.log("New Room has been created");
-              setNewRoom(true);
-              resolve();
-            });
+            // chatSocket.on('onNewRoom', (payload: ConversationMessage) => {
+            //   console.log("New Room has been created");
+            //   setNewRoom(true);
+            //   resolve();
+            // });
 
           //  chatSocket.on('disconnect', handleDisconnect);
           } else {
@@ -98,8 +98,8 @@ export const ChatSocketProvider : React.FC<chatSocketProviderProps> = ({ childre
         setConversationId,
         isFirstConnection,
         setFirstConnection,
-        isNewRoom,
-        setNewRoom,
+        // isNewRoom,
+        // setNewRoom,
     }}
 >
         {children}

@@ -24,7 +24,7 @@ export const ConversationChannelPage = () => {
 		};
 		
 		fetchConversations();
-	  }, [chatSocketContextData, conversationId]);
+	  }, [conversationId]);
 
 	useEffect(() => {
 			chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
