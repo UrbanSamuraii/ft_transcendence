@@ -101,6 +101,7 @@ export class ConversationsController {
 		}
 	}
 
+	// "Pas mal de boulot sur le mute ... Retrouver un nouveau user added et update de la page meme si mute"
 	@Post(':id/get_member_mute')
 	async muteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
