@@ -18,27 +18,27 @@ export class ConversationsController {
 				private userService: UserService,
 				private memberService: MembersService,
 				private messagesService: MessagesService,
-				private sessionManager: GatewaySessionManager,
 				private eventEmitter: EventEmitter2) { }
 	
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
+		
 		// Get the first invited member if there is one
 		let member = null;
 		let userFound = true;
 		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.users));
 		
-		// Get the name of the conversation
 		const convName = await this.convService.establishConvName(req.body.name);
-		// Creating the conversation
 		const createdConversation = await this.convService.createConversation(convName, user, member);
 		
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
+			this.eventEmitter.emit('join.room', user, createdConversation.id);
 			if (userFound) {
 				this.eventEmitter.emit('message.create', '');
+				this.eventEmitter.emit('join.room', member, createdConversation.id);
 				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
 			} else {
 				this.eventEmitter.emit('message.create', '');
@@ -99,20 +99,6 @@ export class ConversationsController {
 			else {
 				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
 		}
-	}
-
-	@Post('socketLeavesRooms')
-	async MakeSocketLeaveRooms(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		console.log("LET S DECONNECT SOCKETS FROM THE ROOMS")
-		// console.log({"SOCKET TO HANDLE": req.body.socket});
-		const user = await this.userService.getUserByToken(req.cookies.token);
-		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
-		const userSocket = await this.sessionManager.getUserSocket(user.id);
-		console.log({"Socket of the user leaving the conv": userSocket});
-		for (const conversation of userWithConversations.conversations) {
-			userSocket.leave(conversation.id.toString());
-		}
-		res.status(201).json({ message: "The member has been removed from the conversation." });
 	}
 }
 

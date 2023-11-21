@@ -63,8 +63,6 @@ export class MessagingGateway implements OnGatewayConnection{
 
 	////////////////////// PRIVATE METHODE //////////////////////
 	
-
-	
 	private associateUserToAuthSocket(socket: AuthenticatedSocket, identifiedUser:User ): AuthenticatedSocket {
 		socket.user = identifiedUser;
 		return socket;
@@ -86,6 +84,20 @@ export class MessagingGateway implements OnGatewayConnection{
 	handleCreateMessage(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		console.log({"REQ handling creation of the message": req});
 		console.log('Create Message');
+	}
+
+	@OnEvent('join.room')
+	joinSpecificConversation(user: User, conversationId: number) {
+		const userSocket = this.sessions.getUserSocket(user.id);
+		userSocket.join(conversationId.toString());
+		console.log({"User socket connected to the room !": userSocket.id});
+	}
+
+	@OnEvent('leave.room')
+	leaveSpecificConversation(user: User, conversationId: number) {
+		const userSocket = this.sessions.getUserSocket(user.id);
+		userSocket.leave(conversationId.toString());
+		console.log({"User socket left to the room !": userSocket.id});
 	}
 
 	// Can be triggered from various parts of the application - not necessary a websocket event
@@ -122,7 +134,6 @@ export class MessagingGateway implements OnGatewayConnection{
 			
 			recipientSockets.forEach((recipientSocket, userId) => {
 				if (userId !== payload.author.id && recipientSocket) {
-					// console.log({"RECIPIENT SOCKET": recipientSocket});
 					recipientSocket.emit('onDeleteMessage', payload);
 				}
 			});

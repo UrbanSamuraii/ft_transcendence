@@ -6,7 +6,7 @@ import { UserService } from "src/user/user.service";
 import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
 import { GatewaySessionManager } from "src/gateway/gateway.session";
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ConversationsService {
@@ -15,7 +15,8 @@ export class ConversationsService {
 				private userService: UserService,
 				private configService: ConfigService,
 				private membersService: MembersService,
-				private sessionManager: GatewaySessionManager
+				private sessionManager: GatewaySessionManager,
+				private eventEmitter: EventEmitter2,
 				) {}
 
 	// To get the Conversation Name at the creation
@@ -80,13 +81,12 @@ export class ConversationsService {
 					},
 				});
 				await this.membersService.addConversationInMembership(userId, existingConversation.id);
-				
-				const userSocket = this.sessionManager.getUserSocket(userId);
-				if (userSocket) {
-					// Join the conversation room
-					userSocket.join(conversationId.toString());
-				  }
-				
+				// const userSocket = this.sessionManager.getUserSocket(userId);
+				// if (userSocket) {
+					// 	userSocket.join(conversationId.toString());
+					//   }
+				const member = await this.userService.getUserById(userId);
+				this.eventEmitter.emit('join.room', member, conversationId);
 				return true;
 			} else { return false; // The user was already in
 			}
@@ -139,12 +139,12 @@ export class ConversationsService {
 				});
 				await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
 				
-				const userSocket = this.sessionManager.getUserSocket(userId);
-				if (userSocket) {
-				  // Leave the conversation room
-				  userSocket.leave(conversationId.toString());
-				}
-
+				// const userSocket = this.sessionManager.getUserSocket(userId);
+				// if (userSocket) {
+				//   userSocket.leave(conversationId.toString());
+				// }
+				const member = await this.userService.getUserById(userId);
+				this.eventEmitter.emit('leave.room', member, conversationId);
 				return true; // The user has been removed
 			} else { return false; // The user was not a member of this conversation
 			}
