@@ -24,7 +24,7 @@ export const ConversationChannelPage = () => {
 		};
 		
 		fetchConversations();
-	  }, [conversationId]);
+	  }, [chatSocketContextData, conversationId]);
 
 	useEffect(() => {
 			chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
@@ -39,7 +39,7 @@ export const ConversationChannelPage = () => {
 		return() => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
-	}, [[chatSocketContextData]]);
+	}, [[chatSocketContextData, conversationId]]);
 
 	useEffect(() => {
 		chatSocketContextData?.chatSocket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {

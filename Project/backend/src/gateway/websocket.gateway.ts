@@ -94,8 +94,8 @@ export class MessagingGateway implements OnGatewayConnection{
 	handleMessageCreatedEvent(payload: any) {
 		// console.log({"Message created in PAYLOAD": payload});
 		if (payload.author) {
-			const authorSocket = this.sessions.getUserSocket(payload.author.id);
-			console.log({"AUTHOR SOCKET": authorSocket.id});
+			// const authorSocket = this.sessions.getUserSocket(payload.author.id);
+			// console.log({"AUTHOR SOCKET": authorSocket.id});
 			// const recipientSockets = this.sessions.getSockets();
 			
 			// recipientSockets.forEach((recipientSocket, userId) => {
@@ -104,11 +104,12 @@ export class MessagingGateway implements OnGatewayConnection{
 			// 		recipientSocket.emit('onMessage', payload);
 			// 	}
 			// });
-			if (authorSocket) authorSocket.emit('onMessage', payload);
-			// this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
+			// if (authorSocket) authorSocket.emit('onMessage', payload);
+			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
+			this.server.emit('onNewRoom', payload); 
 		}
 	}
 
