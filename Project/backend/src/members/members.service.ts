@@ -129,6 +129,19 @@ export class MembersService implements IMembersService {
 		}
 	}
 
+	async isAdmin(conversationId: number, userId: number): Promise<boolean | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { admins: true },
+		});
+		
+		if (!conversation) { return null; }
+		
+		const memberAdminFinded = conversation.admins.find((member) => member.id === userId);
+		if (memberAdminFinded) { return true; }
+		else { return false; }
+	}
+
 	///////// MUTE RELATION ////////
 
 	async addMemberToMutedList(userId: number, conversationId: number) {
