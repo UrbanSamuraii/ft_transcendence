@@ -1,7 +1,6 @@
 import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode, BadRequestException } from "@nestjs/common";
 import { Prisma, User, Conversation} from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
-import { HttpException } from '@nestjs/common';
 import { UserService } from "src/user/user.service";
 import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
@@ -13,9 +12,7 @@ export class ConversationsService {
 
 	constructor(private prismaService: PrismaService,
 				private userService: UserService,
-				private configService: ConfigService,
 				private membersService: MembersService,
-				private sessionManager: GatewaySessionManager,
 				private eventEmitter: EventEmitter2,
 				) {}
 
@@ -120,6 +117,17 @@ export class ConversationsService {
 		}
 		else {return false;}
 	}
+
+	async validateAdminUser(email: string) {
+        const user = await this.prismaService.user.findUnique({
+            where: { email: email }
+        });
+        if (!user) {
+            throw new ForbiddenException('Credentials incorrect: email');
+        }
+        const admin = { ...user };
+        return admin;
+    }
 	
 	async removeMemberFromConversation(userId: number, conversationId: number): Promise<boolean> {
 		const existingConversation = await this.prismaService.conversation.findUnique({
