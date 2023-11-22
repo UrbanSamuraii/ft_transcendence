@@ -78,7 +78,6 @@ function App() {
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
-    const [gameKey, setGameKey] = useState(0);
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
     const { stopSocketConnection } = useSocket();  // Get the socket from context
@@ -94,19 +93,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
         console.log(previousPathname)
         console.log(location.pathname)
-        if (previousPathname === "/game" && location.pathname === "/matchmaking") {
-            console.log("User left the game page!");
-            // If you want to stop the socket connection, you can do so here:
-            stopSocketConnection();
-            navigate("/play"); // Redirect to play page
 
-        }
-        else if (previousPathname === "/game" && location.pathname !== "/game") {
-            console.log("User left the game page!");
-            // If you want to stop the socket connection, you can do so here:
-            stopSocketConnection();
-        }
-        else if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
+        if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
             console.log("User left the conversation page!");
             stopChatSocketConnection();
         }
@@ -150,9 +138,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
             <Route path="/game/:id" element={<SquareGame />} />
-            <Route path="/select-mode" element={<SelectModePage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/ConversationPage" element={<ConversationPage />} >
@@ -163,6 +149,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
             {/* Protected routes */}
             {user && (
                 <>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />

@@ -40,7 +40,10 @@ export class GameGateway implements OnGatewayInit {
     }
 
     private removeFromQueue(clientToRemove: Socket) {
+        console.log("Queue before removal:", this.queue.map(client => client.id)); // Print queue before removal
         this.queue = this.queue.filter(client => client !== clientToRemove);
+        console.log("Queue after removal:", this.queue.map(client => client.id)); // Print queue after removal
+
     }
 
     afterInit(server: Server) {
@@ -77,12 +80,6 @@ export class GameGateway implements OnGatewayInit {
 
         //add a condition here if user ilaready in the queue to disconnect
 
-        console.log("new socket connection");
-
-        const userIndexInQueue = (userEmail: string) => {
-            return this.queue.findIndex(client => client.data.user.email === userEmail);
-        };
-
         try {
             const decoded = this.jwtService.verify(token);
             // Optionally, store the decoded data on the socket for future use
@@ -90,7 +87,6 @@ export class GameGateway implements OnGatewayInit {
             const userInfo = await this.userService.getUserByToken(token);
             console.log("decoded.email = ", decoded.email);
 
-            const index = userIndexInQueue(decoded.email);
             this.addUserToQueue(client);
             client.data.user.username = userInfo.username;
 
@@ -105,15 +101,23 @@ export class GameGateway implements OnGatewayInit {
             // this.playerInfoMap.set(client.data.user.username, playerInfo);
             this.playerInfoMap.set(client.data.user.username, playerInfo);
 
-            console.log(this.queue.length);
+            console.log("Queue length: ", this.queue.length);
+            console.log("Queue contents: ", this.queue.map(client => `ID: ${client.id}, Username: ${client.data.user.username}`));
+
+
             if (this.queue.length >= 2) {  // if there are at least two users in the queue
                 const player1 = this.queue.shift();  // remove the first user from the queue
                 const player2 = this.queue.shift();  // remove the second user from the queue
 
-                console.log("player1.data.user.id = ", player1.data.user.sub);
-                console.log("player2.data.user.id = ", player2.data.user.sub);
-                console.log("player1.data.user.username = ", player1.data.user.username);
-                console.log("player2.data.user.username = ", player2.data.user.username);
+                // console.log("\n\n\nplayer1: \n\n\n", player1);
+                // console.log("\n\n\nplayer2: \n\n\n", player2);
+                console.log("Player 1 Socket ID:", player1.id);
+                console.log("Player 2 Socket ID:", player2.id);
+
+                // console.log("player1.data.user.id = ", player1.data.user.sub);
+                // console.log("player2.data.user.id = ", player2.data.user.sub);
+                // console.log("player1.data.user.username = ", player1.data.user.username);
+                // console.log("player2.data.user.username = ", player2.data.user.username);
 
                 //this "sub" shit is so annoying and so random need to change that garbage ass shit
 
@@ -129,20 +133,22 @@ export class GameGateway implements OnGatewayInit {
                 });
 
                 const gameId = newGame.id;
+
+                console.log("gameId:", gameId);
+
                 player1.join(gameId.toString());
                 player2.join(gameId.toString());
 
                 // Notify both users that a match has been found
 
                 player1.emit('matchFound', { opponent: player2.data.user, gameId });
-                // player1.emit('matchFound', { you: player1.data.user });
                 player2.emit('matchFound', { opponent: player1.data.user, gameId });
-                // player2.emit('matchFound', { you: player2.data.user });
 
                 this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
                     this.server.to(gameId.toString()).emit('updateGameData', {
                         ...data,
                     });
+
 
                     if (data.isGameOver && data.winnerUsername) {
                         this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
@@ -179,7 +185,12 @@ export class GameGateway implements OnGatewayInit {
     handleLeaveMatchmaking(client: Socket) {
         console.log("handleLeaveMatchmaking");
         this.removeFromQueue(client);
-        client.disconnect();
+        // client.disconnect();
+        if (client.data?.user?.username) {
+            this.playerInfoMap.delete(client.data.user.username);
+            console.log(`Removed ${client.data.user.username} from playerInfoMap`);
+        }
+        client.disconnect(true);
     }
 
     @SubscribeMessage('paddleMovements')
