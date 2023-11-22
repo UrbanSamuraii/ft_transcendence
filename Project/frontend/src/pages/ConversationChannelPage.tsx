@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
 import { ConversationMessage } from "../utils/types";
@@ -24,11 +24,13 @@ export const ConversationChannelPage = () => {
         };
 
         fetchConversations();
-    }, [conversationId]); // To implement dependencies ! That s how useEffect works mtf !
+    }, [conversationId]);
 
     useEffect(() => {
         chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setNewMessageReceived(true);
+            chatSocketContextData.setLastMessageDeleted(false);
+            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
                 setConversationsArray(prevConversations => [payload, ...prevConversations]);
@@ -37,7 +39,22 @@ export const ConversationChannelPage = () => {
         return () => {
             chatSocketContextData?.chatSocket?.off('onMessage');
         };
-    }, [[chatSocketContextData]]);
+    }, [[chatSocketContextData, conversationId]]);
+
+    useEffect(() => {
+        chatSocketContextData?.chatSocket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
+            const isMessageInConversation = deletedMessage.conversation_id === Number(conversationId);
+
+            if (isMessageInConversation) {
+                setConversationsArray(prevConversations => {
+                    return prevConversations.filter(message => message.id !== deletedMessage.id);
+                });
+            }
+        });
+        return () => {
+            chatSocketContextData?.chatSocket?.off('onDeleteMessage');
+        };
+    }, [chatSocketContextData, conversationId]);
 
     return (
         <ConversationChannelPageStyle>

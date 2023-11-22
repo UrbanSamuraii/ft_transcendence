@@ -6,6 +6,8 @@ import { User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MessagesService } from 'src/messages/messages.service';
+import { GatewaySessionManager } from 'src/gateway/gateway.session';
 
 
 @UseGuards(Jwt2faAuthGuard)
@@ -15,26 +17,28 @@ export class ConversationsController {
 	constructor(private convService: ConversationsService,
 				private userService: UserService,
 				private memberService: MembersService,
+				private messagesService: MessagesService,
 				private eventEmitter: EventEmitter2) { }
 	
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
+		
 		// Get the first invited member if there is one
 		let member = null;
 		let userFound = true;
 		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.users));
 		
-		// Get the name of the conversation
 		const convName = await this.convService.establishConvName(req.body.name);
-		// Creating the conversation
 		const createdConversation = await this.convService.createConversation(convName, user, member);
 		
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
+			this.eventEmitter.emit('join.room', user, createdConversation.id);
 			if (userFound) {
 				this.eventEmitter.emit('message.create', '');
+				this.eventEmitter.emit('join.room', member, createdConversation.id);
 				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
 			} else {
 				this.eventEmitter.emit('message.create', '');
@@ -59,6 +63,7 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	//////////////// HANDLE RULES AND MEMBERS OF THE CONVERSATION ////////////////////
 
 	// By using @Param, NestJS automatically extracts the value of id from the URL's path parameters and assigns it to the conversationId variable
 	@Post(':id/add_member')
@@ -94,6 +99,43 @@ export class ConversationsController {
 				res.status(201).json({ message: "The member has been removed from the conversation." });}
 			else {
 				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
+		}
+	}
+
+	// "Pas mal de boulot sur le mute ... Retrouver un nouveau user added et update de la page meme si mute"
+	@Post(':id/get_member_mute')
+	async muteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let muted = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToMute));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
+			if (muted) {
+				res.status(201).json({ message: "User muted from the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already in mute." });}
+		}
+	}
+
+	@Post(':id/get_member_unmute')
+	async unmuteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let muted = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUnmute));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			muted = await this.convService.removeMemberFromMutedList(userId, parseInt(conversationId))
+			if (muted) {
+				res.status(201).json({ message: "User unmuted from the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already unmuted." });}
 		}
 	}
 }

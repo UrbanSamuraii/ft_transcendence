@@ -20,7 +20,7 @@ import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
 import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
-
+import axios from 'axios';
 
 const defaultBackgroundStyle = {
     background: '#1a1a1a',
@@ -94,14 +94,17 @@ function Content({ setBackgroundStyle }: ContentProps) {
         console.log(previousPathname)
         console.log(location.pathname)
 
-        if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
-            console.log("User left the conversation page!");
-            stopChatSocketConnection();
-        }
+        const leaveRoomsAndStopConnection = async () => {
+            if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
+                console.log("User left the conversation page!");
+                stopChatSocketConnection();
+            }
+        };
 
-        // Now update the ref after the check
+        leaveRoomsAndStopConnection();
+
         prevPathnameRef.current = location.pathname;
-    }, [location.pathname]);
+    }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
 
     function handlePlayClick() {
         navigate("/select-mode");
@@ -132,7 +135,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
     useEffect(() => {
-        console.log('Content component rendered');
+        // console.log('Content component rendered');
     });
 
     return (

@@ -28,14 +28,17 @@ model User {
     isRegistered  Boolean @default(false)
     is_two_factor_activate Boolean?  @default(false)
     two_factor_secret      String?
-    status  status_t? @default(OFFLINE)
-    conversations Conversation[] @relation("member")
-    messages      Message[] @relation("author")
+    status                status_t?    @default(OFFLINE)
     eloRating               Int       @default(1000)
     gamesWon          Game[] @relation("WinnerRelation")
     totalGamesWon           Int       @default(0)
+    messages      Message[] @relation("author")
+    conversations       Conversation[] @relation("member")
+    conversationsAdmin  Conversation[] @relation("admin")
+    bannedFrom          Conversation[] @relation("banned")
+    mutedFrom           Conversation[] @relation("muted")
 
-    @@unique([id, email, username])
+  @@unique([id, email, username])
 	@@map("users")
 }
 
@@ -60,6 +63,10 @@ model Conversation {
 	updatedAt	DateTime	@updatedAt
 
   members   User[]    @relation("member")
+  admins    User[]    @relation("admin")
+  banned    User[]    @relation("banned")
+  muted     User[]    @relation("muted")
+  
   messages  Message[] 
 
   @@unique([id, name])

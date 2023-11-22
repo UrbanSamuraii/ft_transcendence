@@ -14,17 +14,23 @@ export const ConversationPage = () => {
 	const chatSocketContextData = useContext(chatSocketContext);
 
   useEffect(() => {
-    chatSocketContextData?.startChatSocketConnection();
+      const initializeSocket = async () => {
+        await chatSocketContextData?.startChatSocketConnection();
+      };
+  
+    initializeSocket();
+    console.log({"ChatSocketContextData": chatSocketContextData});
+    
     return () => { };
-  }, []);
+  }, [chatSocketContextData?.chatSocket]);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        // chatSocketContextData?.startChatSocketConnection();
         const prismaConversations = await getConversations();
         setPrismaConversations(prismaConversations); 
-        chatSocketContextData?.setNewMessageReceived(false)
+        chatSocketContextData?.setNewMessageReceived(false);
+        // console.log('Type of prismaConversations:', typeof prismaConversations);
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }
@@ -32,17 +38,17 @@ export const ConversationPage = () => {
 
     fetchConversations();
 
-  }, [chatSocketContextData?.newMessageReceived, chatSocketContextData]);
+  }, [chatSocketContextData]);
 
   useEffect(() => {
       chatSocketContextData?.chatSocket?.on('onMessage', (payload: any) => {
-			console.log('Update de la page');
+			// console.log('Update de la page');
       chatSocketContextData?.setNewMessageReceived(true); 
 		});
 		return() => {
 			chatSocketContextData?.chatSocket?.off('onMessage');
 		};
-	}, [chatSocketContextData?.chatSocket]);
+	}, [chatSocketContextData]);
 
   return (
     <Page>

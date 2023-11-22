@@ -82,11 +82,11 @@ export const RegisterForm = () => {
         }
         else {
             try {
-                console.log("DATA: ", formData);
+                // console.log("DATA: ", formData);
                 const response = await axios.post('http://localhost:3001/auth/signup', formData, {
                     withCredentials: true,
                 });
-                console.log(response.status, response.data.token);
+                // console.log(response.status, response.data.token);
                 navigate('/play');
             } catch (error) {
                 console.error('Sign up request error:', error);
