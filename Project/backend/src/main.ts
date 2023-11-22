@@ -25,7 +25,7 @@ async function bootstrap() {
     app.use(cookieParser());
     await app.listen(port);
 
-     // Gracefully shutdown the server.
+    // Gracefully shutdown the server.
     app.enableShutdownHooks();
 }
 

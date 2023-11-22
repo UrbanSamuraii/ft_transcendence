@@ -1,51 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
+
+/* Base navbar styling */
 .navbar {
     display: flex;
-    flex-wrap: wrap;
-    height: 50px;
-    justify-content: space-between;
     align-items: center;
-    background-color: #2b2b2b;
+    justify-content: space-between;
     padding: 0.5rem 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #1a1a1a;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+    color: white;
+    font-family: 'Roboto', sans-serif;
 }
 
-.navbar a {
+.navbar a,
+.navbar button {
     color: white;
     text-decoration: none;
-    margin: 0 1rem;
+    margin: 0 0.75rem;
     padding: 0.25rem 0.5rem;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-.navbar a:hover {
+.navbar a:hover,
+.navbar button:hover {
     background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
 }
 
+/* Styling for the logo */
 .navbar-logo {
     font-weight: bold;
     font-size: 1.5rem;
 }
 
+/* Button specific styling */
+.navbar button {
+    background: transparent;
+    border-radius: 5px;
+}
+
 /* Media Query for small screens */
 @media screen and (max-width: 600px) {
     .navbar {
-        padding: 0.5rem 1rem;
-        /* Reduce padding */
+        flex-direction: column;
+        padding: 1rem;
     }
 
-    .navbar a {
+    .navbar a,
+    .navbar button {
         font-size: 14px;
-        /* Reduce font size */
-        margin: 0 0.5rem;
-        /* Reduce margin */
-        padding: 0.1rem 0.3rem;
-        /* Reduce padding */
+        margin: 5px;
+        padding: 0.5rem 1rem;
     }
 
     .navbar-logo {
+        margin-bottom: 10px;
         font-size: 1.2rem;
-        /* Reduce logo size */
     }
-
-    /* Optional: Code for hamburger menu goes here */
 }

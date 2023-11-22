@@ -6,6 +6,7 @@ import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
 import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
@@ -16,45 +17,41 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
-function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
+function SquareGame({ }) {
     const canvasRef = useRef(null);
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
     const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
     // const [socket, setSocket] = useState(null);
-    const [isGameActive, setIsGameActive] = useState(true);
-    const isGameActiveRef = useRef(isGameActive);
     const [isGamePaused, setGamePaused] = useState(false);
-    const { socket } = useSocket();  // Get the socket from context
-
-    useEffect(() => {
-        isGameActiveRef.current = isGameActive;
-    }, [isGameActive]);
+    const { socket, stopSocketConnection } = useSocket();  // Get the socket from context
+    const { id: gameId } = useParams(); // Get the game ID from the URL
+    const navigate = useNavigate();
 
     // Update the ref every time activeKeys changes
     useEffect(() => {
         activeKeysRef.current = activeKeys;
     }, [activeKeys]);
 
+    function goBackToMainMenu() {
+        navigate("/");
+    }
+
+    function goBackToMatchmaking() {
+        navigate("/matchmaking");
+    }
+
     useEffect(() => {
         if (!socket) return;  // Ensure socket exists
 
-        console.log("Using socket from context for game.");
+        console.log("Using socket from context for game with ID:", gameId);
 
         socket.on("updateGameData", (data) => {
-            console.log('Received game update from socket.');
+            console.log('Received game update from socket for game ID:', gameId);
 
             setGameData(data);
             drawGame(data);
-
-            if (data.isGameOver) {
-                console.log('Game over detected.');
-                setIsGameActive(false); // Game is no longer active
-                onGameOver();
-            }
         });
-
-        socket.emit('startGame');
 
         const intervalId = setInterval(() => {
             socket.emit('paddleMovements', activeKeysRef.current);
@@ -64,24 +61,10 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             clearInterval(intervalId);
             // Don't close the socket here; it will be managed by the SocketProvider
         };
-    }, [socket]);  // Depend on socket
-
-    // const stopSocketConnection = () => {
-    //     if (socket) {
-    //         socket.close();
-    //         setSocket(null);
-    //     }
-    // };
-
-    const startGame = () => {
-        if (socket) {
-            socket.emit('startGame');
-        }
-    };
+    }, [socket, gameId]);  // Depend on socket
 
     useEffect(() => {
         const handleKeyDown = (event) => {
-            if (!isGameActiveRef.current) return;
 
             console.log(`Key down: ${event.key}`);
 
@@ -112,7 +95,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         };
 
         const handleKeyUp = (event) => {
-            if (!isGameActiveRef.current) return;
 
             console.log(`Key up: ${event.key}`);
 
@@ -263,15 +245,40 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
             ctx.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
         });
 
+        // console.log("cl17: ", data.isGameOver)
+        // console.log("cl18: ", data.winnerUsername)
         if (data.isGameOver) {
-            const buttonWidth = gameWidth * 0.1; // 10% of game width
-            const buttonHeight = gameHeight * 0.05; // 5% of game height
-            const buttonOffsetX = gameWidth - buttonWidth - gameWidth * 0.45; // 10% from the right edge
-            const buttonOffsetY = gameHeight * 0.1; // 10% from the top edge
+            // Constants for layout
+            const buttonWidth = gameWidth * 0.3;
+            const buttonHeight = gameHeight * 0.1;
+            const winnerNameFontSize = gameHeight * 0.06;
+            const buttonOffsetY = gameHeight * 0.6;
+            const textOffsetY = buttonOffsetY - winnerNameFontSize * 2;
 
-            drawButton(offsetX + buttonOffsetX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', onGoBackToMainMenu, gameWidth, gameHeight, offsetX, offsetY);
-            drawButton(offsetX + buttonOffsetX, offsetY + gameHeight - buttonHeight - buttonOffsetY, buttonWidth, buttonHeight, 'PLAY AGAIN', onStartGame, gameWidth, gameHeight, offsetX, offsetY);
+            // Determine the winner's side for X positioning
+            const winnerSideX = data.leftScore > data.rightScore ? gameWidth * 0.25 : gameWidth * 0.75;
+
+            // Set up font and style for the winner's name
+            ctx.font = `${winnerNameFontSize}px 'Press Start 2P', cursive`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+
+            // Calculate positions based on winner's side
+            const textX = offsetX + winnerSideX;
+            const buttonX = textX - buttonWidth / 2; // Center the button on the winner's side
+
+            // Draw winner message
+            ctx.fillText(`Winner: ${data.winnerUsername}`, textX, offsetY + textOffsetY);
+
+            // Draw buttons
+            drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', goBackToMainMenu);
+            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToMatchmaking);
+
+            // Other game over logic
+            stopSocketConnection();
+            console.log('Game over detected.');
         }
+
 
         drawNet(data);
 
@@ -327,8 +334,6 @@ function SquareGame({ onStartGame, onGoBackToMainMenu, onGameOver }) {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [gameData]);
-
-
 
     useEffect(() => {
         const canvas = canvasRef.current;

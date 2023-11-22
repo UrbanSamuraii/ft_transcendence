@@ -25,9 +25,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
             const socketConnection = io(serverAddress, {
                 withCredentials: true
             });
+            console.log("new socket connection");
 
-            socketConnection.on('matchFound', (data) => {
-                console.log('Match found!', data);
+            socketConnection.on('disconnect', (reason) => {
+                if (socketRef.current) {
+                    socketRef.current.close();
+                    socketRef.current = null;
+                    console.log(`Disconnected from server: ${reason}`);
+                }
             });
 
             socketRef.current = socketConnection;  // Store the socket connection in the ref

@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import { PlayerInfo } from './game.gateway';
 
 const nbrOfSquares = 1;
 const aspectRatio = 1318 / 807;
@@ -17,64 +19,57 @@ const squareDx = 1.25;
 @Injectable()
 export class SquareGameService {
 
-    private squares = Array.from({ length: nbrOfSquares }, (_, index) => {
-        const ySpacing = 100 / nbrOfSquares;
-        return {
-            x: 50,  // Positioning each square in the middle, minus half the size
-            y: 50,
-            // dx: index % 2 === 0 ? 1.8 : -0.5,  // Alternate directions: right for even indices, left for odd
-            dx: squareDx,  // Alternate directions: right for even indices, left for odd
-            dy: squareDy,  // No vertical movement
-            // dy: 0.1,
-            // size: 2.2
-            size: squareSize
-        };
-    });
+    private gameStates = new Map<string, any>(); // Using 'any' for simplicity, define a proper type for game state
 
-    private width = 100;
-    private height = 100;
-    private leftPaddle = { x: leftPaddleX, y: leftPaddleY, width: paddleWidth, height: paddleHeight };
-    private rightPaddle = { x: rightPaddleX, y: rightPaddleY, width: paddleWidth, height: paddleHeight };
-    private rightScore = 0;
-    private leftScore = 0;
-    public isGameOver = false;
-    private rightWall = { x: 0, y: 0, width: 0, height: 100 };
-    private leftWall = { x: 100, y: 0, width: 0, height: 100 };
-    private topWall = { x: 0, y: 0, width: 100, height: 0 };
-    private BottomWall = { x: 0, y: 100, width: 100, height: 0 };
-    private gameLoop: NodeJS.Timeout;
-    private moveLeftPaddleDirection: 'up' | 'down' | null = null;
-    private moveRightPaddleDirection: 'up' | 'down' | null = null;
-    private paddleMoveAmount = 2;
-    private desiredLeftPaddleMovement: 'up' | 'down' | null = null;
-    private desiredRightPaddleMovement: 'up' | 'down' | null = null;
-    private maxDyValue = 5;
-    private maxDxValue = 5;
+    constructor(private userService: UserService) { }
+
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
     public isGamePaused = false; // To keep track of the paused state
 
-    resetGame() {
-        this.leftScore = 0;
-        this.rightScore = 0;
-        this.isGameOver = false;
-
-        this.leftPaddle = { x: leftPaddleX, y: leftPaddleY, width: paddleWidth, height: paddleHeight };
-        this.rightPaddle = { x: rightPaddleX, y: rightPaddleY, width: paddleWidth, height: paddleHeight };
-
-        // Reset squares to their initial state
-        this.squares = Array.from({ length: nbrOfSquares }, (_, index) => {
-            const ySpacing = 100 / nbrOfSquares;
-            return {
-                x: 50,  // Positioning each square in the middle, minus half the size
-                y: index * ySpacing,
-                // dx: index % 2 === 0 ? 1.8 : -0.5,  // Alternate directions: right for even indices, left for odd
-                dx: squareDx,  // Alternate directions: right for even indices, left for odd
-                dy: squareDy,  // No vertical movement
-                // dy: 0.1,
-                size: squareSize
-            };
-        });
-
+    private initializeGameState() {
+        return {
+            squares: Array.from({ length: nbrOfSquares }, (_, index) => {
+                return {
+                    x: 50, // Positioning each square in the middle
+                    y: (100 / nbrOfSquares) * index,
+                    dx: squareDx, // Initial horizontal speed
+                    dy: squareDy, // Initial vertical speed
+                    size: squareSize
+                };
+            }),
+            leftPaddle: {
+                x: leftPaddleX,
+                y: leftPaddleY,
+                width: paddleWidth,
+                height: paddleHeight
+            },
+            rightPaddle: {
+                x: rightPaddleX,
+                y: rightPaddleY,
+                width: paddleWidth,
+                height: paddleHeight
+            },
+            leftScore: 0,
+            rightScore: 0,
+            isGameOver: false,
+            width: 100,
+            height: 100,
+            rightWall: { x: 0, y: 0, width: 0, height: 100 },
+            leftWall: { x: 100, y: 0, width: 0, height: 100 },
+            topWall: { x: 0, y: 0, width: 100, height: 0 },
+            BottomWall: { x: 0, y: 100, width: 100, height: 0 },
+            gameLoop: null, // or appropriate initial value
+            moveLeftPaddleDirection: null,
+            moveRightPaddleDirection: null,
+            paddleMoveAmount: 2,
+            desiredLeftPaddleMovement: null,
+            desiredRightPaddleMovement: null,
+            maxDyValue: 5,
+            maxDxValue: 5,
+            angleFactor: 5,
+            isGamePaused: false
+            // Add any other game-related initial state variables here
+        };
     }
 
     adjustDyOnCollision(distanceFromCenter, paddleHeight) {
@@ -82,64 +77,74 @@ export class SquareGameService {
         return (relativeDistance) * this.angleFactor;
     }
 
-    updateGameState(clientInputs, callback: Function) {
+    // updateGameState(gameId: any, clientInputs: any, callback: Function) {
+    updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
 
-        const clientIds = Object.keys(clientInputs);
+        let gameState = this.gameStates.get(gameId);
+        if (!gameState) {
+            // Initialize game state for new gameId
+            gameState = this.initializeGameState();
+            this.gameStates.set(gameId, gameState);
+        }
+
 
         // Assuming 2 players for left and right paddle
-        if (clientIds.length >= 2 && !this.isGamePaused) {
-            const leftClientActiveKeys = clientInputs[clientIds[0]];
-            const rightClientActiveKeys = clientInputs[clientIds[1]];
+        const playerInfos = Array.from(playerInfoMap.values());
 
-            if (leftClientActiveKeys.includes("w")) {
-                const potentialY = this.leftPaddle.y - this.paddleMoveAmount;
-                this.leftPaddle.y = Math.max(potentialY, 0);
-            } else if (leftClientActiveKeys.includes("s")) {
-                const potentialY = this.leftPaddle.y + this.paddleMoveAmount;
-                this.leftPaddle.y = Math.min(potentialY, 100 - this.leftPaddle.height);
+        // Assuming 2 players for left and right paddle
+        if (playerInfos.length >= 2 && !gameState.isGamePaused) {
+            const leftPlayerInfo = playerInfos[0];
+            const rightPlayerInfo = playerInfos[1];
+
+            // Handle left player paddle movement
+            if (leftPlayerInfo.activeKeys.includes("w")) {
+                const potentialY = gameState.leftPaddle.y - gameState.paddleMoveAmount;
+                gameState.leftPaddle.y = Math.max(potentialY, 0);
+            } else if (leftPlayerInfo.activeKeys.includes("s")) {
+                const potentialY = gameState.leftPaddle.y + gameState.paddleMoveAmount;
+                gameState.leftPaddle.y = Math.min(potentialY, 100 - gameState.leftPaddle.height);
             }
 
-            if (rightClientActiveKeys.includes("ArrowUp")) {
-                const potentialY = this.rightPaddle.y - this.paddleMoveAmount;
-                this.rightPaddle.y = Math.max(potentialY, 0);
-            } else if (rightClientActiveKeys.includes("ArrowDown")) {
-                const potentialY = this.rightPaddle.y + this.paddleMoveAmount;
-                this.rightPaddle.y = Math.min(potentialY, 100 - this.rightPaddle.height);
+            // Handle right player paddle movement
+            if (rightPlayerInfo.activeKeys.includes("ArrowUp")) {
+                const potentialY = gameState.rightPaddle.y - gameState.paddleMoveAmount;
+                gameState.rightPaddle.y = Math.max(potentialY, 0);
+            } else if (rightPlayerInfo.activeKeys.includes("ArrowDown")) {
+                const potentialY = gameState.rightPaddle.y + gameState.paddleMoveAmount;
+                gameState.rightPaddle.y = Math.min(potentialY, 100 - gameState.rightPaddle.height);
             }
 
-            this.squares.forEach((square, idx) => {
+            gameState.squares.forEach((square, idx) => {
 
                 square.x += square.dx;
                 square.y += square.dy;
 
-                const leftPaddleDistance = this.intersects(square, this.leftPaddle);
+                const leftPaddleDistance = this.intersects(square, gameState.leftPaddle);
                 if (leftPaddleDistance !== null) {
                     square.dx = -square.dx;
-                    square.dy = this.adjustDyOnCollision(leftPaddleDistance, this.leftPaddle.height);
+                    square.dy = this.adjustDyOnCollision(leftPaddleDistance, gameState.leftPaddle.height);
 
                     // Reposition the square outside of the left paddle bounds
-                    square.x = this.leftPaddle.x + this.leftPaddle.width;
+                    square.x = gameState.leftPaddle.x + gameState.leftPaddle.width;
                 }
 
-                const rightPaddleDistance = this.intersects(square, this.rightPaddle);
+                const rightPaddleDistance = this.intersects(square, gameState.rightPaddle);
                 if (rightPaddleDistance !== null) {
                     square.dx = -square.dx;
-                    square.dy = this.adjustDyOnCollision(rightPaddleDistance, this.rightPaddle.height);
+                    square.dy = this.adjustDyOnCollision(rightPaddleDistance, gameState.rightPaddle.height);
 
                     // Reposition the square outside of the right paddle bounds
-                    square.x = this.rightPaddle.x - square.size;
+                    square.x = gameState.rightPaddle.x - square.size;
 
                 }
 
                 // Check for wall intersections
-                if (square.x + square.size < 0 || square.x > this.width) {
+                if (square.x + square.size < 0 || square.x > gameState.width) {
                     // Reset square position to the center
-                    if (square.x > this.width)
-                        this.leftScore++;
-                    if (square.x + square.size < 0)
-                        this.rightScore++;
-                    square.x = this.width / 2;
-                    square.y = this.height / 2;
+                    if (square.x > gameState.width) leftPlayerInfo.score++;
+                    if (square.x + square.size < 0) rightPlayerInfo.score++;
+                    square.x = gameState.width / 2;
+                    square.y = gameState.height / 2;
 
                     square.dx = squareDx;
                     square.dy = squareDy;
@@ -157,24 +162,39 @@ export class SquareGameService {
 
             });
 
-        }
+            gameState.leftScore = leftPlayerInfo.score;
+            gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
 
-        if (this.leftScore >= 10000 || this.rightScore >= 10000) {
-            this.isGameOver = true;
-            clearInterval(this.gameLoop); // Clear the game loop to stop the game
-        }
+            if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
+                gameState.isGameOver = true;
+                clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
+                const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
 
-        callback({
-            squares: this.squares,
-            leftPaddle: this.leftPaddle,
-            rightPaddle: this.rightPaddle,
-            leftScore: this.leftScore,
-            rightScore: this.rightScore,
-            isGameOver: this.isGameOver
-        });
+                // console.log("cl15: ", winnerUsername);
+                // console.log("cl15: ", gameState.isGameOver);
+                callback({
+                    squares: gameState.squares,
+                    leftPaddle: gameState.leftPaddle,
+                    rightPaddle: gameState.rightPaddle,
+                    leftScore: gameState.leftScore,
+                    rightScore: gameState.rightScore,
+                    isGameOver: gameState.isGameOver,
+                    winnerUsername: winnerUsername
+                });
+            } else {
+                callback({
+                    squares: gameState.squares,
+                    leftPaddle: gameState.leftPaddle,
+                    rightPaddle: gameState.rightPaddle,
+                    leftScore: gameState.leftScore,
+                    rightScore: gameState.rightScore,
+                    isGameOver: gameState.isGameOver
+                });
 
-        if (!this.isGameOver) {
-            setTimeout(() => this.updateGameState(clientInputs, callback), 1000 / 60);
+                if (!gameState.isGameOver) {
+                    setTimeout(() => this.updateGameState(gameId, playerInfoMap, callback), 1000 / 60);
+                }
+            }
         }
     }
 

@@ -14,34 +14,45 @@ datasource db {
 
 model User {
 	id  	Int   @id @default(autoincrement())
-  id42  Int?  @unique  
+    id42  Int?  @unique  
 
 	createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
-
 	first_name  String    @db.VarChar(255)
-  last_name   String    @db.VarChar(255)
-  email       String		@unique @db.VarChar(255)
+    last_name   String    @db.VarChar(255)
+    email       String		@unique @db.VarChar(255)
 	username	  String		@unique @db.VarChar(255)
-  img_url     String?   @db.VarChar(255)
-	
-  hash          String  @default("noTokenBecause42Identification")
-  accessToken   String  @default("noToken")
-  isRegistered  Boolean @default(false)
-  
-  is_two_factor_activate Boolean?  @default(false)
-  two_factor_secret      String?
-  
-  status                status_t?    @default(OFFLINE)
-
-  messages      Message[] @relation("author")
-  conversations       Conversation[] @relation("member")
-  conversationsAdmin  Conversation[] @relation("admin")
-  bannedFrom          Conversation[] @relation("banned")
-  mutedFrom           Conversation[] @relation("muted")
+    img_url     String?   @db.VarChar(255)
+    hash          String  @default("noTokenBecause42Identification")
+    accessToken   String  @default("noToken")
+    isRegistered  Boolean @default(false)
+    is_two_factor_activate Boolean?  @default(false)
+    two_factor_secret      String?
+    status                status_t?    @default(OFFLINE)
+    eloRating               Int       @default(1000)
+    gamesWon          Game[] @relation("WinnerRelation")
+    totalGamesWon           Int       @default(0)
+    messages      Message[] @relation("author")
+    conversations       Conversation[] @relation("member")
+    conversationsAdmin  Conversation[] @relation("admin")
+    bannedFrom          Conversation[] @relation("banned")
+    mutedFrom           Conversation[] @relation("muted")
 
   @@unique([id, email, username])
 	@@map("users")
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  uniqueId  String   @unique
+  player1Id Int
+  player2Id Int
+  winnerId  Int?
+  createdAt DateTime @default(now())
+
+  winner    User? @relation("WinnerRelation", fields: [winnerId], references: [id])
+
+  @@map("games")
 }
 
 model Conversation {

@@ -7,23 +7,23 @@ import Play from './pages/Play/Play';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
-import { AuthenticationPage } from './pages/AuthenticationPage';
-import { LoginPage } from './pages/LoginPage';
+import { Signup } from './pages/Signup';
+import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
-import { AuthenticatedRoute } from './components/routes/AuthenticatedRoutes'
 import Navbar from './components/Navbar/Navbar';
 import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
 import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
+import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 
 const defaultBackgroundStyle = {
-    background: 'linear-gradient(45deg, #f6494d, #F5BD02, #0001ff)',
+    background: '#1a1a1a',
 };
 
 interface ContentProps {
@@ -35,17 +35,23 @@ interface RouteBackgroundStyles {
 }
 
 const routeBackgroundStyles: RouteBackgroundStyles = {
-    '/': { background: 'linear-gradient(45deg, #ff0000, #ff7700, #ff00cc)' },
-    '/select-mode': { background: 'linear-gradient(45deg, #0000ff, #0099ff, #00ffff)' },
-    '/game': { background: 'linear-gradient(45deg, #00ff00, #ccff00, #ffcc00)' },
-    '/add-user': { background: 'linear-gradient(45deg, #F5BD02, #f6494d, #0001ff)' },
-    '/AuthenticationPage': { background: '#1a1a1a'},
-    '/LoginPage': { background: '#1a1a1a'},
-    '/ConversationPage': { background: '#1a1a1a'},
-    '/ConversationChannelPage': { background: '#1a1a1a'},
-    '/TwoFAEnablingPage': { background: '#1a1a1a'},
-    '/TwoFADisablingPage': { background: '#1a1a1a'},
-    '/TwoFACodePage': { background: '#1a1a1a'},
+    '/': {
+        background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
+        // backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+        backgroundColor: '#1a1a1a',
+    },
+    '/select-mode': { background: '#1a1a1a' },
+    '/game': { background: '#1a1a1a' },
+    '/add-user': { background: '#1a1a1a)' },
+    '/signup': { background: '#1a1a1a' },
+    '/Login': { background: '#1a1a1a' },
+    '/ConversationPage': { background: '#1a1a1a' },
+    '/ConversationChannelPage': { background: '#1a1a1a' },
+    '/TwoFAEnablingPage': { background: '#1a1a1a' },
+    '/TwoFADisablingPage': { background: '#1a1a1a' },
+    '/TwoFACodePage': { background: '#1a1a1a' },
 };
 
 function App() {
@@ -53,16 +59,18 @@ function App() {
 
     return (
         <Router>
-            <div className="App" style={backgroundStyle}>
-                <Navbar /> {/* This ensures the navbar is always visible */}
+            <AuthProvider>
+                <div className="App" style={backgroundStyle}>
+                    <Navbar />
                     <ChatSocketProvider>
-                    <SocketProvider>
-                        <Content
-                            setBackgroundStyle={setBackgroundStyle}
-                        />
-                    </SocketProvider>
+                        <SocketProvider>
+                            <Content
+                                setBackgroundStyle={setBackgroundStyle}
+                            />
+                        </SocketProvider>
                     </ChatSocketProvider>
-            </div>
+                </div>
+            </AuthProvider>
         </Router>
     );
 }
@@ -70,12 +78,11 @@ function App() {
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
     const [gameStarted, setGameStarted] = useState(false);
-    const [gameOver, setGameOver] = useState(false);
-    const [gameKey, setGameKey] = useState(0);
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
     const { stopSocketConnection } = useSocket();  // Get the socket from context
     const { stopChatSocketConnection } = useChatSocket();
+    const { user } = useAuth();
 
     useEffect(() => {
         setBackgroundStyle(routeBackgroundStyles[location.pathname] || defaultBackgroundStyle);
@@ -88,66 +95,19 @@ function Content({ setBackgroundStyle }: ContentProps) {
         console.log(location.pathname)
 
         const leaveRoomsAndStopConnection = async () => {
-            if (previousPathname === "/game" && location.pathname === "/matchmaking") {
-                console.log("User left the game page!");
-                // If you want to stop the socket connection, you can do so here:
-                stopSocketConnection();
-                navigate("/play"); // Redirect to play page
-
-            }
-            else if (previousPathname === "/game" && location.pathname !== "/game") {
-                console.log("User left the game page!");
-                // If you want to stop the socket connection, you can do so here:
-                stopSocketConnection();
-            }
-            else if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
+            if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
                 console.log("User left the conversation page!");
                 stopChatSocketConnection();
             }
         };
 
         leaveRoomsAndStopConnection();
-      
+
         prevPathnameRef.current = location.pathname;
     }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
 
-
     function handlePlayClick() {
         navigate("/select-mode");
-    }
-
-    function startGame() {
-        setGameStarted(true);
-        setGameOver(false);
-        setGameKey(prevKey => prevKey + 1);
-        navigate("/game");
-    }
-
-    function handleGameOver() {
-        setGameOver(true);
-    }
-
-    function goBackToMainMenu() {
-        setGameStarted(false);
-        setGameOver(false);
-        navigate("/");
-    }
-
-    async function handleSignUp42Click() {
-        try {
-            window.location.href = 'http://localhost:3001/auth/signup42';
-        }
-        catch (error) {
-            console.error('Sign up request error:', error);
-        }
-    }
-
-    function handleSignUpClick() {
-        navigate('/signup');
-    }
-
-    function handleSignInClick() {
-        navigate('/login');
     }
 
     const TurnOn2FA = async () => {
@@ -165,7 +125,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 credentials: 'include'
             });
             console.log('Signout successful:', response);
-            navigate('/AuthenticationPage');
+            navigate('/signup');
         } catch (error) {
             console.error('Signout failed:', error);
         }
@@ -180,25 +140,30 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
     return (
         <Routes>
-            <Route path="/" element={<HomePage handleSignUp42Click={handleSignUp42Click} handleSignUpClick={handleSignUpClick} handleSignInClick={handleSignInClick} />} />
-            <Route path="/game" element={<SquareGame key={gameKey} onStartGame={startGame} onGoBackToMainMenu={goBackToMainMenu} onGameOver={handleGameOver} />} />
-            <Route path="/select-mode" element={<SelectModePage startGame={startGame} />} />
-            <Route path="/play" element={<AuthenticatedRoute>
-                                        <Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations}/>
-                                         </AuthenticatedRoute>} />
-            <Route path="/2fa-enable" element={<AuthenticatedRoute><TwoFAEnablingPage /></AuthenticatedRoute>} />
-            <Route path="/2fa-disable" element={<AuthenticatedRoute><TwoFADisablingPage /></AuthenticatedRoute>} />
+            {/* Public routes */}
+            <Route path="/game/:id" element={<SquareGame />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/ConversationPage" element={<ConversationPage />} >
+                <Route path="channel/:id" element={<ConversationChannelPage />} />
+            </Route>
             <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
-            <Route path="/AuthenticationPage" element={<AuthenticationPage />} />
-            <Route path="/LoginPage" element={<LoginPage />} />
-            <Route path="/ConversationPage" element= {<AuthenticatedRoute><ConversationPage /></AuthenticatedRoute>} >
-                <Route path="channel/:id" element=
-                {<AuthenticatedRoute><ConversationChannelPage /></AuthenticatedRoute>} />
-            </Route>    
-            <Route path="/matchmaking" element={<Matchmaking />} />
-            <Route path="/@/:username" element={<Profile />} />
+
+            {/* Protected routes */}
+            {user && (
+                <>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/select-mode" element={<SelectModePage />} />
+                    <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
+                    <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
+                    <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
+                    <Route path="/@/:username" element={<Profile />} />
+                    <Route path="/matchmaking" element={<Matchmaking />} />
+                </>
+            )}
         </Routes>
     );
+
 }
 
 export default App;
