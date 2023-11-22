@@ -63,6 +63,7 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	//////////////// HANDLE RULES AND MEMBERS OF THE CONVERSATION ////////////////////
 
 	// By using @Param, NestJS automatically extracts the value of id from the URL's path parameters and assigns it to the conversationId variable
 	@Post(':id/add_member')
@@ -117,6 +118,24 @@ export class ConversationsController {
 				res.status(201).json({ message: "User muted from the conversation." });}
 			else {
 				res.status(403).json({ message: "User is already in mute." });}
+		}
+	}
+
+	@Post(':id/get_member_unmute')
+	async unmuteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let muted = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUnmute));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			muted = await this.convService.removeMemberFromMutedList(userId, parseInt(conversationId))
+			if (muted) {
+				res.status(201).json({ message: "User unmuted from the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already unmuted." });}
 		}
 	}
 }

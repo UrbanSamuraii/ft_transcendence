@@ -91,10 +91,11 @@ export class MessagingGateway implements OnGatewayConnection{
 	@OnEvent('message.create')
 	async handleMessageCreatedEvent(payload: any) {
 		if (payload.author) {
-			const isMute = await this.memberService.isMuteMember(payload.author.id, payload.conversation_id);
+			const isMute = await this.memberService.isMuteMember(payload.conversation_id, payload.author.id);
 			console.log({"Mute author ?": isMute});
 			if (isMute === false) {
-			this.server.to(payload.conversation_id.toString()).emit('onMessage', payload); }
+				console.log("SENDING MESSAGE");
+				this.server.to(payload.conversation_id.toString()).emit('onMessage', payload); }
 		}
 		else {
 			this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
