@@ -5,7 +5,7 @@ import { MembersService } from 'src/members/members.service';
 import { ConversationsService } from 'src/conversations/conversations.service';
 
 @Injectable()
-export class AdminStrategy extends PassportStrategy(Strategy) 
+export class AdminStrategy extends PassportStrategy(Strategy, 'admin') 
 {
   constructor(private memberService: MembersService, private conversationsService: ConversationsService) {
     super({

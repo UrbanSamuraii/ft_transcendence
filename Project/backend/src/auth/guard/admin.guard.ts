@@ -5,7 +5,7 @@ import { UserService } from 'src/user/user.service';
 import { Strategy } from 'passport-jwt';
 
 @Injectable()
-export class AdminAuthGuard extends AuthGuard('admin')
+export class AdminGuard extends AuthGuard('admin')
 {
   constructor(private readonly adminStrategy: AdminStrategy,
 			private readonly userService: UserService) {
@@ -15,24 +15,24 @@ export class AdminAuthGuard extends AuthGuard('admin')
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 	const authHeaderIndex = request.rawHeaders.indexOf('Authorization');
-	let bearerToken;
 	// Check if 'Authorization' header is present
 	if (authHeaderIndex !== -1) {
   		const authorizationValue = request.rawHeaders[authHeaderIndex + 1];
   		if (authorizationValue && authorizationValue.startsWith('Bearer')) {
 		    const bearerToken = authorizationValue.slice(7);
-    		// console.log('Bearer Token:', bearerToken);
-			}
+			const user = await this.userService.getUserByToken(bearerToken);
+			const userId = user.id;
+			console.log({"USER ID GUARD ": userId});
+			const conversationId = request.params.id;
+			request.conversationId = conversationId;
+			console.log({"CONV ID GUARD ": conversationId});
+			const test = await super.canActivate(context);
+			console.log({"Test": test});
+			return (await super.canActivate(context)) as boolean;
+		}
 	}
-	const user = await this.userService.getUserByToken(bearerToken);
-	console.log('User id:', user.id);
-    const userId = user.id;
-    const conversationId = request.params.id;
-
-    request.conversationId = conversationId;
-	console.log({"USER ID GUARD": userId});
-	console.log({"CONV ID GUARD": conversationId});
-
+	const test = await super.canActivate(context);
+	console.log({"Test": test});
 	return (await super.canActivate(context)) as boolean;
   }
 

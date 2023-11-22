@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
-import { AdminAuthGuard, Jwt2faAuthGuard } from 'src/auth/guard';
+import { AdminGuard, Jwt2faAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
 import { User } from '@prisma/client';
@@ -70,7 +70,7 @@ export class ConversationsController {
 
 	// By using @Param, NestJS automatically extracts the value of id from the URL's path parameters and assigns it to the conversationId variable
 	@Post(':id/add_member')
-	@UseGuards(AdminAuthGuard)
+	@UseGuards(AdminGuard)
 	async AddMemberToConversation(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
