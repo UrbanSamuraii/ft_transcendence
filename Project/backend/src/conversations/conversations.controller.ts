@@ -8,7 +8,7 @@ import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagesService } from 'src/messages/messages.service';
 import { GetUser } from 'src/auth/decorator';
-import { AdminStrategy } from 'src/auth/strategy';
+// import { AdminStrategy } from 'src/auth/strategy';
 
 
 @UseGuards(Jwt2faAuthGuard)
@@ -19,8 +19,7 @@ export class ConversationsController {
 				private userService: UserService,
 				private memberService: MembersService,
 				private messagesService: MessagesService,
-				private eventEmitter: EventEmitter2,
-				private adminStrategy: AdminStrategy) { }
+				private eventEmitter: EventEmitter2) { }
 	
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
@@ -77,25 +76,6 @@ export class ConversationsController {
 		@Req() req, 
 		@Res({ passthrough: true }) res: ExpressResponse) 
 		{
-
-	// 	console.log({"USER": user});
-	// 	// console.log({"Request": req});
-	// 	const authHeaderIndex = req.rawHeaders.indexOf('Authorization');
-	// 	let bearerToken;
-	// // Check if 'Authorization' header is present
-	// 	if (authHeaderIndex !== -1) {
-  	// 	const authorizationValue = req.rawHeaders[authHeaderIndex + 1];
-  	// 	if (authorizationValue && authorizationValue.startsWith('Bearer')) {
-	// 	    const bearerToken = authorizationValue.slice(7);
-    // 		// console.log('Bearer Token:', bearerToken);
-	// 		}
-	// 	}
-	// 	const AuthUser = await this.userService.getUserByToken(bearerToken);
-	// 	console.log({"AUTH USER ID": AuthUser.id});
-	// 	const result = await this.adminStrategy.validate(String(AuthUser.id), conversationId);
-  	// 	console.log('Validation Result:', result);
-		
-		
 		let member = null;
 		let userFound = true;
 		let added = false;

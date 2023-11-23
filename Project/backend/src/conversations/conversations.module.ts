@@ -5,11 +5,11 @@ import { ConversationsController } from './conversations.controller';
 import { UserService } from 'src/user/user.service';
 import { MembersService } from 'src/members/members.service';
 import { GatewaySessionManager } from 'src/gateway/gateway.session';
-import { AdminStrategy } from 'src/auth/strategy';
+// import { AdminStrategy } from 'src/auth/strategy';
 
 @Global()
 @Module({
-	providers: [ConversationsService, PrismaService, UserService, MembersService, GatewaySessionManager, AdminStrategy],
+	providers: [ConversationsService, PrismaService, UserService, MembersService, GatewaySessionManager],
     controllers: [ConversationsController],
     exports: [ConversationsService]
 })
