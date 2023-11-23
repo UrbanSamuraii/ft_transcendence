@@ -8,10 +8,10 @@ export class AdminGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-	// console.log({"REQUEST USER from Guard":request.user});
+	console.log({"REQUEST USER from Guard":request.user});
 	const userId = request.user.sub;
 	const conversationId = request.params.id;
-	// console.log({"CONV ID GUARD ": conversationId});
+	console.log({"CONV ID GUARD ": conversationId});
 	return (this.memberService.isAdmin(Number(conversationId), Number(userId)));
   }
 

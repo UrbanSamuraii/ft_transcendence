@@ -73,9 +73,7 @@ export class ConversationsController {
 	async AddMemberToConversation(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
-		@Req() req, 
-		@Res({ passthrough: true }) res: ExpressResponse) 
-		{
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
 		let userFound = true;
 		let added = false;
@@ -93,7 +91,11 @@ export class ConversationsController {
 	}
 
 	@Post(':id/remove_member')
-	async RemoveMemberFromConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+	@UseGuards(AdminGuard)
+	async RemoveMemberFromConversation(
+		@Param('id') conversationId: string, 
+		@GetUser() user: User,
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
 		let userFound = true;
 		let removed = false;
@@ -111,7 +113,11 @@ export class ConversationsController {
 	}
 
 	@Post(':id/get_member_mute')
-	async muteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+	@UseGuards(AdminGuard)
+	async muteMemberOfConversation(
+		@Param('id') conversationId: string,
+		@GetUser() user: User,
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
 		let userFound = true;
 		let muted = false;
@@ -129,7 +135,11 @@ export class ConversationsController {
 	}
 
 	@Post(':id/get_member_unmute')
-	async unmuteMemberOfConversation(@Param('id') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+	@UseGuards(AdminGuard)
+	async unmuteMemberOfConversation(
+		@Param('id') conversationId: string, 
+		@GetUser() user: User,
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
 		let userFound = true;
 		let muted = false;
@@ -143,6 +153,50 @@ export class ConversationsController {
 				res.status(201).json({ message: "User unmuted from the conversation." });}
 			else {
 				res.status(403).json({ message: "User is already unmuted." });}
+		}
+	}
+
+	@Post(':id/update_member_to_admin')
+	@UseGuards(AdminGuard)
+	async UpdateMemberToAdmin(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let upgradedUser = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToAdd));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			upgradedUser = await this.convService.upgrateUserToAdmin(userId, parseInt(conversationId))
+			if (upgradedUser) {
+				res.status(201).json({ message: "User is now an admin of the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already an admin of the conversation." });}
+		}
+	}
+
+	@Post(':id/downgrade_admin_to_member')
+	@UseGuards(AdminGuard)
+	async DowngradeAdminToMember(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		let member = null;
+		let userFound = true;
+		let downgradedUser = false;
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToAdd));
+		if (!userFound) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = member.id;
+			downgradedUser = await this.convService.downgradeAdminStatus(userId, parseInt(conversationId))
+			if (downgradedUser) {
+				res.status(201).json({ message: "User is not an admin of the conversation anymore." });}
+			else {
+				res.status(403).json({ message: "User wasn't an admin of the conversation." });}
 		}
 	}
 }
