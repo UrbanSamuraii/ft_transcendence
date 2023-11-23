@@ -13,15 +13,15 @@ datasource db {
 }
 
 model User {
-	id  	Int   @id @default(autoincrement())
+	  id  	Int   @id @default(autoincrement())
     id42  Int?  @unique  
 
-	createdAt	DateTime	@default(now())
-	updatedAt	DateTime	@updatedAt
-	first_name  String    @db.VarChar(255)
+	  createdAt	DateTime	@default(now())
+	  updatedAt	DateTime	@updatedAt
+	  first_name  String    @db.VarChar(255)
     last_name   String    @db.VarChar(255)
     email       String		@unique @db.VarChar(255)
-	username	  String		@unique @db.VarChar(255)
+	  username	  String		@unique @db.VarChar(255)
     img_url     String?   @db.VarChar(255)
     hash          String  @default("noTokenBecause42Identification")
     accessToken   String  @default("noToken")
@@ -32,11 +32,17 @@ model User {
     eloRating               Int       @default(1000)
     gamesWon          Game[] @relation("WinnerRelation")
     totalGamesWon           Int       @default(0)
+    
     messages      Message[] @relation("author")
+    
+    conversationsOwner  Conversation[] @relation("ownedConversations")
     conversations       Conversation[] @relation("member")
     conversationsAdmin  Conversation[] @relation("admin")
     bannedFrom          Conversation[] @relation("banned")
     mutedFrom           Conversation[] @relation("muted")
+
+    blockedUsers   User[] @relation("blockedUsers")
+    blockedBy User[] @relation("blockedUsers")
 
   @@unique([id, email, username])
 	@@map("users")
@@ -61,6 +67,13 @@ model Conversation {
 
   createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
+
+  privacy   privacy_t @default(PUBLIC)
+  protected Boolean @default(false)
+  password  String?
+
+  owner     User?     @relation("ownedConversations", fields: [ownerId],  references: [id])
+  ownerId   Int?
 
   members   User[]    @relation("member")
   admins    User[]    @relation("admin")
@@ -89,4 +102,9 @@ enum status_t {
   ONLINE
   OFFLINE
   PLAYING
+}
+
+enum privacy_t {
+  PUBLIC
+  PRIVATE
 }

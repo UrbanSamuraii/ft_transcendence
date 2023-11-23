@@ -34,7 +34,6 @@ export class UserService {
     }
 
     async getUserByToken(token: string) {
-        // console.log("token = ", token);
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },
@@ -117,42 +116,41 @@ export class UserService {
         }
     }
 
-    //////////////// CONVERSATION SETTNGS //////////////////
+    // //////////////// CONVERSATION SETTNGS //////////////////
 
-    async addMemberToBannedList(userId: number, conversationId: number) {
-		const existingUser = await this.prisma.user.findUnique({
-			where: { id: userId },
-			include: { bannedFrom: true },
-		});
+    // async addMemberToBannedList(userId: number, conversationId: number) {
+	// 	const existingUser = await this.prisma.user.findUnique({
+	// 		where: { id: userId },
+	// 		include: { bannedFrom: true },
+	// 	});
 		
-		if (existingUser) {
-				const updatedConversationsBannedFrom = [
-					...existingUser.bannedFrom.map((conv) => ({ id: conv.id })),
-					{ id: conversationId }];
+	// 	if (existingUser) {
+	// 			const updatedConversationsBannedFrom = [
+	// 				...existingUser.bannedFrom.map((conv) => ({ id: conv.id })),
+	// 				{ id: conversationId }];
 		
-			await this.prisma.user.update({
-				where: { id: userId },
-				data: { bannedFrom: { set: updatedConversationsBannedFrom } },
-			});
-		}
-	}
+	// 		await this.prisma.user.update({
+	// 			where: { id: userId },
+	// 			data: { bannedFrom: { set: updatedConversationsBannedFrom } },
+	// 		});
+	// 	}
+	// }
 
-    async removeMemberFromBannedList(userId: number, conversationId: number) {
-		const existingUser = await this.prisma.user.findUnique({
-			where: { id: userId },
-			include: { conversations: true, bannedFrom: true },
-		});
+    // async removeMemberFromBannedList(userId: number, conversationId: number) {
+	// 	const existingUser = await this.prisma.user.findUnique({
+	// 		where: { id: userId },
+	// 		include: { conversations: true, bannedFrom: true },
+	// 	});
 
-		if (existingUser) {
-			const updatedBannedUser = existingUser.bannedFrom.filter((conv) => conv.id !== conversationId);
+	// 	if (existingUser) {
+	// 		const updatedBannedUser = existingUser.bannedFrom.filter((conv) => conv.id !== conversationId);
 		  
-			await this.prisma.user.update({
-			  where: { id: userId },
-			  data: { conversations: { set: updatedBannedUser } },
-			});
-		}
-	}
-
+	// 		await this.prisma.user.update({
+	// 		  where: { id: userId },
+	// 		  data: { conversations: { set: updatedBannedUser } },
+	// 		});
+	// 	}
+	// }
 
     //////////////// 2FA SETTNGS //////////////////
 

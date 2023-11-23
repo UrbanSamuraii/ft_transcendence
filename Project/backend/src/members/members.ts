@@ -2,9 +2,9 @@ import { User } from "@prisma/client";
 
 export interface IMembersService {
 	findMemberInConversation(conversationID: number, userId: number): Promise<User>;
-	addConversationInMembership(userId: number, conversationId: number);
-	removeConversationFromMembership(userId: number, conversationId: number);
 	getMemberWithConversationsHeIsMemberOf(user: User);
+	isAdmin(conversationId: number, userId: number): Promise<boolean | null>;
+	isMuteMember(conversationId: number, userId: number): Promise<boolean | null>;
 }
 
 

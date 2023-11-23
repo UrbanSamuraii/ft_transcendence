@@ -2,9 +2,7 @@ import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode, B
 import { Prisma, User, Conversation} from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "src/user/user.service";
-import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
-import { GatewaySessionManager } from "src/gateway/gateway.session";
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -54,6 +52,14 @@ export class ConversationsService {
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
 		
 		await this.addUserToConversation(userMember.id, createdConversation.id);
+		await this.prismaService.conversation.update({
+			where: { id: createdConversation.id },
+			data: {
+				owner: {
+					connect: [{ id: userMember.id }],
+				},
+			},
+		});
 		if (firstInviteMember) {await this.addUserToConversation(firstInviteMember.id, createdConversation.id);}
 		
 		return createdConversation;
@@ -69,6 +75,8 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (!isMember) {
+				const isBanned = await this.isUserIdBannedFromConversation(userId, conversationId);
+				if (isBanned) { return false; }
 				await this.prismaService.conversation.update({
 					where: { id: conversationId },
 					data: {
@@ -77,11 +85,7 @@ export class ConversationsService {
 						},
 					},
 				});
-				await this.membersService.addConversationInMembership(userId, existingConversation.id);
-				// const userSocket = this.sessionManager.getUserSocket(userId);
-				// if (userSocket) {
-					// 	userSocket.join(conversationId.toString());
-					//   }
+				// await this.membersService.addConversationInMembership(userId, existingConversation.id);
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('join.room', member, conversationId);
 				return true;
@@ -110,7 +114,7 @@ export class ConversationsService {
 						},
 					});
 				};
-				await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
+				// await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
 				return true; // The user has been added to the admin list
 			} else { return false; // The user was already in
 			}
@@ -126,6 +130,7 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
+				await this.downgradeAdminStatus(userId, conversationId); // remove the user from the admin list of the conv before
 				await this.prismaService.conversation.update({
 					where: { id: conversationId },
 					data: {
@@ -134,7 +139,7 @@ export class ConversationsService {
 						},
 					},
 				});
-				await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
+				// await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
 				
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('leave.room', member, conversationId);
@@ -164,14 +169,14 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.removeAdminStatus(userId, existingConversation.id);
-					return true; // The user has been removed from the admin List
+					// await this.membersService.removeAdminStatus(userId, existingConversation.id);
+					return true;
 				}
 			} else {
-				return false; // The user was not an admin of this conversation
+				return false;
 			}
 		} else {
-			return false; // We haven t found the conversation
+			return false;
 		}
 	}
 
@@ -195,7 +200,7 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.addMemberToMutedList(userId, existingConversation.id);
+					// await this.membersService.addMemberToMutedList(userId, existingConversation.id);
 					return true;
 				}
 			} else { return false; }
@@ -221,7 +226,7 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.removeMutedStatus(userId, existingConversation.id);
+					// await this.membersService.removeMutedStatus(userId, existingConversation.id);
 					return true;
 				}
 			} else {
@@ -249,16 +254,48 @@ export class ConversationsService {
 						},
 					},
 				});
-				await this.userService.addMemberToBannedList(userId, existingConversation.id);
+				await this.removeMemberFromConversation(userId, conversationId); // If the user was member of the conv, let s remove him from it
 			return true; }
 		}
 		else { return false; }
 	}
 
-	async isUserBanned(userToAdd: User, conversationId: number): Promise<boolean> {
+	async removeUserFromBannedList(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		const userToAllow = await this.userService.getUserById(userId);
+		if (existingConversation && userToAllow) {
+			const isAllow = existingConversation.banned.some((banned) => banned.id === userId);
+			if (isAllow) {
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: {
+						banned: {
+							disconnect: [{ id: userId }],
+						},
+					},
+				});
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	async isUserBannedFromConversation(userToAdd: User, conversationId: number): Promise<boolean> {
 		const conversation = await this.prismaService.conversation.findUnique({
 		  where: { id: conversationId },
 		  include: { banned: { where: { id: userToAdd.id } } },
+		});
+		return !!conversation?.banned.length;
+    }
+
+	async isUserIdBannedFromConversation(userIdToAdd: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { banned: { where: { id: userIdToAdd }} },
 		});
 		return !!conversation?.banned.length;
     }
@@ -353,8 +390,6 @@ export class ConversationsService {
 			return [];
 		}
 	}
-
-	
 }	  
 	  
 	  

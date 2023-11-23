@@ -8,7 +8,6 @@ import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagesService } from 'src/messages/messages.service';
 import { GetUser } from 'src/auth/decorator';
-// import { AdminStrategy } from 'src/auth/strategy';
 
 
 @UseGuards(Jwt2faAuthGuard)
@@ -67,7 +66,6 @@ export class ConversationsController {
 
 	//////////////// HANDLE RULES AND MEMBERS OF THE CONVERSATION ////////////////////
 
-	// By using @Param, NestJS automatically extracts the value of id from the URL's path parameters and assigns it to the conversationId variable
 	@Post(':id/add_member')
 	@UseGuards(AdminGuard)
 	async AddMemberToConversation(
@@ -123,7 +121,7 @@ export class ConversationsController {
 		let muted = false;
 		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToMute));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
@@ -145,7 +143,7 @@ export class ConversationsController {
 		let muted = false;
 		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUnmute));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
 			muted = await this.convService.removeMemberFromMutedList(userId, parseInt(conversationId))
@@ -165,9 +163,9 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let upgradedUser = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToAdd));
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUpgrade));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
 			upgradedUser = await this.convService.upgrateUserToAdmin(userId, parseInt(conversationId))
@@ -187,9 +185,9 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let downgradedUser = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToAdd));
+		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.adminToDowngrade));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
 			downgradedUser = await this.convService.downgradeAdminStatus(userId, parseInt(conversationId))
@@ -197,6 +195,44 @@ export class ConversationsController {
 				res.status(201).json({ message: "User is not an admin of the conversation anymore." });}
 			else {
 				res.status(403).json({ message: "User wasn't an admin of the conversation." });}
+		}
+	}
+
+	@Post(':id/ban_user')
+	@UseGuards(AdminGuard)
+	async BanUserFromConversation(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const target = await this.userService.getUser(req.body.userToBan);
+		if (!target) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = target.id;
+			const bannedUser = await this.convService.banUserFromConversation(userId, parseInt(conversationId))
+			if (bannedUser) {
+				res.status(201).json({ message: "User is now banned from the conversation." });}
+			else {
+				res.status(403).json({ message: "User is already banned from the conversation." });}
+		}
+	}
+
+	@Post(':id/allow_user')
+	@UseGuards(AdminGuard)
+	async AllowUserOnConversation(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const target = await this.userService.getUser(req.body.userToAllow);
+		if (!target) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const userId = target.id;
+			const allowedUser = await this.convService.removeUserFromBannedList(userId, parseInt(conversationId))
+			if (allowedUser) {
+				res.status(201).json({ message: "User is now allowed in this conversation." });}
+			else {
+				res.status(403).json({ message: "User wasn't banned from the conversation." });}
 		}
 	}
 }
