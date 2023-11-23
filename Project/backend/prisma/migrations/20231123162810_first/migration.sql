@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "status_t" AS ENUM ('ONLINE', 'OFFLINE', 'PLAYING');
 
+-- CreateEnum
+CREATE TYPE "privacy_t" AS ENUM ('PUBLIC', 'PRIVATE');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
@@ -42,6 +45,10 @@ CREATE TABLE "conversations" (
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "privacy" "privacy_t" NOT NULL DEFAULT 'PUBLIC',
+    "protected" BOOLEAN NOT NULL DEFAULT false,
+    "password" TEXT,
+    "ownerId" INTEGER,
 
     CONSTRAINT "conversations_pkey" PRIMARY KEY ("id")
 );
@@ -56,6 +63,12 @@ CREATE TABLE "Message" (
     "conversation_id" INTEGER NOT NULL,
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_blockedUsers" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
 );
 
 -- CreateTable
@@ -104,6 +117,12 @@ CREATE UNIQUE INDEX "conversations_name_key" ON "conversations"("name");
 CREATE UNIQUE INDEX "conversations_id_name_key" ON "conversations"("id", "name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_blockedUsers_AB_unique" ON "_blockedUsers"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_blockedUsers_B_index" ON "_blockedUsers"("B");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_member_AB_unique" ON "_member"("A", "B");
 
 -- CreateIndex
@@ -131,10 +150,19 @@ CREATE INDEX "_muted_B_index" ON "_muted"("B");
 ALTER TABLE "games" ADD CONSTRAINT "games_winnerId_fkey" FOREIGN KEY ("winnerId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_authorName_fkey" FOREIGN KEY ("authorName") REFERENCES "users"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_blockedUsers" ADD CONSTRAINT "_blockedUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_blockedUsers" ADD CONSTRAINT "_blockedUsers_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_member" ADD CONSTRAINT "_member_A_fkey" FOREIGN KEY ("A") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;

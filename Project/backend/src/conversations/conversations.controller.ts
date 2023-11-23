@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
-import { AdminGuard, Jwt2faAuthGuard } from 'src/auth/guard';
+import { AdminGuard, Jwt2faAuthGuard, OwnerGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
 import { User } from '@prisma/client';
@@ -35,7 +35,6 @@ export class ConversationsController {
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
-			await this.convService.upgrateUserToAdmin(user.id, createdConversation.id);
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
 			if (userFound) {
 				this.eventEmitter.emit('message.create', '');
@@ -235,6 +234,30 @@ export class ConversationsController {
 				res.status(403).json({ message: "User wasn't banned from the conversation." });}
 		}
 	}
+
+	@Post(':id/set_password')
+	@UseGuards(OwnerGuard)
+	async SetConversationPassword(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		
+		const oldPassword = await this.convService.getPassword(parseInt(conversationId));
+		if (oldPassword) {
+			if (oldPassword !== req.body.oldPassword) {
+				res.status(403).json({ message: "Actual Password doesn't match without input" });
+				return ;
+			} 
+		}
+
+		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
+		if (newPassword) {
+			res.status(201).json({ message: "New password well implemented." });}
+		else {
+			res.status(201).json({ message: "The conversation is not protected." });}
+	}
+
+
 }
 
 
