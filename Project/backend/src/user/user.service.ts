@@ -117,6 +117,43 @@ export class UserService {
         }
     }
 
+    //////////////// CONVERSATION SETTNGS //////////////////
+
+    async addMemberToBannedList(userId: number, conversationId: number) {
+		const existingUser = await this.prisma.user.findUnique({
+			where: { id: userId },
+			include: { bannedFrom: true },
+		});
+		
+		if (existingUser) {
+				const updatedConversationsBannedFrom = [
+					...existingUser.bannedFrom.map((conv) => ({ id: conv.id })),
+					{ id: conversationId }];
+		
+			await this.prisma.user.update({
+				where: { id: userId },
+				data: { bannedFrom: { set: updatedConversationsBannedFrom } },
+			});
+		}
+	}
+
+    async removeMemberFromBannedList(userId: number, conversationId: number) {
+		const existingUser = await this.prisma.user.findUnique({
+			where: { id: userId },
+			include: { conversations: true, bannedFrom: true },
+		});
+
+		if (existingUser) {
+			const updatedBannedUser = existingUser.bannedFrom.filter((conv) => conv.id !== conversationId);
+		  
+			await this.prisma.user.update({
+			  where: { id: userId },
+			  data: { conversations: { set: updatedBannedUser } },
+			});
+		}
+	}
+
+
     //////////////// 2FA SETTNGS //////////////////
 
     // Update our user with the 2FA secret generated in the auth.service
@@ -139,11 +176,5 @@ export class UserService {
         });
         return updateUser;
     }
-
-    // To get a user's conversations
-    // const userConversations = await prisma.user.findUnique({
-    //     where: { id: userId },
-    //   }).conversations();
-
 }
 

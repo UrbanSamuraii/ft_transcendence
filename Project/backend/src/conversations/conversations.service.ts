@@ -117,17 +117,6 @@ export class ConversationsService {
 		}
 		else {return false;}
 	}
-
-	async validateAdminUser(email: string) {
-        const user = await this.prismaService.user.findUnique({
-            where: { email: email }
-        });
-        if (!user) {
-            throw new ForbiddenException('Credentials incorrect: email');
-        }
-        const admin = { ...user };
-        return admin;
-    }
 	
 	async removeMemberFromConversation(userId: number, conversationId: number): Promise<boolean> {
 		const existingConversation = await this.prismaService.conversation.findUnique({
@@ -147,10 +136,6 @@ export class ConversationsService {
 				});
 				await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
 				
-				// const userSocket = this.sessionManager.getUserSocket(userId);
-				// if (userSocket) {
-				//   userSocket.leave(conversationId.toString());
-				// }
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('leave.room', member, conversationId);
 				return true; // The user has been removed
@@ -246,6 +231,37 @@ export class ConversationsService {
 			return false;
 		}
 	}
+
+	async banUserFromConversation(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		const userToBan = await this.userService.getUserById(userId);
+		if (userToBan && existingConversation) {
+			const isBanned = existingConversation.banned.some((banned) => banned.id === userId);
+			if (!isBanned) {	
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: {
+						banned: {
+							connect: [{ id: userId }],
+						},
+					},
+				});
+				await this.userService.addMemberToBannedList(userId, existingConversation.id);
+			return true; }
+		}
+		else { return false; }
+	}
+
+	async isUserBanned(userToAdd: User, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { banned: { where: { id: userToAdd.id } } },
+		});
+		return !!conversation?.banned.length;
+    }
 
 	/////////////////// MESSAGE SERVICE ///////////////////
 
