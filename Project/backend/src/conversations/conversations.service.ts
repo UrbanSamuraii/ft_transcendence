@@ -1,5 +1,5 @@
 import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode, BadRequestException } from "@nestjs/common";
-import { Prisma, User, Conversation} from '@prisma/client';
+import { Prisma, User, Conversation, privacy_t} from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { MembersService } from "src/members/members.service";
@@ -356,7 +356,7 @@ export class ConversationsService {
 		return conversation?.name;
 	}
 	
-	async getConversationByName(convName: string) {
+	async getConversationByName(convName: string): Promise<Conversation | null> {
 		return await this.prismaService.conversation.findUnique({
 			where: { name: convName },
 			include: { members: true },
@@ -423,63 +423,18 @@ export class ConversationsService {
             data: { protected: false, password: null },
         }); return false; }
 	}
+
+	async setConversationPrivate(conversationId: number) {
+		await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { privacy: privacy_t.PRIVATE },
+        });
+	}
+
+	async setConversationPublic(conversationId: number) {
+		await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { privacy: privacy_t.PUBLIC },
+        });
+	}
 }	  
-	  
-	  
-	  
-	  
-	  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// async createConversation(name: string, sub: number) {
-// 	const existingConversation = this.prismaService.conversation.findFirst({
-// 		where: {
-// 			name,
-// 		}
-// 	});
-// 	if (existingConversation) {
-// 		throw new BadRequestException({name : "Conversation already exist"})
-// 	}
-// 	return this.prismaService.conversation.create({
-// 		data: {
-// 			name,
-// 			members: {
-// 				connect: {
-// 					id: sub,   	// For now we just have our user creating the conv who is in it and we are going to add user 
-// 								// 1 by 1. If at the end there is only one user -> we are gonna delete the conversation
-// 				}
-// 			}
-// 		}
-// 	})
-// }
-

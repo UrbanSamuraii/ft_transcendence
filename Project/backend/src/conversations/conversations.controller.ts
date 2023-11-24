@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException,
 import { AdminGuard, Jwt2faAuthGuard, OwnerGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
-import { User } from '@prisma/client';
+import { User, privacy_t } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -63,8 +63,51 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
-	//////////////// HANDLE RULES AND MEMBERS OF THE CONVERSATION ////////////////////
+	@Post('join')
+	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
+		if (!conversation) {
+			res.status(403).json({ message: "There is no conversation of this name, please verify." });}
+
+		if (this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
+			res.status(403).json({ message: "Your profil is banned from this conversation." });}
+		if (conversation.privacy === privacy_t.PRIVATE) {
+			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." });}
+		if (conversation.protected && conversation.password != null) {
+			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id, });}
+		
+		const added = await this.convService.addUserToConversation(user.id, conversation.id);
+		if (added) {
+			res.status(201).json({ message: "You have now joined the conversation." });}
+		else {
+			res.status(403).json({ message: "You were already in the conversation." });}
+	}
+
+	@Post('validate_password')
+	async ValidatePassword(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		// We will have to insert the convID in the req somewhere.
+		const conversation = await this.convService.getConversationByName(req.body.conversationName);
+		const passwordToValidate = conversation.password;
+
+		if (req.body.password === passwordToValidate) {
+			const added = await this.convService.addUserToConversation(user.id, conversation.id);
+			if (added) {
+				res.status(201).json({ message: "You have now joined the conversation." });}
+			else {
+				res.status(403).json({ message: "You were already in the coonversation." });}
+			}
+		else {
+			res.status(403).json({ message: "Wrong password." });}
+	}
+
+	//////////////// HANDLE RULES AND MEMBERS OF SPECIFIC CONVERSATION ////////////////////
+
+
+	// Admin can add users to conversation - no matter if it is a private or public one
+	// The user who has been add doesn t need to enter the password if the conversation is protected
 	@Post(':id/add_member')
 	@UseGuards(AdminGuard)
 	async AddMemberToConversation(
@@ -257,6 +300,23 @@ export class ConversationsController {
 			res.status(201).json({ message: "The conversation is not protected." });}
 	}
 
+	@Post(':id/set_private')
+	@UseGuards(OwnerGuard)
+	async SetConversationPrivate(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		await this.convService.setConversationPrivate(parseInt(conversationId));
+		res.status(201).json({ message: "Conversation is now Private." });}
+
+	@Post(':id/set_public')
+	@UseGuards(OwnerGuard)
+	async SetConversationPublic(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		await this.convService.setConversationPublic(parseInt(conversationId));
+		res.status(201).json({ message: "Conversation is now Public." });}
 
 }
 

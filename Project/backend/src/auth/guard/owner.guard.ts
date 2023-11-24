@@ -8,11 +8,11 @@ export class OwnerGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-	console.log({"REQUEST USER from Guard":request.user});
-	const userId = request.user.sub;
-	const conversationId = request.params.id;
-	console.log({"CONV ID GUARD ": conversationId});
-	return (this.conversationsService.isOwnerOfTheConversation(Number(userId), Number(conversationId)));
+	  console.log({"REQUEST USER from Guard":request.user});
+	  const userId = request.user.sub;
+	  const conversationId = request.params.id;
+	  console.log({"CONV ID GUARD ": conversationId});
+	  return (this.conversationsService.isOwnerOfTheConversation(Number(userId), Number(conversationId)));
   }
 
   handleRequest(err: any, user: any, info: any) {
