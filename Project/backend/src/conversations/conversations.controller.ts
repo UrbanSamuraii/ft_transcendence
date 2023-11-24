@@ -27,7 +27,7 @@ export class ConversationsController {
 		// Get the first invited member if there is one
 		let member = null;
 		let userFound = true;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.users));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.users));
 		
 		const convName = await this.convService.establishConvName(req.body.name);
 		const createdConversation = await this.convService.createConversation(convName, user, member);
@@ -69,20 +69,20 @@ export class ConversationsController {
 		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
 		if (!conversation) {
-			res.status(403).json({ message: "There is no conversation of this name, please verify." });}
-
-		if (this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
-			res.status(403).json({ message: "Your profil is banned from this conversation." });}
+			res.status(403).json({ message: "There is no conversation of this name, please verify." }); return;}
+		
+		if (!this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
+			res.status(403).json({ message: "Your profil is banned from this conversation." }); return;}
 		if (conversation.privacy === privacy_t.PRIVATE) {
-			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." });}
+			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." }); return;}
 		if (conversation.protected && conversation.password != null) {
-			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id, });}
+			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
 		
 		const added = await this.convService.addUserToConversation(user.id, conversation.id);
 		if (added) {
-			res.status(201).json({ message: "You have now joined the conversation." });}
+			res.status(201).json({ message: "You have now joined the conversation." }); return;}
 		else {
-			res.status(403).json({ message: "You were already in the conversation." });}
+			res.status(403).json({ message: "You were already in the conversation." }); return;}
 	}
 
 	@Post('validate_password')
@@ -95,12 +95,12 @@ export class ConversationsController {
 		if (req.body.password === passwordToValidate) {
 			const added = await this.convService.addUserToConversation(user.id, conversation.id);
 			if (added) {
-				res.status(201).json({ message: "You have now joined the conversation." });}
+				res.status(201).json({ message: "You have now joined the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "You were already in the coonversation." });}
+				res.status(403).json({ message: "You were already in the coonversation." }); return;}
 			}
 		else {
-			res.status(403).json({ message: "Wrong password." });}
+			res.status(403).json({ message: "Wrong password." }); return;}
 	}
 
 	//////////////// HANDLE RULES AND MEMBERS OF SPECIFIC CONVERSATION ////////////////////
@@ -117,16 +117,21 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let added = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToAdd));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToAdd));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(400).json({ message: "User not found." }); return;}
 		else {
 			const userId = member.id;
-			added = await this.convService.addUserToConversation(userId, parseInt(conversationId))
-			if (added) {
-				res.status(201).json({ message: "User added to the conversation." });}
+			const isAlreadyMember = await this.convService.isMemberOfTheConversation(userId, parseInt(conversationId));
+			if (isAlreadyMember) {
+				res.status(400).json({ message: "User is already in the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "User is already in the conversation." });}
+				added = await this.convService.addUserToConversation(userId, parseInt(conversationId))
+				if (added) {
+					res.status(201).json({ message: "User added to the conversation." }); return;}
+				else {
+					res.status(400).json({ message: "Can't add the user to the conversation." }); return;}
+			}
 		}
 	}
 
@@ -139,16 +144,16 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let removed = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.memberToRemove));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.memberToRemove));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found." });}
+			res.status(403).json({ message: "User not found." }); return;}
 		else {
 			const memberId = member.id;
 			removed = await this.convService.removeMemberFromConversation(memberId, parseInt(conversationId))
 			if (removed) {
-				res.status(201).json({ message: "The member has been removed from the conversation." });}
+				res.status(201).json({ message: "The member has been removed from the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." });}
+				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." }); return;}
 		}
 	}
 
@@ -161,16 +166,16 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToMute));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToMute));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found in the conversation." });}
+			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
 			if (muted) {
-				res.status(201).json({ message: "User muted from the conversation." });}
+				res.status(201).json({ message: "User muted from the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "User is already in mute." });}
+				res.status(403).json({ message: "User is already in mute." }); return;}
 		}
 	}
 
@@ -183,16 +188,16 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUnmute));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute));
 		if (!userFound) {
-			res.status(403).json({ message: "User not found in the conversation." });}
+			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
 			muted = await this.convService.removeMemberFromMutedList(userId, parseInt(conversationId))
 			if (muted) {
-				res.status(201).json({ message: "User unmuted from the conversation." });}
+				res.status(201).json({ message: "User unmuted from the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "User is already unmuted." });}
+				res.status(403).json({ message: "User is already unmuted." }); return;}
 		}
 	}
 
@@ -205,7 +210,7 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let upgradedUser = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.userToUpgrade));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade));
 		if (!userFound) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
@@ -214,7 +219,7 @@ export class ConversationsController {
 			if (upgradedUser) {
 				res.status(201).json({ message: "User is now an admin of the conversation." });}
 			else {
-				res.status(403).json({ message: "User is already an admin of the conversation." });}
+				res.status(403).json({ message: "Can't update this user to admin of the conversation (is already an administrator ?)." });}
 		}
 	}
 
@@ -227,7 +232,7 @@ export class ConversationsController {
 		let member = null;
 		let userFound = true;
 		let downgradedUser = false;
-		({ member, userFound } = await this.convService.getMemberByUsernameOrEmail(req.body.adminToDowngrade));
+		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.adminToDowngrade));
 		if (!userFound) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
@@ -246,11 +251,13 @@ export class ConversationsController {
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		const target = await this.userService.getUser(req.body.userToBan);
-		if (!target) {
+		let member = null;
+		let userFound = true;
+		({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToBan));
+		if (!userFound) {
 			res.status(403).json({ message: "User not found." });}
 		else {
-			const userId = target.id;
+			const userId = member.id;
 			const bannedUser = await this.convService.banUserFromConversation(userId, parseInt(conversationId))
 			if (bannedUser) {
 				res.status(201).json({ message: "User is now banned from the conversation." });}
@@ -265,11 +272,13 @@ export class ConversationsController {
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		const target = await this.userService.getUser(req.body.userToAllow);
-		if (!target) {
-			res.status(403).json({ message: "User not found." });}
-		else {
-			const userId = target.id;
+			let member = null;
+			let userFound = true;
+			({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToAllow));
+			if (!userFound) {
+				res.status(403).json({ message: "User not found." });}
+			else {
+				const userId = member.id;
 			const allowedUser = await this.convService.removeUserFromBannedList(userId, parseInt(conversationId))
 			if (allowedUser) {
 				res.status(201).json({ message: "User is now allowed in this conversation." });}

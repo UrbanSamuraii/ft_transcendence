@@ -21,28 +21,6 @@ export class ConversationsService {
 		return convName;
 	}
 
-	// To get the user - and the fact that we find it or not
-	async getMemberByUsernameOrEmail(inputDataMember: string) {
-		const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
-		const email = usersArray[0];
-		let member = null;
-		let userFound = true;
-		if (usersArray[0] !== "") {userFound = false;}
-		const memberByEmail = usersArray[0] !== "" ? await this.userService.getUser({ email }) : null;
-		if (memberByEmail) {
-			member = memberByEmail;
-			userFound = true;
-		} else {
-			const username = usersArray[0];
-			const memberByUsername = usersArray[0] !== "" ? await this.userService.getUser({ username }) : null;
-			if (memberByUsername) { 
-				member = memberByUsername;
-				userFound = true;
-			}
-		}
-		return {member, userFound};
-	}
-
 	async createConversation(convName: string, userMember: User, firstInviteMember: User | null) {
 		
 		const existingConversation = await this.getConversationByName(convName);
@@ -67,7 +45,16 @@ export class ConversationsService {
 			include: { owner: { where: { id: userIdTargeted }} },
 		  });
 		  return !!conversation?.owner;
-	  }
+	}
+
+	async isMemberOfTheConversation(userIdTargeted: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true },
+		  });
+		  return !!conversation?.members.find(member => member.id === userIdTargeted);
+	}
+	
   
 	/////////////////// ADD / REMOVE MEMBER - ADMIN ///////////////////
 	
@@ -77,8 +64,6 @@ export class ConversationsService {
 			include: { members: true },
 		});
 		if (existingConversation) {
-			const isMember = existingConversation.members.some((member) => member.id === userId);
-			if (!isMember) {
 				const isBanned = await this.isUserIdBannedFromConversation(userId, conversationId);
 				if (isBanned) { return false; }
 				await this.prismaService.conversation.update({
@@ -89,12 +74,9 @@ export class ConversationsService {
 						},
 					},
 				});
-				// await this.membersService.addConversationInMembership(userId, existingConversation.id);
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('join.room', member, conversationId);
 				return true;
-			} else { return false; // The user was already in
-			}
 		}
 		else {return false;}
 	}
@@ -134,7 +116,8 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
-				const isOwner = this.isOwnerOfTheConversation(userId, conversationId)
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
+				console.log({"is owner to remove ?": isOwner});
 				if (isOwner) { return false; }
 				await this.downgradeAdminStatus(userId, conversationId); // remove the user from the admin list of the conv before
 				await this.prismaService.conversation.update({
@@ -165,7 +148,7 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
-				const isOwner = this.isOwnerOfTheConversation(userId, conversationId)
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
 				if (isOwner) { return false; }
 				const isAdmin = existingConversation.admins.some((admin) => admin.id === userId);
 				if (isAdmin) {
@@ -198,7 +181,7 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
-				const isOwner = this.isOwnerOfTheConversation(userId, conversationId)
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
 				if (isOwner) { return false; }
 				const isMuted = existingConversation.muted.some((muted) => muted.id === userId);
 				if (!isMuted) {	
@@ -254,7 +237,7 @@ export class ConversationsService {
 		});
 		const userToBan = await this.userService.getUserById(userId);
 		if (userToBan && existingConversation) {
-			const isOwner = this.isOwnerOfTheConversation(userId, conversationId)
+			const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
 				if (isOwner) { return false; }
 			const isBanned = existingConversation.banned.some((banned) => banned.id === userId);
 			if (!isBanned) {	

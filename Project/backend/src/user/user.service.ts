@@ -116,41 +116,28 @@ export class UserService {
         }
     }
 
-    // //////////////// CONVERSATION SETTNGS //////////////////
-
-    // async addMemberToBannedList(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prisma.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { bannedFrom: true },
-	// 	});
-		
-	// 	if (existingUser) {
-	// 			const updatedConversationsBannedFrom = [
-	// 				...existingUser.bannedFrom.map((conv) => ({ id: conv.id })),
-	// 				{ id: conversationId }];
-		
-	// 		await this.prisma.user.update({
-	// 			where: { id: userId },
-	// 			data: { bannedFrom: { set: updatedConversationsBannedFrom } },
-	// 		});
-	// 	}
-	// }
-
-    // async removeMemberFromBannedList(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prisma.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { conversations: true, bannedFrom: true },
-	// 	});
-
-	// 	if (existingUser) {
-	// 		const updatedBannedUser = existingUser.bannedFrom.filter((conv) => conv.id !== conversationId);
-		  
-	// 		await this.prisma.user.update({
-	// 		  where: { id: userId },
-	// 		  data: { conversations: { set: updatedBannedUser } },
-	// 		});
-	// 	}
-	// }
+    // SPECIFIC for Conversations
+    // To get the user - and the fact that we find it or not
+	async getUserByUsernameOrEmail(inputDataMember: string) {
+		const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
+		const email = usersArray[0];
+		let member = null;
+		let userFound = true;
+		if (usersArray[0] !== "") {userFound = false;}
+		const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
+		if (memberByEmail) {
+			member = memberByEmail;
+			userFound = true;
+		} else {
+			const username = usersArray[0];
+			const memberByUsername = usersArray[0] !== "" ? await this.getUser({ username }) : null;
+			if (memberByUsername) { 
+				member = memberByUsername;
+				userFound = true;
+			}
+		}
+		return {member, userFound};
+	}
 
     //////////////// 2FA SETTNGS //////////////////
 

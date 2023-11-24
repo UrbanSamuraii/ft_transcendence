@@ -17,7 +17,7 @@ export class OwnerGuard implements CanActivate {
 
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      throw err || new UnauthorizedException("You can't set up a Password on this conversation as your not its owner mtf");
+      throw err || new UnauthorizedException();
     }
     return user;
   }
