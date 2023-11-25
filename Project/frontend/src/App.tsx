@@ -148,11 +148,11 @@ function Content({ setBackgroundStyle }: ContentProps) {
                 <Route path="channel/:id" element={<ConversationChannelPage />} />
             </Route>
             <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
+            <Route path="/" element={<HomePage />} />
 
             {/* Protected routes */}
             {user && (
                 <>
-                    <Route path="/" element={<HomePage />} />
                     <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
