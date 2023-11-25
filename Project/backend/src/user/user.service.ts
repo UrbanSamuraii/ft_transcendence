@@ -34,7 +34,6 @@ export class UserService {
     }
 
     async getUserByToken(token: string) {
-        // console.log("token = ", token);
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },
@@ -117,6 +116,29 @@ export class UserService {
         }
     }
 
+    // SPECIFIC for Conversations
+    // To get the user - and the fact that we find it or not
+	async getUserByUsernameOrEmail(inputDataMember: string) {
+		const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
+		const email = usersArray[0];
+		let member = null;
+		let userFound = true;
+		if (usersArray[0] !== "") {userFound = false;}
+		const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
+		if (memberByEmail) {
+			member = memberByEmail;
+			userFound = true;
+		} else {
+			const username = usersArray[0];
+			const memberByUsername = usersArray[0] !== "" ? await this.getUser({ username }) : null;
+			if (memberByUsername) { 
+				member = memberByUsername;
+				userFound = true;
+			}
+		}
+		return {member, userFound};
+	}
+
     //////////////// 2FA SETTNGS //////////////////
 
     // Update our user with the 2FA secret generated in the auth.service
@@ -139,11 +161,5 @@ export class UserService {
         });
         return updateUser;
     }
-
-    // To get a user's conversations
-    // const userConversations = await prisma.user.findUnique({
-    //     where: { id: userId },
-    //   }).conversations();
-
 }
 

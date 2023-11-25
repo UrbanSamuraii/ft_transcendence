@@ -5,7 +5,6 @@ import { AuthService } from '../auth.service';
 import { PrismaService } from "../../prisma/prisma.service";
 import { Prisma, User } from '@prisma/client';
 
-
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) 
 {

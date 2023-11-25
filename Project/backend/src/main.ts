@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { UnauthorizedExceptionFilter } from './auth/filters/unauthorized-exception.filter';
+import { ForbiddenExceptionFilter } from './auth/filters/forbidden-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import * as passport from "passport";
 import { WebsocketAdapter } from './gateway/gateway.adapter';
@@ -23,6 +25,10 @@ async function bootstrap() {
         whitelist: true,
     }));
     app.use(cookieParser());
+    app.useGlobalFilters(
+        new UnauthorizedExceptionFilter(),
+        new ForbiddenExceptionFilter(),
+    );
     await app.listen(port);
 
     // Gracefully shutdown the server.

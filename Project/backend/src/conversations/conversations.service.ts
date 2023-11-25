@@ -1,11 +1,8 @@
 import { Injectable, Req, Res, Body, ForbiddenException, HttpStatus, HttpCode, BadRequestException } from "@nestjs/common";
-import { Prisma, User, Conversation} from '@prisma/client';
+import { Prisma, User, Conversation, privacy_t} from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
-import { HttpException } from '@nestjs/common';
 import { UserService } from "src/user/user.service";
-import { ConfigService } from "@nestjs/config";
 import { MembersService } from "src/members/members.service";
-import { GatewaySessionManager } from "src/gateway/gateway.session";
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -13,9 +10,7 @@ export class ConversationsService {
 
 	constructor(private prismaService: PrismaService,
 				private userService: UserService,
-				private configService: ConfigService,
 				private membersService: MembersService,
-				private sessionManager: GatewaySessionManager,
 				private eventEmitter: EventEmitter2,
 				) {}
 
@@ -26,42 +21,41 @@ export class ConversationsService {
 		return convName;
 	}
 
-	// To get the user - and the fact that we find it or not
-	async getMemberByUsernameOrEmail(inputDataMember: string) {
-		const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
-		const email = usersArray[0];
-		let member = null;
-		let userFound = true;
-		if (usersArray[0] !== "") {userFound = false;}
-		const memberByEmail = usersArray[0] !== "" ? await this.userService.getUser({ email }) : null;
-		if (memberByEmail) {
-			member = memberByEmail;
-			userFound = true;
-		} else {
-			const username = usersArray[0];
-			const memberByUsername = usersArray[0] !== "" ? await this.userService.getUser({ username }) : null;
-			if (memberByUsername) { 
-				member = memberByUsername;
-				userFound = true;
-			}
-		}
-		return {member, userFound};
-	}
-
 	async createConversation(convName: string, userMember: User, firstInviteMember: User | null) {
 		
 		const existingConversation = await this.getConversationByName(convName);
 		if (existingConversation) { return null; }
 		
-		const conversationData: Prisma.ConversationCreateInput = { name: convName };
+		const conversationData: Prisma.ConversationCreateInput = { 
+			name: convName,
+			owner: { connect: { id: userMember.id } },
+			admins: { connect: { id: userMember.id } },
+			members: { connect: { id: userMember.id } },
+		};
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
 		
-		await this.addUserToConversation(userMember.id, createdConversation.id);
 		if (firstInviteMember) {await this.addUserToConversation(firstInviteMember.id, createdConversation.id);}
 		
 		return createdConversation;
 	}
 
+	async isOwnerOfTheConversation(userIdTargeted: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { owner: { where: { id: userIdTargeted }} },
+		  });
+		  return !!conversation?.owner;
+	}
+
+	async isMemberOfTheConversation(userIdTargeted: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true },
+		  });
+		  return !!conversation?.members.find(member => member.id === userIdTargeted);
+	}
+	
+  
 	/////////////////// ADD / REMOVE MEMBER - ADMIN ///////////////////
 	
 	async addUserToConversation(userId: number, conversationId: number): Promise<boolean> {
@@ -70,8 +64,8 @@ export class ConversationsService {
 			include: { members: true },
 		});
 		if (existingConversation) {
-			const isMember = existingConversation.members.some((member) => member.id === userId);
-			if (!isMember) {
+				const isBanned = await this.isUserIdBannedFromConversation(userId, conversationId);
+				if (isBanned) { return false; }
 				await this.prismaService.conversation.update({
 					where: { id: conversationId },
 					data: {
@@ -80,16 +74,9 @@ export class ConversationsService {
 						},
 					},
 				});
-				await this.membersService.addConversationInMembership(userId, existingConversation.id);
-				// const userSocket = this.sessionManager.getUserSocket(userId);
-				// if (userSocket) {
-					// 	userSocket.join(conversationId.toString());
-					//   }
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('join.room', member, conversationId);
 				return true;
-			} else { return false; // The user was already in
-			}
 		}
 		else {return false;}
 	}
@@ -113,9 +100,9 @@ export class ConversationsService {
 						},
 					});
 				};
-				await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
-				return true; // The user has been added to the admin list
-			} else { return false; // The user was already in
+				// await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
+				return true;
+			} else { return false;
 			}
 		}
 		else {return false;}
@@ -129,6 +116,10 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
+				console.log({"is owner to remove ?": isOwner});
+				if (isOwner) { return false; }
+				await this.downgradeAdminStatus(userId, conversationId); // remove the user from the admin list of the conv before
 				await this.prismaService.conversation.update({
 					where: { id: conversationId },
 					data: {
@@ -137,19 +128,15 @@ export class ConversationsService {
 						},
 					},
 				});
-				await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
+				// await this.membersService.removeConversationFromMembership(userId, existingConversation.id);
 				
-				// const userSocket = this.sessionManager.getUserSocket(userId);
-				// if (userSocket) {
-				//   userSocket.leave(conversationId.toString());
-				// }
 				const member = await this.userService.getUserById(userId);
 				this.eventEmitter.emit('leave.room', member, conversationId);
-				return true; // The user has been removed
-			} else { return false; // The user was not a member of this conversation
+				return true; 
+			} else { return false;
 			}
 		} else {
-			return false; // We haven t found the conversation
+			return false;
 		}
 	}
 
@@ -161,6 +148,8 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
+				if (isOwner) { return false; }
 				const isAdmin = existingConversation.admins.some((admin) => admin.id === userId);
 				if (isAdmin) {
 					await this.prismaService.conversation.update({
@@ -171,14 +160,14 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.removeAdminStatus(userId, existingConversation.id);
-					return true; // The user has been removed from the admin List
+					// await this.membersService.removeAdminStatus(userId, existingConversation.id);
+					return true;
 				}
 			} else {
-				return false; // The user was not an admin of this conversation
+				return false;
 			}
 		} else {
-			return false; // We haven t found the conversation
+			return false;
 		}
 	}
 
@@ -192,6 +181,8 @@ export class ConversationsService {
 		if (existingConversation) {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
+				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
+				if (isOwner) { return false; }
 				const isMuted = existingConversation.muted.some((muted) => muted.id === userId);
 				if (!isMuted) {	
 					await this.prismaService.conversation.update({
@@ -202,7 +193,7 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.addMemberToMutedList(userId, existingConversation.id);
+					// await this.membersService.addMemberToMutedList(userId, existingConversation.id);
 					return true;
 				}
 			} else { return false; }
@@ -228,7 +219,7 @@ export class ConversationsService {
 							},
 						},
 					});
-					await this.membersService.removeMutedStatus(userId, existingConversation.id);
+					// await this.membersService.removeMutedStatus(userId, existingConversation.id);
 					return true;
 				}
 			} else {
@@ -238,6 +229,71 @@ export class ConversationsService {
 			return false;
 		}
 	}
+
+	async banUserFromConversation(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		const userToBan = await this.userService.getUserById(userId);
+		if (userToBan && existingConversation) {
+			const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
+				if (isOwner) { return false; }
+			const isBanned = existingConversation.banned.some((banned) => banned.id === userId);
+			if (!isBanned) {	
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: {
+						banned: {
+							connect: [{ id: userId }],
+						},
+					},
+				});
+				await this.removeMemberFromConversation(userId, conversationId); // If the user was member of the conv, let s remove him from it
+			return true; }
+		}
+		else { return false; }
+	}
+
+	async removeUserFromBannedList(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		const userToAllow = await this.userService.getUserById(userId);
+		if (existingConversation && userToAllow) {
+			const isAllow = existingConversation.banned.some((banned) => banned.id === userId);
+			if (isAllow) {
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: {
+						banned: {
+							disconnect: [{ id: userId }],
+						},
+					},
+				});
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	async isUserBannedFromConversation(userToAdd: User, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { banned: { where: { id: userToAdd.id } } },
+		});
+		return !!conversation?.banned.length;
+    }
+
+	async isUserIdBannedFromConversation(userIdToAdd: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { banned: { where: { id: userIdToAdd }} },
+		});
+		return !!conversation?.banned.length;
+    }
 
 	/////////////////// MESSAGE SERVICE ///////////////////
 
@@ -283,7 +339,7 @@ export class ConversationsService {
 		return conversation?.name;
 	}
 	
-	async getConversationByName(convName: string) {
+	async getConversationByName(convName: string): Promise<Conversation | null> {
 		return await this.prismaService.conversation.findUnique({
 			where: { name: convName },
 			include: { members: true },
@@ -330,64 +386,38 @@ export class ConversationsService {
 		}
 	}
 
-	
+	async getPassword(conversationId: number): Promise<String | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation.protected) { return conversation.password; }
+		else { return null; }
+	}
+
+	/////////////////// SETTERS /////////////////// 
+
+	async setPassword(newPassword: string, conversationId: number): Promise<boolean> {
+		if (newPassword != null) { await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { protected: true, password: newPassword },
+        }); return true; }
+		else if (newPassword === null) { await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { protected: false, password: null },
+        }); return false; }
+	}
+
+	async setConversationPrivate(conversationId: number) {
+		await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { privacy: privacy_t.PRIVATE },
+        });
+	}
+
+	async setConversationPublic(conversationId: number) {
+		await this.prismaService.conversation.update({
+            where: { id: conversationId },
+            data: { privacy: privacy_t.PUBLIC },
+        });
+	}
 }	  
-	  
-	  
-	  
-	  
-	  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// async createConversation(name: string, sub: number) {
-// 	const existingConversation = this.prismaService.conversation.findFirst({
-// 		where: {
-// 			name,
-// 		}
-// 	});
-// 	if (existingConversation) {
-// 		throw new BadRequestException({name : "Conversation already exist"})
-// 	}
-// 	return this.prismaService.conversation.create({
-// 		data: {
-// 			name,
-// 			members: {
-// 				connect: {
-// 					id: sub,   	// For now we just have our user creating the conv who is in it and we are going to add user 
-// 								// 1 by 1. If at the end there is only one user -> we are gonna delete the conversation
-// 				}
-// 			}
-// 		}
-// 	})
-// }
-
