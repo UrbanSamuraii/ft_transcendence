@@ -298,15 +298,13 @@ export class ConversationsController {
 		if (oldPassword) {
 			if (oldPassword !== req.body.oldPassword) {
 				res.status(403).json({ message: "Actual Password doesn't match without input" });
-				return ;
-			} 
-		}
+				return ;}}
 
 		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
 		if (newPassword) {
-			res.status(201).json({ message: "New password well implemented." });}
+			res.status(201).json({ message: "New password well implemented." }); return;}
 		else {
-			res.status(201).json({ message: "The conversation is not protected." });}
+			res.status(201).json({ message: "The conversation is not protected." }); return;}
 	}
 
 	@Post(':id/set_private')
