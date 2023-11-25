@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { Button, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalForms.css';
+import { useSocket } from './../../SocketContext';
+
 
 interface FormData {
     email: string;
@@ -12,6 +14,8 @@ interface FormData {
 }
 
 export const LoginForm = () => {
+
+    const { socket } = useSocket();  // Get the socket from context
 
     const navigate = useNavigate();
 
@@ -52,8 +56,13 @@ export const LoginForm = () => {
                 const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password: formData.password }, {
                     withCredentials: true,
                 });
-                if (response.status == 200)
+                if (response.status == 200) {
+                    console.log("before ON AUTH");
+                    if (socket) {
+                        socket.disconnect()
+                    }
                     navigate('/play');
+                }
                 else {
                     console.log({ "User using 2FA authentication": response.data.user.email });
                     navigate(`/FortyTwoFA?userEmail=${response.data.user.email}`)

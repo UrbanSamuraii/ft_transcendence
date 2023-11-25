@@ -8,14 +8,15 @@ import { ScrollableContainer } from "../components/messages/MessagePanel";
 import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuthHook';
-import { useChatSocket } from "../utils/context/chatSocketContext";
+import { useSocket } from '../SocketContext';
 
 export const ConversationChannelPage = () => {
 
     const conversationId = useParams().id;
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
-    const chatSocketContextData = useChatSocket();
+    // const chatSocketContextData = useChatSocket();
+    const chatSocketContextData = useSocket();
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -27,7 +28,7 @@ export const ConversationChannelPage = () => {
     }, [conversationId]);
 
     useEffect(() => {
-        chatSocketContextData?.chatSocket?.on('onMessage', (payload: ConversationMessage) => {
+        chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setNewMessageReceived(true);
             chatSocketContextData.setLastMessageDeleted(false);
             console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
@@ -37,12 +38,12 @@ export const ConversationChannelPage = () => {
             }
         });
         return () => {
-            chatSocketContextData?.chatSocket?.off('onMessage');
+            chatSocketContextData?.socket?.off('onMessage');
         };
     }, [[chatSocketContextData, conversationId]]);
 
     useEffect(() => {
-        chatSocketContextData?.chatSocket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
+        chatSocketContextData?.socket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
             const isMessageInConversation = deletedMessage.conversation_id === Number(conversationId);
 
             if (isMessageInConversation) {
@@ -52,7 +53,7 @@ export const ConversationChannelPage = () => {
             }
         });
         return () => {
-            chatSocketContextData?.chatSocket?.off('onDeleteMessage');
+            chatSocketContextData?.socket?.off('onDeleteMessage');
         };
     }, [chatSocketContextData, conversationId]);
 

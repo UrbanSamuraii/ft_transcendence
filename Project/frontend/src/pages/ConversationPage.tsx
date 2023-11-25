@@ -5,56 +5,58 @@ import { useParams } from 'react-router-dom';
 import { ConversationPanel } from '../components/conversations/ConversationPannel';
 import { useEffect, useState, useContext } from 'react';
 import { getConversations } from '../utils/hooks/getConversations';
-import { chatSocketContext } from "../utils/context/chatSocketContext";
+// import { useSocket } from "../utils/context/useSocket";
+import { useSocket } from '../SocketContext';
 
 export const ConversationPage = () => {
-  
-  const { id } = useParams();
-  const [prismaConversations, setPrismaConversations] = useState<any[]>([]); 
-	const chatSocketContextData = useContext(chatSocketContext);
 
-  useEffect(() => {
-      const initializeSocket = async () => {
-        await chatSocketContextData?.startChatSocketConnection();
-      };
-  
-    initializeSocket();
-    console.log({"ChatSocketContextData": chatSocketContextData});
-    
-    return () => { };
-  }, [chatSocketContextData?.chatSocket]);
+    const { id } = useParams();
+    const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
+    // const socket = useContext(useSocket);
+    const { socket, setNewMessageReceived, newMessageReceived } = useSocket();  // Get the socket from context
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const prismaConversations = await getConversations();
-        setPrismaConversations(prismaConversations); 
-        chatSocketContextData?.setNewMessageReceived(false);
-        // console.log('Type of prismaConversations:', typeof prismaConversations);
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-      }
-    };
+    //   useEffect(() => {
+    //       const initializeSocket = async () => {
+    //         await socket?.startChatSocketConnection();
+    //       };
 
-    fetchConversations();
+    //     initializeSocket();
+    //     console.log({"socket": socket});
 
-  }, [chatSocketContextData]);
+    //     return () => { };
+    //   }, [socket?.chatSocket]);
 
-  useEffect(() => {
-      chatSocketContextData?.chatSocket?.on('onMessage', (payload: any) => {
-			// console.log('Update de la page');
-      chatSocketContextData?.setNewMessageReceived(true); 
-		});
-		return() => {
-			chatSocketContextData?.chatSocket?.off('onMessage');
-		};
-	}, [chatSocketContextData]);
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const prismaConversations = await getConversations();
+                setPrismaConversations(prismaConversations);
+                setNewMessageReceived(false);
+                // console.log('Type of prismaConversations:', typeof prismaConversations);
+            } catch (error) {
+                console.error('Error fetching conversations:', error);
+            }
+        };
 
-  return (
-    <Page>
-      <ConversationSidebar conversations={prismaConversations} />
-        {!id && <ConversationPanel />}
-      <Outlet />
-    </Page>
-  );
+        fetchConversations();
+
+    }, [socket, newMessageReceived]);
+
+    useEffect(() => {
+        socket?.on('onMessage', (payload: any) => {
+            // console.log('Update de la page');
+            setNewMessageReceived(true);
+        });
+        return () => {
+            socket?.off('onMessage');
+        };
+    }, [socket, newMessageReceived]);
+
+    return (
+        <Page>
+            <ConversationSidebar conversations={prismaConversations} />
+            {!id && <ConversationPanel />}
+            <Outlet />
+        </Page>
+    );
 };

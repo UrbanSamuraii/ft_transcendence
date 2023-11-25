@@ -8,6 +8,8 @@ import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import { Signup } from './pages/Signup';
+// import { Signout } from './pages/Signout/Signout';
+import Signout from './pages/Signout/Signout';
 import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
@@ -15,12 +17,13 @@ import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
-import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
+// import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
+// import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
+import { OnlySocketProvider, useSocket } from './SocketContext';
 
 const defaultBackgroundStyle = {
     background: '#1a1a1a',
@@ -60,16 +63,18 @@ function App() {
     return (
         <Router>
             <AuthProvider>
-                <div className="App" style={backgroundStyle}>
-                    <Navbar />
-                    <ChatSocketProvider>
-                        <SocketProvider>
-                            <Content
-                                setBackgroundStyle={setBackgroundStyle}
-                            />
-                        </SocketProvider>
-                    </ChatSocketProvider>
-                </div>
+                <OnlySocketProvider>
+                    <div className="App" style={backgroundStyle}>
+                        <Navbar />
+                        {/* <ChatSocketProvider> */}
+                        {/* <SocketProvider> */}
+                        <Content
+                            setBackgroundStyle={setBackgroundStyle}
+                        />
+                        {/* </SocketProvider> */}
+                        {/* </ChatSocketProvider> */}
+                    </div>
+                </OnlySocketProvider>
             </AuthProvider>
         </Router>
     );
@@ -80,8 +85,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const [gameStarted, setGameStarted] = useState(false);
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
-    const { stopSocketConnection } = useSocket();  // Get the socket from context
-    const { stopChatSocketConnection } = useChatSocket();
+    // const { stopChatSocketConnection } = useChatSocket();
     const { user } = useAuth();
 
     useEffect(() => {
@@ -94,17 +98,18 @@ function Content({ setBackgroundStyle }: ContentProps) {
         console.log(previousPathname)
         console.log(location.pathname)
 
-        const leaveRoomsAndStopConnection = async () => {
-            if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
-                console.log("User left the conversation page!");
-                stopChatSocketConnection();
-            }
-        };
+        // const leaveRoomsAndStopConnection = async () => {
+        //     if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
+        //         console.log("User left the conversation page!");
+        //         stopChatSocketConnection();
+        //     }
+        // };
 
-        leaveRoomsAndStopConnection();
+        // leaveRoomsAndStopConnection();
 
         prevPathnameRef.current = location.pathname;
-    }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
+        // }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
+    }, [location.pathname, prevPathnameRef, navigate]);
 
     function handlePlayClick() {
         navigate("/select-mode");
@@ -119,12 +124,16 @@ function Content({ setBackgroundStyle }: ContentProps) {
     }
 
     const handleSignoutClick = async () => {
+
         try {
             const response = await fetch('http://localhost:3001/auth/signout', {
                 method: 'GET',
                 credentials: 'include'
             });
             console.log('Signout successful:', response);
+            // if (socket) {
+            // socket.disconnect()
+            // }
             navigate('/signup');
         } catch (error) {
             console.error('Signout failed:', error);
@@ -159,6 +168,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
                     <Route path="/@/:username" element={<Profile />} />
                     <Route path="/matchmaking" element={<Matchmaking />} />
+                    <Route path="/signout" element={<Signout />} />
                 </>
             )}
         </Routes>

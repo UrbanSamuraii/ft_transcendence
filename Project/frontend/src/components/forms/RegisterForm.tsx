@@ -5,6 +5,7 @@ import { Button, Button42, InputContainer, InputField, InputLabel } from '../../
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
+import { useSocket } from './../../SocketContext';
 
 interface FormData {
     email: string;
@@ -17,6 +18,7 @@ interface FormData {
 export const RegisterForm = () => {
 
     const navigate = useNavigate();
+    const { socket } = useSocket();  // Get the socket from context
 
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -87,6 +89,9 @@ export const RegisterForm = () => {
                     withCredentials: true,
                 });
                 // console.log(response.status, response.data.token);
+                if (socket) {
+                    socket.disconnect()
+                }
                 navigate('/play');
             } catch (error) {
                 console.error('Sign up request error:', error);
