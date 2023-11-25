@@ -18,8 +18,22 @@ CREATE TABLE "users" (
     "is_two_factor_activate" BOOLEAN DEFAULT false,
     "two_factor_secret" TEXT,
     "status" "status_t" DEFAULT 'OFFLINE',
+    "eloRating" INTEGER NOT NULL DEFAULT 1000,
+    "totalGamesWon" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "games" (
+    "id" SERIAL NOT NULL,
+    "uniqueId" TEXT NOT NULL,
+    "player1Id" INTEGER NOT NULL,
+    "player2Id" INTEGER NOT NULL,
+    "winnerId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "games_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,6 +95,9 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_id_email_username_key" ON "users"("id", "email", "username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "games_uniqueId_key" ON "games"("uniqueId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "conversations_name_key" ON "conversations"("name");
 
 -- CreateIndex
@@ -109,6 +126,9 @@ CREATE UNIQUE INDEX "_muted_AB_unique" ON "_muted"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_muted_B_index" ON "_muted"("B");
+
+-- AddForeignKey
+ALTER TABLE "games" ADD CONSTRAINT "games_winnerId_fkey" FOREIGN KEY ("winnerId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_authorName_fkey" FOREIGN KEY ("authorName") REFERENCES "users"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
