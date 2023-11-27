@@ -58,9 +58,8 @@ export class ConversationsController {
 	async GetConversationById(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const conversation = await this.convService.getConversationWithAllMessagesById(idConv);
-
 		if (conversation) { return conversation; } 
-		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
 	@Post('join')

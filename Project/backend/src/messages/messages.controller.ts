@@ -39,8 +39,9 @@ export class MessagesController {
 	}
 
 	@Get(':conversationId')
-	async getMessagesFromConversationId(@Param('conversationId') conversationId: string) {
+	async getMessagesFromConversationId(@Param('conversationId') conversationId: string, @Res({ passthrough: true }) res: ExpressResponse) {
 		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId));
+		if (!conversation) {res.status(404); return;}
 		const messagesInTheConversationId = conversation.messages;
 		return messagesInTheConversationId;
 	}
