@@ -3,12 +3,13 @@ import io, { Socket } from 'socket.io-client';
 
 type SocketContextType = {
     socket: Socket | null;
+    disconnectAndReconnect: () => void;
     newMessageReceived: boolean;
     setNewMessageReceived: Dispatch<SetStateAction<boolean>>;
     isLastMessageDeleted: boolean;
     setLastMessageDeleted: Dispatch<SetStateAction<boolean>>;
-    isFirstConnection: boolean;
-    setFirstConnection: Dispatch<SetStateAction<boolean>>;
+    isSocketDisconnected: boolean;
+    setSocketDisconnected: Dispatch<SetStateAction<boolean>>;
     conversationId: number | null,
     setConversationId: Dispatch<SetStateAction<number | null>>;
 };
@@ -26,11 +27,11 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
     const [newMessageReceived, setNewMessageReceived] = useState(false);
     const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
     const [conversationId, setConversationId] = useState<number | null>(null);
-    const [isFirstConnection, setFirstConnection] = useState(false);
+    const [isSocketDisconnected, setSocketDisconnected] = useState(false);
 
     const serverAddress = window.location.hostname === 'localhost' ?
         'http://localhost:3001' :
-        `http://${window.location.hostname}:3002`;
+        `http://${window.location.hostname}:3001`;
 
     useEffect(() => {
         const socketConnection = io(serverAddress, {
@@ -38,34 +39,39 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         });
         setSocket(socketConnection);
 
-        socketConnection.on('disconnect', () => {
-            // Logic to handle reconnection
-            console.log('Socket disconnected, attempting to reconnect...');
-            const newSocketConnection = io(serverAddress, {
-                withCredentials: true
-            });
-            setSocket(newSocketConnection);
-        });
-
-        // Cleanup function to disconnect socket when the component unmounts
         return () => {
             socketConnection.disconnect();
         };
-    }, []); // Empty dependency array to ensure this runs only once
+    }, []);
+
+    const disconnectAndReconnect = (currentSocket?: Socket) => {
+        if (currentSocket) {
+            console.log({"Socket Disconnected -> Ready To Get A New One": socket?.id});
+            currentSocket.disconnect();
+        }
+
+        const newSocketConnection = io(serverAddress, {
+            withCredentials: true
+        });
+
+        console.log({"New Socket after Deconnection": newSocketConnection?.id});
+        setSocket(newSocketConnection);
+    };
+    
 
     return (
         <SocketContext.Provider
             value={{
-                // socket: socketRef.current,
                 socket: socket,
+                disconnectAndReconnect: () => disconnectAndReconnect(socket!),
                 newMessageReceived,
                 setNewMessageReceived,
                 isLastMessageDeleted,
                 setLastMessageDeleted,
                 conversationId,
                 setConversationId,
-                isFirstConnection,
-                setFirstConnection,
+                isSocketDisconnected,
+                setSocketDisconnected,
             }}
         >
             {children}

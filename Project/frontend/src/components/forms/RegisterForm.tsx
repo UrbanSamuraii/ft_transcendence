@@ -18,7 +18,7 @@ interface FormData {
 export const RegisterForm = () => {
 
     const navigate = useNavigate();
-    const { socket } = useSocket();  // Get the socket from context
+    const { socket, disconnectAndReconnect } = useSocket();  // Get the socket from context
 
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -84,14 +84,11 @@ export const RegisterForm = () => {
         }
         else {
             try {
-                // console.log("DATA: ", formData);
                 const response = await axios.post('http://localhost:3001/auth/signup', formData, {
                     withCredentials: true,
                 });
-                // console.log(response.status, response.data.token);
-                if (socket) {
-                    socket.disconnect()
-                }
+                console.log({"Socket from Register Form": socket?.id});
+                disconnectAndReconnect();
                 navigate('/play');
             } catch (error) {
                 console.error('Sign up request error:', error);

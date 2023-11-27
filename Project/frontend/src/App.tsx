@@ -98,17 +98,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
         console.log(previousPathname)
         console.log(location.pathname)
 
-        // const leaveRoomsAndStopConnection = async () => {
-        //     if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
-        //         console.log("User left the conversation page!");
-        //         stopChatSocketConnection();
-        //     }
-        // };
-
-        // leaveRoomsAndStopConnection();
-
         prevPathnameRef.current = location.pathname;
-        // }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
     }, [location.pathname, prevPathnameRef, navigate]);
 
     function handlePlayClick() {
@@ -124,19 +114,11 @@ function Content({ setBackgroundStyle }: ContentProps) {
     }
 
     const handleSignoutClick = async () => {
-
         try {
-            const response = await fetch('http://localhost:3001/auth/signout', {
-                method: 'GET',
-                credentials: 'include'
-            });
-            console.log('Signout successful:', response);
-            // if (socket) {
-            // socket.disconnect()
-            // }
-            navigate('/signup');
+            navigate('/signout');
         } catch (error) {
             console.error('Signout failed:', error);
+            navigate('/error');
         }
     }
 
@@ -144,7 +126,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
     useEffect(() => {
-        // console.log('Content component rendered');
     });
 
     return (

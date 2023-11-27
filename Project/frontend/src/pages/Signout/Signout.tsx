@@ -1,11 +1,10 @@
-// SignoutPage.js
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSocket } from '../../SocketContext'; // Adjust the import path as needed
+import { useSocket } from '../../SocketContext';
 
 const SignoutPage = () => {
     const navigate = useNavigate();
-    const { socket } = useSocket();
+    const { socket, disconnectAndReconnect } = useSocket();
 
     useEffect(() => {
         const signout = async () => {
@@ -14,19 +13,19 @@ const SignoutPage = () => {
                     method: 'GET',
                     credentials: 'include'
                 });
-
-                // if (socket) {
-                //     socket.disconnect();
-                // }
+                if (socket) {
+                    console.log({"Sign out socket": socket.id});
+                    disconnectAndReconnect();
+                }
                 navigate('/');
             } catch (error) {
                 console.error('Signout failed:', error);
-                navigate('/error'); // Navigate to an error page if needed
+                navigate('/error');
             }
         };
 
         signout();
-    }, []);
+    }, [socket, disconnectAndReconnect]);
 
     return <div>Signing out...</div>;
 };
