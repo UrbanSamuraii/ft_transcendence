@@ -8,8 +8,6 @@ type SocketContextType = {
     setNewMessageReceived: Dispatch<SetStateAction<boolean>>;
     isLastMessageDeleted: boolean;
     setLastMessageDeleted: Dispatch<SetStateAction<boolean>>;
-    isSocketDisconnected: boolean;
-    setSocketDisconnected: Dispatch<SetStateAction<boolean>>;
     conversationId: number | null,
     setConversationId: Dispatch<SetStateAction<number | null>>;
 };
@@ -27,7 +25,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
     const [newMessageReceived, setNewMessageReceived] = useState(false);
     const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
     const [conversationId, setConversationId] = useState<number | null>(null);
-    const [isSocketDisconnected, setSocketDisconnected] = useState(false);
 
     const serverAddress = window.location.hostname === 'localhost' ?
         'http://localhost:3001' :
@@ -70,8 +67,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
                 setLastMessageDeleted,
                 conversationId,
                 setConversationId,
-                isSocketDisconnected,
-                setSocketDisconnected,
             }}
         >
             {children}

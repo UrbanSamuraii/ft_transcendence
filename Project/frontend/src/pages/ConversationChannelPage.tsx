@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
@@ -15,13 +15,17 @@ export const ConversationChannelPage = () => {
     const conversationId = useParams().id;
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
-    // const chatSocketContextData = useChatSocket();
     const chatSocketContextData = useSocket();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchConversations = async () => {
-            const conversations = await getConversationsIdentified(conversationId);
-            setConversationsArray(conversations);
+            try {
+                const conversations = await getConversationsIdentified(conversationId);
+                setConversationsArray(conversations);}
+            catch (error) {
+                navigate('/Play');
+            }
         };
 
         fetchConversations();
