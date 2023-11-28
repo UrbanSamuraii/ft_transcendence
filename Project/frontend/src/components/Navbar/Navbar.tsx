@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { useAuth } from '../../AuthContext'; // Update the path accordingly
@@ -7,18 +7,27 @@ function Navbar() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    const handleSignInClick = () => {
-        navigate('/login');
-    };
-
-    const handleSignoutClick = () => {
-        navigate('/signout');
-    };
+    const dropdownRef = useRef<HTMLDivElement>(null); // Typed as HTMLDivElement
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
+
+    useEffect(() => {
+        function handleClickOutside(event: any) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        }
+
+        // Add event listener
+        document.addEventListener('mousedown', handleClickOutside);
+
+        // Cleanup the event listener
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div className="navbar">
