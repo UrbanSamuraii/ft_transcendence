@@ -119,25 +119,22 @@ export class UserService {
 
     // SPECIFIC for Conversations
     // To get the user - and the fact that we find it or not
-    async getUserByUsernameOrEmail(inputDataMember: string) {
+    async getUserByUsernameOrEmail(inputDataMember: string): Promise<User | null> {
         const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
         const email = usersArray[0];
         let member = null;
-        let userFound = true;
-        if (usersArray[0] !== "") { userFound = false; }
+        
         const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
         if (memberByEmail) {
-            member = memberByEmail;
-            userFound = true;
+            return memberByEmail;
         } else {
             const username = usersArray[0];
             const memberByUsername = usersArray[0] !== "" ? await this.getUser({ username }) : null;
             if (memberByUsername) {
-                member = memberByUsername;
-                userFound = true;
+               return memberByUsername;
             }
+            else { return null; }
         }
-        return { member, userFound };
     }
 
     //////////////// 2FA SETTNGS //////////////////

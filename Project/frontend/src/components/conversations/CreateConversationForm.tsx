@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
 import './GlobalConversations.css'
 import axios from 'axios';
-import { resolvePath } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
 
 interface ConvDataInput {
 	name: string;
-	users: string;
+	users: string[];
 }
 
 type CreateConversationFormProps = {
@@ -19,7 +17,7 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		name: '',
-		users: '',
+		users: [],
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -36,17 +34,26 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 		}));
 	};
 
+	const handleAddUser = () => {
+		if (ConvDataInput.users.includes(ConvDataInput.name)) {
+		  	setFormErrors({ name: 'User already added' });
+		} else {
+		  	setConvDataInput((prevData) => ({
+				...prevData,
+				users: [...prevData.users, ConvDataInput.name],
+				name: '',
+			}));
+		}
+	};
+
 	const navigate = useNavigate();
 
 	const handleCreateConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.name) {
-		  newErrors.name = 'Name is required';
+		if (!ConvDataInput.name && !ConvDataInput.users) {
+		  newErrors.name = 'Name or at least one User is required';
 		}
-		// if (!ConvDataInput.users) {
-		// 	newErrors.users = 'At least one user is required';
-		// }
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
 		} 
@@ -102,6 +109,9 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 						type="text" name="users" value={ConvDataInput.users} onChange={handleInputChange} />
 						{formErrors.users && <div className="error-message">{formErrors.users}</div>}
 					</InputLabel>
+					<ButtonAddUser type="button" onClick={handleAddUser}>
+            			Add User
+          			</ButtonAddUser>
 				</InputContainer>
 			</div>
 

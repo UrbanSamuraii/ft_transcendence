@@ -21,7 +21,7 @@ export class ConversationsService {
 		return convName;
 	}
 
-	async createConversation(convName: string, userMember: User, firstInviteMember: User | null) {
+	async createConversation(convName: string, userMember: User, invitedMembers: User[] | null) {
 		
 		const existingConversation = await this.getConversationByName(convName);
 		if (existingConversation) { return null; }
@@ -33,9 +33,10 @@ export class ConversationsService {
 			members: { connect: { id: userMember.id } },
 		};
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
-		
-		if (firstInviteMember) {await this.addUserToConversation(firstInviteMember.id, createdConversation.id);}
-		
+		if (invitedMembers) {
+			for (const invitedMember of invitedMembers) {
+				await this.addUserToConversation(invitedMember.id, createdConversation.id);
+			}}
 		return createdConversation;
 	}
 

@@ -24,26 +24,32 @@ export class ConversationsController {
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		
-		// Get the first invited member if there is one
-		let member = null;
-		let userFound = true;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.users));
-		
-		const convName = await this.convService.establishConvName(req.body.name);
-		const createdConversation = await this.convService.createConversation(convName, user, member);
+		// Get the users associated to the username or emails ...
+		const invitedMembers = await Promise.all(
+			req.body.users.map(async (usernameOrEmail) => {
+				const member = await this.userService.getUserByUsernameOrEmail(usernameOrEmail);
+				return member;
+			})
+		);
+		let convName = null;
+		if (req.body.name) { 
+			convName = await this.convService.establishConvName(req.body.name); }
+		else { const usernames = [user.username, ...(invitedMembers.map(member => member.username))];
+			convName = usernames.join(' '); }
+		const createdConversation = await this.convService.createConversation(convName, user, invitedMembers);
 		
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
-			if (userFound) {
-				this.eventEmitter.emit('message.create', '');
-				this.eventEmitter.emit('join.room', member, createdConversation.id);
-				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
-			} else {
-				this.eventEmitter.emit('message.create', '');
-				res.status(202).json({ message: "Conversation created, but the user was not found.", conversationId: createdConversation.id  });
+			if (invitedMembers && invitedMembers.length > 0) {
+				for (const invitedMember of invitedMembers) {
+					this.eventEmitter.emit('join.room', invitedMember, createdConversation.id);
+				}
 			}
+			res.status(201).json({
+				message: invitedMembers ? "Conversation created with invited members" : "Conversation created",
+				conversationId: createdConversation.id });
 		}
 	}
 
@@ -114,10 +120,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let added = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToAdd));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToAdd);
+		if (!member) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
 			const userId = member.id;
@@ -141,10 +146,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let removed = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.memberToRemove));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.memberToRemove);
+		if (!member) {
 			res.status(403).json({ message: "User not found." }); return;}
 		else {
 			const memberId = member.id;
@@ -163,10 +167,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToMute));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToMute);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
@@ -185,10 +188,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
@@ -207,10 +209,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let upgradedUser = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
@@ -229,10 +230,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let downgradedUser = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.adminToDowngrade));
-		if (!userFound) {
+		(member = await this.userService.getUserByUsernameOrEmail(req.body.adminToDowngrade));
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
@@ -251,9 +251,8 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
-		({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToBan));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToBan);
+		if (!member) {
 			res.status(403).json({ message: "User not found." });}
 		else {
 			const userId = member.id;
@@ -272,9 +271,8 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 			let member = null;
-			let userFound = true;
-			({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToAllow));
-			if (!userFound) {
+			member = await this.userService.getUserByUsernameOrEmail(req.body.userToAllow);
+			if (!member) {
 				res.status(403).json({ message: "User not found." });}
 			else {
 				const userId = member.id;

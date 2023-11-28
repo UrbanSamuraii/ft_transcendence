@@ -5,14 +5,13 @@ import { useParams } from 'react-router-dom';
 import { ConversationPanel } from '../components/conversations/ConversationPannel';
 import { useEffect, useState, useContext } from 'react';
 import { getConversations } from '../utils/hooks/getConversations';
-// import { useSocket } from "../utils/context/useSocket";
 import { useSocket } from '../SocketContext';
 
 export const ConversationPage = () => {
 
     const { id } = useParams();
     const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
-    const { socket, setNewMessageReceived, newMessageReceived } = useSocket();  
+    const { socket, setNewMessageReceived, newMessageReceived, isLastMessageDeleted } = useSocket();  
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -27,7 +26,7 @@ export const ConversationPage = () => {
 
         fetchConversations();
 
-    }, [socket, newMessageReceived]);
+    }, [socket, newMessageReceived, isLastMessageDeleted]);
 
     useEffect(() => {
         socket?.on('onMessage', (payload: any) => {
@@ -37,6 +36,7 @@ export const ConversationPage = () => {
             socket?.off('onMessage');
         };
     }, [socket, newMessageReceived]);
+
 
     return (
         <Page>
