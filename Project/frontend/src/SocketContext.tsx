@@ -38,13 +38,18 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         });
         setSocket(socketConnection);
 
-        socketConnection.on('disconnect', () => {
+        socketConnection.on('disconnect', (reason) => {
             // Logic to handle reconnection
-            console.log('Socket disconnected, attempting to reconnect...');
-            const newSocketConnection = io(serverAddress, {
-                withCredentials: true
-            });
-            setSocket(newSocketConnection);
+            if (reason === "io server disconnect") {
+                console.log('Socket manually disconnected, attempting to reconnect...');
+                // the disconnection was initiated by the server, you need to reconnect manually
+                const newSocketConnection = io(serverAddress, {
+                    withCredentials: true
+                });
+                setSocket(newSocketConnection);
+            }
+            else
+                console.log("socket disconnected... attempting to reconnect");
         });
 
         // Cleanup function to disconnect socket when the component unmounts
@@ -57,7 +62,7 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         <SocketContext.Provider
             value={{
                 // socket: socketRef.current,
-                socket: socket,
+                socket,
                 newMessageReceived,
                 setNewMessageReceived,
                 isLastMessageDeleted,

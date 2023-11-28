@@ -58,3 +58,52 @@
         font-size: 1.2rem;
     }
 }
+
+.profile-name {
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    background-color: #333;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+    z-index: 1000;
+    box-sizing: border-box;
+    /* Include padding and border in the element's total width and height */
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+    display: block;
+    width: 100%;
+    /* Stretch to full width */
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    margin: 0;
+    /* Reset margin */
+    border: none;
+    /* Reset border */
+    background: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    /* Include padding in the element's total width */
+}
+
+/* Remove padding and margin from ul, if you use it for dropdown */
+.dropdown-menu ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+    background-color: #444;
+}

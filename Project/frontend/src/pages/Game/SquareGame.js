@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import './SquareGame.css';
 import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
-import { useSocket } from '../Matchmaking/SocketContext';  // Update the path accordingly if needed
+import { useSocket } from '../../SocketContext';  // Update the path accordingly if needed
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
@@ -22,15 +22,22 @@ function SquareGame({ }) {
     const [gameData, setGameData] = useState(null);
     const [activeKeys, setActiveKeys] = useState([]);
     const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
-    // const [socket, setSocket] = useState(null);
     const [isGamePaused, setGamePaused] = useState(false);
-    const { socket, stopSocketConnection } = useSocket();  // Get the socket from context
+    const { socket } = useSocket();  // Get the socket from context
     const { id: gameId } = useParams(); // Get the game ID from the URL
     const navigate = useNavigate();
+    const [intervalId, setIntervalId] = useState(null);
+    const lastSentWasEmptyRef = useRef(true);
 
-    // Update the ref every time activeKeys changes
+    // Update the interval based on active keys
     useEffect(() => {
         activeKeysRef.current = activeKeys;
+
+        // if (activeKeys.length > 0) {
+        //     startInterval();
+        // } else {
+        //     stopInterval();
+        // }
     }, [activeKeys]);
 
     function goBackToMainMenu() {
@@ -42,26 +49,36 @@ function SquareGame({ }) {
     }
 
     useEffect(() => {
-        if (!socket) return;  // Ensure socket exists
+        if (!socket) return;
 
-        console.log("Using socket from context for game with ID:", gameId);
-
-        socket.on("updateGameData", (data) => {
-            console.log('Received game update from socket for game ID:', gameId);
-
+        const handleGameDataUpdate = (data) => {
             setGameData(data);
             drawGame(data);
-        });
 
+            if (data.isGameOver) {
+                clearInterval(intervalId);
+            }
+        };
+
+        socket.on("updateGameData", handleGameDataUpdate);
+
+        // A single interval is set up and maintained
         const intervalId = setInterval(() => {
-            socket.emit('paddleMovements', activeKeysRef.current);
-        }, 100 / 60);
+            const currentKeys = activeKeysRef.current;
+            if (currentKeys.length > 0) {
+                socket.emit('paddleMovements', currentKeys);
+                lastSentWasEmptyRef.current = false;
+            } else if (!lastSentWasEmptyRef.current) {
+                socket.emit('paddleMovements', []);
+                lastSentWasEmptyRef.current = true;
+            }
+        }, 1000 / 60);
 
         return () => {
             clearInterval(intervalId);
-            // Don't close the socket here; it will be managed by the SocketProvider
+            socket.off("updateGameData", handleGameDataUpdate);
         };
-    }, [socket, gameId]);  // Depend on socket
+    }, [socket, gameId]);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -117,7 +134,6 @@ function SquareGame({ }) {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-        // }, [activeKeys, isGamePaused, socket]);
     }, [activeKeys, isGamePaused]);
 
 
@@ -275,7 +291,6 @@ function SquareGame({ }) {
             drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToMatchmaking);
 
             // Other game over logic
-            stopSocketConnection();
             console.log('Game over detected.');
         }
 

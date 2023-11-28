@@ -124,20 +124,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
     }
 
     const handleSignoutClick = async () => {
-
-        try {
-            const response = await fetch('http://localhost:3001/auth/signout', {
-                method: 'GET',
-                credentials: 'include'
-            });
-            console.log('Signout successful:', response);
-            // if (socket) {
-            // socket.disconnect()
-            // }
-            navigate('/signup');
-        } catch (error) {
-            console.error('Signout failed:', error);
-        }
+        navigate('/signout');
     }
 
     const GoToConversations = async () => {

@@ -16,7 +16,6 @@ import { User } from "@prisma/client";
         credentials: true,
     }
 })
-
 export class MessagingGateway implements OnGatewayConnection {
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
