@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 interface ConvDataInput {
 	name: string;
-	users: string[];
+	user: string[];
 }
 
 type CreateConversationFormProps = {
@@ -17,7 +17,7 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		name: '',
-		users: [],
+		user: '',
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -38,10 +38,10 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 		if (ConvDataInput.users.includes(ConvDataInput.name)) {
 		  	setFormErrors({ name: 'User already added' });
 		} else {
+			console.log({"User": ConvDataInput.name});
 		  	setConvDataInput((prevData) => ({
 				...prevData,
-				users: [...prevData.users, ConvDataInput.name],
-				name: '',
+				users: [...prevData.users],
 			}));
 		}
 	};

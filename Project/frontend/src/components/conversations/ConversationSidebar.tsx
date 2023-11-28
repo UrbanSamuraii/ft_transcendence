@@ -63,7 +63,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
       const closeMenu = () => {
         console.log('Closing menu');
         setShowMenu(false);
-    };
+      };
 
     return (
         <>
@@ -77,10 +77,6 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                 <header>
                     <div className="header-content">
                         <h2>Conversations</h2>
-                        {/* <ButtonOverlay onClick={() => {
-                            setShowModal(!showModal);
-                        }}>
-                            <MdPostAdd size={30} /> </ButtonOverlay> */}
                         <ButtonOverlay onClick={openMenu}>
                             <MdPostAdd size={30} />{' '}
                         </ButtonOverlay>
