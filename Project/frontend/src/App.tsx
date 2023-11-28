@@ -8,7 +8,6 @@ import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import { Signup } from './pages/Signup';
-// import { Signout } from './pages/Signout/Signout';
 import Signout from './pages/Signout/Signout';
 import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
@@ -17,10 +16,8 @@ import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
 import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
-// import { SocketProvider, useSocket } from './pages/Matchmaking/SocketContext';  // Update the path accordingly
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-// import { ChatSocketProvider, useChatSocket } from './utils/context/chatSocketContext';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 import { OnlySocketProvider, useSocket } from './SocketContext';
@@ -66,13 +63,9 @@ function App() {
                 <OnlySocketProvider>
                     <div className="App" style={backgroundStyle}>
                         <Navbar />
-                        {/* <ChatSocketProvider> */}
-                        {/* <SocketProvider> */}
                         <Content
                             setBackgroundStyle={setBackgroundStyle}
                         />
-                        {/* </SocketProvider> */}
-                        {/* </ChatSocketProvider> */}
                     </div>
                 </OnlySocketProvider>
             </AuthProvider>
@@ -82,10 +75,8 @@ function App() {
 
 function Content({ setBackgroundStyle }: ContentProps) {
     const location = useLocation();
-    const [gameStarted, setGameStarted] = useState(false);
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
-    // const { stopChatSocketConnection } = useChatSocket();
     const { user } = useAuth();
 
     useEffect(() => {
@@ -98,17 +89,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
         console.log(previousPathname)
         console.log(location.pathname)
 
-        // const leaveRoomsAndStopConnection = async () => {
-        //     if (previousPathname === "/ConversationPage" && !location.pathname.startsWith("/ConversationPage")) {
-        //         console.log("User left the conversation page!");
-        //         stopChatSocketConnection();
-        //     }
-        // };
-
-        // leaveRoomsAndStopConnection();
-
         prevPathnameRef.current = location.pathname;
-        // }, [location.pathname, prevPathnameRef, stopSocketConnection, stopChatSocketConnection, navigate]);
     }, [location.pathname, prevPathnameRef, navigate]);
 
     function handlePlayClick() {
@@ -130,9 +111,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const GoToConversations = async () => {
         navigate('/ConversationPage')
     }
-    useEffect(() => {
-        // console.log('Content component rendered');
-    });
 
     return (
         <Routes>

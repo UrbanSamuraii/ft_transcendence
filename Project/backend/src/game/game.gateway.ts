@@ -48,7 +48,6 @@ export class GameGateway implements OnGatewayInit {
 
     afterInit(server: Server) {
         console.log("Socket.io initialized");
-
     }
 
     private async handleGameOver(winnerUsername: string, gameId: number): Promise<void> {
@@ -102,7 +101,7 @@ export class GameGateway implements OnGatewayInit {
 
         if (!token) {
             console.log('No token provided from enterMatchmaking');
-            client.disconnect(true);  // Disconnect the client
+            // client.disconnect(true);  // Disconnect the client
             return;
         } // check if the token is auth
 
