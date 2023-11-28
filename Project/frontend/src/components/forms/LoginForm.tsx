@@ -61,7 +61,7 @@ export const LoginForm = () => {
                     if (socket) {
                         socket.disconnect()
                     }
-                    navigate('/play');
+                    navigate('/');
                 }
                 else {
                     console.log({ "User using 2FA authentication": response.data.user.email });

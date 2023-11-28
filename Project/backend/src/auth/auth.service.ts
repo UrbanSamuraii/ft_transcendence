@@ -273,7 +273,7 @@ export class AuthService {
                     sameSite: 'lax',
                     expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
                 });
-                res.redirect('http://localhost:3000/play');
+                res.redirect('http://localhost:3000/');
             }
             else {
                 const user = await this.userService.getUser({ email });
@@ -289,7 +289,7 @@ export class AuthService {
                         sameSite: 'lax',
                         expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
                     });
-                    res.redirect('http://localhost:3000/play');
+                    res.redirect('http://localhost:3000/');
                 }
                 else {
                     res.status(201).redirect(`http://localhost:3000/FortyTwoFA?userEmail=${user.email}`);

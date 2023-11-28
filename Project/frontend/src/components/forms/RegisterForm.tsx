@@ -92,7 +92,7 @@ export const RegisterForm = () => {
                 if (socket) {
                     socket.disconnect()
                 }
-                navigate('/play');
+                navigate('/');
             } catch (error) {
                 console.error('Sign up request error:', error);
                 if (axios.isAxiosError(error)) {
