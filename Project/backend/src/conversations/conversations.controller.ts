@@ -31,6 +31,7 @@ export class ConversationsController {
 				return member;
 			})
 		);
+		console.log({"Members joigning the conversation at its creation": invitedMembers});
 		let convName = null;
 		if (req.body.name) { 
 			convName = await this.convService.establishConvName(req.body.name); }
@@ -42,6 +43,7 @@ export class ConversationsController {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
+			this.eventEmitter.emit('message.create', '');
 			if (invitedMembers && invitedMembers.length > 0) {
 				for (const invitedMember of invitedMembers) {
 					this.eventEmitter.emit('join.room', invitedMember, createdConversation.id);

@@ -35,7 +35,9 @@ export class ConversationsService {
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
 		if (invitedMembers) {
 			for (const invitedMember of invitedMembers) {
-				await this.addUserToConversation(invitedMember.id, createdConversation.id);
+				const isAlreadyMember = await this.isMemberOfTheConversation(invitedMember.id, createdConversation.id);
+				if (!isAlreadyMember) {
+				await this.addUserToConversation(invitedMember.id, createdConversation.id); }
 			}}
 		return createdConversation;
 	}

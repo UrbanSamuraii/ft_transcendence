@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 interface ConvDataInput {
 	name: string;
-	user: string[];
+	users: string[];
+	currentUsername: string;
 }
 
 type CreateConversationFormProps = {
@@ -17,7 +18,8 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		name: '',
-		user: '',
+		users: [],
+		currentUsername: ''
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -35,25 +37,26 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 	};
 
 	const handleAddUser = () => {
-		if (ConvDataInput.users.includes(ConvDataInput.name)) {
-		  	setFormErrors({ name: 'User already added' });
-		} else {
-			console.log({"User": ConvDataInput.name});
+		console.log("ADD USER:");
+		console.log({"username INPUT FORM": ConvDataInput.currentUsername});
+		if (ConvDataInput.currentUsername.trim() !== '') {
 		  	setConvDataInput((prevData) => ({
-				...prevData,
-				users: [...prevData.users],
-			}));
+			...prevData,
+			users: [...prevData.users, prevData.currentUsername],
+			currentUsername: ''
+		  }));
 		}
-	};
+	  };
 
 	const navigate = useNavigate();
 
 	const handleCreateConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.name && !ConvDataInput.users) {
-		  newErrors.name = 'Name or at least one User is required';
-		}
+		if (!ConvDataInput.name || ConvDataInput.users.length === 0) {
+			newErrors.name = 'Conversation Name is required';
+			newErrors.currentUsername = 'At least one User is required';
+		  }
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
 		} 
@@ -67,7 +70,6 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
 				} else {
-					// Successfully created a conversation, we close the modal and navigate to the conv'
 					const conversationId = response.data.conversationId;
 					setShowModal(false);
 					navigate(`channel/${conversationId}`);
@@ -106,12 +108,12 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 					<InputLabel htmlFor="Username(s) or email(s) of the member(s)">
 						Username(s) or email(s) of the member(s)		
 						<InputField
-						type="text" name="users" value={ConvDataInput.users} onChange={handleInputChange} />
-						{formErrors.users && <div className="error-message">{formErrors.users}</div>}
+						type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange} />
 					</InputLabel>
 					<ButtonAddUser type="button" onClick={handleAddUser}>
             			Add User
           			</ButtonAddUser>
+						{formErrors.currentUsername && <div className="error-message">{formErrors.currentUsername}</div>}
 				</InputContainer>
 			</div>
 
