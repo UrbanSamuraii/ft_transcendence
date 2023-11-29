@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FC } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
 import { ConversationMessage } from "../utils/types";
@@ -9,6 +9,23 @@ import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
+
+
+interface ConversationMenuProps {
+    onClose: () => void;
+    onOptionClick: (option: string) => void;
+}
+  
+const CreateConversationMenu: FC<ConversationMenuProps> = ({ onClose, onOptionClick }) => {
+    return (
+        <div className="menu-container">
+            <button className="menu-button" onClick={() => onOptionClick('create')}>Create a conversation</button>
+            <button className="menu-button" onClick={() => onOptionClick('join')}>Join a conversation</button>
+            <button className="menu-button" onClick={() => onOptionClick('block')}>Block a user</button>
+            <button className="menu-button" onClick={onClose}>Cancel</button>
+        </div>
+    );
+};
 
 export const ConversationChannelPage = () => {
 
@@ -35,7 +52,7 @@ export const ConversationChannelPage = () => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setNewMessageReceived(true);
             chatSocketContextData.setLastMessageDeleted(false);
-            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
+            // console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
                 setConversationsArray(prevConversations => [payload, ...prevConversations]);

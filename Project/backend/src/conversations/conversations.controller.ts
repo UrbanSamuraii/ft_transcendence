@@ -75,10 +75,12 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
+		// console.log({"CONV TO JOIN": conversation.name});
+		// console.log({"IS BANNED ?": await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)});
+
 		if (!conversation) {
 			res.status(403).json({ message: "There is no conversation of this name, please verify." }); return;}
-		
-		if (!this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
+		if ( await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
 			res.status(403).json({ message: "Your profil is banned from this conversation." }); return;}
 		if (conversation.privacy === privacy_t.PRIVATE) {
 			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." }); return;}

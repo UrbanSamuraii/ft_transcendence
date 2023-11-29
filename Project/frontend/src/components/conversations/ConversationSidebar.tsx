@@ -6,6 +6,7 @@ import './GlobalConversations.css';
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
+import { ConversationMenuModal } from '../modals/ConversationMenuModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -13,12 +14,13 @@ type Props = {
     conversations: ConversationType[];
 }
 
-interface CreateConversationMenuProps {
+export interface CreateConversationMenuProps {
+    setShowModal: (show: boolean) => void;
     onClose: () => void;
     onOptionClick: (option: string) => void;
 }
   
-const CreateConversationMenu: FC<CreateConversationMenuProps> = ({ onClose, onOptionClick }) => {
+export const CreateConversationMenu: FC<CreateConversationMenuProps> = ({ onClose, onOptionClick, setShowModal }) => {
     return (
         <div className="menu-container">
             <button className="menu-button" onClick={() => onOptionClick('create')}>Create a conversation</button>
@@ -32,7 +34,7 @@ const CreateConversationMenu: FC<CreateConversationMenuProps> = ({ onClose, onOp
 export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const navigate = useNavigate();
-    const [showMenu, setShowMenu] = useState(false);
+    const [showMenuModal, setShowMenuModal] = useState(false);
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
@@ -51,7 +53,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const handleMenuOptionClick = (option: string) => {
         console.log('Selected option:', option);
-        setShowMenu(false);
+        setShowMenuModal(false);
         if (option === 'create') {
             setShowModalCreate(true);
         }
@@ -62,26 +64,31 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     
       const openMenu = () => {
         console.log("OPEN");
-        setShowMenu(true);
+        setShowMenuModal(true);
     };
     
       const closeMenu = () => {
         console.log('Closing menu');
-        setShowMenu(false);
+        setShowMenuModal(false);
       };
 
     return (
         <>
-            {showMenu && <CreateConversationMenu onClose={closeMenu} onOptionClick={handleMenuOptionClick} />}
+            {showMenuModal && ( <ConversationMenuModal
+                setShowModal={() => {
+                    setShowMenuModal(false);}}
+                    onClose={closeMenu}
+                    onOptionClick={handleMenuOptionClick}
+                />)}
             {showModalCreate && (<CreateConversationModal
-                    setShowModal={() => {
-                        setShowModalCreate(false);
-                        setShowMenu(false);
+                setShowModal={() => {
+                    setShowModalCreate(false);
+                    setShowMenuModal(false);
                 }} /> )}
             {showModalJoin && (<JoinConversationModal
                 setShowModal={() => {
                     setShowModalJoin(false);
-                    setShowMenu(false);
+                    setShowMenuModal(false);
                 }} /> )}
             <ConversationSidebarStyle>
                 <header>

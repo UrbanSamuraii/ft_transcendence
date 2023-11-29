@@ -210,7 +210,7 @@ export const ButtonOverlay = styled.button`
   border-radius: 5px;
 
   &:hover::before {
-    content: "Click to open Conversation Menu";
+    content: "Click to open Conversations Menu";
     position: absolute;
     top: 60px;
     left: 70%;
