@@ -37,7 +37,7 @@ export class ConversationsService {
 			for (const invitedMember of invitedMembers) {
 				const isAlreadyMember = await this.isMemberOfTheConversation(invitedMember.id, createdConversation.id);
 				if (!isAlreadyMember) {
-				await this.addUserToConversation(invitedMember.id, createdConversation.id); }
+					await this.addUserToConversation(invitedMember.id, createdConversation.id); }
 			}}
 		return createdConversation;
 	}

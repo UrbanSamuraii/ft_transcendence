@@ -5,6 +5,7 @@ import { FC, useState, useEffect } from 'react';
 import './GlobalConversations.css';
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
+import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -32,7 +33,8 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showModalCreate, setShowModalCreate] = useState(false);
+    const [showModalJoin, setShowModalJoin] = useState(false);
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted } = useSocket();  
@@ -51,7 +53,10 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         console.log('Selected option:', option);
         setShowMenu(false);
         if (option === 'create') {
-            setShowModal(true);
+            setShowModalCreate(true);
+        }
+        else if (option === 'join') {
+            setShowModalJoin(true);
         }
     };
     
@@ -68,11 +73,16 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     return (
         <>
             {showMenu && <CreateConversationMenu onClose={closeMenu} onOptionClick={handleMenuOptionClick} />}
-            {showModal && (<CreateConversationModal
+            {showModalCreate && (<CreateConversationModal
                     setShowModal={() => {
-                        setShowModal(false);
+                        setShowModalCreate(false);
                         setShowMenu(false);
-                    }} /> )}
+                }} /> )}
+            {showModalJoin && (<JoinConversationModal
+                setShowModal={() => {
+                    setShowModalJoin(false);
+                    setShowMenu(false);
+                }} /> )}
             <ConversationSidebarStyle>
                 <header>
                     <div className="header-content">
