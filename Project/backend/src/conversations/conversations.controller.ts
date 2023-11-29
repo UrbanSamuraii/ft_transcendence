@@ -87,6 +87,7 @@ export class ConversationsController {
 		
 		const added = await this.convService.addUserToConversation(user.id, conversation.id);
 		if (added) {
+			this.eventEmitter.emit('message.create', '');
 			res.status(201).json({ message: "You have now joined the conversation.", conversationId: conversation.id }); return;}
 		else {
 			res.status(202).json({ message: "You were already in the conversation.", conversationId: conversation.id }); return;}
