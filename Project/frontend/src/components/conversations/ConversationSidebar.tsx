@@ -39,12 +39,12 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(true);
-            console.log("Message du serveur LAST MESSAGE DELETED");
+            // console.log("Message du serveur LAST MESSAGE DELETED");
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
                 [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
             }));
-            console.log({ "DELETING LAST !": deletedMessage });
+            // console.log({ "DELETING LAST !": deletedMessage });
         });
         return () => {
             chatSocketContextData.setLastMessageDeleted(false);
@@ -53,7 +53,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     }, [[chatSocketContextData, conversationId, isLastMessageDeleted]]);
 
     const handleMenuOptionClick = (option: string) => {
-        console.log('Selected option:', option);
+        // console.log('Selected option:', option);
         setShowMenuModal(false);
         if (option === 'create') {
             setShowModalCreate(true);

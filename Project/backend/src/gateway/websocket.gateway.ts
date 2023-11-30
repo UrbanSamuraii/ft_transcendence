@@ -120,7 +120,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('message.deleted')
     handleMessageDeletedEvent(payload: any) {
-        console.log({ "When deleting a message": payload });
+        // console.log({ "When deleting a message": payload });
         if (payload.author) {
             const authorSocket = this.sessions.getUserSocket(payload.author.id);
             const recipientSockets = this.sessions.getSockets();
@@ -139,7 +139,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('last.message.deleted')
     handleLastMessageDeletedEvent(payload: any) {
-        console.log({ "When deleting LAST MESSAGE": payload });
+        // console.log({ "When deleting LAST MESSAGE": payload });
         if (payload.author) {
             const authorSocket = this.sessions.getUserSocket(payload.author.id);
             const recipientSockets = this.sessions.getSockets();
