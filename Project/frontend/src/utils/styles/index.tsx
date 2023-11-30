@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { PageProps } from './styleType';
 
 export const CSB_WIDTH: number = 350;
+export const NAVBAR_HEIGHT: number = 2; // define in rem
+
 
 export const InputField = styled.input`
   font-family: 'Inter';
@@ -68,7 +70,7 @@ export const Page = styled.div`
 export const ConversationSidebarStyle = styled.aside`
   position: fixed;
   left: 0;
-  top: 75px;
+  top: calc(${NAVBAR_HEIGHT}rem + 80px);;
   height: 100%;
   background-color: #1a1a1a;
   width: ${CSB_WIDTH}px;
@@ -91,7 +93,7 @@ export const ConversationSidebarStyle = styled.aside`
   & header {
     position: fixed;
     display: flex;
-    top:0;
+    top: ${NAVBAR_HEIGHT}rem;
     justify-content: space-between;
     padding: 0 18px;
     background-color: #151515;
