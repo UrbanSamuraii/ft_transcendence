@@ -10,6 +10,7 @@
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
     color: white;
     font-family: 'Roboto', sans-serif;
+    z-index: 1;
 }
 
 .navbar a,

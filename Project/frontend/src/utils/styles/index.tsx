@@ -36,7 +36,7 @@ export const InputLabel = styled.label`
   margin: 4px 0;
 `;
 
-export const Button = styled.button `
+export const Button = styled.button`
   width: 100%;
   height: 70px;
   background-color: #2b09ff;
@@ -45,7 +45,7 @@ export const Button = styled.button `
   border: none !important;
 `;
 
-export const Button42 = styled.button `
+export const Button42 = styled.button`
   width: 100%;
   height: 90px; !important;
   background-color: #000;
@@ -161,7 +161,7 @@ export const ConversationSidebarTexts = styled.div`
   border-bottom: 1px
 `;
 
-export const Button2FA = styled.button `
+export const Button2FA = styled.button`
   width: 60%;
   height: 50px;
   background-color: #2b09ff;
@@ -247,7 +247,7 @@ export const ButtonAddUser = styled.button`
   width: 100px;
 `;
 
-export const MessageContainerStyle = styled.div `
+export const MessageContainerStyle = styled.div`
   flex-grow: 1;
   background: inherit;
   border: 1px solid #e0e0e0; 
@@ -260,7 +260,7 @@ export const MessageContainerStyle = styled.div `
   margin-left: 50px;
 `;
 
-export const MessageContainerPersonnalStyle = styled.div `
+export const MessageContainerPersonnalStyle = styled.div`
   background: inherit;
   border: 1px solid #e0e0e0; 
   border-radius: 5px;
@@ -273,7 +273,7 @@ export const MessageContainerPersonnalStyle = styled.div `
   margin-right: 100px;
 `;
 
-export const MessageContainerHeaderStyle = styled.div `
+export const MessageContainerHeaderStyle = styled.div`
   flex-grow: 1;
   background: black;
   width: 100%;
