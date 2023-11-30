@@ -3,7 +3,6 @@ import io, { Socket } from 'socket.io-client';
 
 type SocketContextType = {
     socket: Socket | null;
-    // disconnectAndReconnect: () => void;
     newMessageReceived: boolean;
     setNewMessageReceived: Dispatch<SetStateAction<boolean>>;
     isLastMessageDeleted: boolean;
@@ -55,7 +54,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         <SocketContext.Provider
             value={{
                 socket,
-                // disconnectAndReconnect: () => disconnectAndReconnect(socket!),
                 newMessageReceived,
                 setNewMessageReceived,
                 isLastMessageDeleted,

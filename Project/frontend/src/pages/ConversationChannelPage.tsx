@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, FC } from 'react';
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
 import { ConversationMessage } from "../utils/types";
@@ -10,23 +10,18 @@ import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
 
-
 export const ConversationChannelPage = () => {
 
     const conversationId = useParams().id;
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
+    // const chatSocketContextData = useChatSocket();
     const chatSocketContextData = useSocket();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchConversations = async () => {
-            try {
-                const conversations = await getConversationsIdentified(conversationId);
-                setConversationsArray(conversations);}
-            catch (error) {
-                navigate('/Play');
-            }
+            const conversations = await getConversationsIdentified(conversationId);
+            setConversationsArray(conversations);
         };
 
         fetchConversations();
@@ -36,7 +31,7 @@ export const ConversationChannelPage = () => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setNewMessageReceived(true);
             chatSocketContextData.setLastMessageDeleted(false);
-            // console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
+            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
                 setConversationsArray(prevConversations => [payload, ...prevConversations]);

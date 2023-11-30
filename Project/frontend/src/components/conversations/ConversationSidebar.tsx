@@ -3,6 +3,7 @@ import { MdPostAdd } from 'react-icons/md';
 import { ConversationType } from '../../utils/types';
 import { FC, useState, useEffect } from 'react';
 import './GlobalConversations.css';
+import { ConversationMessage } from "../../utils/types";
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
@@ -22,20 +23,37 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showModalJoin, setShowModalJoin] = useState(false);
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
-    const { isLastMessageDeleted, setLastMessageDeleted } = useSocket();  
+    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
+
+    // useEffect(() => {
+    //     console.log({"Last message deleted": isLastMessageDeleted});
+    //     if (isLastMessageDeleted !== undefined) {
+    //         setLastMessageDeletedMap(prevMap => ({
+    //             ...prevMap,
+    //             [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
+    //         }));
+    //         setLastMessageDeleted(false);
+    //     }
+    // }, [isLastMessageDeleted, conversationId]);
 
     useEffect(() => {
-        if (isLastMessageDeleted !== undefined) {
+        chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
+            chatSocketContextData.setLastMessageDeleted(true);
+            // console.log("Message du serveur LAST MESSAGE DELETED");
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
                 [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
             }));
-            setLastMessageDeleted(false);
-        }
-    }, [isLastMessageDeleted, chatSocketContextData?.conversationId]);
+            // console.log({ "DELETING LAST !": deletedMessage });
+        });
+        return () => {
+            chatSocketContextData.setLastMessageDeleted(false);
+            chatSocketContextData?.socket?.off('onDeleteLastMessage');
+        };
+    }, [[chatSocketContextData, conversationId, isLastMessageDeleted]]);
 
     const handleMenuOptionClick = (option: string) => {
-        console.log('Selected option:', option);
+        // console.log('Selected option:', option);
         setShowMenuModal(false);
         if (option === 'create') {
             setShowModalCreate(true);

@@ -323,9 +323,28 @@ export class ConversationsService {
 
 	async deleteMessageFromConversation(conversationId: number, messageToDeleteId: number) {
 		await this.prismaService.message.delete({
-		  where: {
-			id: messageToDeleteId,
-		  	},
+			where: {
+				id: messageToDeleteId,
+			},
+		});
+	
+		const currentConversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { messages: true },
+		});
+		if (!currentConversation) {
+			throw new Error(`Conversation with id ${conversationId} not found.`);}
+	
+		const updatedMessages = currentConversation.messages.filter(
+			(message) => message.id !== messageToDeleteId
+		);	
+		const updatedConversation = await this.prismaService.conversation.update({
+			where: { id: conversationId },
+			data: {
+				messages: {
+					set: updatedMessages,
+				},
+			},
 		});
 	}
 

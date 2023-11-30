@@ -31,7 +31,7 @@ export class ConversationsController {
 				return member;
 			})
 		);
-		console.log({"Members joigning the conversation at its creation": invitedMembers});
+		// console.log({"Members joigning the conversation at its creation": invitedMembers});
 		let convName = null;
 		if (req.body.name) { 
 			convName = await this.convService.establishConvName(req.body.name); }
