@@ -17,6 +17,8 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
 	const updatedAtFormatted = `${updatedAtDate.getFullYear()}-${(updatedAtDate.getMonth() + 1).toString().padStart(2, '0')}-${updatedAtDate.getDate()} at ${updatedAtDate.getHours()}:${updatedAtDate.getMinutes()}:${updatedAtDate.getSeconds()}`;
 	const [showDeleteButton, setShowDeleteButton] = useState(false);
 	const chatSocketContextData = useSocket();
+	const { isLastMessageDeleted, setLastMessageDeleted, setConversationId } = useSocket();
+
 
 	const handleContextMenu = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -30,9 +32,9 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
         });
 		if (response.data.isLastMessageDeleted === true) {
 			console.log("LAST MESSAGE DELETED");
-			console.log({"CONV ID": messageToDelete.conversation_id});
-			chatSocketContextData?.setLastMessageDeleted(true);
-			chatSocketContextData?.setConversationId(messageToDelete.conversation_id);
+			// console.log({"CONV ID": messageToDelete.conversation_id});
+			setLastMessageDeleted(true);
+			setConversationId(messageToDelete.conversation_id);
 		}
 		setShowDeleteButton(false);
 	};

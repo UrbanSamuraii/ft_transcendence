@@ -17,7 +17,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 const response = await axios.get(`http://localhost:3001/conversations/${conversationId}`, {
 					withCredentials: true,
 				  });
-                // console.log({"SHOULD BE CONV TITLE": response.data.name});
 				setConversationName(response.data.name);
             } catch (error) {
                 console.error('Error fetching conversation name:', error);

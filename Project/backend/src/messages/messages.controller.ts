@@ -59,8 +59,9 @@ export class MessagesController {
 		let isLastMessageDeleted = false;
 		const numberOfMessages = existingConversation.messages.length;
 		if (messageId === existingConversation.messages[numberOfMessages - 1].id) { 
-			isLastMessageDeleted = true; 
-		}
+			isLastMessageDeleted = true;
+			this.eventEmitter.emit('last.message.deleted', messageToDelete);
+		}0
 		
 		await this.conversationsService.deleteMessageFromConversation(conversationId, messageId);
 		

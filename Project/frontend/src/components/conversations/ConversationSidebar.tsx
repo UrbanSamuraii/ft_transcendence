@@ -3,6 +3,7 @@ import { MdPostAdd } from 'react-icons/md';
 import { ConversationType } from '../../utils/types';
 import { FC, useState, useEffect } from 'react';
 import './GlobalConversations.css';
+import { ConversationMessage } from "../../utils/types";
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
@@ -22,9 +23,10 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showModalJoin, setShowModalJoin] = useState(false);
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
-    const { isLastMessageDeleted, setLastMessageDeleted } = useSocket();  
+    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
 
     useEffect(() => {
+        console.log({"Last message deleted": isLastMessageDeleted});
         if (isLastMessageDeleted !== undefined) {
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
@@ -32,7 +34,21 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             }));
             setLastMessageDeleted(false);
         }
-    }, [isLastMessageDeleted, chatSocketContextData?.conversationId]);
+    }, [isLastMessageDeleted, conversationId]);
+
+    useEffect(() => {
+        chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
+            chatSocketContextData.setLastMessageDeleted(true);
+            // console.log({ "DELETING LAST !": deletedMessage });
+            setLastMessageDeletedMap(prevMap => ({
+                ...prevMap,
+                [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
+            }));
+        });
+        return () => {
+            chatSocketContextData?.socket?.off('onDeleteLastMessage');
+        };
+    }, [[chatSocketContextData, conversationId]]);
 
     const handleMenuOptionClick = (option: string) => {
         console.log('Selected option:', option);
