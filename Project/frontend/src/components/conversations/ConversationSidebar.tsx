@@ -14,23 +14,6 @@ type Props = {
     conversations: ConversationType[];
 }
 
-export interface CreateConversationMenuProps {
-    setShowModal: (show: boolean) => void;
-    onClose: () => void;
-    onOptionClick: (option: string) => void;
-}
-  
-export const CreateConversationMenu: FC<CreateConversationMenuProps> = ({ onClose, onOptionClick, setShowModal }) => {
-    return (
-        <div className="menu-container">
-            <button className="menu-button" onClick={() => onOptionClick('create')}>Create a conversation</button>
-            <button className="menu-button" onClick={() => onOptionClick('join')}>Join a conversation</button>
-            <button className="menu-button" onClick={() => onOptionClick('block')}>Block a user</button>
-            <button className="menu-button" onClick={onClose}>Cancel</button>
-        </div>
-    );
-};
-
 export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const navigate = useNavigate();
@@ -70,7 +53,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
       const closeMenu = () => {
         console.log('Closing menu');
         setShowMenuModal(false);
-      };
+    };
 
     return (
         <>

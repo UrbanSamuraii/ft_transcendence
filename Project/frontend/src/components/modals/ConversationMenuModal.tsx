@@ -1,5 +1,5 @@
 import { OverlayStyle, OverlayContent } from '../../utils/styles';
-import { CreateConversationMenu, CreateConversationMenuProps } from '../conversations/ConversationSidebar';
+import { CreateConversationMenu, CreateConversationMenuProps } from '../conversations/ConversationGlobalMenu';
 import OutsideClickHandler from 'react-outside-click-handler';
 
 export const ConversationMenuModal: React.FC<CreateConversationMenuProps> = ({ setShowModal, onClose, onOptionClick }) => {
