@@ -1,12 +1,12 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { CreateConversationForm } from '../conversations/CreateConversationForm'
+import { JoinConversationForm } from '../conversations/JoinConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type CreateConversationModalProps = {
+type JoinConversationModalProps = {
 	setShowModal: (show: boolean) => void;
 };
 
-export const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ setShowModal }) => {
+export const JoinConversationModal: React.FC<JoinConversationModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -15,7 +15,7 @@ export const CreateConversationModal: React.FC<CreateConversationModalProps> = (
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<CreateConversationForm setShowModal={setShowModal}/>
+					<JoinConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>

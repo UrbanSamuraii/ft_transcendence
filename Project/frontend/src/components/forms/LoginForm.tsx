@@ -52,12 +52,10 @@ export const LoginForm = () => {
         }
         else {
             try {
-                // console.log("DATA: ", formData);
                 const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password: formData.password }, {
                     withCredentials: true,
                 });
                 if (response.status == 200) {
-                    console.log("before ON AUTH");
                     if (socket) {
                         socket.disconnect()
                     }

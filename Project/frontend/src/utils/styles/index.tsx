@@ -208,6 +208,21 @@ export const ButtonOverlay = styled.button`
   padding: 0px 0px; 
   font-size: 16px; 
   border-radius: 5px;
+
+  &:hover::before {
+    content: "Click to open Conversations Menu";
+    position: absolute;
+    top: 60px;
+    left: 70%;
+    transform: translateX(-55%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    opacity: 0.8;
+    font-size: 14px;
+    white-space: nowrap;
+  }
 `;
 
 export const ButtonCreateConv = styled.button`
@@ -219,6 +234,17 @@ export const ButtonCreateConv = styled.button`
   border-radius: 5px;
   height: 40px;
   width: 200px;
+`;
+
+export const ButtonAddUser = styled.button`
+  background-color: #3c3c9c;
+  color: #fff; 
+  border: none;
+  padding: 0px 0px; 
+  font-size: 12px; 
+  border-radius: 0px;
+  height: 30px;
+  width: 100px;
 `;
 
 export const MessageContainerStyle = styled.div `

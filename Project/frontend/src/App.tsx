@@ -105,7 +105,12 @@ function Content({ setBackgroundStyle }: ContentProps) {
     }
 
     const handleSignoutClick = async () => {
-        navigate('/signout');
+        try {
+            navigate('/signout');
+        } catch (error) {
+            console.error('Signout failed:', error);
+            navigate('/error');
+        }
     }
 
     const GoToConversations = async () => {

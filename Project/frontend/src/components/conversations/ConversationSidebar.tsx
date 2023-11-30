@@ -1,12 +1,13 @@
 import { ConversationSidebarContainer, ConversationSidebarItem, ConversationSidebarStyle, ConversationSidebarTexts } from '../../utils/styles';
 import { MdPostAdd } from 'react-icons/md';
 import { ConversationType } from '../../utils/types';
-import { FC, useState, useContext, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import './GlobalConversations.css';
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
+import { JoinConversationModal } from '../modals/JoinConversationModal';
+import { ConversationMenuModal } from '../modals/ConversationMenuModal';
 import { ButtonOverlay } from '../../utils/styles';
-// import { chatSocketContext } from "../../utils/context/chatSocketContext";
 import { useSocket } from '../../SocketContext';
 
 type Props = {
@@ -16,32 +17,69 @@ type Props = {
 export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const navigate = useNavigate();
-    const [showModal, setShowModal] = useState(false);
+    const [showMenuModal, setShowMenuModal] = useState(false);
+    const [showModalCreate, setShowModalCreate] = useState(false);
+    const [showModalJoin, setShowModalJoin] = useState(false);
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
+    const { isLastMessageDeleted, setLastMessageDeleted } = useSocket();  
 
     useEffect(() => {
-        // When isLastMessageDeleted changes in the context, update the corresponding entry in the map
-        if (chatSocketContextData?.isLastMessageDeleted !== undefined) {
+        if (isLastMessageDeleted !== undefined) {
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
                 [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
             }));
-            chatSocketContextData.setLastMessageDeleted(false);
+            setLastMessageDeleted(false);
         }
-    }, [chatSocketContextData?.isLastMessageDeleted, chatSocketContextData?.conversationId]);
+    }, [isLastMessageDeleted, chatSocketContextData?.conversationId]);
+
+    const handleMenuOptionClick = (option: string) => {
+        console.log('Selected option:', option);
+        setShowMenuModal(false);
+        if (option === 'create') {
+            setShowModalCreate(true);
+        }
+        else if (option === 'join') {
+            setShowModalJoin(true);
+        }
+    };
+    
+      const openMenu = () => {
+        console.log("OPEN");
+        setShowMenuModal(true);
+    };
+    
+      const closeMenu = () => {
+        console.log('Closing menu');
+        setShowMenuModal(false);
+    };
 
     return (
         <>
-            {showModal && <CreateConversationModal setShowModal={setShowModal} />}
+            {showMenuModal && ( <ConversationMenuModal
+                setShowModal={() => {
+                    setShowMenuModal(false);}}
+                    onClose={closeMenu}
+                    onOptionClick={handleMenuOptionClick}
+                />)}
+            {showModalCreate && (<CreateConversationModal
+                setShowModal={() => {
+                    setShowModalCreate(false);
+                    setShowMenuModal(false);
+                }} /> )}
+            {showModalJoin && (<JoinConversationModal
+                setShowModal={() => {
+                    setShowModalJoin(false);
+                    setShowMenuModal(false);
+                }} /> )}
             <ConversationSidebarStyle>
                 <header>
                     <div className="header-content">
                         <h2>Conversations</h2>
-                        <ButtonOverlay onClick={() => {
-                            setShowModal(!showModal);
-                        }}>
-                            <MdPostAdd size={30} /> </ButtonOverlay>
+                        <ButtonOverlay onClick={openMenu}>
+                            <MdPostAdd size={30} />{' '}
+                        </ButtonOverlay>
                     </div>
                 </header>
                 <ConversationSidebarContainer>
@@ -54,7 +92,6 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                                     <div> <span>{conversation.name || conversation.members[0].username}</span> </div>
                                 </div>
                                 <div className="conversationLastMessage">
-                                    {/* <div><span>{conversation.messages[0]?.message}</span> </div> */}
                                     <div>
                                         <span>{lastMessageDeletedMap[conversation.id] ? 'Last message deleted' : conversation.messages[0]?.message}</span>
                                     </div>

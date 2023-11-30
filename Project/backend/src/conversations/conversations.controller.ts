@@ -24,26 +24,34 @@ export class ConversationsController {
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		
-		// Get the first invited member if there is one
-		let member = null;
-		let userFound = true;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.users));
-		
-		const convName = await this.convService.establishConvName(req.body.name);
-		const createdConversation = await this.convService.createConversation(convName, user, member);
+		// Get the users associated to the username or emails ...
+		const invitedMembers = await Promise.all(
+			req.body.users.map(async (usernameOrEmail) => {
+				const member = await this.userService.getUserByUsernameOrEmail(usernameOrEmail);
+				return member;
+			})
+		);
+		console.log({"Members joigning the conversation at its creation": invitedMembers});
+		let convName = null;
+		if (req.body.name) { 
+			convName = await this.convService.establishConvName(req.body.name); }
+		else { const usernames = [user.username, ...(invitedMembers.map(member => member.username))];
+			convName = usernames.join(' '); }
+		const createdConversation = await this.convService.createConversation(convName, user, invitedMembers);
 		
 		if (!createdConversation) {
 			res.status(403).json({ message: "A Conversation with the same name already exist" });}
 		else {
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
-			if (userFound) {
-				this.eventEmitter.emit('message.create', '');
-				this.eventEmitter.emit('join.room', member, createdConversation.id);
-				res.status(201).json({ message: "Conversation created", conversationId: createdConversation.id });
-			} else {
-				this.eventEmitter.emit('message.create', '');
-				res.status(202).json({ message: "Conversation created, but the user was not found.", conversationId: createdConversation.id  });
+			this.eventEmitter.emit('message.create', '');
+			if (invitedMembers && invitedMembers.length > 0) {
+				for (const invitedMember of invitedMembers) {
+					this.eventEmitter.emit('join.room', invitedMember, createdConversation.id);
+				}
 			}
+			res.status(201).json({
+				message: invitedMembers ? "Conversation created with invited members" : "Conversation created",
+				conversationId: createdConversation.id });
 		}
 	}
 
@@ -58,9 +66,8 @@ export class ConversationsController {
 	async GetConversationById(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const conversation = await this.convService.getConversationWithAllMessagesById(idConv);
-
 		if (conversation) { return conversation; } 
-		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
 	@Post('join')
@@ -68,21 +75,24 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
+		// console.log({"CONV TO JOIN": conversation.name});
+		// console.log({"IS BANNED ?": await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)});
+
 		if (!conversation) {
 			res.status(403).json({ message: "There is no conversation of this name, please verify." }); return;}
-		
-		if (!this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
+		if ( await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
 			res.status(403).json({ message: "Your profil is banned from this conversation." }); return;}
 		if (conversation.privacy === privacy_t.PRIVATE) {
 			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." }); return;}
 		if (conversation.protected && conversation.password != null) {
-			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
+			res.status(403).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
 		
 		const added = await this.convService.addUserToConversation(user.id, conversation.id);
 		if (added) {
-			res.status(201).json({ message: "You have now joined the conversation." }); return;}
+			this.eventEmitter.emit('message.create', '');
+			res.status(201).json({ message: "You have now joined the conversation.", conversationId: conversation.id }); return;}
 		else {
-			res.status(403).json({ message: "You were already in the conversation." }); return;}
+			res.status(202).json({ message: "You were already in the conversation.", conversationId: conversation.id }); return;}
 	}
 
 	@Post('validate_password')
@@ -115,10 +125,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let added = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToAdd));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToAdd);
+		if (!member) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
 			const userId = member.id;
@@ -142,10 +151,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let removed = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.memberToRemove));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.memberToRemove);
+		if (!member) {
 			res.status(403).json({ message: "User not found." }); return;}
 		else {
 			const memberId = member.id;
@@ -164,10 +172,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToMute));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToMute);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
@@ -186,10 +193,9 @@ export class ConversationsController {
 		@GetUser() user: User,
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let muted = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
 			const userId = member.id;
@@ -208,10 +214,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let upgradedUser = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade);
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
@@ -230,10 +235,9 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
 		let downgradedUser = false;
-		({ member, userFound } = await this.userService.getUserByUsernameOrEmail(req.body.adminToDowngrade));
-		if (!userFound) {
+		(member = await this.userService.getUserByUsernameOrEmail(req.body.adminToDowngrade));
+		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." });}
 		else {
 			const userId = member.id;
@@ -252,9 +256,8 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
-		let userFound = true;
-		({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToBan));
-		if (!userFound) {
+		member = await this.userService.getUserByUsernameOrEmail(req.body.userToBan);
+		if (!member) {
 			res.status(403).json({ message: "User not found." });}
 		else {
 			const userId = member.id;
@@ -273,9 +276,8 @@ export class ConversationsController {
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 			let member = null;
-			let userFound = true;
-			({member, userFound} = await this.userService.getUserByUsernameOrEmail(req.body.userToAllow));
-			if (!userFound) {
+			member = await this.userService.getUserByUsernameOrEmail(req.body.userToAllow);
+			if (!member) {
 				res.status(403).json({ message: "User not found." });}
 			else {
 				const userId = member.id;
