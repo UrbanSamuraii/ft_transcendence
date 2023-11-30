@@ -11,22 +11,6 @@ import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
 
 
-interface ConversationMenuProps {
-    onClose: () => void;
-    onOptionClick: (option: string) => void;
-}
-  
-const CreateConversationMenu: FC<ConversationMenuProps> = ({ onClose, onOptionClick }) => {
-    return (
-        <div className="menu-container">
-            <button className="menu-button" onClick={() => onOptionClick('create')}>Create a conversation</button>
-            <button className="menu-button" onClick={() => onOptionClick('join')}>Join a conversation</button>
-            <button className="menu-button" onClick={() => onOptionClick('block')}>Block a user</button>
-            <button className="menu-button" onClick={onClose}>Cancel</button>
-        </div>
-    );
-};
-
 export const ConversationChannelPage = () => {
 
     const conversationId = useParams().id;

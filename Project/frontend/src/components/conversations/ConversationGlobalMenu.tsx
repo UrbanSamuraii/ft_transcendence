@@ -1,8 +1,5 @@
-import { useState, FC } from "react";
-import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { FC } from "react";
 import './GlobalConversations.css'
-import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 
 export interface CreateConversationMenuProps {
     setShowModal: (show: boolean) => void;
