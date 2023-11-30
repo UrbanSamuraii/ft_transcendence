@@ -123,7 +123,7 @@ export class UserService {
         const usersArray = inputDataMember.split(/[.,;!?'"<>]|\s/);
         const email = usersArray[0];
         let member = null;
-        
+
         const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
         if (memberByEmail) {
             return memberByEmail;
@@ -131,7 +131,7 @@ export class UserService {
             const username = usersArray[0];
             const memberByUsername = usersArray[0] !== "" ? await this.getUser({ username }) : null;
             if (memberByUsername) {
-               return memberByUsername;
+                return memberByUsername;
             }
             else { return null; }
         }

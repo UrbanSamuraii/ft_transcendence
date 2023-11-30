@@ -44,6 +44,7 @@ export class MessagingGateway implements OnGatewayConnection {
         // 	client.join(conversation.id.toString());
         // }
 
+
         if (token) {
             const identifiedUser = await this.userService.getUserByToken(token);
             if (identifiedUser) {
@@ -61,13 +62,13 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' });
 
-        client.on('disconnect', (reason) => {
-            console.log('Client disconnected:', client.id, 'Reason:', reason);
-            if (reason === 'transport close') {
-                client.disconnect();
-                client = null;
-            }
-        });
+        // client.on('disconnect', (reason) => {
+        //     console.log('Client disconnected:', client.id, 'Reason:', reason);
+        //     if (reason === 'transport close') {
+        //         client.disconnect();
+        //         client = null;
+        //     }
+        // });
         return;
     }
 
@@ -84,6 +85,7 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     //////////////////////////////////////////////////////////////
+
 
     // To inject the WebSocket server instance provided by socket.io
     @WebSocketServer() server: Server;

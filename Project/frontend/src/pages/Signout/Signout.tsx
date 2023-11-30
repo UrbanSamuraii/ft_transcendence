@@ -13,9 +13,9 @@ const SignoutPage = () => {
                     method: 'GET',
                     credentials: 'include'
                 });
-                // if (socket) {
-                //     console.log({"Sign out socket": socket.id});
-                //     disconnectAndReconnect();
+                // if (socket && socket.id) {
+                //     console.log({ "Sign out socket": socket.id });
+                //     socket.disconnect();
                 // }
                 navigate('/');
             } catch (error) {

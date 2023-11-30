@@ -38,7 +38,8 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
 
         socketConnection.on('disconnect', (reason) => {
             // Logic to handle reconnection
-            if (reason === "io server disconnect") {
+            if (reason === "io client disconnect" || reason === "io server disconnect") {
+                // if (reason === "io client disconnect") {
                 console.log('Socket manually disconnected, attempting to reconnect...');
                 // the disconnection was initiated by the server, you need to reconnect manually
                 const newSocketConnection = io(serverAddress, {
