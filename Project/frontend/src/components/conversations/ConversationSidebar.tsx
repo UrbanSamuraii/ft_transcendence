@@ -39,11 +39,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(true);
-            // console.log({ "DELETING LAST !": deletedMessage });
-            setLastMessageDeletedMap(prevMap => ({
-                ...prevMap,
-                [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
-            }));
+            console.log({ "DELETING LAST !": deletedMessage });
         });
         return () => {
             chatSocketContextData?.socket?.off('onDeleteLastMessage');

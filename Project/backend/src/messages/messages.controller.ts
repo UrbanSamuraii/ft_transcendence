@@ -55,13 +55,17 @@ export class MessagesController {
 			include: { messages: true },
 		});
 		const messageId = messageToDelete.id;
+		// console.log("Message id to delete", messageId);
 
 		let isLastMessageDeleted = false;
 		const numberOfMessages = existingConversation.messages.length;
+		// console.log("Size of the conversation", numberOfMessages);
+		// console.log("Last message of the conv id", existingConversation.messages[numberOfMessages - 1].id);
 		if (messageId === existingConversation.messages[numberOfMessages - 1].id) { 
 			isLastMessageDeleted = true;
+			// console.log("Deleting last message");
 			this.eventEmitter.emit('last.message.deleted', messageToDelete);
-		}0
+		}
 		
 		await this.conversationsService.deleteMessageFromConversation(conversationId, messageId);
 		
