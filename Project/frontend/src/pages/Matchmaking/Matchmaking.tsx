@@ -22,15 +22,16 @@ function Matchmaking() {
         };
 
         // Emit 'enterMatchmaking' if already connected
-        if (socket.connected) {
-            console.log("Socket already connected, emitting 'enterMatchmaking'");
-            socket.emit('enterMatchmaking');
-        } else {
-            socket.on('connect', () => {
-                console.log("Connected, socket id:", socket.id);
-                socket.emit('enterMatchmaking');
-            });
-        }
+        // if (socket.connected) {
+        // console.log("Socket already connected, emitting 'enterMatchmaking'");
+        // socket.emit('enterMatchmaking');
+        // } else {
+        // socket.on('connect', () => {
+        // console.log("Connected, socket id:", socket.id);
+        // socket.emit('enterMatchmaking');
+        // });
+        // }
+        socket.emit('enterMatchmaking');
 
         socket.on('matchFound', handleMatchFound);
 
@@ -41,7 +42,8 @@ function Matchmaking() {
             if (!matchFoundRef.current)
                 socket.emit('leaveMatchmaking');
         };
-    }, [socket, navigate]);
+        // }, [socket, navigate]);
+    }, []);
 
     return (
         <div className="paddle-container">
