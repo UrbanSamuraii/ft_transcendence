@@ -70,8 +70,8 @@ export const Page = styled.div`
 export const ConversationSidebarStyle = styled.aside`
   position: fixed;
   left: 0;
-  top: calc(${NAVBAR_HEIGHT}rem + 80px);;
-  height: 100%;
+  top: calc(${NAVBAR_HEIGHT}rem + 80px);
+  height: calc(100% - ${NAVBAR_HEIGHT}rem - 80px);
   background-color: #1a1a1a;
   width: ${CSB_WIDTH}px;
   border-right: 1px solid #606060;
@@ -89,7 +89,6 @@ export const ConversationSidebarStyle = styled.aside`
   &::-webkit-scrollbar-track {
     background-color: #1a1a1a;
   }
-
   & header {
     position: fixed;
     display: flex;
@@ -99,13 +98,11 @@ export const ConversationSidebarStyle = styled.aside`
     background-color: #151515;
     height: 80px;
     border-bottom: 1px solid #606060;
-    
     & h2 {
       font-weight: 500;
       margin-right: 150px;
       color: #fff;
     }
-
     & .header-content {
       display: flex;
       align-items: center;
@@ -114,10 +111,9 @@ export const ConversationSidebarStyle = styled.aside`
 `;
 
 export const ConversationChannelPageStyle = styled.div`
-  min-width: 400px;
   position: fixed;
   left: 0;
-  top: 0;
+  top: ${NAVBAR_HEIGHT}rem;
   bottom: 0;
   width: 100%;
   height: 100%;
@@ -128,10 +124,9 @@ export const ConversationChannelPageStyle = styled.div`
 export const ConversationPannelStyle = styled.div`
   position: fixed;
   left: 0;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+  top: 3rem;
+  width: calc(100% - ${CSB_WIDTH}px);
+  height: calc(100% - 3rem);
   margin-left: ${CSB_WIDTH}px;
   background-color: #1f1f1f;
 `;
