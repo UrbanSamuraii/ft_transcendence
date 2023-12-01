@@ -40,3 +40,41 @@
 	color: rgb(255, 255, 255);
 }
 
+.convMenu {
+	display: flex;
+	align-items: center;
+	margin-right: 450px;
+	margin-top: 20px;
+
+	button {
+		font-size: 40px;
+	  	margin-left: 10px;
+	}
+  
+	.profile-name {
+	  cursor: pointer;
+	  position: relative;
+	  user-select: none;
+	  /* Other styles for profile-name */
+	}
+  
+	.dropdown-menu {
+	  position: absolute;
+	  right: 0;
+	  width: 550px;
+	  /* Other styles for dropdown-menu */
+	}
+  }
+
+.convMenuButton {
+	width: 550px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #444e55;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}

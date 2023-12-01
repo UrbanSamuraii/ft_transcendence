@@ -1,5 +1,5 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { CreateConversationForm } from '../conversations/CreateConversationForm'
+import { CreateConversationForm } from '../forms/CreateConversationForm'
 import OutsideClickHandler from 'react-outside-click-handler';
 
 type CreateConversationModalProps = {

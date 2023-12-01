@@ -1,21 +1,22 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
-import './GlobalConversations.css'
+import { useParams } from "react-router-dom";
+import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
 interface ConvDataInput {
-	conversationName: string;
+	userToAdd: string;
 }
 
-type JoinConversationFormProps = {
+type AddMemberToConversationFormProps = {
     setShowModal: (show: boolean) => void;
 };
 
-export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setShowModal }) => {
+export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormProps> = ({ setShowModal }) => {
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
-		conversationName: '',
+		userToAdd: '',
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -33,12 +34,13 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 	};
 
 	const navigate = useNavigate();
+	const conversationId = useParams().id;
 
 	const handleJoinConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.conversationName) {
-			newErrors.conversationName = 'Conversation Name is required';
+		if (!ConvDataInput.userToAdd) {
+			newErrors.userToAdd = 'Username is required';
 		}
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
@@ -46,19 +48,16 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 		else {
 			try {
 				console.log({"DATA" : ConvDataInput});
-				const response = await axios.post('http://localhost:3001/conversations/join', ConvDataInput, {
-					withCredentials: true });
-				console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
+				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/add_member`, ConvDataInput, {
+        			withCredentials: true });
+				console.log({"RESPONSE from ADDING USER TO CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
-				} else {
-					const conversationId = response.data.conversationId;
-					setShowModal(false);
-					navigate(`channel/${conversationId}`);
-				}
+				} 
+				setShowModal(false);
 			} catch (error) {
-				console.error('Creating conversation error:', error);
+				console.error('Adding user to conversation error:', error);
 				if (axios.isAxiosError(error)) {
 					if (error.response && error.response.data) {
 						const customError = error.response.data.message;
@@ -73,22 +72,22 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 
 	return (
 		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-			<h2>Join Conversation</h2>
+			<h2>Add User to the Conversation</h2>
 			
 			<div className="input-createConv-container">
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
-						Conversation Name
+						Username or email
 						<InputField
-						type="text" name="conversationName" value={ConvDataInput.conversationName} onChange={handleInputChange} />
-						{formErrors.conversationName && <div className="error-message">{formErrors.conversationName}</div>}
+						type="text" name="userToAdd" value={ConvDataInput.userToAdd} onChange={handleInputChange} />
+						{formErrors.userToAdd && <div className="error-message">{formErrors.userToAdd}</div>}
 					</InputLabel>
 				</InputContainer>
 			</div>
 
 
 			<div className="button-createConv-container">
-				<ButtonCreateConv type="submit" >Join Conversation</ButtonCreateConv>
+				<ButtonCreateConv type="submit" >Add User</ButtonCreateConv>
 			</div>
 
 		</form>
