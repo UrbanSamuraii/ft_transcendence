@@ -41,7 +41,7 @@ export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversati
   };
 
   return (
-    <form className="form-Create-Conversation">
+    <div>
       <h2>Member List</h2>
       <div className="member-list">
         <ul>
@@ -55,6 +55,6 @@ export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversati
           ))}
         </ul>
       </div>
-    </form>
+    </div>
   );
 };
