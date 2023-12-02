@@ -41,20 +41,22 @@ export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversati
   };
 
   return (
-    <div>
-      <h2>Member List</h2>
-      <div className="member-list">
-        <ul>
-          {memberList.map((member) => (
-            <li key={member.username}>
-              <span>{member.username}</span>
-              <button onClick={() => upgradeMemberToAdmin(member.username)}>
-                Upgrade to Admin
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+	<div>
+	  <h2>Member List</h2>
+	  <div className="member-list">
+		<ul>
+		  {memberList.map((member) => (
+			<li key={member.username}>
+			  <button
+				className="username-button"
+				onClick={() => upgradeMemberToAdmin(member.username)}
+			  >
+				{member.username}
+			  </button>
+			</li>
+		  ))}
+		</ul>
+	  </div>
+	</div>
   );
 };
