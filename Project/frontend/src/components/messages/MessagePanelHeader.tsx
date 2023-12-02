@@ -10,6 +10,7 @@ import { AddMemberToConversationModal } from '../modals/AddMemberToConversationM
 import { RemoveMemberFromConversationModal } from '../modals/RemoveMemberFromConversationModal';
 import { MuteMemberInConversationModal } from '../modals/MuteMemberInConversationModal';
 import { UnMuteMemberInConversationModal } from '../modals/UnMuteMemberInConversationModal';
+import { UpgradeMemberInConversationModal } from '../modals/UpgradeMemberInConversationModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -45,6 +46,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
     const [showMuteMemberModal, setShowMuteMemberModal] = useState(false);
     const [showUnMuteMemberModal, setShowUnMuteMemberModal] = useState(false);
+    const [showUpgradeMemberModal, setShowUpgradeMemberModal] = useState(false);
 
 
 	const handleOutsideClick = () => {
@@ -102,6 +104,10 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowUnMuteMemberModal(false);
                 }} /> )}
+			{showUpgradeMemberModal && (<UpgradeMemberInConversationModal
+                setShowModal={() => {
+                    setShowUpgradeMemberModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
@@ -117,6 +123,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
 										<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
 										<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
+										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member</button>
 
 									</div>
 								)}

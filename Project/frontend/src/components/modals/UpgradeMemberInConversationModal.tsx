@@ -1,13 +1,12 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { UpgradeMemberConversationForm } from '../forms/UpgradeMemberConversationForm';
+import { UpgradeMemberInConversationForm } from '../forms/UpgradeMemberConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type UserListModalProps = {
+type UpgradeUserModalProps = {
 	setShowModal: (show: boolean) => void;
-	
 };
 
-export const UnMuteMemberInConversationModal: React.FC<UserListModalProps> = ({ setShowModal }) => {
+export const UpgradeMemberInConversationModal: React.FC<UpgradeUserModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -16,7 +15,7 @@ export const UnMuteMemberInConversationModal: React.FC<UserListModalProps> = ({ 
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<UpgradeMemberConversationForm setShowModal={setShowModal}/>
+					<UpgradeMemberInConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>
