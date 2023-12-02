@@ -4,8 +4,10 @@ import { useEffect, useState, FC, useRef } from "react";
 import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { AddMemberToConversationModal } from '../modals/AddMemberToConversationModal';
+
 import OutsideClickHandler from 'react-outside-click-handler';
+import { AddMemberToConversationModal } from '../modals/AddMemberToConversationModal';
+import { RemoveMemberFromConversationModal } from '../modals/RemoveMemberFromConversationModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -36,8 +38,9 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
-	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+	const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -73,7 +76,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 console.error('Error fetching conversation name:', error);
             }
         };
-
         fetchConversationName();
     }, [conversationId]);
 	
@@ -82,6 +84,10 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 			{showAddMemberModal && (<AddMemberToConversationModal
                 setShowModal={() => {
                     setShowAddMemberModal(false);
+                }} /> )}
+			{showRemoveMemberModal && (<RemoveMemberFromConversationModal
+                setShowModal={() => {
+                    setShowRemoveMemberModal(false);
                 }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
@@ -95,6 +101,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 								{isDropdownOpen && (
 									<div className="dropdown-menu">
 										<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
+										<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
 									</div>
 								)}
 							</div>
