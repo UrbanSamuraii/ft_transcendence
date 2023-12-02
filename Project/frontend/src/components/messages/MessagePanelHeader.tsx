@@ -5,6 +5,7 @@ import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { AddMemberToConversationModal } from '../modals/AddMemberToConversationModal';
+import OutsideClickHandler from 'react-outside-click-handler';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -36,8 +37,15 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
 	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
+
+	const handleOutsideClick = () => {
+		setIsOpen(false);
+		setIsDropdownOpen(false);
+	};
 
 	const toggleDropdown = () => {
+		setIsOpen(!isOpen);
         setIsDropdownOpen(!isDropdownOpen);
     };
 
@@ -80,6 +88,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 					{conversationName}
 				</div>
 				<div className="convMenu">
+				<OutsideClickHandler onOutsideClick={handleOutsideClick}>
 					{user ? (
 						<>
 							<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
@@ -93,6 +102,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 					) : (
 						<button onClick={() => navigate('/login')}>SIGN IN</button>
 					)}
+				</OutsideClickHandler>
 				</div>
 			</MessageContainerHeaderStyle>
 		</>
