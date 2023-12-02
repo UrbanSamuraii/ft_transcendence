@@ -21,6 +21,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showMenuModal, setShowMenuModal] = useState(false);
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
+
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  

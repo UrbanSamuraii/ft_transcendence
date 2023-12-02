@@ -3,11 +3,13 @@ import axios from 'axios';
 import { useEffect, useState, FC, useRef } from "react";
 import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import OutsideClickHandler from 'react-outside-click-handler';
 import { AddMemberToConversationModal } from '../modals/AddMemberToConversationModal';
 import { RemoveMemberFromConversationModal } from '../modals/RemoveMemberFromConversationModal';
+import { MuteMemberInConversationModal } from '../modals/MuteMemberInConversationModal';
+import { UnMuteMemberInConversationModal } from '../modals/UnMuteMemberInConversationModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -41,6 +43,9 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const [isOpen, setIsOpen] = useState(false);
 	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 	const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
+    const [showMuteMemberModal, setShowMuteMemberModal] = useState(false);
+    const [showUnMuteMemberModal, setShowUnMuteMemberModal] = useState(false);
+
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -89,6 +94,14 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowRemoveMemberModal(false);
                 }} /> )}
+			{showMuteMemberModal && (<MuteMemberInConversationModal
+                setShowModal={() => {
+                    setShowMuteMemberModal(false);
+                }} /> )}
+			{showUnMuteMemberModal && (<UnMuteMemberInConversationModal
+                setShowModal={() => {
+                    setShowUnMuteMemberModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
@@ -102,6 +115,9 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 									<div className="dropdown-menu">
 										<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
 										<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
+										<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
+										<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
+
 									</div>
 								)}
 							</div>

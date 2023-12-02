@@ -399,7 +399,7 @@ export class ConversationsService {
 		}
 	}
 
-	async getConversationMembers(conversationId: number): Promise<User[]> {
+	async getConversationMembers(conversationId: number): Promise<User[] | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
 			include: { members: true },
@@ -408,7 +408,7 @@ export class ConversationsService {
 		if (conversation) {
 			return conversation.members;
 		} else { // Not sure it is usefull, we will check this into a conversation directly
-			return [];
+			return null;
 		}
 	}
 

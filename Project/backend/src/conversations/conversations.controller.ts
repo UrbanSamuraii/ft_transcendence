@@ -70,6 +70,14 @@ export class ConversationsController {
 		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/members')
+	async GetMembersInTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const userList = await this.convService.getConversationMembers(idConv);
+		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Post('join')
 	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -176,6 +184,8 @@ export class ConversationsController {
 		member = await this.userService.getUserByUsernameOrEmail(req.body.userToMute);
 		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
+		else if (member?.username === user.username) {
+			res.status(403).json({ message: "You can't mute yoursel." }); return;}
 		else {
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
