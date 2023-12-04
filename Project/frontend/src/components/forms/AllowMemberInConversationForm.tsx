@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-
-// http://localhost:3001/conversations/${conversationId}/get_member_mute
 
 type Member = {
 	username: string;
@@ -15,7 +11,7 @@ type Member = {
 	setShowModal: (show: boolean) => void;
   };
   
-  export const MuteMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
+  export const AllowMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
 	const conversationId = useParams().id;
   
@@ -35,10 +31,10 @@ type Member = {
 	  fetchMemberList();
 	}, []);
   
-	const unMuteMember = async (username: string) => {
+	const allowMember = async (username: string) => {
 	  try {
-	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/get_member_mute`, 
-		{ userToMute: username }, 
+	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/get_member_Allow`, 
+		{ userToUnmute: username }, 
 		{ withCredentials: true });
 		console.log("USER SELECTED ", response)
 	  } catch (error: any) {
@@ -60,7 +56,7 @@ type Member = {
 			  <li key={member.username}>
 				<button
 				  className="username-button"
-				  onClick={() => unMuteMember(member.username)}
+				  onClick={() => allowMember(member.username)}
 				>
 				  {member.username}
 				</button>

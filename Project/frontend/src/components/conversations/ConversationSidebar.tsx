@@ -7,7 +7,7 @@ import { ConversationMessage } from "../../utils/types";
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
-import { ConversationMenuModal } from '../modals/ConversationMenuModal';
+import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 

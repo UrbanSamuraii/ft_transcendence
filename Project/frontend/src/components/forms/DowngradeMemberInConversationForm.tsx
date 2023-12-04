@@ -10,7 +10,7 @@ type MemberInConversationFormProps = {
   setShowModal: (show: boolean) => void;
 };
 
-export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
+export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
   const [memberList, setMemberList] = useState<Member[]>([]);
   const conversationId = useParams().id;
 
@@ -30,11 +30,12 @@ export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormP
     fetchMemberList();
   }, []);
 
-  const upgradeMemberToAdmin = async (username: string) => {
+  const downgradeAdminToMember = async (username: string) => {
     try {
-      await axios.post(`http://localhost:3001/conversations/${conversationId}/update_member_to_admin`,
-		{ userToUnmute: username }, 
+		await axios.post(`http://localhost:3001/conversations/${conversationId}/downgrade_admin_to_member`,
+		{ adminToDowngrade: username }, 
 		{ withCredentials: true });
+    //   console.log("USER SELECTED ", username);
     } catch (error) {
       console.error('Error upgrading member to admin:', error);
       
@@ -50,7 +51,7 @@ export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormP
             <li key={member.username}>
               <button
                 className="username-button"
-                onClick={() => upgradeMemberToAdmin(member.username)}
+                onClick={() => downgradeAdminToMember(member.username)}
               >
                 {member.username}
               </button>

@@ -11,6 +11,9 @@ import { RemoveMemberFromConversationModal } from '../modals/RemoveMemberFromCon
 import { MuteMemberInConversationModal } from '../modals/MuteMemberInConversationModal';
 import { UnMuteMemberInConversationModal } from '../modals/UnMuteMemberInConversationModal';
 import { UpgradeMemberInConversationModal } from '../modals/UpgradeMemberInConversationModal';
+import { DowngradeMemberInConversationModal } from '../modals/DowngradeMemberInConversationModal';
+import { BanUserFromConversationModal} from '../modals/BanUserFromConversationModal';
+
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -47,7 +50,8 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
     const [showMuteMemberModal, setShowMuteMemberModal] = useState(false);
     const [showUnMuteMemberModal, setShowUnMuteMemberModal] = useState(false);
     const [showUpgradeMemberModal, setShowUpgradeMemberModal] = useState(false);
-
+    const [showDowngradeMemberModal, setShowDowngradeMemberModal] = useState(false);
+    const [showBanUserModal, setShowBanUserModal] = useState(false);
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -108,6 +112,14 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowUpgradeMemberModal(false);
                 }} /> )}
+			{showDowngradeMemberModal && (<DowngradeMemberInConversationModal
+                setShowModal={() => {
+                    setShowDowngradeMemberModal(false);
+                }} /> )}
+			{showBanUserModal && (<BanUserFromConversationModal
+                setShowModal={() => {
+                    setShowBanUserModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
@@ -123,7 +135,9 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
 										<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
 										<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
-										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member</button>
+										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>
+										<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
+										<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User from the conversation</button>
 
 									</div>
 								)}

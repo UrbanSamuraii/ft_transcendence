@@ -412,12 +412,39 @@ export class ConversationsService {
 		}
 	}
 
+	// To return the members' list - excluding myself
+	async getConversationOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { members: true },
+		});
+	  
+		if (conversation) {
+		  const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
+		  return membersWithoutUser; 
+		} 
+		else { return null; }
+	}
+
 	async getPassword(conversationId: number): Promise<String | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
 		});
 		if (conversation.protected) { return conversation.password; }
 		else { return null; }
+	}
+
+	async getBannedUsers(conversationId: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		
+		if (conversation) {
+			return conversation.banned;
+		} else { // Not sure it is usefull, we will check this into a conversation directly
+			return null;
+		}
 	}
 
 	/////////////////// SETTERS /////////////////// 

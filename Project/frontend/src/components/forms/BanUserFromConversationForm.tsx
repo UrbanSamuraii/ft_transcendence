@@ -5,17 +5,17 @@ import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 
 interface ConvDataInput {
-	userToAdd: string;
+	userToBan: string;
 }
 
-type AddMemberToConversationFormProps = {
+type BanUserFromConversationFormProps = {
     setShowModal: (show: boolean) => void;
 };
 
-export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormProps> = ({ setShowModal }) => {
+export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormProps> = ({ setShowModal }) => {
 
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
-		userToAdd: '',
+		userToBan: '',
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -37,8 +37,8 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
 	const handleJoinConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.userToAdd) {
-			newErrors.userToAdd = 'Username is required';
+		if (!ConvDataInput.userToBan) {
+			newErrors.userToBan = 'Username is required';
 		}
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
@@ -46,16 +46,16 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
 		else {
 			try {
 				console.log({"DATA" : ConvDataInput});
-				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/add_member`, ConvDataInput, {
+				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/ban_user`, ConvDataInput, {
         			withCredentials: true });
-				console.log({"RESPONSE from ADDING USER TO CONVERSATION": response}); 
+				console.log({"RESPONSE from BANNING USER FROM CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
 				} 
 				setShowModal(false);
 			} catch (error) {
-				console.error('Adding user to conversation error:', error);
+				console.error('Banning user to conversation error:', error);
 				if (axios.isAxiosError(error)) {
 					if (error.response && error.response.data) {
 						const customError = error.response.data.message;
@@ -70,15 +70,15 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
 
 	return (
 		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-			<h2>Add User to the Conversation</h2>
+			<h2>Ban User from the Conversation</h2>
 			
 			<div className="input-createConv-container">
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
 						Username or email
 						<InputField
-						type="text" name="userToAdd" value={ConvDataInput.userToAdd} onChange={handleInputChange} />
-						{formErrors.userToAdd && <div className="error-message">{formErrors.userToAdd}</div>}
+						type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} />
+						{formErrors.userToBan && <div className="error-message">{formErrors.userToBan}</div>}
 					</InputLabel>
 				</InputContainer>
 			</div>

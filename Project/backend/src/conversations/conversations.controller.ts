@@ -70,11 +70,22 @@ export class ConversationsController {
 		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	// WARNING : send back all OTHER MEMBERS of the conv' ! The user making the request is then excluded !!
 	@Get(':id/members')
-	async GetMembersInTheConversation(@Param('id') id: string) {
+	async GetMembersInTheConversation(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
 		const idConv = parseInt(id);
-		const userList = await this.convService.getConversationMembers(idConv);
+		const userList = await this.convService.getConversationOtherMembers(idConv, userId);
 		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Get(':id/banned_users')
+	async GetBannedUserFromTheConversation(@Param('id') id: string, @Req() req) {
+		const idConv = parseInt(id);
+		const bannedUsersList = await this.convService.getBannedUsers(idConv);
+		if (bannedUsersList) { return bannedUsersList; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
