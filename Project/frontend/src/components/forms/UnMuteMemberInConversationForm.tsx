@@ -37,10 +37,15 @@ type Member = {
 		{ userToUnmute: username }, 
 		{ withCredentials: true });
 		console.log("USER SELECTED ", response)
-	  } catch (error) {
-		console.error('Error un-muting member:', error);
+	  } catch (error: any) {
+		if (error.response && error.response.status === 403) {
+			alert("Unauthorized: Please log in.");
+		  } else if (error.response && error.response.data && error.response.data.message) {
+			alert(error.response.data.message);
+		  } else {
+			console.error('Error un-muting member:', error);
 	  }
-	};
+	};};
   
 	return (
 	  <div className="member-list-container">
@@ -61,5 +66,4 @@ type Member = {
 		</div>
 	  </div>
 	);
-  };
-  
+};
