@@ -54,7 +54,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
     const [showDowngradeMemberModal, setShowDowngradeMemberModal] = useState(false);
     const [showBanUserModal, setShowBanUserModal] = useState(false);
     const [showAllowUserModal, setShowAllowUserModal] = useState(false);
-
+	const [isOwner, setIsOwner] = useState(false);
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -109,6 +109,23 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	  
 		fetchPrivacyStatus();
 	}, [conversationId]);
+
+	useEffect(() => {
+		const fetchOwnerStatus = async () => {
+		  try {
+			const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/owner`, {
+			  withCredentials: true,
+			});
+			// console.log("RESPONSE FROM who is owner ?", response.data.id);
+			// console.log("User id", user?.id);
+			setIsOwner(response.data.id === user?.id);
+		  } catch (error) {
+			console.error('Error fetching conversation owner status:', error);
+		  }
+		};
+	
+		fetchOwnerStatus();
+	  }, [conversationId, user]);
 
 	const handleTogglePrivacy = async () => {
 		try {
@@ -168,6 +185,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 				<OutsideClickHandler onOutsideClick={handleOutsideClick}>
 					{user ? (
 						<>
+							{isOwner && <button className="ownerButton">Owner Action</button>}
 							<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
 								{isDropdownOpen && (
 									<div className="dropdown-menu">
@@ -177,7 +195,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
 										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>
 										<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
-										<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User from the conversation</button>
+										<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>
 										<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>
 										
 										<div className="privacy-toggle">

@@ -455,6 +455,17 @@ export class ConversationsService {
 		else { return null; }
 	}
 
+	async getOwner(conversationId: number): Promise<User | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) {
+			const owner = await this.userService.getUserById(conversation.ownerId);
+			return owner; }
+		else { return null; }
+	}
+
+
 	/////////////////// SETTERS /////////////////// 
 
 	async setPassword(newPassword: string, conversationId: number): Promise<boolean> {

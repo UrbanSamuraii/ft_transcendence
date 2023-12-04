@@ -97,6 +97,14 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/owner')
+	async GetOwnerOfTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const owner = await this.convService.getOwner(idConv);
+		if (owner) { return owner; } 
+		else { throw new HttpException('Owner not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Post('join')
 	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -141,7 +149,6 @@ export class ConversationsController {
 	}
 
 	//////////////// HANDLE RULES AND MEMBERS OF SPECIFIC CONVERSATION ////////////////////
-
 
 	// Admin can add users to conversation - no matter if it is a private or public one
 	// The user who has been add doesn t need to enter the password if the conversation is protected
@@ -224,7 +231,6 @@ export class ConversationsController {
 		let member = null;
 		let muted = false;
 		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute);
-		console.log("Username targeted :", member);
 		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
@@ -329,7 +335,7 @@ export class ConversationsController {
 		const oldPassword = await this.convService.getPassword(parseInt(conversationId));
 		if (oldPassword) {
 			if (oldPassword !== req.body.oldPassword) {
-				res.status(403).json({ message: "Actual Password doesn't match without input" });
+				res.status(403).json({ message: "Actual Password doesn't match with input" });
 				return ;}}
 
 		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
