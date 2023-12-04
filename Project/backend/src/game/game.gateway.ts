@@ -168,6 +168,12 @@ export class GameGateway implements OnGatewayInit {
             if (data.isGameOver && data.winnerUsername) {
                 this.resetUserGameStatus(player1.data.user.username);
                 this.resetUserGameStatus(player2.data.user.username);
+                player1.leave(gameId.toString());
+                player2.leave(gameId.toString());
+                this.playerInfoMap.delete(player1.data.user.username);
+                this.playerInfoMap.delete(player2.data.user.username);
+                this.userCurrentGameMap.delete(player1.data.user.username);
+                this.userCurrentGameMap.delete(player2.data.user.username);
                 this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
                     console.error('Error handling game over:', error);
                     // Handle any errors that occur in the game over handling
@@ -276,7 +282,7 @@ export class GameGateway implements OnGatewayInit {
     async handleAttemptReconnect(client: Socket, payload: { username: string; gameId: string }): Promise<void> {
         // Check if the user is supposed to be in the game room
         // if (this.isUserInGame(payload.username, payload.gameId) && !this.isUserInRoom(client, payload.gameId)) {
-        client.join(payload.gameId);
+        client.join(payload.gameId.toString());
         // const gameState = this.getGameState(payload.gameId);
         // client.emit('gameStateUpdate', gameState);
         // }
