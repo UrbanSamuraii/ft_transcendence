@@ -447,6 +447,14 @@ export class ConversationsService {
 		}
 	}
 
+	async getStatus(conversationId: number): Promise<String | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) { console.log("conversation.privacy", conversation.privacy); return conversation.privacy }
+		else { return null; }
+	}
+
 	/////////////////// SETTERS /////////////////// 
 
 	async setPassword(newPassword: string, conversationId: number): Promise<boolean> {

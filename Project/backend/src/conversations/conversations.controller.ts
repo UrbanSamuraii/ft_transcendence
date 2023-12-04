@@ -89,6 +89,14 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/status')
+	async GetStatusOfTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const status = await this.convService.getStatus(idConv);
+		if (status) { return status; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Post('join')
 	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -331,21 +339,23 @@ export class ConversationsController {
 			res.status(201).json({ message: "The conversation is not protected." }); return;}
 	}
 
-	@Post(':id/set_private')
+	@Get(':id/set_private')
 	@UseGuards(OwnerGuard)
 	async SetConversationPrivate(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log("Setting the conversation to PRIVATE");
 		await this.convService.setConversationPrivate(parseInt(conversationId));
 		res.status(201).json({ message: "Conversation is now Private." });}
 
-	@Post(':id/set_public')
+	@Get(':id/set_public')
 	@UseGuards(OwnerGuard)
 	async SetConversationPublic(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log("Setting the conversation to PUBLIC");
 		await this.convService.setConversationPublic(parseInt(conversationId));
 		res.status(201).json({ message: "Conversation is now Public." });}
 

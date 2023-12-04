@@ -1,5 +1,5 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { AllowMemberInConversationForm } from '../forms/UnMuteMemberInConversationForm';
+import { AllowMemberInConversationForm } from '../forms/AllowMemberInConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
 type AllowConversationModalProps = {

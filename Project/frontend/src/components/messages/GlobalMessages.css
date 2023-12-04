@@ -78,3 +78,27 @@
 	border-radius: 5px;
 	cursor: pointer;
 }
+
+/* Privacy button style */
+
+.privacy-toggle {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .toggle-button {
+	padding: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .toggle-button.private {
+	background-color: #f02a2a; /* Red for private */
+	color: white;
+  }
+  
+  .toggle-button.public {
+	background-color: #276927; /* Green for public */
+	color: white;
+  }
+  

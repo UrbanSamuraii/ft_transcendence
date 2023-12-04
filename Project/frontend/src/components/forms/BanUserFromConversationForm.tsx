@@ -85,7 +85,7 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 
 
 			<div className="button-createConv-container">
-				<ButtonCreateConv type="submit" >Add User</ButtonCreateConv>
+				<ButtonCreateConv type="submit" >Ban User</ButtonCreateConv>
 			</div>
 
 		</form>

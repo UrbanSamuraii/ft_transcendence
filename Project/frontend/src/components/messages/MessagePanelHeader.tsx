@@ -13,7 +13,7 @@ import { UnMuteMemberInConversationModal } from '../modals/UnMuteMemberInConvers
 import { UpgradeMemberInConversationModal } from '../modals/UpgradeMemberInConversationModal';
 import { DowngradeMemberInConversationModal } from '../modals/DowngradeMemberInConversationModal';
 import { BanUserFromConversationModal} from '../modals/BanUserFromConversationModal';
-
+import { AllowMemberInConversationModal } from '../modals/AllowMemberInConversationModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -45,6 +45,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
 	const [isOpen, setIsOpen] = useState(false);
+	const [isPrivate, setIsPrivate] = useState(false);
 	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 	const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
     const [showMuteMemberModal, setShowMuteMemberModal] = useState(false);
@@ -52,6 +53,8 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
     const [showUpgradeMemberModal, setShowUpgradeMemberModal] = useState(false);
     const [showDowngradeMemberModal, setShowDowngradeMemberModal] = useState(false);
     const [showBanUserModal, setShowBanUserModal] = useState(false);
+    const [showAllowUserModal, setShowAllowUserModal] = useState(false);
+
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -89,6 +92,39 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
         };
         fetchConversationName();
     }, [conversationId]);
+
+
+	useEffect(() => {
+		const fetchPrivacyStatus = async () => {
+		  try {
+				const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/status`, {
+			  withCredentials: true,
+			});
+			// console.log("STATUS OF THE CONVERSATION", response.data);
+			setIsPrivate(response.data === 'PRIVATE');
+		  } catch (error) {
+			console.error('Error fetching conversation privacy status:', error);
+		  }
+		};
+	  
+		fetchPrivacyStatus();
+	}, [conversationId]);
+
+	const handleTogglePrivacy = async () => {
+		try {
+			if (isPrivate) {
+				await axios.get(`http://localhost:3001/conversations/${conversationId}/set_public`, {
+					withCredentials: true,});
+			} else {
+			  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/set_private`, {
+			  withCredentials: true,});
+			}
+			setIsPrivate(!isPrivate);
+		} catch (error) {
+		  console.error('Error toggling conversation privacy:', error);
+		}
+	};
+	  
 	
 	return (
 		<>
@@ -120,6 +156,10 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowBanUserModal(false);
                 }} /> )}
+			{showAllowUserModal && (<AllowMemberInConversationModal
+                setShowModal={() => {
+                    setShowAllowUserModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
@@ -138,7 +178,17 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>
 										<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
 										<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User from the conversation</button>
-
+										<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>
+										
+										<div className="privacy-toggle">
+											<button
+											className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
+											onClick={handleTogglePrivacy}
+											>
+											{isPrivate ? 'Private Conversation' : 'Public Conversation'}
+											</button>
+										</div>
+										
 									</div>
 								)}
 							</div>

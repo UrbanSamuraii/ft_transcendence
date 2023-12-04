@@ -18,10 +18,9 @@ type Member = {
 	useEffect(() => {
 	  const fetchMemberList = async () => {
 		try {
-		  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/members`, {
+		  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/banned_users`, {
 				withCredentials: true,
 			});
-		  	// console.log({"MEMBER LIST in the conversation": response});
 			setMemberList(response.data);
 		} catch (error) {
 		  console.error('Error fetching member list:', error);
@@ -33,8 +32,8 @@ type Member = {
   
 	const allowMember = async (username: string) => {
 	  try {
-	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/get_member_Allow`, 
-		{ userToUnmute: username }, 
+	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/allow_user`, 
+		{ userToAllow: username }, 
 		{ withCredentials: true });
 		console.log("USER SELECTED ", response)
 	  } catch (error: any) {
@@ -49,21 +48,25 @@ type Member = {
   
 	return (
 	  <div className="member-list-container">
-		<h2>Member List</h2>
-		<div className="member-list">
-		  <ul>
-			{memberList.map((member) => (
-			  <li key={member.username}>
-				<button
-				  className="username-button"
-				  onClick={() => allowMember(member.username)}
-				>
-				  {member.username}
-				</button>
-			  </li>
-			))}
-		  </ul>
+		<h2>Banned Users from the Conversation</h2>
+		{memberList.length > 0 ? (
+			<div className="member-list">
+			<ul>
+				{memberList.map((member) => (
+				<li key={member.username}>
+					<button
+					className="username-button"
+					onClick={() => allowMember(member.username)}
+					>
+					{member.username}
+					</button>
+				</li>
+				))}
+			</ul>
+			</div>
+		) : (
+			<p>No user is banned from this conversation.</p>
+		)}
 		</div>
-	  </div>
 	);
 };
