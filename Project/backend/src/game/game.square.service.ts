@@ -79,13 +79,14 @@ export class SquareGameService {
     }
 
     // updateGameState(gameId: any, clientInputs: any, callback: Function) {
-    updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
-
-        let gameState = this.gameStates.get(gameId);
+    // updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
+    updateGameState(gameId: number, playerInfoMap: Map<string, PlayerInfo>, callback: Function) {
+        let gameState = this.gameStates.get(gameId.toString());
         if (!gameState) {
             // Initialize game state for new gameId
             gameState = this.initializeGameState();
-            this.gameStates.set(gameId, gameState);
+            this.gameStates.set(gameId.toString(), gameState);
+
         }
 
 

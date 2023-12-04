@@ -10,6 +10,7 @@ function Matchmaking() {
     const [ongoingGameId, setOngoingGameId] = useState(null);
     const [isGameStatusChecked, setIsGameStatusChecked] = useState(false);
     const isGameStatusCheckedRef = useRef(isGameStatusChecked);
+    const ongoingGameIdRef = useRef(ongoingGameId);
 
     useEffect(() => {
         if (!socket) {
@@ -21,6 +22,7 @@ function Matchmaking() {
             socket.off('gameStatusResponse');
             if (data.inGame) {
                 setOngoingGameId(data.gameId);
+                ongoingGameIdRef.current = data.gameId;
             } else {
                 console.log("Emitting enterMatchmaking");
                 socket.emit('enterMatchmaking');
@@ -46,7 +48,7 @@ function Matchmaking() {
             console.log("ongoingGameId:", ongoingGameId);
             console.log("isGameStatusChecked:", isGameStatusChecked);
 
-            if (!matchFoundRef.current && ongoingGameId == null && isGameStatusCheckedRef.current) {
+            if (!matchFoundRef.current && ongoingGameIdRef.current == null && isGameStatusCheckedRef.current) {
                 console.log("Emitting leaveMatchmaking");
                 socket.emit('leaveMatchmaking');
             }
