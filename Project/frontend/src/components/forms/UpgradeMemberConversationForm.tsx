@@ -6,11 +6,11 @@ type Member = {
   username: string;
 };
 
-type UpgradeMemberInConversationFormProps = {
+type MemberInConversationFormProps = {
   setShowModal: (show: boolean) => void;
 };
 
-export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversationFormProps> = ({ setShowModal }) => {
+export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
   const [memberList, setMemberList] = useState<Member[]>([]);
   const conversationId = useParams().id;
 
@@ -18,10 +18,10 @@ export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversati
     const fetchMemberList = async () => {
       try {
         const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/members`, {
-			withCredentials: true,
+			  withCredentials: true,
 		  });
         // console.log({"MEMBER LIST in the conversation": response});
-		setMemberList(response.data);
+		  setMemberList(response.data);
       } catch (error) {
         console.error('Error fetching member list:', error);
       }
@@ -41,22 +41,22 @@ export const UpgradeMemberInConversationForm: React.FC<UpgradeMemberInConversati
   };
 
   return (
-	<div>
-	  <h2>Member List</h2>
-	  <div className="member-list">
-		<ul>
-		  {memberList.map((member) => (
-			<li key={member.username}>
-			  <button
-				className="username-button"
-				onClick={() => upgradeMemberToAdmin(member.username)}
-			  >
-				{member.username}
-			  </button>
-			</li>
-		  ))}
-		</ul>
-	  </div>
-	</div>
+    <div className="member-list-container">
+      <h2>Member List</h2>
+      <div className="member-list">
+        <ul>
+          {memberList.map((member) => (
+            <li key={member.username}>
+              <button
+                className="username-button"
+                onClick={() => upgradeMemberToAdmin(member.username)}
+              >
+                {member.username}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };

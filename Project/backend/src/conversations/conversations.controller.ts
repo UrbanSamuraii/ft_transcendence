@@ -205,6 +205,7 @@ export class ConversationsController {
 		let member = null;
 		let muted = false;
 		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUnmute);
+		console.log("Username targeted :", member);
 		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
 		else {
@@ -213,7 +214,7 @@ export class ConversationsController {
 			if (muted) {
 				res.status(201).json({ message: "User unmuted from the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "User is already unmuted." }); return;}
+				res.status(401).json({ message: "User is already unmuted." }); return;}
 		}
 	}
 
