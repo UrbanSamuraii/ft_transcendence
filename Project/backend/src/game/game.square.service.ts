@@ -16,6 +16,7 @@ const squareSize = 2.2;
 const squareDy = 0;
 const squareDx = 1.25;
 
+
 @Injectable()
 export class SquareGameService {
 

@@ -9,6 +9,7 @@ function Matchmaking() {
     const matchFoundRef = useRef(false);
     const [ongoingGameId, setOngoingGameId] = useState(null);
     const [isGameStatusChecked, setIsGameStatusChecked] = useState(false);
+    const isGameStatusCheckedRef = useRef(isGameStatusChecked);
 
     useEffect(() => {
         if (!socket) {
@@ -17,13 +18,17 @@ function Matchmaking() {
         }
 
         const handleGameStatusResponse = (data: any) => {
+            socket.off('gameStatusResponse');
             if (data.inGame) {
                 setOngoingGameId(data.gameId);
             } else {
+                console.log("Emitting enterMatchmaking");
                 socket.emit('enterMatchmaking');
                 socket.on('matchFound', handleMatchFound);
             }
             setIsGameStatusChecked(true); // Update when the check is complete
+            isGameStatusCheckedRef.current = true;
+            console.log("isGameStatusChecked: ", isGameStatusChecked);
         };
 
         const handleMatchFound = (data: any) => {
@@ -37,12 +42,17 @@ function Matchmaking() {
 
         return () => {
             console.log("Matchmaking component is unmounting");
-            socket.off('gameStatusResponse', handleGameStatusResponse);
-            socket.off('matchFound', handleMatchFound);
-            if (!matchFoundRef.current && ongoingGameId == null && isGameStatusChecked)
+            console.log("matchFoundRef.current:", matchFoundRef.current);
+            console.log("ongoingGameId:", ongoingGameId);
+            console.log("isGameStatusChecked:", isGameStatusChecked);
+
+            if (!matchFoundRef.current && ongoingGameId == null && isGameStatusCheckedRef.current) {
+                console.log("Emitting leaveMatchmaking");
                 socket.emit('leaveMatchmaking');
+            }
         };
-    }, [socket]);
+
+    }, []);
 
     const handleReconnectClick = () => {
         if (ongoingGameId) {

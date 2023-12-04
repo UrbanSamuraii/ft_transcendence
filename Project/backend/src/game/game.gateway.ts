@@ -84,6 +84,7 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
+
     private async verifyTokenAndGetUserInfo(client: Socket): Promise<User | null> {
         const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
         if (!token) {
@@ -113,6 +114,8 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
+        console.log('Queue before adding:', this.queue.map(c => c.data.user.username));
+
         const playerInfo: PlayerInfo = {
             // id: client.data.user.sub, // or appropriate user ID
             // username: client.data.user.username,
@@ -122,6 +125,7 @@ export class GameGateway implements OnGatewayInit {
         };
         this.playerInfoMap.set(client.data.user.username, playerInfo);
         this.queue.push(client);
+        console.log('Queue after adding:', this.queue.map(c => c.data.user.username));
     }
 
     private resetUserGameStatus(username: string): void {
@@ -158,12 +162,10 @@ export class GameGateway implements OnGatewayInit {
         player1.emit('matchFound', { opponent: player2.data.user, gameId });
         player2.emit('matchFound', { opponent: player1.data.user, gameId });
 
-
         this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
             this.server.to(gameId.toString()).emit('updateGameData', {
                 ...data,
             });
-
 
             if (data.isGameOver && data.winnerUsername) {
                 this.resetUserGameStatus(player1.data.user.username);
