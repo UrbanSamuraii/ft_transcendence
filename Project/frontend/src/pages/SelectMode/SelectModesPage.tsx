@@ -1,23 +1,50 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSocket } from '../../SocketContext';
 
-interface SelectModePageProps { }
-
-const SelectModePage: React.FC<SelectModePageProps> = ({ }) => {
-
+const SelectModePage = () => {
     const navigate = useNavigate();
+    const { socket } = useSocket(); // Assuming you have a SocketContext
+    const [ongoingGameId, setOngoingGameId] = useState(null);
+
+    useEffect(() => {
+        if (!socket) {
+            console.error('Socket is not available');
+            return;
+        }
+
+        socket.emit('checkGameStatus');
+
+        const handleGameStatusResponse = (data: any) => {
+            if (data.inGame) {
+                setOngoingGameId(data.gameId);
+            }
+        };
+
+        socket.on('gameStatusResponse', handleGameStatusResponse); // Update 'gameStatusResponse' with the actual event name used in your backend
+
+        return () => {
+            socket.off('gameStatusResponse', handleGameStatusResponse);
+        };
+    }, [socket]);
+
     const handleClassicModeClick = () => {
-        // Navigate to the matchmaking page when CLASSIC mode is clicked
         navigate('/matchmaking');
+    };
+
+    const handleReconnectClick = () => {
+        if (ongoingGameId) {
+            navigate(`/game/${ongoingGameId}`);
+        }
     };
 
     return (
         <div className="mode-selection">
-            {/* <button className="mode-button classic-mode" onClick={startGame}>CLASSIC</button> */}
             <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
-            <button className="mode-button start-button placeholder-1">PLACEHOLDER 1</button>
-            <button className="mode-button start-button placeholder-2">PLACEHOLDER 2</button>
-            {/* <button className="signout-button" onClick={handleSignoutClick}>SIGN OUT</button> */}
+            {ongoingGameId && (
+                <button className="mode-button reconnect-button" onClick={handleReconnectClick}>RECONNECT</button>
+            )}
+            {/* Other buttons */}
         </div>
     );
 };

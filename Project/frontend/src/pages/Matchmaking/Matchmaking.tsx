@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Matchmaking.css';
 import { useSocket } from '../../SocketContext';
@@ -7,7 +7,8 @@ function Matchmaking() {
     const { socket } = useSocket();
     const navigate = useNavigate();
     const matchFoundRef = useRef(false);
-    console.log("Matchmaking component mounted/re-rendered");
+    const [ongoingGameId, setOngoingGameId] = useState(null);
+    const [isGameStatusChecked, setIsGameStatusChecked] = useState(false);
 
     useEffect(() => {
         if (!socket) {
@@ -15,35 +16,49 @@ function Matchmaking() {
             return;
         }
 
+        const handleGameStatusResponse = (data: any) => {
+            if (data.inGame) {
+                setOngoingGameId(data.gameId);
+            } else {
+                socket.emit('enterMatchmaking');
+                socket.on('matchFound', handleMatchFound);
+            }
+            setIsGameStatusChecked(true); // Update when the check is complete
+        };
+
         const handleMatchFound = (data: any) => {
             console.log('Match found!', data);
             navigate(`/game/${data.gameId}`);
             matchFoundRef.current = true;
         };
 
-        // Emit 'enterMatchmaking' if already connected
-        // if (socket.connected) {
-        // console.log("Socket already connected, emitting 'enterMatchmaking'");
-        // socket.emit('enterMatchmaking');
-        // } else {
-        // socket.on('connect', () => {
-        // console.log("Connected, socket id:", socket.id);
-        // socket.emit('enterMatchmaking');
-        // });
-        // }
-        socket.emit('enterMatchmaking');
-
-        socket.on('matchFound', handleMatchFound);
+        socket.emit('checkGameStatus');
+        socket.on('gameStatusResponse', handleGameStatusResponse);
 
         return () => {
             console.log("Matchmaking component is unmounting");
+            socket.off('gameStatusResponse', handleGameStatusResponse);
             socket.off('matchFound', handleMatchFound);
-            socket.off('connect');
-            if (!matchFoundRef.current)
+            if (!matchFoundRef.current && ongoingGameId == null && isGameStatusChecked)
                 socket.emit('leaveMatchmaking');
         };
-        // }, [socket, navigate]);
-    }, []);
+    }, [socket]);
+
+    const handleReconnectClick = () => {
+        if (ongoingGameId) {
+            navigate(`/game/${ongoingGameId}`);
+        }
+    };
+
+    if (ongoingGameId) {
+        return (
+            <div className="reconnect-container">
+                <button className="reconnect-button" onClick={handleReconnectClick}>
+                    Reconnect to Game
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="paddle-container">

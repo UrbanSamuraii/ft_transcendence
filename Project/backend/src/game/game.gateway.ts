@@ -28,6 +28,8 @@ export class GameGateway implements OnGatewayInit {
     private queue: Socket[] = [];
     private playerInfoMap = new Map<number, PlayerInfo>();
     private gameLoop: NodeJS.Timeout;
+    private userInGameMap = new Map<string, boolean>();
+    private userCurrentGameMap = new Map<string, number>(); // username -> gameId
 
     constructor(private gameService: SquareGameService,
         private readonly jwtService: JwtService,
@@ -35,10 +37,6 @@ export class GameGateway implements OnGatewayInit {
         private prisma: PrismaService // Inject Prisma service here
 
     ) { }
-
-    // private addUserToQueue(client: Socket) {
-    //     this.queue.push(client);
-    // }
 
     private removeFromQueue(clientToRemove: Socket) {
         console.log("Queue before removal:", this.queue.map(client => client.id)); // Print queue before removal
@@ -68,19 +66,11 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
-
     async handleConnection(client: Socket, ...args: any[]) {
         // Listen for disconnect
         client.on('disconnect', (reason) => {
             // console.log('Client disconnected:', client.id);
             console.log('Client disconnected:', 'Reason:', reason);
-
-            // const index = this.queue.indexOf(client);
-            // if (index !== -1) {
-            //     this.queue.splice(index, 1);
-            // }
-
-            // this.playerInfoMap.delete(client.data.user.sub);
         });
     }
 
@@ -88,14 +78,11 @@ export class GameGateway implements OnGatewayInit {
     handleLeaveMatchmaking(client: Socket) {
         console.log("handleLeaveMatchmaking");
         this.removeFromQueue(client);
-        // client.disconnect();
         if (client.data?.user?.username) {
             this.playerInfoMap.delete(client.data.user.username);
             console.log(`Removed ${client.data.user.username} from playerInfoMap`);
         }
-        // client.disconnect(true);
     }
-
 
     private async verifyTokenAndGetUserInfo(client: Socket): Promise<User | null> {
         const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
@@ -121,6 +108,11 @@ export class GameGateway implements OnGatewayInit {
     private addUserToQueue(client: Socket, userInfo: User): void {
         client.data.user = userInfo;
 
+        if (this.userInGameMap.get(userInfo.username)) {
+            console.log('User is already in a game, user:', userInfo.username);
+            return;
+        }
+
         const playerInfo: PlayerInfo = {
             // id: client.data.user.sub, // or appropriate user ID
             // username: client.data.user.username,
@@ -130,6 +122,10 @@ export class GameGateway implements OnGatewayInit {
         };
         this.playerInfoMap.set(client.data.user.username, playerInfo);
         this.queue.push(client);
+    }
+
+    private resetUserGameStatus(username: string): void {
+        this.userInGameMap.set(username, false);
     }
 
     private async startMatchmaking(): Promise<void> {
@@ -146,6 +142,9 @@ export class GameGateway implements OnGatewayInit {
         if (!player1 || !player2) {
             return;
         }
+
+        this.userInGameMap.set(player1.data.user.username, true);
+        this.userInGameMap.set(player2.data.user.username, true);
 
         // Create a new game in your database or game management system
         const newGame = await this.createGame(player1, player2);
@@ -167,6 +166,8 @@ export class GameGateway implements OnGatewayInit {
 
 
             if (data.isGameOver && data.winnerUsername) {
+                this.resetUserGameStatus(player1.data.user.username);
+                this.resetUserGameStatus(player2.data.user.username);
                 this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
                     console.error('Error handling game over:', error);
                     // Handle any errors that occur in the game over handling
@@ -190,8 +191,13 @@ export class GameGateway implements OnGatewayInit {
                 // Other game-related data...
             }
         });
-
+        this.userCurrentGameMap.set(player1.data.user.username, newGame.id);
+        this.userCurrentGameMap.set(player2.data.user.username, newGame.id);
         return newGame;
+    }
+
+    private getCurrentGameIdForUser(username: string): number | null {
+        return this.userCurrentGameMap.get(username) || null;
     }
 
     @SubscribeMessage('enterMatchmaking')
@@ -215,101 +221,6 @@ export class GameGateway implements OnGatewayInit {
             this.startMatchmaking();
         }
     }
-
-    //     const token = client.handshake.headers.cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
-
-    //     if (!token) {
-    //         console.log('No token provided from enterMatchmaking');
-    //         // client.disconnect(true);  // Disconnect the client
-    //         return;
-    //     } // check if the token is auth
-
-    //     try {
-    //         const decoded = this.jwtService.verify(token);
-    //         // Optionally, store the decoded data on the socket for future use
-    //         client.data.user = decoded;
-    //         const userInfo = await this.userService.getUserByToken(token);
-    //         console.log("decoded.email = ", decoded.email);
-
-    //         this.addUserToQueue(client, );
-    //         client.data.user.username = userInfo.username;
-
-    //         const playerInfo: PlayerInfo = {
-    //             // id: client.data.user.sub, // or appropriate user ID
-    //             // username: client.data.user.username,
-    //             username: userInfo.username,
-    //             score: 0,
-    //             activeKeys: []
-    //         };
-
-    //         this.playerInfoMap.set(client.data.user.username, playerInfo);
-
-    //         console.log("Queue length: ", this.queue.length);
-    //         console.log("Queue contents: ", this.queue.map(client => `ID: ${client.id}, Username: ${client.data.user.username}`));
-
-
-    //         if (this.queue.length >= 2) {  // if there are at least two users in the queue
-    //             const player1 = this.queue.shift();  // remove the first user from the queue
-    //             const player2 = this.queue.shift();  // remove the second user from the queue
-
-    //             // console.log("\n\n\nplayer1: \n\n\n", player1);
-    //             // console.log("\n\n\nplayer2: \n\n\n", player2);
-    //             console.log("Player 1 Socket ID:", player1.id);
-    //             console.log("Player 2 Socket ID:", player2.id);
-
-    //             // console.log("player1.data.user.id = ", player1.data.user.sub);
-    //             // console.log("player2.data.user.id = ", player2.data.user.sub);
-    //             // console.log("player1.data.user.username = ", player1.data.user.username);
-    //             // console.log("player2.data.user.username = ", player2.data.user.username);
-
-    //             //this "sub" shit is so annoying and so random need to change that garbage ass shit
-
-    //             const newGame = await this.prisma.game.create({
-    //                 data: {
-    //                     uniqueId: uuidv4(), // Generate a UUID for uniqueId
-    //                     player1Id: player1.data.user.sub,
-    //                     // player1Id: player1.data.user.id,
-    //                     player2Id: player2.data.user.sub,
-    //                     // player2Id: player2.data.user.id,
-    //                     // other game data if necessary
-    //                 }
-    //             });
-
-    //             const gameId = newGame.id;
-
-    //             console.log("gameId:", gameId);
-
-    //             player1.join(gameId.toString());
-    //             player2.join(gameId.toString());
-
-    //             // Notify both users that a match has been found
-
-    //             player1.emit('matchFound', { opponent: player2.data.user, gameId });
-    //             player2.emit('matchFound', { opponent: player1.data.user, gameId });
-
-    //             this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
-    //                 this.server.to(gameId.toString()).emit('updateGameData', {
-    //                     ...data,
-    //                 });
-
-
-    //                 if (data.isGameOver && data.winnerUsername) {
-    //                     this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
-    //                         console.error('Error handling game over:', error);
-    //                         // Handle any errors that occur in the game over handling
-    //                     });
-    //                 }
-    //             });
-
-    //             console.log(`Matched ${player1.id} with ${player2.id}`);
-    //         }
-
-    //     } catch (e) {
-    //         console.log('Invalid token', e);
-    //         client.disconnect(true);  // Disconnect the client
-    //         return;
-    //     }
-    // }
 
     @SubscribeMessage('paddleMovements')
     handlePaddleMovements(client: Socket, activeKeys: string[]) {
@@ -347,4 +258,17 @@ export class GameGateway implements OnGatewayInit {
         this.gameService.isGamePaused = false;
     }
 
+    @SubscribeMessage('checkGameStatus')
+    async handleCheckGameStatus(client: Socket): Promise<void> {
+        const userInfo = await this.verifyTokenAndGetUserInfo(client);
+        if (!userInfo) {
+            client.emit('gameStatusResponse', { inGame: false });
+            return;
+        }
+
+        const inGame = this.userInGameMap.get(userInfo.username);
+        const gameId = inGame ? this.getCurrentGameIdForUser(userInfo.username) : null;
+
+        client.emit('gameStatusResponse', { inGame, gameId });
+    }
 }
