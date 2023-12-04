@@ -33,11 +33,6 @@ function SquareGame({ }) {
     useEffect(() => {
         activeKeysRef.current = activeKeys;
 
-        // if (activeKeys.length > 0) {
-        //     startInterval();
-        // } else {
-        //     stopInterval();
-        // }
     }, [activeKeys]);
 
     function goBackToMainMenu() {
@@ -59,6 +54,8 @@ function SquareGame({ }) {
                 clearInterval(intervalId);
             }
         };
+
+        socket.emit("attemptReconnect", { username: getCookie("username"), gameId });
 
         socket.on("updateGameData", handleGameDataUpdate);
 

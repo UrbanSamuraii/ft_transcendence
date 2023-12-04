@@ -26,25 +26,6 @@ export class MessagingGateway implements OnGatewayConnection {
         const cookie = client.handshake.headers.cookie;
         const token = cookie?.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1];
 
-        // if (!token) {
-        //     console.log('No token provided');
-        //     client.disconnect(true);
-        //     return;
-        // }
-
-        // const identifiedUser = await this.userService.getUserByToken(token);
-        // if (identifiedUser) {
-        // 	client = this.associateUserToAuthSocket(client, identifiedUser);
-        // 	this.sessions.setUserSocket(identifiedUser.id, client);
-        // }
-
-        // // To make my userSocket join all the room the user is member of
-        // const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
-        // for (const conversation of userWithConversations.conversations) {
-        // 	client.join(conversation.id.toString());
-        // }
-
-
         if (token) {
             const identifiedUser = await this.userService.getUserByToken(token);
             if (identifiedUser) {

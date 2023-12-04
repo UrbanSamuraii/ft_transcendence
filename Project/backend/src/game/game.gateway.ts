@@ -271,4 +271,14 @@ export class GameGateway implements OnGatewayInit {
 
         client.emit('gameStatusResponse', { inGame, gameId });
     }
+
+    @SubscribeMessage('attemptReconnect')
+    async handleAttemptReconnect(client: Socket, payload: { username: string; gameId: string }): Promise<void> {
+        // Check if the user is supposed to be in the game room
+        // if (this.isUserInGame(payload.username, payload.gameId) && !this.isUserInRoom(client, payload.gameId)) {
+        client.join(payload.gameId);
+        // const gameState = this.getGameState(payload.gameId);
+        // client.emit('gameStateUpdate', gameState);
+        // }
+    }
 }
