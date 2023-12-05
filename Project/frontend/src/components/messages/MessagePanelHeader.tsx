@@ -186,29 +186,29 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 					{user ? (
 						<>
 							{isOwner && <button className="ownerButton">Owner Action</button>}
-							<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
-								{isDropdownOpen && (
-									<div className="dropdown-menu">
-										<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
-										<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
-										<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
-										<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
-										<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>
-										<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
-										<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>
-										<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>
-										
-										<div className="privacy-toggle">
-											<button
-											className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
-											onClick={handleTogglePrivacy}
-											>
-											{isPrivate ? 'Private Conversation' : 'Public Conversation'}
-											</button>
-										</div>
-										
+								<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
+							{isDropdownOpen && (
+								<div className="dropdown-menu">
+									<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
+									<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
+									<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
+									<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>
+									<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>
+									<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
+									<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>
+									<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>
+									
+									<div className="privacy-toggle">
+										<button
+										className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
+										onClick={handleTogglePrivacy}
+										>
+										{isPrivate ? 'Private Conversation' : 'Public Conversation'}
+										</button>
 									</div>
-								)}
+									
+								</div>
+							)}
 							</div>
 						</>
 					) : (

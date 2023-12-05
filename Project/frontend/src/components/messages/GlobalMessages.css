@@ -43,7 +43,7 @@
 .convMenu {
 	display: flex;
 	align-items: center;
-	margin-right: 450px;
+	width: 40%;
 	margin-top: 20px;
 
 	button {
@@ -100,5 +100,11 @@
   .toggle-button.public {
 	background-color: #276927; /* Green for public */
 	color: white;
-  }
+}
+
+.owner-action-menu {
+	display: flex;
+	align-items: center;
+	margin-left: 10px; /* Adjust the margin as needed */
+}
   
