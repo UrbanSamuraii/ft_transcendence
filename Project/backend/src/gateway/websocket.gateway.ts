@@ -138,4 +138,9 @@ export class MessagingGateway implements OnGatewayConnection {
         }
     }
 
+    @OnEvent('change.privacy')
+    displayChangeOfPrivacyEvent(payload: any) {
+        // console.log({ "When deleting LAST MESSAGE": payload });
+        
+    }
 }
