@@ -7,7 +7,7 @@ import { ConversationMessage } from "../../utils/types";
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
-import { ConversationMenuModal } from '../modals/ConversationMenuModal';
+import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -21,6 +21,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showMenuModal, setShowMenuModal] = useState(false);
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
+
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  

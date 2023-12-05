@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
-import './GlobalConversations.css'
+import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 

@@ -1,12 +1,12 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { JoinConversationForm } from '../forms/JoinConversationForm';
+import { BanUserFromConversationForm } from '../forms/BanUserFromConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type JoinConversationModalProps = {
+type BanUserConversationModalProps = {
 	setShowModal: (show: boolean) => void;
 };
 
-export const JoinConversationModal: React.FC<JoinConversationModalProps> = ({ setShowModal }) => {
+export const BanUserFromConversationModal: React.FC<BanUserConversationModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -15,7 +15,7 @@ export const JoinConversationModal: React.FC<JoinConversationModalProps> = ({ se
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<JoinConversationForm setShowModal={setShowModal}/>
+					<BanUserFromConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>

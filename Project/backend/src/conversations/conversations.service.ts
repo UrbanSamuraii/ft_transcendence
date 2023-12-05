@@ -399,7 +399,7 @@ export class ConversationsService {
 		}
 	}
 
-	async getConversationMembers(conversationId: number): Promise<User[]> {
+	async getConversationMembers(conversationId: number): Promise<User[] | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
 			include: { members: true },
@@ -408,8 +408,22 @@ export class ConversationsService {
 		if (conversation) {
 			return conversation.members;
 		} else { // Not sure it is usefull, we will check this into a conversation directly
-			return [];
+			return null;
 		}
+	}
+
+	// To return the members' list - excluding myself
+	async getConversationOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { members: true },
+		});
+	  
+		if (conversation) {
+		  const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
+		  return membersWithoutUser; 
+		} 
+		else { return null; }
 	}
 
 	async getPassword(conversationId: number): Promise<String | null> {
@@ -419,6 +433,38 @@ export class ConversationsService {
 		if (conversation.protected) { return conversation.password; }
 		else { return null; }
 	}
+
+	async getBannedUsers(conversationId: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { banned: true },
+		});
+		
+		if (conversation) {
+			return conversation.banned;
+		} else { // Not sure it is usefull, we will check this into a conversation directly
+			return null;
+		}
+	}
+
+	async getStatus(conversationId: number): Promise<String | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) { console.log("conversation.privacy", conversation.privacy); return conversation.privacy }
+		else { return null; }
+	}
+
+	async getOwner(conversationId: number): Promise<User | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) {
+			const owner = await this.userService.getUserById(conversation.ownerId);
+			return owner; }
+		else { return null; }
+	}
+
 
 	/////////////////// SETTERS /////////////////// 
 

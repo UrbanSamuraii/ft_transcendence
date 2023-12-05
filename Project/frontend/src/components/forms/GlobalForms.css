@@ -99,3 +99,63 @@
 	}
 }
 
+
+/* FORMULA USERNAME DISPLAY */
+
+.member-list-container {
+	background-color: #4d4c4c;
+	width: 500px;
+	height: 200px;
+	padding: 20px;
+	display: flex;
+  	flex-direction: column;
+ 	align-items: center;
+ 	justify-content: center;
+}
+
+.member-list-container h2 {
+	margin-bottom: 30px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center; 
+}
+
+.member-list-container p {
+	margin-bottom: 30px;
+	font-size: 15px;
+	font-weight: italic;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center; 
+}
+
+.member-list ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.username-button {
+	display: block;
+	width: 100%;
+	padding: 8px 16px;
+	margin: 4px;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	background-color: #4d4c4c;
+	color: white;
+	border: 1px solid #4d4c4c;
+	border-radius: 4px;
+	transition: background-color 0.3s, color 0.3s;
+}
+  
+  .username-button:hover {
+	background-color: #8d8f8d;
+	border: 1px solid #ffffff;
+}
+  

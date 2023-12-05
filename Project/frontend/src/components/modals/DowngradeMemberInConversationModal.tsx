@@ -1,12 +1,12 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { JoinConversationForm } from '../forms/JoinConversationForm';
+import { DowngradeMemberInConversationForm } from '../forms/DowngradeMemberInConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type JoinConversationModalProps = {
+type DowngradeUserModalProps = {
 	setShowModal: (show: boolean) => void;
 };
 
-export const JoinConversationModal: React.FC<JoinConversationModalProps> = ({ setShowModal }) => {
+export const DowngradeMemberInConversationModal: React.FC<DowngradeUserModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -15,7 +15,7 @@ export const JoinConversationModal: React.FC<JoinConversationModalProps> = ({ se
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<JoinConversationForm setShowModal={setShowModal}/>
+					<DowngradeMemberInConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>

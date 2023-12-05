@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { PageProps } from './styleType';
 
 export const CSB_WIDTH: number = 350;
+export const NAVBAR_HEIGHT: number = 2; // define in rem
+
 
 export const InputField = styled.input`
   font-family: 'Inter';
@@ -68,9 +70,9 @@ export const Page = styled.div`
 export const ConversationSidebarStyle = styled.aside`
   position: fixed;
   left: 0;
-  top: 75px;
-  height: 100%;
-  background-color: #1a1a1a;
+  top: calc(${NAVBAR_HEIGHT}rem + 80px);
+  height: calc(100% - ${NAVBAR_HEIGHT}rem - 80px);
+  background-color: #1f1f1f;
   width: ${CSB_WIDTH}px;
   border-right: 1px solid #606060;
   overflow-y: scroll;
@@ -87,23 +89,23 @@ export const ConversationSidebarStyle = styled.aside`
   &::-webkit-scrollbar-track {
     background-color: #1a1a1a;
   }
-
   & header {
     position: fixed;
     display: flex;
-    top:0;
+    top: ${NAVBAR_HEIGHT}rem;
     justify-content: space-between;
     padding: 0 18px;
-    background-color: #151515;
+    background-color: #1f1f1f;
     height: 80px;
+    width: ${CSB_WIDTH}px;
     border-bottom: 1px solid #606060;
+    border-right: 1px solid #606060;
     
     & h2 {
       font-weight: 500;
       margin-right: 150px;
       color: #fff;
     }
-
     & .header-content {
       display: flex;
       align-items: center;
@@ -112,24 +114,21 @@ export const ConversationSidebarStyle = styled.aside`
 `;
 
 export const ConversationChannelPageStyle = styled.div`
-  min-width: 400px;
   position: fixed;
   left: 0;
-  top: 0;
-  bottom: 0;
+  top: ${NAVBAR_HEIGHT}rem;
   width: 100%;
-  height: 100%;
+  height: 90%;
   margin-left: ${CSB_WIDTH}px; 
-  background-color: #1f1f1f;
+  background-color: #777777;
 `;
 
 export const ConversationPannelStyle = styled.div`
   position: fixed;
   left: 0;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+  top: 3rem;
+  width: calc(100% - ${CSB_WIDTH}px);
+  height: calc(100% - 3rem);
   margin-left: ${CSB_WIDTH}px;
   background-color: #1f1f1f;
 `;
@@ -188,7 +187,7 @@ export const OverlayStyle = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  margin-left: ${CSB_WIDTH}px;
+  margin-right: ${CSB_WIDTH}px;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
@@ -198,7 +197,9 @@ export const OverlayStyle = styled.div`
 `;
 
 export const OverlayContent = styled.div`
-  margin-right: ${CSB_WIDTH}px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ButtonOverlay = styled.button`
@@ -226,7 +227,7 @@ export const ButtonOverlay = styled.button`
 `;
 
 export const ButtonCreateConv = styled.button`
-  background-color: #3c3c9c;
+  background-color: #1a1a1a;
   color: #fff; 
   border: none;
   padding: 0px 0px; 
@@ -274,12 +275,39 @@ export const MessageContainerPersonnalStyle = styled.div`
 `;
 
 export const MessageContainerHeaderStyle = styled.div`
-  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
   background: black;
   width: 100%;
   height: 80px;
   border-bottom: 1px solid #606060;
-  border-left: 1px solid #606060;
+
+  .messagePanelTitle {
+    margin-left: 100px;
+    color: white;
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+
+    button {
+      font-size: 8rem;
+      margin-left: 10px;
+    }
+
+    .profile-name {
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      font-size: 8rem;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+    }
+  }
 `;
 
 export const MessageInputFieldStyle = styled.div`
@@ -309,7 +337,7 @@ export const MessageInputTextArea = styled.textarea`
   resize: none;
   overflow: hidden;
   height: auto;
-  width: 85%; /* Adjust as needed */
+  width: 85%; 
   min-height: 54px;
   max-height: 162px;
   overflow-y: auto;
@@ -326,9 +354,9 @@ export const MessageSendButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 45px; /* Fixed width for MessageSendButton to keep it a circle */
-  min-width: 45px; /* Minimum width for MessageSendButton */
-  height: 45px; /* Fixed height for MessageSendButton to keep it a circle */
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
 `;
 
 export const MessageSendIcon = styled.span`

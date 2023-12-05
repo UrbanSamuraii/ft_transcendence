@@ -70,6 +70,41 @@ export class ConversationsController {
 		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	// WARNING : send back all OTHER MEMBERS of the conv' ! The user making the request is then excluded !!
+	@Get(':id/members')
+	async GetMembersInTheConversation(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const userList = await this.convService.getConversationOtherMembers(idConv, userId);
+		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Get(':id/banned_users')
+	async GetBannedUserFromTheConversation(@Param('id') id: string, @Req() req) {
+		const idConv = parseInt(id);
+		const bannedUsersList = await this.convService.getBannedUsers(idConv);
+		if (bannedUsersList) { return bannedUsersList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Get(':id/status')
+	async GetStatusOfTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const status = await this.convService.getStatus(idConv);
+		if (status) { return status; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Get(':id/owner')
+	async GetOwnerOfTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const owner = await this.convService.getOwner(idConv);
+		if (owner) { return owner; } 
+		else { throw new HttpException('Owner not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Post('join')
 	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -114,7 +149,6 @@ export class ConversationsController {
 	}
 
 	//////////////// HANDLE RULES AND MEMBERS OF SPECIFIC CONVERSATION ////////////////////
-
 
 	// Admin can add users to conversation - no matter if it is a private or public one
 	// The user who has been add doesn t need to enter the password if the conversation is protected
@@ -176,6 +210,8 @@ export class ConversationsController {
 		member = await this.userService.getUserByUsernameOrEmail(req.body.userToMute);
 		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." }); return;}
+		else if (member?.username === user.username) {
+			res.status(403).json({ message: "You can't mute yoursel." }); return;}
 		else {
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
@@ -203,7 +239,7 @@ export class ConversationsController {
 			if (muted) {
 				res.status(201).json({ message: "User unmuted from the conversation." }); return;}
 			else {
-				res.status(403).json({ message: "User is already unmuted." }); return;}
+				res.status(401).json({ message: "User is already unmuted." }); return;}
 		}
 	}
 
@@ -299,7 +335,7 @@ export class ConversationsController {
 		const oldPassword = await this.convService.getPassword(parseInt(conversationId));
 		if (oldPassword) {
 			if (oldPassword !== req.body.oldPassword) {
-				res.status(403).json({ message: "Actual Password doesn't match without input" });
+				res.status(403).json({ message: "Actual Password doesn't match with input" });
 				return ;}}
 
 		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
@@ -309,21 +345,23 @@ export class ConversationsController {
 			res.status(201).json({ message: "The conversation is not protected." }); return;}
 	}
 
-	@Post(':id/set_private')
+	@Get(':id/set_private')
 	@UseGuards(OwnerGuard)
 	async SetConversationPrivate(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log("Setting the conversation to PRIVATE");
 		await this.convService.setConversationPrivate(parseInt(conversationId));
 		res.status(201).json({ message: "Conversation is now Private." });}
 
-	@Post(':id/set_public')
+	@Get(':id/set_public')
 	@UseGuards(OwnerGuard)
 	async SetConversationPublic(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		console.log("Setting the conversation to PUBLIC");
 		await this.convService.setConversationPublic(parseInt(conversationId));
 		res.status(201).json({ message: "Conversation is now Public." });}
 

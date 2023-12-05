@@ -4,7 +4,7 @@ import './GlobalConversations.css';
 export const ConversationPanel = () => {
 	return (
 		<ConversationPannelStyle>
-			Conversation Panel
+			WELCOME
 		</ConversationPannelStyle>
 	);
 };

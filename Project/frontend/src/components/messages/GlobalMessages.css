@@ -40,3 +40,71 @@
 	color: rgb(255, 255, 255);
 }
 
+.convMenu {
+	display: flex;
+	align-items: center;
+	width: 40%;
+	margin-top: 20px;
+
+	button {
+		font-size: 40px;
+	  	margin-left: 10px;
+	}
+  
+	.profile-name {
+	  cursor: pointer;
+	  position: relative;
+	  user-select: none;
+	  /* Other styles for profile-name */
+	}
+  
+	.dropdown-menu {
+	  position: absolute;
+	  right: 0;
+	  width: 550px;
+	  /* Other styles for dropdown-menu */
+	}
+  }
+
+.convMenuButton {
+	width: 300px !important;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #444e55;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+/* Privacy button style */
+
+.privacy-toggle {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .toggle-button {
+	padding: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .toggle-button.private {
+	background-color: #f02a2a; /* Red for private */
+	color: white;
+  }
+  
+  .toggle-button.public {
+	background-color: #276927; /* Green for public */
+	color: white;
+}
+
+.owner-action-menu {
+	display: flex;
+	align-items: center;
+	margin-left: 10px; /* Adjust the margin as needed */
+}
+  
