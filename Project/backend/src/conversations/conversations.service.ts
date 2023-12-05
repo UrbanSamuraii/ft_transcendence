@@ -426,14 +426,6 @@ export class ConversationsService {
 		else { return null; }
 	}
 
-	async getPassword(conversationId: number): Promise<String | null> {
-		const conversation = await this.prismaService.conversation.findUnique({
-			where: { id: conversationId },
-		});
-		if (conversation.protected) { return conversation.password; }
-		else { return null; }
-	}
-
 	async getBannedUsers(conversationId: number): Promise<User[] | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -447,14 +439,6 @@ export class ConversationsService {
 		}
 	}
 
-	async getStatus(conversationId: number): Promise<String | null> {
-		const conversation = await this.prismaService.conversation.findUnique({
-			where: { id: conversationId },
-		});
-		if (conversation) { console.log("conversation.privacy", conversation.privacy); return conversation.privacy }
-		else { return null; }
-	}
-
 	async getOwner(conversationId: number): Promise<User | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -465,6 +449,31 @@ export class ConversationsService {
 		else { return null; }
 	}
 
+	// To get privacy
+	async getStatus(conversationId: number): Promise<String | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) { return conversation.privacy; }
+		else { return null; }
+	}
+
+	// To know if protected or not 
+	async isProtected(conversationId: number): Promise<boolean | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation) { return conversation.protected; }
+		else { return null; }
+	}
+
+	async getPassword(conversationId: number): Promise<String | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+		});
+		if (conversation.protected) { return conversation.password; }
+		else { return null; }
+	}
 
 	/////////////////// SETTERS /////////////////// 
 

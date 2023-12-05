@@ -357,6 +357,7 @@ export class ConversationsController {
 		this.eventEmitter.emit('change.privacy', {conversationId, privacy});
 		res.status(201).json({ message: "Conversation is now Private." });}
 
+		
 	@Get(':id/set_public')
 	@UseGuards(OwnerGuard)
 	async SetConversationPublic(

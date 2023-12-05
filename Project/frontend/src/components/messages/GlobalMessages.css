@@ -43,28 +43,38 @@
 .convMenu {
 	display: flex;
 	align-items: center;
-	width: 40%;
-	margin-top: 20px;
-
+	margin-right: 500px;
+  
 	button {
-		font-size: 40px;
-	  	margin-left: 10px;
+	  font-size: 40px;
+	  margin-left: 10px;
 	}
   
 	.profile-name {
 	  cursor: pointer;
 	  position: relative;
 	  user-select: none;
-	  /* Other styles for profile-name */
 	}
   
 	.dropdown-menu {
 	  position: absolute;
 	  right: 0;
-	  width: 550px;
-	  /* Other styles for dropdown-menu */
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-around;
 	}
-  }
+}
+
+  
+.owner-action-menu {
+	display: flex;
+	align-items: center;
+}
+
+.owner-action-menu button {
+	font-size: 20px;
+	color: rgb(54, 49, 121);
+}
 
 .convMenuButton {
 	width: 300px !important;
@@ -102,9 +112,3 @@
 	color: white;
 }
 
-.owner-action-menu {
-	display: flex;
-	align-items: center;
-	margin-left: 10px; /* Adjust the margin as needed */
-}
-  

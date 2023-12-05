@@ -38,6 +38,23 @@ const HamburgerIcon = () => (
 	</svg>
 );
 
+const LockIcon = () => (
+	<svg
+	  xmlns="http://www.w3.org/2000/svg"
+	  width="30"
+	  height="30"
+	  viewBox="0 0 24 24"
+	  fill="none"
+	  stroke="currentColor"
+	  strokeWidth="2"
+	  strokeLinecap="round"
+	  strokeLinejoin="round"
+	>
+	  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+	  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+	</svg>
+  );
+
 export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationId }) => {
 	
 	const [conversationName, setConversationName] = useState<string | null>(null);
@@ -102,7 +119,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 				const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/status`, {
 			  withCredentials: true,
 			});
-			// console.log("STATUS OF THE CONVERSATION", response.data);
 			setIsPrivate(response.data === 'PRIVATE');
 		  } catch (error) {
 			console.error('Error fetching conversation privacy status:', error);
@@ -128,8 +144,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 			const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/owner`, {
 			  withCredentials: true,
 			});
-			// console.log("RESPONSE FROM who is owner ?", response.data.id);
-			// console.log("User id", user?.id);
 			setIsOwner(response.data.id === user?.id);
 		  } catch (error) {
 			console.error('Error fetching conversation owner status:', error);
@@ -196,10 +210,8 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 				<OutsideClickHandler onOutsideClick={handleOutsideClick}>
 					{user ? (
 						<>
-							{isOwner && <button className="ownerButton">Owner Action</button>}
 								<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
-							{isDropdownOpen && (
-								<div className="dropdown-menu">
+							{isDropdownOpen && ( <div className="dropdown-menu">
 									<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
 									<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
 									<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
@@ -218,6 +230,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										</button>
 									</div>
 									
+									{isOwner && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}> <LockIcon /> </button>)}
 								</div>
 							)}
 							</div>
