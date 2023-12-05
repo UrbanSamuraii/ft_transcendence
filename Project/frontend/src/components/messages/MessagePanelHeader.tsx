@@ -4,6 +4,7 @@ import { useEffect, useState, FC, useRef } from "react";
 import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useSocket } from '../../SocketContext';
 
 import OutsideClickHandler from 'react-outside-click-handler';
 import { AddMemberToConversationModal } from '../modals/AddMemberToConversationModal';
@@ -55,6 +56,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
     const [showBanUserModal, setShowBanUserModal] = useState(false);
     const [showAllowUserModal, setShowAllowUserModal] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
+	const socketContextData = useSocket();
 
 	const handleOutsideClick = () => {
 		setIsOpen(false);
@@ -142,7 +144,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 		}
 	};
 	  
-	
 	return (
 		<>
 			{showAddMemberModal && (<AddMemberToConversationModal
