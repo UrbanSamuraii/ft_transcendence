@@ -353,7 +353,8 @@ export class ConversationsController {
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		console.log("Setting the conversation to PRIVATE");
 		await this.convService.setConversationPrivate(parseInt(conversationId));
-		this.eventEmitter.emit('change.privacy', conversationId);
+		const privacy = 'PRIVATE';
+		this.eventEmitter.emit('change.privacy', {conversationId, privacy});
 		res.status(201).json({ message: "Conversation is now Private." });}
 
 	@Get(':id/set_public')
@@ -364,7 +365,8 @@ export class ConversationsController {
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		console.log("Setting the conversation to PUBLIC");
 		await this.convService.setConversationPublic(parseInt(conversationId));
-		this.eventEmitter.emit('change.privacy', conversationId);
+		const privacy = 'PUBLIC';
+		this.eventEmitter.emit('change.privacy', {conversationId, privacy});
 		res.status(201).json({ message: "Conversation is now Public." });}
 
 }

@@ -113,6 +113,16 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	}, [conversationId]);
 
 	useEffect(() => {
+        socketContextData?.socket?.on('onChangePrivacy', (payload: any) => {
+			console.log("Change of privacy", payload.privacy);
+            setIsPrivate(payload.privacy === 'PRIVATE');
+        });
+        return () => {
+            socketContextData?.socket?.off('onChangePrivacy');
+        };
+    }, [socketContextData, conversationId]);
+
+	useEffect(() => {
 		const fetchOwnerStatus = async () => {
 		  try {
 			const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/owner`, {

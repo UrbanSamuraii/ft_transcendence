@@ -104,15 +104,16 @@ export class MessagingGateway implements OnGatewayConnection {
     handleMessageDeletedEvent(payload: any) {
         // console.log({ "When deleting a message": payload });
         if (payload.author) {
-            const authorSocket = this.sessions.getUserSocket(payload.author.id);
-            const recipientSockets = this.sessions.getSockets();
+            // const authorSocket = this.sessions.getUserSocket(payload.author.id);
+            // const recipientSockets = this.sessions.getSockets();
 
-            recipientSockets.forEach((recipientSocket, userId) => {
-                if (userId !== payload.author.id && recipientSocket) {
-                    recipientSocket.emit('onDeleteMessage', payload);
-                }
-            });
-            if (authorSocket) authorSocket.emit('onDeleteMessage', payload);
+            // recipientSockets.forEach((recipientSocket, userId) => {
+            //     if (userId !== payload.author.id && recipientSocket) {
+            //         recipientSocket.emit('onDeleteMessage', payload);
+            //     }
+            // });
+            // if (authorSocket) authorSocket.emit('onDeleteMessage', payload);
+            this.server.to(payload.conversation_id.toString()).emit('onDeleteMessage', payload);
         }
         else {
             this.server.emit('onDeleteMessage', payload);
@@ -123,15 +124,16 @@ export class MessagingGateway implements OnGatewayConnection {
     handleLastMessageDeletedEvent(payload: any) {
         // console.log({ "When deleting LAST MESSAGE": payload });
         if (payload.author) {
-            const authorSocket = this.sessions.getUserSocket(payload.author.id);
-            const recipientSockets = this.sessions.getSockets();
+            // const authorSocket = this.sessions.getUserSocket(payload.author.id);
+            // const recipientSockets = this.sessions.getSockets();
 
-            recipientSockets.forEach((recipientSocket, userId) => {
-                if (userId !== payload.author.id && recipientSocket) {
-                    recipientSocket.emit('onDeleteLastMessage', payload);
-                }
-            });
-            if (authorSocket) authorSocket.emit('onDeleteLastMessage', payload);
+            // recipientSockets.forEach((recipientSocket, userId) => {
+            //     if (userId !== payload.author.id && recipientSocket) {
+            //         recipientSocket.emit('onDeleteLastMessage', payload);
+            //     }
+            // });
+            // if (authorSocket) authorSocket.emit('onDeleteLastMessage', payload);
+            this.server.to(payload.conversation_id.toString()).emit('onDeleteLastMessage', payload);
         }
         else {
             this.server.emit('onDeleteLastMessage', payload);
@@ -140,7 +142,8 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('change.privacy')
     displayChangeOfPrivacyEvent(payload: any) {
-        // console.log({ "When deleting LAST MESSAGE": payload });
-        
+        console.log("The server has detect a change in privacy room number :", payload);
+        this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
+        // this.server.emit('onChangePrivacy', payload);
     }
 }
