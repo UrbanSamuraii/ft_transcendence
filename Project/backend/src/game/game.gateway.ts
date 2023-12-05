@@ -72,7 +72,7 @@ export class GameGateway implements OnGatewayInit {
         client.on('disconnect', (reason) => {
             // console.log('Client disconnected:', client.id);
             console.log('Client disconnected:', 'Reason:', reason);
-            console.log("this socket was in this room: ", client.rooms); // the Set contains at least the socket ID
+            // console.log("this socket was in this room: ", client.rooms); // the Set contains at least the socket ID
         });
     }
 
