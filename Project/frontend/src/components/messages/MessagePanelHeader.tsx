@@ -116,7 +116,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	useEffect(() => {
 		const fetchPrivacyStatus = async () => {
 		  try {
-				const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/status`, {
+			const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/status`, {
 			  withCredentials: true,
 			});
 			setIsPrivate(response.data === 'PRIVATE');
@@ -124,19 +124,18 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 			console.error('Error fetching conversation privacy status:', error);
 		  }
 		};
-	  
 		fetchPrivacyStatus();
-	}, [conversationId]);
+	  
+		const onChangePrivacyHandler = (payload: any) => {
+		  console.log("Change of privacy", payload.privacy);
+		  setIsPrivate(payload.privacy === 'PRIVATE');
+		};
+		socketContextData?.socket?.on('onChangePrivacy', onChangePrivacyHandler);
+		return () => {
+		  socketContextData?.socket?.off('onChangePrivacy', onChangePrivacyHandler);
+		};
+	  }, [socketContextData, conversationId]);
 
-	useEffect(() => {
-        socketContextData?.socket?.on('onChangePrivacy', (payload: any) => {
-			console.log("Change of privacy", payload.privacy);
-            setIsPrivate(payload.privacy === 'PRIVATE');
-        });
-        return () => {
-            socketContextData?.socket?.off('onChangePrivacy');
-        };
-    }, [socketContextData, conversationId]);
 
 	useEffect(() => {
 		const fetchOwnerStatus = async () => {
@@ -153,6 +152,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 		fetchOwnerStatus();
 	  }, [conversationId, user]);
 
+	  
 	const handleTogglePrivacy = async () => {
 		try {
 			if (isPrivate) {
