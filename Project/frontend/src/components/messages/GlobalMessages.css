@@ -43,7 +43,22 @@
 .convMenu {
 	display: flex;
 	align-items: center;
-	margin-right: 500px;
+	margin-right: 450px;
+	margin-top: 25px;
+	&:hover::before {
+		content: "Click to handle conversation parameters";
+		position: absolute;
+		top: 50px;
+		left: 65%;
+		transform: translateX(-80%);
+		background-color: #333;
+		color: #fff;
+		padding: 5px;
+		border-radius: 3px;
+		opacity: 0.8;
+		font-size: 16px;
+		white-space: nowrap;
+	}
   
 	button {
 	  font-size: 40px;
