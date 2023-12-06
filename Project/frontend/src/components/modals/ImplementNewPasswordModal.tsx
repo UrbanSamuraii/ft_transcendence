@@ -9,12 +9,12 @@ type NewPasswordModalProps = {
 
 export const ImplementNewPasswordModal: React.FC<NewPasswordModalProps> = ({ setShowModal }) => {
 
-	useEffect(() => {
-		console.log('ImplementNewPasswordModal mounted');
-		return () => {
-			console.log('ImplementNewPasswordModal unmounted');
-		};
-	}, []);
+	// useEffect(() => {
+	// 	console.log('ImplementNewPasswordModal mounted');
+	// 	return () => {
+	// 		console.log('ImplementNewPasswordModal unmounted');
+	// 	};
+	// }, []);
 	
 	return (
 		<OverlayStyle>

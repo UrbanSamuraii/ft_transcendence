@@ -130,7 +130,7 @@ export class ConversationsController {
 		if (conversation.privacy === privacy_t.PRIVATE) {
 			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." }); return;}
 		if (conversation.protected && conversation.password != null) {
-			res.status(403).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
+			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
 		
 		const added = await this.convService.addUserToConversation(user.id, conversation.id);
 		if (added) {

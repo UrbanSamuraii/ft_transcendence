@@ -52,7 +52,11 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
-				} else {
+				} 
+				else if (response.status === 202) {
+					console.log("There is a password protecting the conversation");
+				}
+				else {
 					const conversationId = response.data.conversationId;
 					setShowModal(false);
 					navigate(`channel/${conversationId}`);
