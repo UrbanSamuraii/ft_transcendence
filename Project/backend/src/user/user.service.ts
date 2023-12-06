@@ -80,6 +80,24 @@ export class UserService {
         }
     }
 
+    async getEloRating(userId: number): Promise<number> {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id: userId },
+                select: { eloRating: true }
+            });
+
+            if (user) {
+                return user.eloRating;
+            } else {
+                throw new Error(`User with ID ${userId} not found.`);
+            }
+        } catch (error) {
+            console.error("Error retrieving ELO rating:", error);
+            throw error;
+        }
+    }
+
     async getUserIdByUsername(username: string): Promise<number | null> {
         const user = await this.prisma.user.findUnique({
             where: { username },
@@ -113,6 +131,37 @@ export class UserService {
         } catch (error) {
             // Handle errors, possibly throw a custom error or log it
             console.error("Error incrementing games won:", error);
+            throw error;
+        }
+    }
+
+    async incrementGamesLost(userId: number): Promise<void> {
+        try {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    totalGamesLost: {
+                        increment: 1
+                    }
+                }
+            });
+        } catch (error) {
+            // Handle errors, possibly throw a custom error or log it
+            console.error("Error incrementing games won:", error);
+            throw error;
+        }
+    }
+
+    async updateEloRating(userId: number, newEloRating: number): Promise<void> {
+        try {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    eloRating: newEloRating
+                }
+            });
+        } catch (error) {
+            console.error("Error updating ELO rating:", error);
             throw error;
         }
     }

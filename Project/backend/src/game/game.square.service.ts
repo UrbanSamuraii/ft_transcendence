@@ -171,6 +171,12 @@ export class SquareGameService {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
                 const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
+                const loserUsername = leftPlayerInfo.score < rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
+
+                const winnerInfo = playerInfoMap.get(winnerUsername);
+                const loserInfo = playerInfoMap.get(loserUsername);
+                const winnerEloChange = winnerInfo.potentialEloGain;
+                const loserEloChange = loserInfo.potentialEloLoss;
 
                 // console.log("cl15: ", winnerUsername);
                 // console.log("cl15: ", gameState.isGameOver);
@@ -181,7 +187,12 @@ export class SquareGameService {
                     leftScore: gameState.leftScore,
                     rightScore: gameState.rightScore,
                     isGameOver: gameState.isGameOver,
-                    winnerUsername: winnerUsername
+                    winnerUsername: winnerUsername,
+                    loserUsername: loserUsername,
+                    winnerEloChange: winnerEloChange,
+                    loserEloChange: loserEloChange,
+                    winnerCurrentElo: winnerInfo.currentElo,
+                    loserCurrentElo: loserInfo.currentElo,
                 });
             } else {
                 callback({

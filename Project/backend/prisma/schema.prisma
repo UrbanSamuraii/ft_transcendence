@@ -32,6 +32,7 @@ model User {
     eloRating               Int       @default(1000)
     gamesWon          Game[] @relation("WinnerRelation")
     totalGamesWon           Int       @default(0)
+    totalGamesLost           Int       @default(0)
     
     messages      Message[] @relation("author")
     

@@ -7,6 +7,7 @@ import { getCookie } from '../../utils/cookies'
 import { useSocket } from '../../SocketContext';  // Update the path accordingly if needed
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../../AuthContext';
 
 const targetAspectRatio = 1318 / 807;
 const BASE_WIDTH = 1920;
@@ -28,6 +29,7 @@ function SquareGame({ }) {
     const navigate = useNavigate();
     const [intervalId, setIntervalId] = useState(null);
     const lastSentWasEmptyRef = useRef(true);
+    const { user } = useAuth();
 
     // Update the interval based on active keys
     useEffect(() => {
@@ -133,6 +135,7 @@ function SquareGame({ }) {
         };
     }, [activeKeys, isGamePaused]);
 
+    const buttons = [];
 
     const drawButton = (x, y, width, height, text, callback) => {
         console.log(`Drawing button with text: ${text}`);
@@ -161,11 +164,23 @@ function SquareGame({ }) {
 
         // Store callback and button bounds for click detection
         buttons.push({
-            x, y, width, height, callback
+            x, y, width, height, callback, text
         });
     }
 
-    const buttons = [];
+    function clearButtons() {
+        buttons.length = 0;
+    }
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        canvas.addEventListener('click', handleCanvasClick);
+
+        return () => {
+            canvas.removeEventListener('click', handleCanvasClick);
+        };
+        // Removed dependency on buttons
+    }, []);
 
     const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
@@ -258,15 +273,16 @@ function SquareGame({ }) {
             ctx.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
         });
 
-        // console.log("cl17: ", data.isGameOver)
-        // console.log("cl18: ", data.winnerUsername)
         if (data.isGameOver) {
             // Constants for layout
+            clearButtons();
+            const buttonOffsetY = gameHeight * 0.6;
+            const winnerNameFontSize = gameHeight * 0.06;
+            const textOffsetY = buttonOffsetY - winnerNameFontSize * 2;
+            const eloTextOffsetY = textOffsetY + winnerNameFontSize + 5; // Below the winner's name
             const buttonWidth = gameWidth * 0.3;
             const buttonHeight = gameHeight * 0.1;
-            const winnerNameFontSize = gameHeight * 0.06;
-            const buttonOffsetY = gameHeight * 0.6;
-            const textOffsetY = buttonOffsetY - winnerNameFontSize * 2;
+            const eloFontSize = winnerNameFontSize * 0.75; // Adjusted proportionally
 
             // Determine the winner's side for X positioning
             const winnerSideX = data.leftScore > data.rightScore ? gameWidth * 0.25 : gameWidth * 0.75;
@@ -282,6 +298,18 @@ function SquareGame({ }) {
 
             // Draw winner message
             ctx.fillText(`Winner: ${data.winnerUsername}`, textX, offsetY + textOffsetY);
+            const localPlayerUsername = user.username;
+
+            // Determine if the local player is the winner or loser
+            const isLocalPlayerWinner = localPlayerUsername === data.winnerUsername;
+            const isLocalPlayerLoser = localPlayerUsername === data.loserUsername;
+            const localPlayerCurrentElo = isLocalPlayerWinner ? data.winnerCurrentElo : (isLocalPlayerLoser ? data.loserCurrentElo : null);
+            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? -data.loserEloChange : 0);
+            const newElo = localPlayerCurrentElo + localPlayerEloChange;
+
+            ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`; // Update font size
+            const eloChangeText = `Your ELO: ${Math.round(newElo)}`;
+            ctx.fillText(eloChangeText, textX, offsetY + eloTextOffsetY);
 
             // Draw buttons
             drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', goBackToMainMenu);
@@ -368,7 +396,6 @@ function SquareGame({ }) {
             <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', position: 'absolute' }} />
         </div>
     );
-
 
 }
 export default SquareGame;
