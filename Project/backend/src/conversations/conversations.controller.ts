@@ -89,10 +89,20 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	// conversation status : Private or Public
 	@Get(':id/status')
 	async GetStatusOfTheConversation(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const status = await this.convService.getStatus(idConv);
+		if (status) { return status; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	// conversation status : Private or Public
+	@Get(':id/isProtected')
+	async GetProtectionOfTheConversation(@Param('id') id: string) {
+		const idConv = parseInt(id);
+		const status = await this.convService.isProtected(idConv);
 		if (status) { return status; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
@@ -325,24 +335,39 @@ export class ConversationsController {
 		}
 	}
 
-	@Post(':id/set_password')
+	@Post(':id/verify_password')
 	@UseGuards(OwnerGuard)
-	async SetConversationPassword(
+	async VerifyPassword(
 		@Param('id') conversationId: string,
 		@GetUser() user: User, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		
 		const oldPassword = await this.convService.getPassword(parseInt(conversationId));
 		if (oldPassword) {
-			if (oldPassword !== req.body.oldPassword) {
-				res.status(403).json({ message: "Actual Password doesn't match with input" });
-				return ;}}
-
-		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
-		if (newPassword) {
-			res.status(201).json({ message: "New password well implemented." }); return;}
+			if (oldPassword !== req.body.password) {
+				res.status(403).json({ message: "Actual Password doesn't match." }); return ;}
+			else {
+				res.status(201).json({ message: "Valid Password." }); return;}}
 		else {
 			res.status(201).json({ message: "The conversation is not protected." }); return;}
+	}
+
+	@Post(':id/set_newPassword')
+	@UseGuards(OwnerGuard)
+	async SetConversationPassword(
+		@Param('id') conversationId: string,
+		@GetUser() user: User, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		
+		const newPassword = await this.convService.setPassword(req.body.newPassword, parseInt(conversationId))
+		if (newPassword) {
+			res.status(201).json({ message: "New password well implemented." }); 
+			this.eventEmitter.emit('change.password', {conversationId, newPassword});
+			return;}
+		else {
+			res.status(201).json({ message: "The conversation is not protected." }); 
+			this.eventEmitter.emit('change.password', {conversationId, newPassword});
+			return;}
 	}
 
 	@Get(':id/set_private')

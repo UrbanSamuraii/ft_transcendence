@@ -146,4 +146,11 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
         // this.server.emit('onChangePrivacy', payload);
     }
+
+    @OnEvent('change.password')
+    displayChangeOfPasswordEvent(payload: any) {
+        console.log("The server has detect a change in password of room number :", payload);
+        this.server.to(payload.conversationId).emit('onChangePassword', payload);
+        // this.server.emit('onChangePrivacy', payload);
+    }
 }

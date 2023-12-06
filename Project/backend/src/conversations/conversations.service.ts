@@ -449,7 +449,7 @@ export class ConversationsService {
 		else { return null; }
 	}
 
-	// To get privacy
+	// To get privacy : Public or Private
 	async getStatus(conversationId: number): Promise<String | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -458,7 +458,7 @@ export class ConversationsService {
 		else { return null; }
 	}
 
-	// To know if protected or not 
+	// To know if protected or not by a password
 	async isProtected(conversationId: number): Promise<boolean | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },

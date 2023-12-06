@@ -15,6 +15,8 @@ import { UpgradeMemberInConversationModal } from '../modals/UpgradeMemberInConve
 import { DowngradeMemberInConversationModal } from '../modals/DowngradeMemberInConversationModal';
 import { BanUserFromConversationModal} from '../modals/BanUserFromConversationModal';
 import { AllowMemberInConversationModal } from '../modals/AllowMemberInConversationModal';
+import { ImplementNewPasswordModal } from '../modals/ImplementNewPasswordModal';
+import { VerifyPasswordModal } from '../modals/VerifyPasswordModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -64,6 +66,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const navigate = useNavigate();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isPrivate, setIsPrivate] = useState(false);
+	const [isProtected, setIsProtected] = useState(false);
 	const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 	const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
     const [showMuteMemberModal, setShowMuteMemberModal] = useState(false);
@@ -71,7 +74,9 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
     const [showUpgradeMemberModal, setShowUpgradeMemberModal] = useState(false);
     const [showDowngradeMemberModal, setShowDowngradeMemberModal] = useState(false);
     const [showBanUserModal, setShowBanUserModal] = useState(false);
-    const [showAllowUserModal, setShowAllowUserModal] = useState(false);
+	const [showAllowUserModal, setShowAllowUserModal] = useState(false);
+    const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
+    const [showVerifyPasswordModal, setShowVerifyPasswordModal] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
 	const socketContextData = useSocket();
 
@@ -134,6 +139,29 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 		return () => {
 		  socketContextData?.socket?.off('onChangePrivacy', onChangePrivacyHandler);
 		};
+	}, [socketContextData, conversationId]);
+
+	useEffect(() => {
+		const fetchProtectedStatus = async () => {
+		  try {
+			const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/isProtected`, {
+			  withCredentials: true,
+			});
+			setIsProtected(response.data);
+		  } catch (error) {
+			console.error('Error fetching conversation protected status:', error);
+		  }
+		};
+		fetchProtectedStatus();
+
+		const onChangePasswordHandler = (payload: any) => {
+			console.log("Change of password: is protected ?", payload.newPassword);
+			setIsProtected(payload.newPassword);
+		  };
+		  socketContextData?.socket?.on('onChangePassword', onChangePasswordHandler);
+		  return () => {
+			socketContextData?.socket?.off('onChangePassword', onChangePasswordHandler);
+		  };
 	  }, [socketContextData, conversationId]);
 
 
@@ -202,6 +230,14 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowAllowUserModal(false);
                 }} /> )}
+			{showNewPasswordModal && (<ImplementNewPasswordModal
+                setShowModal={() => {
+                    setShowNewPasswordModal(false);
+                }} /> )}
+			{showVerifyPasswordModal && (<VerifyPasswordModal
+                setShowModal={() => {
+                    setShowVerifyPasswordModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
@@ -211,7 +247,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 					{user ? (
 						<>
 								<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
-							{isDropdownOpen && ( <div className="dropdown-menu">
+									{isDropdownOpen && ( <div className="dropdown-menu">
 									<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>
 									<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>
 									<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>
@@ -224,13 +260,15 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 									<div className="privacy-toggle">
 										<button
 										className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
-										onClick={handleTogglePrivacy}
-										>
-										{isPrivate ? 'Private Conversation' : 'Public Conversation'}
+										onClick={handleTogglePrivacy} > {isPrivate ? 'Private Conversation' : 'Public Conversation'}
 										</button>
 									</div>
 									
-									{isOwner && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}> <LockIcon /> </button>)}
+									{isOwner && (<button className="convMenuButton" onClick={() => { 
+										if (isProtected) { setShowVerifyPasswordModal(true); } 
+										else { setShowNewPasswordModal(true); }
+										}}> 
+										<LockIcon /> </button>)}
 								</div>
 							)}
 							</div>

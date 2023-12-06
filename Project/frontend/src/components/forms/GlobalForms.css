@@ -158,4 +158,23 @@
 	background-color: #8d8f8d;
 	border: 1px solid #ffffff;
 }
+
+/* To disable the password */
+.disable-password-checkbox {
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+	color: white;
+}
+  
+.disable-password-checkbox label {
+	margin-left: 5px;
+	user-select: none;
+	cursor: pointer;
+	color: white;
+}
+  
+.disable-password-checkbox input {
+	margin-right: 5px;
+}
   
