@@ -3,6 +3,7 @@ import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { CheckPasswordModal } from "../modals/CheckPasswordModal";
 
 interface ConvDataInput {
 	conversationName: string;
@@ -14,6 +15,8 @@ type JoinConversationFormProps = {
 
 export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setShowModal }) => {
 
+	const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
+	// const [conversationId, setConversationId] = useState<string | null>(null);
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		conversationName: '',
 	  });
@@ -55,6 +58,9 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 				} 
 				else if (response.status === 202) {
 					console.log("There is a password protecting the conversation");
+					const id = response.data.conversationId;
+					// setConversationId(id);
+					setShowCheckPasswordModal(true);
 				}
 				else {
 					const conversationId = response.data.conversationId;
@@ -76,6 +82,12 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 	};
 
 	return (
+		<>
+		{showCheckPasswordModal && (<CheckPasswordModal
+			setShowModal={() => {
+				setShowCheckPasswordModal(false);
+				setShowModal(false);
+			}} /> )}
 		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
 			<h2>Join Conversation</h2>
 			
@@ -96,5 +108,6 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 			</div>
 
 		</form>
+		</>
 	);
 };
