@@ -1,22 +1,27 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 
 interface ConvDataInput {
 	password: string;
+	convId: number | null;
 }
 
-type CheckPasswordFormFormProps = {
+type CheckPasswordFormProps = {
     setShowModal: (show: boolean) => void;
+	conversationId: number | null;
 };
 
-export const CheckPasswordForm: React.FC<CheckPasswordFormFormProps> = ({ setShowModal }) => {
+export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowModal, conversationId }) => {
 
+	console.log("THE CONV ID", conversationId);
 	
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		password: '',
+		// convId: parseInt(conversationId),
+		convId: conversationId,
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -33,7 +38,7 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormFormProps> = ({ setSho
 		}));
 	};
 
-	const conversationId = useParams().id;
+	// const conversationId = convId;
 
 	const handleVerifyPassword = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -46,10 +51,11 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormFormProps> = ({ setSho
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
-				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/verify_password`, ConvDataInput, {
+				console.log({"DATA TO VALIDATE" : ConvDataInput});
+				const response = await axios.post(`http://localhost:3001/conversations/validate_password`, ConvDataInput, {
         			withCredentials: true });
-				console.log({"RESPONSE from VERIFYING PASSWORD": response}); 
+				setShowModal(false);
+				console.log({"RESPONSE from VALIDATING PASSWORD": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);

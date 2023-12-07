@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
@@ -16,7 +16,8 @@ type JoinConversationFormProps = {
 export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setShowModal }) => {
 
 	const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
-	// const [conversationId, setConversationId] = useState<string | null>(null);
+	const [convId, setConversationId] = useState<number | null>(null);
+	// let convId: number | null = null;
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		conversationName: '',
 	  });
@@ -57,10 +58,13 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 					alert(`Warning: ${customWarning}`);
 				} 
 				else if (response.status === 202) {
-					console.log("There is a password protecting the conversation");
+					// console.log("There is a password protecting the conversation");
 					const id = response.data.conversationId;
-					// setConversationId(id);
+					setConversationId(id);
+					// convId = id;
+					// console.log("Id of the protected conversation : ", convId);
 					setShowCheckPasswordModal(true);
+					// setShowModal(false);
 				}
 				else {
 					const conversationId = response.data.conversationId;
@@ -83,11 +87,11 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 
 	return (
 		<>
-		{showCheckPasswordModal && (<CheckPasswordModal
+		{showCheckPasswordModal && convId !== null && (<CheckPasswordModal
 			setShowModal={() => {
 				setShowCheckPasswordModal(false);
 				setShowModal(false);
-			}} /> )}
+			}} convId={convId} /> )}
 		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
 			<h2>Join Conversation</h2>
 			

@@ -363,6 +363,12 @@ export class ConversationsService {
 			include: { members: true },
 		});
 	}
+
+	async getConversationById(convId: number): Promise<Conversation | null> {
+		return await this.prismaService.conversation.findUnique({
+			where: { id: convId },
+		});
+	}
 	
 	async getConversationWithAllMessagesById(convId: number) {
 

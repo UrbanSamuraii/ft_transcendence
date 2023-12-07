@@ -144,12 +144,13 @@ export class ConversationsController {
 	async ValidatePassword(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		// We will have to insert the convID in the req somewhere.
-		const conversation = await this.convService.getConversationByName(req.body.conversationName);
+		const conversation = await this.convService.getConversationById(req.body.convId);
 		const passwordToValidate = conversation.password;
 
 		if (req.body.password === passwordToValidate) {
 			const added = await this.convService.addUserToConversation(user.id, conversation.id);
 			if (added) {
+				this.eventEmitter.emit('message.create', '');
 				res.status(201).json({ message: "You have now joined the conversation." }); return;}
 			else {
 				res.status(403).json({ message: "You were already in the coonversation." }); return;}
