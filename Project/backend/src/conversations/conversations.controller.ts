@@ -120,9 +120,6 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
-		// console.log({"CONV TO JOIN": conversation.name});
-		// console.log({"IS BANNED ?": await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)});
-
 		if (!conversation) {
 			res.status(403).json({ message: "There is no conversation of this name, please verify." }); return;}
 		if ( await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
@@ -135,6 +132,7 @@ export class ConversationsController {
 		const added = await this.convService.addUserToConversation(user.id, conversation.id);
 		if (added) {
 			this.eventEmitter.emit('message.create', '');
+			this.eventEmitter.emit('join.room', user, conversation.id);
 			res.status(201).json({ message: "You have now joined the conversation.", conversationId: conversation.id }); return;}
 		else {
 			res.status(202).json({ message: "You were already in the conversation.", conversationId: conversation.id }); return;}
@@ -204,7 +202,9 @@ export class ConversationsController {
 			const memberId = member.id;
 			removed = await this.convService.removeMemberFromConversation(memberId, parseInt(conversationId))
 			if (removed) {
-				res.status(201).json({ message: "The member has been removed from the conversation." }); return;}
+				res.status(201).json({ message: "The member has been removed from the conversation." }); 
+				this.eventEmitter.emit('remove.member', {conversationId, member});
+				return;}
 			else {
 				res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." }); return;}
 		}

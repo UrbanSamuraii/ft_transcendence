@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
@@ -20,7 +19,6 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
 	
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		password: '',
-		// convId: parseInt(conversationId),
 		convId: conversationId,
 	  });
 
@@ -37,8 +35,6 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
 		  [name]: '',
 		}));
 	};
-
-	// const conversationId = convId;
 
 	const handleVerifyPassword = async (e: React.FormEvent) => {
 		e.preventDefault();

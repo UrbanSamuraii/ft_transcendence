@@ -12,6 +12,26 @@ export const ConversationPage = () => {
     const { id } = useParams();
     const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
     const { socket, setNewMessageReceived, newMessageReceived, isLastMessageDeleted } = useSocket();  
+    const chatSocketContextData = useSocket();
+
+    useEffect(() => {
+        const onMemberMoveHandler = async (payload: any) => {
+            console.log("FETCHING PRISMA CONV AGAIN");
+            try {
+                const prismaConversations = await getConversations();
+                setPrismaConversations(prismaConversations);
+                setNewMessageReceived(false);
+            } catch (error) {
+                console.error('Error fetching conversations:', error);
+            }
+        };
+        socket?.on('onJoinRoom', onMemberMoveHandler);
+        socket?.on('onRemovedMember', onMemberMoveHandler);
+        return () => {
+            socket?.off('onRemovedMember', onMemberMoveHandler);
+            socket?.off('onRemovedMember', onMemberMoveHandler);
+        };
+    }, [socket, chatSocketContextData]);
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -23,7 +43,6 @@ export const ConversationPage = () => {
                 console.error('Error fetching conversations:', error);
             }
         };
-
         fetchConversations();
 
     }, [socket, newMessageReceived, isLastMessageDeleted]);

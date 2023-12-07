@@ -72,10 +72,11 @@ export class MessagingGateway implements OnGatewayConnection {
     @WebSocketServer() server: Server;
 
     @OnEvent('join.room')
-    joinSpecificConversation(user: User, conversationId: number) {
+    async joinSpecificConversation(user: User, conversationId: number) {
         const userSocket = this.sessions.getUserSocket(user.id);
         userSocket.join(conversationId.toString());
         console.log({ "User socket connected to the room !": userSocket.id });
+        this.server.to(userSocket.id.toString()).emit('onJoinRoom', user, conversationId);
     }
 
     @OnEvent('leave.room')
@@ -151,6 +152,16 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPasswordEvent(payload: any) {
         console.log("The server has detect a change in password of room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePassword', payload);
+        // this.server.emit('onChangePrivacy', payload);
+    }
+
+    @OnEvent('remove.member')
+    async alertRemoveMember(payload: any) {
+        console.log("The server is alerting that a member has been excluded from room", payload.conversationId);
+        console.log("Excluded member", payload.member);
+        const removedMemberSocket = await this.sessions.getUserSocket(payload.member.id);
+        console.log(removedMemberSocket.id);
+        this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
         // this.server.emit('onChangePrivacy', payload);
     }
 }

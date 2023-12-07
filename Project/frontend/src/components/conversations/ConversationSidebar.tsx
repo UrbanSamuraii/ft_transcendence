@@ -26,26 +26,13 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
 
-    // useEffect(() => {
-    //     console.log({"Last message deleted": isLastMessageDeleted});
-    //     if (isLastMessageDeleted !== undefined) {
-    //         setLastMessageDeletedMap(prevMap => ({
-    //             ...prevMap,
-    //             [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
-    //         }));
-    //         setLastMessageDeleted(false);
-    //     }
-    // }, [isLastMessageDeleted, conversationId]);
-
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(true);
-            // console.log("Message du serveur LAST MESSAGE DELETED");
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
                 [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
             }));
-            // console.log({ "DELETING LAST !": deletedMessage });
         });
         return () => {
             chatSocketContextData.setLastMessageDeleted(false);
@@ -54,7 +41,6 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     }, [[chatSocketContextData, conversationId, isLastMessageDeleted]]);
 
     const handleMenuOptionClick = (option: string) => {
-        // console.log('Selected option:', option);
         setShowMenuModal(false);
         if (option === 'create') {
             setShowModalCreate(true);
@@ -63,14 +49,12 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             setShowModalJoin(true);
         }
     };
-    
-      const openMenu = () => {
-        console.log("OPEN");
+      
+    const openMenu = () => {
         setShowMenuModal(true);
     };
-    
-      const closeMenu = () => {
-        console.log('Closing menu');
+      
+    const closeMenu = () => {
         setShowMenuModal(false);
     };
 

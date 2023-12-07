@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
@@ -15,8 +15,20 @@ export const ConversationChannelPage = () => {
     const conversationId = useParams().id;
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
-    // const chatSocketContextData = useChatSocket();
     const chatSocketContextData = useSocket();
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {
+            console.log({ "REMOVED FROM A CONV !": payload });
+            if (conversationId === payload.conversationId) {
+                navigate('/ConversationPage');
+            }
+        });
+        return () => {
+            chatSocketContextData?.socket?.off('onRemovedMember');
+        };
+    }, [[chatSocketContextData, conversationId]]);
 
     useEffect(() => {
         const fetchConversations = async () => {
