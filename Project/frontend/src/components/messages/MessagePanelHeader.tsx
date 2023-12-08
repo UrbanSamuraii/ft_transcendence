@@ -17,6 +17,7 @@ import { BanUserFromConversationModal} from '../modals/BanUserFromConversationMo
 import { AllowMemberInConversationModal } from '../modals/AllowMemberInConversationModal';
 import { ImplementNewPasswordModal } from '../modals/ImplementNewPasswordModal';
 import { VerifyPasswordModal } from '../modals/VerifyPasswordModal';
+import { LeavingConversationModal } from '../modals/LeavingTheConversationModal';
 
 type MessagePanelHeaderProps = {
 	conversationId: number;
@@ -77,6 +78,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 	const [showAllowUserModal, setShowAllowUserModal] = useState(false);
     const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
     const [showVerifyPasswordModal, setShowVerifyPasswordModal] = useState(false);
+	const [showLeavingConversationModal, setShowLeavingConversationModal] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
 	const socketContextData = useSocket();
 
@@ -238,10 +240,15 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowVerifyPasswordModal(false);
                 }} /> )}
+			{showLeavingConversationModal && (<LeavingConversationModal
+                setShowModal={() => {
+                    setShowLeavingConversationModal(false);
+                }} /> )}
 			<MessageContainerHeaderStyle>
 				<div className="messagePanelTitle">
 					{conversationName}
 				</div>
+
 				<div className="convMenu">
 				<OutsideClickHandler onOutsideClick={handleOutsideClick}>
 					{user ? (
@@ -256,7 +263,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 									<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>
 									<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>
 									<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>
-									
+									<button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave the conversation</button>
 									<div className="privacy-toggle">
 										<button
 										className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
@@ -276,6 +283,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 					) : (
 						<button onClick={() => navigate('/login')}>SIGN IN</button>
 					)}
+
 				</OutsideClickHandler>
 				</div>
 			</MessageContainerHeaderStyle>

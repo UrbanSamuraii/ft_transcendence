@@ -157,6 +157,20 @@ export class ConversationsController {
 			res.status(403).json({ message: "Wrong password." }); return;}
 	}
 
+	@Post(':id/leave_conversation')
+	async LeaveTheConversation(
+		@Param('id') conversationId: string, 
+		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const left = await this.convService.removeMemberFromConversation(user.id, parseInt(conversationId))
+		if (left) {
+			res.status(201).json({ message: "You have successfully left the conversation." }); 
+			this.eventEmitter.emit('remove.member', {conversationId, user});
+			return;}
+		else {
+			res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." }); return;}
+	}
+
 	//////////////// HANDLE RULES AND MEMBERS OF SPECIFIC CONVERSATION ////////////////////
 
 	// Admin can add users to conversation - no matter if it is a private or public one
@@ -262,6 +276,7 @@ export class ConversationsController {
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		let member = null;
 		let upgradedUser = false;
+		console.log("User to upgrade : ", req.body.userToUpgrade);
 		member = await this.userService.getUserByUsernameOrEmail(req.body.userToUpgrade);
 		if (!member) {
 			res.status(403).json({ message: "User not found in the conversation." });}

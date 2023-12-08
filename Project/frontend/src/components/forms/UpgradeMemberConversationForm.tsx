@@ -33,11 +33,10 @@ export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormP
   const upgradeMemberToAdmin = async (username: string) => {
     try {
       await axios.post(`http://localhost:3001/conversations/${conversationId}/update_member_to_admin`,
-		{ userToUnmute: username }, 
+		{ userToUpgrade: username }, 
 		{ withCredentials: true });
     } catch (error) {
       console.error('Error upgrading member to admin:', error);
-      
     }
   };
 
