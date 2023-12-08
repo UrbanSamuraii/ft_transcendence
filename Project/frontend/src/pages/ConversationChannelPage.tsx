@@ -35,7 +35,6 @@ export const ConversationChannelPage = () => {
             const conversations = await getConversationsIdentified(conversationId);
             setConversationsArray(conversations);
         };
-
         fetchConversations();
     }, [conversationId]);
 

@@ -14,24 +14,24 @@ export const ConversationPage = () => {
     const { socket, setNewMessageReceived, newMessageReceived, isLastMessageDeleted } = useSocket();  
     const chatSocketContextData = useSocket();
 
-    useEffect(() => {
-        const onMemberMoveHandler = async (payload: any) => {
-            console.log("FETCHING PRISMA CONV AGAIN");
-            try {
-                const prismaConversations = await getConversations();
-                setPrismaConversations(prismaConversations);
-                setNewMessageReceived(false);
-            } catch (error) {
-                console.error('Error fetching conversations:', error);
-            }
-        };
-        socket?.on('onJoinRoom', onMemberMoveHandler);
-        socket?.on('onRemovedMember', onMemberMoveHandler);
-        return () => {
-            socket?.off('onRemovedMember', onMemberMoveHandler);
-            socket?.off('onRemovedMember', onMemberMoveHandler);
-        };
-    }, [socket, chatSocketContextData]);
+    // useEffect(() => {
+    //     const onMemberMoveHandler = async (payload: any) => {
+    //         console.log("FETCHING PRISMA CONV AGAIN");
+    //         try {
+    //             const prismaConversations = await getConversations();
+    //             setPrismaConversations(prismaConversations);
+    //             setNewMessageReceived(false);
+    //         } catch (error) {
+    //             console.error('Error fetching conversations:', error);
+    //         }
+    //     };
+    //     socket?.on('onJoinRoom', onMemberMoveHandler);
+    //     socket?.on('onRemovedMember', onMemberMoveHandler);
+    //     return () => {
+    //         socket?.off('onJoinRoom', onMemberMoveHandler);
+    //         socket?.off('onRemovedMember', onMemberMoveHandler);
+    //     };
+    // }, [socket, chatSocketContextData]);
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -45,7 +45,14 @@ export const ConversationPage = () => {
         };
         fetchConversations();
 
-    }, [socket, newMessageReceived, isLastMessageDeleted]);
+        socket?.on('onJoinRoom', fetchConversations);
+        socket?.on('onRemovedMember', fetchConversations);
+        return () => {
+            socket?.off('onJoinRoom', fetchConversations);
+            socket?.off('onRemovedMember', fetchConversations);
+        };
+
+    }, [socket, chatSocketContextData, newMessageReceived, isLastMessageDeleted]);
 
     useEffect(() => {
         socket?.on('onMessage', (payload: any) => {

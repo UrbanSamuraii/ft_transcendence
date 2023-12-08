@@ -158,9 +158,9 @@ export class MessagingGateway implements OnGatewayConnection {
     @OnEvent('remove.member')
     async alertRemoveMember(payload: any) {
         console.log("The server is alerting that a member has been excluded from room", payload.conversationId);
-        console.log("Excluded member", payload.member);
+        // console.log("Excluded member", payload.member);
         const removedMemberSocket = await this.sessions.getUserSocket(payload.member.id);
-        console.log(removedMemberSocket.id);
+        // console.log(removedMemberSocket.id);
         this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
         // this.server.emit('onChangePrivacy', payload);
     }
