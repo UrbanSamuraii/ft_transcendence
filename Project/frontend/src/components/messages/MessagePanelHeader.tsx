@@ -189,14 +189,20 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 		const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/isAdmin`, {
 			withCredentials: true,
 		});
+		console.log("Is ADMIN of the conversation ? ", response.data);
 		setIsAdmin(response.data);
 		} catch (error) {
 		console.error('Error fetching conversation owner status:', error);
 		}
 	};
-
 	fetchAdminStatus();
-	}, [conversationId, user]);
+
+	socketContextData?.socket?.on('onAdminStatusMember', fetchAdminStatus);
+		return () => {
+		socketContextData?.socket?.off('onAdminStatusMember', fetchAdminStatus);
+		};
+
+	}, [socketContextData, conversationId, user]);
 	  
 	const handleTogglePrivacy = async () => {
 		try {

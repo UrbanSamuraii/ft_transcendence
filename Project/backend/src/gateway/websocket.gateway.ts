@@ -43,13 +43,6 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' });
 
-        // client.on('disconnect', (reason) => {
-        //     console.log('Client disconnected:', client.id, 'Reason:', reason);
-        //     if (reason === 'transport close') {
-        //         client.disconnect();
-        //         client = null;
-        //     }
-        // });
         return;
     }
 
@@ -67,7 +60,6 @@ export class MessagingGateway implements OnGatewayConnection {
 
     //////////////////////////////////////////////////////////////
 
-
     // To inject the WebSocket server instance provided by socket.io
     @WebSocketServer() server: Server;
 
@@ -79,12 +71,12 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(userSocket.id.toString()).emit('onJoinRoom', user, conversationId);
     }
 
-    @OnEvent('leave.room')
-    leaveSpecificConversation(user: User, conversationId: number) {
-        const userSocket = this.sessions.getUserSocket(user.id);
-        userSocket.leave(conversationId.toString());
-        console.log({ "User socket left to the room !": userSocket.id });
-    }
+    // @OnEvent('leave.room')
+    // leaveSpecificConversation(user: User, conversationId: number) {
+    //     const userSocket = this.sessions.getUserSocket(user.id);
+    //     userSocket.leave(conversationId.toString());
+    //     console.log({ "User socket left to the room !": userSocket.id });
+    // }
 
     @OnEvent('message.create')
     async handleMessageCreatedEvent(payload: any) {
@@ -127,6 +119,13 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
     }
 
+    @OnEvent('admin.status.member')
+    async displayChangeOfStatusMemberEvent(payload: any) {
+        console.log("The server has detect a change in status of member :", payload.member);
+        const memberSocket = await this.sessions.getUserSocket(payload.member.id);
+        this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);
+    }
+
     @OnEvent('change.password')
     displayChangeOfPasswordEvent(payload: any) {
         console.log("The server has detect a change in password of room number :", payload);
@@ -137,6 +136,7 @@ export class MessagingGateway implements OnGatewayConnection {
     async alertRemoveMember(payload: any) {
         console.log("The server is alerting that a member left the room", payload.conversationId);
         const removedMemberSocket = await this.sessions.getUserSocket(payload.member.id);
+        removedMemberSocket.leave(payload.conversationId.toString());
         this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
     }
 }

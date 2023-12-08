@@ -314,9 +314,11 @@ export class ConversationsController {
 			const userId = member.id;
 			upgradedUser = await this.convService.upgrateUserToAdmin(userId, parseInt(conversationId))
 			if (upgradedUser) {
-				res.status(201).json({ message: "User is now an admin of the conversation." });}
+				res.status(201).json({ message: "User is now an admin of the conversation." });
+				this.eventEmitter.emit('admin.status.member', {conversationId, member});
+				return ;}
 			else {
-				res.status(403).json({ message: "Can't update this user to admin of the conversation (is already an administrator ?)." });}
+				res.status(403).json({ message: "Can't update this user to admin of the conversation (is already an administrator ?)." }); return; }
 		}
 	}
 
@@ -335,9 +337,11 @@ export class ConversationsController {
 			const userId = member.id;
 			downgradedUser = await this.convService.downgradeAdminStatus(userId, parseInt(conversationId))
 			if (downgradedUser) {
-				res.status(201).json({ message: "User is not an admin of the conversation anymore." });}
+				res.status(201).json({ message: "User is not an admin of the conversation anymore." });
+				this.eventEmitter.emit('admin.status.member', {conversationId, member});
+				return ;}
 			else {
-				res.status(403).json({ message: "User wasn't an admin of the conversation." });}
+				res.status(403).json({ message: "User wasn't an admin of the conversation." }); return ;}
 		}
 	}
 
@@ -355,7 +359,9 @@ export class ConversationsController {
 			const userId = member.id;
 			const bannedUser = await this.convService.banUserFromConversation(userId, parseInt(conversationId))
 			if (bannedUser) {
-				res.status(201).json({ message: "User is now banned from the conversation." });}
+				this.eventEmitter.emit('remove.member', {conversationId, member});
+				res.status(201).json({ message: "User is now banned from the conversation." });
+				return; }
 			else {
 				res.status(403).json({ message: "User is already banned from the conversation." });}
 		}

@@ -116,8 +116,9 @@ export class ConversationsService {
 					where: { id: conversationId },
 					data: { members: { disconnect: [{ id: userId }] } },
 				});
-				const member = await this.userService.getUserById(userId);
-				this.eventEmitter.emit('leave.room', member, conversationId);
+				// const member = await this.userService.getUserById(userId);
+				// this.eventEmitter.emit('leave.room', member, conversationId);
+				// this.eventEmitter.emit('remove.member', {conversationId, member});
 				return true; 
 			} else { return false; }
 		} else {
@@ -172,8 +173,9 @@ export class ConversationsService {
 					},
 				});
 				
-				const member = await this.userService.getUserById(userId);
-				this.eventEmitter.emit('leave.room', member, conversationId);
+				// const member = await this.userService.getUserById(userId);
+				// this.eventEmitter.emit('leave.room', member, conversationId);
+				// this.eventEmitter.emit('remove.member', {conversationId, member});
 				return true; 
 			} else { return false;
 			}
@@ -482,7 +484,7 @@ export class ConversationsService {
 		});
 		if (conversation) {
 			const adminsWithoutUser = conversation.admins.filter((admin) => admin.id !== userIdToExclude);
-			return conversation.admins;
+			return adminsWithoutUser;
 		} else {
 			return null;
 		}
@@ -495,7 +497,7 @@ export class ConversationsService {
 		});
 		if (conversation) {
 			const mutesWithoutUser = conversation.muted.filter((mute) => mute.id !== userIdToExclude);
-			return conversation.muted;
+			return mutesWithoutUser;
 		} else {
 			return null;
 		}
