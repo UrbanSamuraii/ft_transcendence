@@ -14,7 +14,6 @@ export class ConversationsService {
 				private eventEmitter: EventEmitter2,
 				) {}
 
-	// To get the Conversation Name at the creation
 	async establishConvName(inputDataConvName: string): Promise<string | null> {
 		const name = inputDataConvName.split(/[,;'"<>]|\s/);
 		const convName = name[0];
@@ -66,7 +65,6 @@ export class ConversationsService {
 		  return !!conversation?.members.find(member => member.id === userIdTargeted);
 	}
 	
-  
 	/////////////////// ADD / REMOVE MEMBER - ADMIN ///////////////////
 	
 	async addUserToConversation(userId: number, conversationId: number): Promise<boolean> {
@@ -99,7 +97,6 @@ export class ConversationsService {
 		});
 		if (existingConversation) {
 			const isOwner = await this.isOwnerOfTheConversation(userId, conversationId);
-			// console.log("Owner is leaving the conversation");
 			if (isOwner) {
 				await this.prismaService.conversation.update({
 					where: { id: conversationId },
@@ -147,7 +144,6 @@ export class ConversationsService {
 						},
 					});
 				};
-				// await this.membersService.addConversationInAdministratedList(userId, existingConversation.id);
 				return true;
 			} else { return false;
 			}
@@ -322,14 +318,6 @@ export class ConversationsService {
 		}
 	}
 
-	async isUserBannedFromConversation(userToAdd: User, conversationId: number): Promise<boolean> {
-		const conversation = await this.prismaService.conversation.findUnique({
-		  where: { id: conversationId },
-		  include: { banned: { where: { id: userToAdd.id } } },
-		});
-		return !!conversation?.banned.length;
-    }
-
 	async isUserIdBannedFromConversation(userIdToAdd: number, conversationId: number): Promise<boolean> {
 		const conversation = await this.prismaService.conversation.findUnique({
 		  where: { id: conversationId },
@@ -454,7 +442,6 @@ export class ConversationsService {
 			where: { id: conversationId },
 			include: { members: true },
 		});
-		
 		if (conversation) {
 			return conversation.members;
 		} else { // Not sure it is usefull, we will check this into a conversation directly
@@ -481,10 +468,35 @@ export class ConversationsService {
 			where: { id: conversationId },
 			include: { banned: true },
 		});
-		
 		if (conversation) {
 			return conversation.banned;
-		} else { // Not sure it is usefull, we will check this into a conversation directly
+		} else {
+			return null;
+		}
+	}
+
+	async getAdminOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { admins: true },
+		});
+		if (conversation) {
+			const adminsWithoutUser = conversation.admins.filter((admin) => admin.id !== userIdToExclude);
+			return conversation.admins;
+		} else {
+			return null;
+		}
+	}
+
+	async getMutedOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { muted: true },
+		});
+		if (conversation) {
+			const mutesWithoutUser = conversation.muted.filter((mute) => mute.id !== userIdToExclude);
+			return conversation.muted;
+		} else {
 			return null;
 		}
 	}

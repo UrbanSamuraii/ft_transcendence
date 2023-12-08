@@ -45,10 +45,10 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
+				// console.log({"DATA" : ConvDataInput});
 				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/ban_user`, ConvDataInput, {
         			withCredentials: true });
-				console.log({"RESPONSE from BANNING USER FROM CONVERSATION": response}); 
+				// console.log({"RESPONSE from BANNING USER FROM CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);

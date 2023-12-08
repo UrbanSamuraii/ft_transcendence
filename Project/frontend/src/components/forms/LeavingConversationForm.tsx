@@ -11,7 +11,7 @@ export const LeavingConversationForm: React.FC<LeavingConversationFormProps> = (
   const conversationId = useParams().id;
 
   const LeavingTheConv = async () => {
-    console.log("LEAVING THE ROOM");
+    // console.log("LEAVING THE ROOM");
 	try {
 		await axios.get(`http://localhost:3001/conversations/${conversationId}/leave_conversation`,
 		{ withCredentials: true });

@@ -56,7 +56,7 @@ const LockIcon = () => (
 	  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
 	  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
 	</svg>
-  );
+);
 
 export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationId }) => {
 	
@@ -189,7 +189,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 		const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/isAdmin`, {
 			withCredentials: true,
 		});
-		console.log("IS ADMIN ? : ", response);
 		setIsAdmin(response.data);
 		} catch (error) {
 		console.error('Error fetching conversation owner status:', error);
@@ -198,8 +197,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 
 	fetchAdminStatus();
 	}, [conversationId, user]);
-
-
 	  
 	const handleTogglePrivacy = async () => {
 		try {

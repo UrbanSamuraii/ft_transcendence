@@ -40,7 +40,7 @@ type Member = {
 	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/get_member_mute`, 
 		{ userToMute: username }, 
 		{ withCredentials: true });
-		console.log("USER SELECTED ", response)
+		// console.log("USER SELECTED ", response)
 	  } catch (error: any) {
 		if (error.response && error.response.status === 403) {
 			alert("Unauthorized: Please log in.");

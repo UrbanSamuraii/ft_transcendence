@@ -35,7 +35,7 @@ type Member = {
 	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/allow_user`, 
 		{ userToAllow: username }, 
 		{ withCredentials: true });
-		console.log("USER SELECTED ", response)
+		// console.log("USER SELECTED ", response)
 	  } catch (error: any) {
 		if (error.response && error.response.status === 403) {
 			alert("Unauthorized: Please log in.");

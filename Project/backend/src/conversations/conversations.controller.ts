@@ -81,6 +81,26 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/muted_members')
+	async GetMutedMembersInTheConversation(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const userList = await this.convService.getMutedOtherMembers(idConv, userId);
+		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Get(':id/admin_members')
+	async GetAdminOtherMembers(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const userList = await this.convService.getAdminOtherMembers(idConv, userId);
+		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Get(':id/banned_users')
 	async GetBannedUserFromTheConversation(@Param('id') id: string, @Req() req) {
 		const idConv = parseInt(id);

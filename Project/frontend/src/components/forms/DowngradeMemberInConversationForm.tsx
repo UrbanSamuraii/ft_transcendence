@@ -17,7 +17,7 @@ export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFor
   useEffect(() => {
     const fetchMemberList = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/members`, {
+        const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/admin_members`, {
 			  withCredentials: true,
 		  });
         // console.log({"MEMBER LIST in the conversation": response});

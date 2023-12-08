@@ -49,10 +49,10 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
+				// console.log({"DATA" : ConvDataInput});
 				const response = await axios.post('http://localhost:3001/conversations/join', ConvDataInput, {
 					withCredentials: true });
-				console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
+				// console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);

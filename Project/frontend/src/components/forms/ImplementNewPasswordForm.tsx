@@ -60,10 +60,10 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
+				// console.log({"DATA" : ConvDataInput});
 				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/set_newPassword`, ConvDataInput, {
         			withCredentials: true });
-				console.log({"RESPONSE from SETTING UP A NEW PASSWORD": response}); 
+				// console.log({"RESPONSE from SETTING UP A NEW PASSWORD": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
@@ -87,7 +87,7 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
 		try {
 		  const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/set_newPassword`, { newPassword: null },
 			{ withCredentials: true });
-		  console.log({ "RESPONSE_DISABLE_PASSWORD": response });
+		//   console.log({ "RESPONSE_DISABLE_PASSWORD": response });
 		  if (response.status === 403) {
 			const customWarning = response.data.message;
 			alert(`Warning: ${customWarning}`);

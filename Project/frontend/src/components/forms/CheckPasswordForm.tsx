@@ -15,7 +15,7 @@ type CheckPasswordFormProps = {
 
 export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowModal, conversationId }) => {
 
-	console.log("THE CONV ID", conversationId);
+	// console.log("THE CONV ID", conversationId);
 	
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		password: '',
@@ -47,11 +47,11 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
 		} 
 		else {
 			try {
-				console.log({"DATA TO VALIDATE" : ConvDataInput});
+				// console.log({"DATA TO VALIDATE" : ConvDataInput});
 				const response = await axios.post(`http://localhost:3001/conversations/validate_password`, ConvDataInput, {
         			withCredentials: true });
 				setShowModal(false);
-				console.log({"RESPONSE from VALIDATING PASSWORD": response}); 
+				// console.log({"RESPONSE from VALIDATING PASSWORD": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
