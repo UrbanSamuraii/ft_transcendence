@@ -50,6 +50,14 @@ export class ConversationsService {
 		  return !!conversation?.owner;
 	}
 
+	async isAdminOfTheConv(userIdTargeted: number, conversationId: number): Promise<boolean> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { admins: true },
+		  });
+		  return !!conversation?.admins.find(admin => admin.id === userIdTargeted);
+	}
+
 	async isMemberOfTheConversation(userIdTargeted: number, conversationId: number): Promise<boolean> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -82,6 +90,42 @@ export class ConversationsService {
 				return true;
 		}
 		else {return false;}
+	}
+
+	async leaveTheConversation(userId: number, conversationId: number): Promise<boolean> {
+		const existingConversation = await this.prismaService.conversation.findUnique({
+		  where: { id: conversationId },
+		  include: { members: true, admins: true, owner: true },
+		});
+		if (existingConversation) {
+			const isOwner = await this.isOwnerOfTheConversation(userId, conversationId);
+			// console.log("Owner is leaving the conversation");
+			if (isOwner) {
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: { ownerId: null },
+				});
+			}
+			const isAdmin = existingConversation.admins.some((admin) => admin.id === userId);
+			if (isAdmin) {
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: { admins: { disconnect: [{ id: userId }] } },
+				});
+			}
+			const isMember = existingConversation.members.some((member) => member.id === userId);
+			if (isMember) {
+				await this.prismaService.conversation.update({
+					where: { id: conversationId },
+					data: { members: { disconnect: [{ id: userId }] } },
+				});
+				const member = await this.userService.getUserById(userId);
+				this.eventEmitter.emit('leave.room', member, conversationId);
+				return true; 
+			} else { return false; }
+		} else {
+			return false;
+		}
 	}
 
 	async upgrateUserToAdmin(userId: number, conversationId: number): Promise<boolean> {

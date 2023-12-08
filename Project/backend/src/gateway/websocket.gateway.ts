@@ -103,17 +103,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('message.deleted')
     handleMessageDeletedEvent(payload: any) {
-        // console.log({ "When deleting a message": payload });
         if (payload.author) {
-            // const authorSocket = this.sessions.getUserSocket(payload.author.id);
-            // const recipientSockets = this.sessions.getSockets();
-
-            // recipientSockets.forEach((recipientSocket, userId) => {
-            //     if (userId !== payload.author.id && recipientSocket) {
-            //         recipientSocket.emit('onDeleteMessage', payload);
-            //     }
-            // });
-            // if (authorSocket) authorSocket.emit('onDeleteMessage', payload);
             this.server.to(payload.conversation_id.toString()).emit('onDeleteMessage', payload);
         }
         else {
@@ -123,17 +113,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('last.message.deleted')
     handleLastMessageDeletedEvent(payload: any) {
-        // console.log({ "When deleting LAST MESSAGE": payload });
         if (payload.author) {
-            // const authorSocket = this.sessions.getUserSocket(payload.author.id);
-            // const recipientSockets = this.sessions.getSockets();
-
-            // recipientSockets.forEach((recipientSocket, userId) => {
-            //     if (userId !== payload.author.id && recipientSocket) {
-            //         recipientSocket.emit('onDeleteLastMessage', payload);
-            //     }
-            // });
-            // if (authorSocket) authorSocket.emit('onDeleteLastMessage', payload);
             this.server.to(payload.conversation_id.toString()).emit('onDeleteLastMessage', payload);
         }
         else {
@@ -145,23 +125,18 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPrivacyEvent(payload: any) {
         console.log("The server has detect a change in privacy room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
-        // this.server.emit('onChangePrivacy', payload);
     }
 
     @OnEvent('change.password')
     displayChangeOfPasswordEvent(payload: any) {
         console.log("The server has detect a change in password of room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePassword', payload);
-        // this.server.emit('onChangePrivacy', payload);
     }
 
     @OnEvent('remove.member')
     async alertRemoveMember(payload: any) {
-        console.log("The server is alerting that a member has been excluded from room", payload.conversationId);
-        // console.log("Excluded member", payload.member);
+        console.log("The server is alerting that a member left the room", payload.conversationId);
         const removedMemberSocket = await this.sessions.getUserSocket(payload.member.id);
-        // console.log(removedMemberSocket.id);
         this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
-        // this.server.emit('onChangePrivacy', payload);
     }
 }

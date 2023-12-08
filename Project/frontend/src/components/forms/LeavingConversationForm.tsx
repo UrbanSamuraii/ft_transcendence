@@ -11,8 +11,9 @@ export const LeavingConversationForm: React.FC<LeavingConversationFormProps> = (
   const conversationId = useParams().id;
 
   const LeavingTheConv = async () => {
-    try {
-		await axios.post(`http://localhost:3001/conversations/${conversationId}/leave_conversation`,
+    console.log("LEAVING THE ROOM");
+	try {
+		await axios.get(`http://localhost:3001/conversations/${conversationId}/leave_conversation`,
 		{ withCredentials: true });
     } catch (error) {
       console.error('Error when leaving the conversation:', error);

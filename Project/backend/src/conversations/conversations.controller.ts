@@ -115,6 +115,15 @@ export class ConversationsController {
 		else { throw new HttpException('Owner not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/isAdmin')
+	async IsAdminOfTheConversation(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const isAdmin = await this.convService.isAdminOfTheConv(userId, idConv);
+		return (isAdmin);
+	}
+
 	@Post('join')
 	async JoinConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -157,15 +166,16 @@ export class ConversationsController {
 			res.status(403).json({ message: "Wrong password." }); return;}
 	}
 
-	@Post(':id/leave_conversation')
+	@Get(':id/leave_conversation')
 	async LeaveTheConversation(
 		@Param('id') conversationId: string, 
 		@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-		const user = await this.userService.getUserByToken(req.cookies.token);
-		const left = await this.convService.removeMemberFromConversation(user.id, parseInt(conversationId))
+		const member = await this.userService.getUserByToken(req.cookies.token);
+		// console.log("User leaving the room : ", user.username);
+		const left = await this.convService.leaveTheConversation(member.id, parseInt(conversationId))
 		if (left) {
 			res.status(201).json({ message: "You have successfully left the conversation." }); 
-			this.eventEmitter.emit('remove.member', {conversationId, user});
+			this.eventEmitter.emit('remove.member', {conversationId, member});
 			return;}
 		else {
 			res.status(403).json({ message: "Can't remove the member you are looking for from this conversation." }); return;}
