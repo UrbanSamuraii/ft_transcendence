@@ -37,7 +37,7 @@ function Navbar() {
             <div className="navbar-center">
                 <Link to="/games">Games</Link>
                 <Link to="/tournaments">Tournaments</Link>
-                <Link to="/learn">Learn</Link>
+                <Link to="/leaderboard">Leaderboard</Link>
             </div>
             <div className="navbar-right">
                 {user ? (

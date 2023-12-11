@@ -18,6 +18,8 @@ import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
+import UserLeaderboard from './pages/Profile/UserLeaderboard';
+import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 import { OnlySocketProvider, useSocket } from './SocketContext';
@@ -136,7 +138,10 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
-                    <Route path="/@/:username" element={<Profile />} />
+                    <Route path="/@/:username" element={<Profile />}>
+                        <Route path="leaderboard" element={<UserLeaderboard />} />
+                    </Route>
+                    <Route path="/leaderboard" element={<GlobalLeaderboard />} />
                     <Route path="/matchmaking" element={<Matchmaking />} />
                     <Route path="/signout" element={<Signout />} />
                 </>

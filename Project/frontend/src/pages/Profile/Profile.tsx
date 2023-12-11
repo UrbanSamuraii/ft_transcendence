@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
 
 function Profile() {
@@ -28,14 +28,16 @@ function Profile() {
         if (username) {
             fetchUserInfo();
         }
-    }, [username]); // Dependency array includes username to refetch if it changes
+    }, [username]);
 
     return (
         <div className="profile-container">
             <p>Username: {userInfo.username}</p>
             <p>Email: {userInfo.email}</p>
-            <p>Games Won: {userInfo.totalGamesWon}</p> {/* Display games won */}
-            {/* More user info here */}
+            <p>Games Won: {userInfo.totalGamesWon}</p>
+            <Link to={`/@/${username}/leaderboard`} className="profile-button">
+                View Leaderboard
+            </Link>
             <button className="profile-button">Edit Profile</button>
         </div>
     );
