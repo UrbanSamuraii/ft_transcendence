@@ -26,4 +26,6 @@ import { GatewayModule } from './gateway/gateway.module';
     ],
     providers: [GameGateway, SquareGameService],
 })
+
+
 export class AppModule { }

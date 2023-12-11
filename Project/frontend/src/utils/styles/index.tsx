@@ -7,10 +7,10 @@ export const NAVBAR_HEIGHT: number = 2; // define in rem
 
 export const InputField = styled.input`
   font-family: 'Inter';
-  background-color: inherit;
+  background-color: white;
   outline: none !important;
   border: none !important;
-  color: #fff !important;
+  color: black !important;
   font-size: 18px !important;
   width: 100% !important;
   box-sizing: border-box;
@@ -18,13 +18,13 @@ export const InputField = styled.input`
   margin: 4px 0 !important;
 
   ::placeholder {
-    color: #fff !important;
+    color: white !important;
     background-color: inherit !important;
   }
 `;
 
 export const InputContainer = styled.div`
-  background-color: #131313;
+  background-color: rgba(19, 19, 19, 0.7);
   padding: 12px 16px;
   border-radius: 10px;
   width: 100%;
@@ -32,19 +32,25 @@ export const InputContainer = styled.div`
 `;
 
 export const InputLabel = styled.label`
-  display: block;
-  color: #8f8f8f;
-  font-size: 14px;
-  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  color: #fff;
+  display: inline-block; 
 `;
 
 export const Button = styled.button`
   width: 100%;
   height: 70px;
-  background-color: #2b09ff;
-  color: #fff
+  background-color: rgb(30, 30, 30);
+  color: #fff;
   outline: none !important;
   border: none !important;
+  transition: background-color 0.3s ease; /* Add a smooth transition effect */
+
+  &:hover {
+    background-color: rgba(30, 30, 30, 0.8); /* Adjust the alpha value for hover state */
+  }
 `;
 
 export const Button42 = styled.button`

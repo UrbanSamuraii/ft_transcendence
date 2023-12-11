@@ -119,8 +119,34 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
 
+    function handleLoginClick() {
+        navigate("/login");
+      }
+    
+      function handleSignupClick() {
+        navigate("/signup");
+      }
+
     return (
         <Routes>
+            {/* <Route path="/" element={
+                <div className="App">
+                <header className="App-header">
+                <p>
+                {
+                    // !data ? "Loading..." : data
+                }
+                </p>
+                <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet"/>
+            <button className='glitch-button'>ULTIMATE PONG</button>
+            <div className="button-container">
+                <button className='log-button' data-text="LOG IN" onClick={handleLoginClick}>log in</button>
+                <button className='log-button' data-text="SIGN UP" onClick={handleSignupClick}>sign up</button>
+            </div>
+            </header>
+            </div>
+            } /> */}
             {/* Public routes */}
             <Route path="/game/:id" element={<SquareGame />} />
             <Route path="/signup" element={<Signup />} />

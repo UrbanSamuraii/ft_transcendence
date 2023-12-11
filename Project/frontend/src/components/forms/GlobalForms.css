@@ -1,6 +1,12 @@
 
 .form-container {
-	width: 700px;
+	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+	border-radius: 10px;
+	width: 500px;
+	height: 500px;
 	margin-right: 10px;
 }
 
@@ -34,18 +40,36 @@
 }
 
 .input-login-container {
-	margin-bottom: 10px;
+    margin-top: 90px;
+    margin-right: 50px;
+    margin-left: 50px;
 }
 
+.input-login-container + .input-login-container {
+    margin-top: 10px;
+}
+
+.icon {
+	margin-right: 8px;
+	color: #fff
+  }
+
 .button-login-container {
-	margin-top: 20px;
+    margin-right: 50px;
+    margin-left: 50px;
+	margin-top: 80px;
 }
 
 .nameFieldRow {
-	width: 100%;
+	margin-top: 30px;
+	margin-left: 30px;
+	margin-right: 30px;
+	/* width: 100%; */
 	display: flex;
-	justify-content: space-between;
-	padding: 10px 0;
+}
+
+.nameFieldRow + .nameFieldRow {
+	margin-top: 10px;
 }
 
 .nameFieldContainerFirst {
@@ -91,7 +115,7 @@
 	width: 100%;
 	
 	font-style: italic;
-    font-size: 80%; 
+    font-size: 90%; 
 	
 	& :last-child {
 		text-decoration: underline;
