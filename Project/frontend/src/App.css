@@ -10,10 +10,17 @@
     position: relative;
     width: 100%;
     height: 100%;
-    /* background-image: url('/Project/frontend/public/HomeBackgroundRetro2.png'); */
-    /* This should be full height if you want to center in the viewport */
-    /* Rest of your styles... */
-}
+    background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
+/* tut mojno pomenyat kartinku fona */
+  }
+
+  .login-page {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
+/* tut mojno pomenyat kartinku fona */
+  }
 
 .play-button {
     position: absolute;
@@ -312,8 +319,7 @@ button:hover {
 body,
 html {
     background-color: #1a1a1a;
-    font-family: 'Inter';
-    /* color: #fff; */
+    font-family: Arial, sans-serif;
 }
 
 h2 {

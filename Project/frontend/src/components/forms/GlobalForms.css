@@ -1,13 +1,18 @@
+.some-class {
+	display: flex;
+	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+	background-size: cover;
+/* importanttttttttttttttt */
+}
 
 .form-container {
-	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+	background-color: transparent;
+	border: 2px solid rgba(255, 255, 255, 0.137);
 	border-radius: 10px;
-	width: 500px;
-	height: 500px;
-	margin-right: 10px;
+	backdrop-filter: blur(20px);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	width: 420px;
+	/* padding: 30px 40px; */
 }
 
 .TwoFA-form-container {
@@ -40,13 +45,21 @@
 }
 
 .input-login-container {
-    margin-top: 90px;
-    margin-right: 50px;
-    margin-left: 50px;
+	/* position: relative; */
+    margin-top: 10px;
+    margin-right: 30px;
+    margin-left: 30px;
 }
 
 .input-login-container + .input-login-container {
     margin-top: 10px;
+}
+
+.input-login-container i {
+	color: #fff;
+	position: absolute;
+	right: 60px;
+	transform: translateY(+40%);
 }
 
 .icon {
@@ -55,9 +68,9 @@
   }
 
 .button-login-container {
-    margin-right: 50px;
-    margin-left: 50px;
-	margin-top: 80px;
+    margin-right: 30px;
+    margin-left: 30px;
+	margin-top: 30px;
 }
 
 .nameFieldRow {
@@ -66,6 +79,13 @@
 	margin-right: 30px;
 	/* width: 100%; */
 	display: flex;
+}
+
+.nameFieldRow i {
+	color: #fff;
+	position: absolute;
+	right: 60px;
+	transform: translateY(+40%);
 }
 
 .nameFieldRow + .nameFieldRow {
@@ -109,16 +129,22 @@
 	}
 }
 
+.zagolovok {
+	color: #fff;
+	text-align: center;
+	font-size: 36px;
+	font-family:Arial, Helvetica, sans-serif;
+	margin-top: 30px;
+}
+
 .existingUserOrNot {
 	margin: 20px 0;
 	text-align: center;
 	width: 100%;
-	
-	font-style: italic;
+	color: #fff;
     font-size: 90%; 
 	
 	& :last-child {
-		text-decoration: underline;
 		color: white;
 	}
 }
