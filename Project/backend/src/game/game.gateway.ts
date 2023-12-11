@@ -14,6 +14,9 @@ export interface PlayerInfo {
     username: string;
     score: number;
     activeKeys: string[]; // array of keys currently being pressed
+    currentElo: number;
+    potentialEloGain: number;
+    potentialEloLoss: number;
 }
 
 @WebSocketGateway({
@@ -50,20 +53,64 @@ export class GameGateway implements OnGatewayInit {
         console.log("Socket.io initialized");
     }
 
-    private async handleGameOver(winnerUsername: string, gameId: number): Promise<void> {
-        try {
-            // Fetch the winner's ID based on the username
-            const winnerId = await this.userService.getUserIdByUsername(winnerUsername);
-            if (winnerId) {
-                // Increment the winner's total games won
-                await this.userService.incrementGamesWon(winnerId);
+    async calculateEloRatings(winnerId: number, loserId: number) {
+        const kFactor = 32; // K-factor determines the sensitivity of ELO rating changes
+        const winnerRating = await this.userService.getEloRating(winnerId);
+        const loserRating = await this.userService.getEloRating(loserId);
 
-                // Optionally, you can also emit an event to all clients in the game room about the game over
+        const expectedWinnerScore = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 400));
+        const expectedLoserScore = 1 / (1 + Math.pow(10, (winnerRating - loserRating) / 400));
+
+        const newWinnerRating = winnerRating + kFactor * (1 - expectedWinnerScore);
+        const newLoserRating = loserRating + kFactor * (0 - expectedLoserScore);
+
+        return { newWinnerRating, newLoserRating };
+    }
+
+    async calculatePotentialEloChanges(player1Id: number, player2Id: number) {
+        const kFactor = 32; // K-factor for ELO calculation. Adjust as needed.
+        const player1Rating = await this.userService.getEloRating(player1Id);
+        const player2Rating = await this.userService.getEloRating(player2Id);
+
+        // Calculate expected scores
+        const expectedScorePlayer1 = 1 / (1 + Math.pow(10, (player2Rating - player1Rating) / 400));
+        const expectedScorePlayer2 = 1 / (1 + Math.pow(10, (player1Rating - player2Rating) / 400));
+
+        // Calculate potential ELO gains and losses
+        const potentialGainPlayer1 = Math.round(kFactor * (1 - expectedScorePlayer1));
+        const potentialLossPlayer1 = Math.round(kFactor * (0 - expectedScorePlayer1));
+        const potentialGainPlayer2 = Math.round(kFactor * (1 - expectedScorePlayer2));
+        const potentialLossPlayer2 = Math.round(kFactor * (0 - expectedScorePlayer2));
+
+        return {
+            player1: { potentialEloGain: potentialGainPlayer1, potentialEloLoss: potentialLossPlayer1 },
+            player2: { potentialEloGain: potentialGainPlayer2, potentialEloLoss: potentialLossPlayer2 }
+        };
+    }
+
+
+
+    private async handleGameOver(winnerUsername: string, loserUsername: string, gameId: number): Promise<void> {
+        try {
+            const winnerId = await this.userService.getUserIdByUsername(winnerUsername);
+            const loserId = await this.userService.getUserIdByUsername(loserUsername);
+
+            if (winnerId && loserId) {
+                await this.userService.incrementGamesWon(winnerId);
+                await this.userService.incrementGamesLost(loserId);
+
+                // Calculate new ELO ratings
+                const eloRatings = await this.calculateEloRatings(winnerId, loserId);
+                const { newWinnerRating, newLoserRating } = eloRatings;
+
+                // Update ELO ratings
+                await this.userService.updateEloRating(winnerId, newWinnerRating);
+                await this.userService.updateEloRating(loserId, newLoserRating);
+
                 this.server.to(gameId.toString()).emit('gameOver', { winnerUsername });
             }
         } catch (error) {
             console.error('Error in handleGameOver:', error);
-            // Handle errors appropriately
         }
     }
 
@@ -108,29 +155,41 @@ export class GameGateway implements OnGatewayInit {
         return this.queue.some(client => client.data.user.username === username);
     }
 
-    private addUserToQueue(client: Socket, userInfo: User): void {
+    private async addUserToQueue(client: Socket, userInfo: User): Promise<void> {
         client.data.user = userInfo;
 
         if (this.userInGameMap.get(userInfo.username)) {
             console.log('User is already in a game, user:', userInfo.username);
             return;
         }
+        this.queue.push(client);
 
-        console.log('Queue before adding:', this.queue.map(c => c.data.user.username));
+        let currentElo;
+
+        try {
+            // Attempt to fetch the current ELO rating
+            currentElo = await this.userService.getEloRating(userInfo.id);
+        } catch (error) {
+            console.error(`Error fetching ELO rating for user ${userInfo.username}:`, error);
+            // Set a default ELO rating or handle the error as needed
+            currentElo = 1000; // Example default ELO rating
+            // Optionally, you can decide not to add the user to the queue if ELO is critical
+            // return; // Uncomment this line if you don't want to add users without a valid ELO rating
+        }
 
         const playerInfo: PlayerInfo = {
-            // id: client.data.user.sub, // or appropriate user ID
-            // username: client.data.user.username,
             username: userInfo.username,
             score: 0,
-            activeKeys: []
+            activeKeys: [],
+            currentElo: currentElo,
+            potentialEloGain: 0,
+            potentialEloLoss: 0,
         };
-        // this.playerInfoMap.set(client.data.user.username, playerInfo);
-        client.data.playerInfo = playerInfo;
-        this.queue.push(client);
-        console.log('Queue after adding:', this.queue.map(c => c.data.user.username));
 
+        client.data.playerInfo = playerInfo;
     }
+
+
 
     private resetUserGameStatus(username: string): void {
         this.userInGameMap.set(username, false);
@@ -141,7 +200,6 @@ export class GameGateway implements OnGatewayInit {
         if (this.queue.length < 2) {
             return;
         }
-
         // Dequeue the first two players
         const player1 = this.queue.shift();
         const player2 = this.queue.shift();
@@ -157,14 +215,17 @@ export class GameGateway implements OnGatewayInit {
         // Create a new game in your database or game management system
         const newGame = await this.createGame(player1, player2);
 
-        // Add additional game setup logic here if needed
+        const gameId = newGame.id;
 
-        // Notify both players that a match has been found
-        const gameId = newGame.id;  // Assuming newGame has an 'id' property
+        const eloChanges = await this.calculatePotentialEloChanges(player1.data.user.id, player2.data.user.id);
+
+        // Update playerInfo with ELO changes
+        const updatedPlayer1Info = { ...player1.data.playerInfo, ...eloChanges.player1 };
+        const updatedPlayer2Info = { ...player2.data.playerInfo, ...eloChanges.player2 };
 
         const gamePlayerInfoMap = new Map<string, PlayerInfo>();
-        gamePlayerInfoMap.set(player1.data.user.username, player1.data.playerInfo);
-        gamePlayerInfoMap.set(player2.data.user.username, player2.data.playerInfo);
+        gamePlayerInfoMap.set(player1.data.user.username, updatedPlayer1Info);
+        gamePlayerInfoMap.set(player2.data.user.username, updatedPlayer2Info);
 
         this.playerInfoMap.set(gameId, gamePlayerInfoMap);
 
@@ -182,18 +243,18 @@ export class GameGateway implements OnGatewayInit {
             });
 
 
-            if (data.isGameOver && data.winnerUsername) {
+            if (data.isGameOver && data.winnerUsername && data.loserUsername) {
                 this.resetUserGameStatus(player1.data.user.username);
                 this.resetUserGameStatus(player2.data.user.username);
                 player1.leave(gameId.toString());
                 player2.leave(gameId.toString());
-                console.log('%s player1 has left %s room', player1.data.user.username, gameId.toString())
-                console.log('%s player2 has left %s room', player2.data.user.username, gameId.toString())
+                // console.log('%s player1 has left %s room', player1.data.user.username, gameId.toString())
+                // console.log('%s player2 has left %s room', player2.data.user.username, gameId.toString())
                 this.playerInfoMap.delete(player1.data.user.username);
                 this.playerInfoMap.delete(player2.data.user.username);
                 this.userCurrentGameMap.delete(player1.data.user.username);
                 this.userCurrentGameMap.delete(player2.data.user.username);
-                this.handleGameOver(data.winnerUsername, gameId).catch((error) => {
+                this.handleGameOver(data.winnerUsername, data.loserUsername, gameId).catch((error) => {
                     console.error('Error handling game over:', error);
                 });
             }
