@@ -1,13 +1,12 @@
-import React, { useEffect } from 'react';
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { ImplementNewPasswordForm } from '../forms/ImplementNewPasswordForm'
+import { BlockConversationForm } from '../forms/BlockConversationForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type NewPasswordModalProps = {
+type BlockConversationModalProps = {
 	setShowModal: (show: boolean) => void;
 };
 
-export const ImplementNewPasswordModal: React.FC<NewPasswordModalProps> = ({ setShowModal }) => {
+export const BlockUserModal: React.FC<BlockConversationModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -16,7 +15,7 @@ export const ImplementNewPasswordModal: React.FC<NewPasswordModalProps> = ({ set
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<ImplementNewPasswordForm setShowModal={setShowModal}/>
+					<BlockConversationForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>

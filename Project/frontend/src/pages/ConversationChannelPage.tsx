@@ -30,14 +30,22 @@ export const ConversationChannelPage = () => {
         };
     }, [[chatSocketContextData, conversationId]]);
 
+    // To set all messages from the conv - need to sort on the getter at the backend
     useEffect(() => {
         const fetchConversations = async () => {
             const conversations = await getConversationsIdentified(conversationId);
             setConversationsArray(conversations);
         };
         fetchConversations();
-    }, [conversationId]);
+    
+        const socket = chatSocketContextData?.socket;
+        if (socket) { socket.on('onBeingBlockedorBlocked', fetchConversations) }
+        return () => {
+            if (socket) { socket.off('onBeingBlockedorBlocked', fetchConversations) }
+        };
+    }, [chatSocketContextData, conversationId]);
 
+    // To get last message sent - need to not socket emit to the user who blocked the author
     useEffect(() => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setNewMessageReceived(true);
@@ -56,17 +64,16 @@ export const ConversationChannelPage = () => {
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
             const isMessageInConversation = deletedMessage.conversation_id === Number(conversationId);
-
             if (isMessageInConversation) {
                 setConversationsArray(prevConversations => {
                     return prevConversations.filter(message => message.id !== deletedMessage.id);
-                });
-            }
+                });}
         });
         return () => {
             chatSocketContextData?.socket?.off('onDeleteMessage');
         };
     }, [chatSocketContextData, conversationId]);
+
 
     return (
         <ConversationChannelPageStyle>

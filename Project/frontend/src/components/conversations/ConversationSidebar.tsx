@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
+import { BlockUserModal } from '../modals/BlockUserModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -21,6 +22,8 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showMenuModal, setShowMenuModal] = useState(false);
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
+    const [showModalBlock, setShowModalBlock] = useState(false);
+
 
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
@@ -48,6 +51,9 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         else if (option === 'join') {
             setShowModalJoin(true);
         }
+        else if (option === 'block') {
+            setShowModalBlock(true);
+        }
     };
       
     const openMenu = () => {
@@ -74,6 +80,11 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             {showModalJoin && (<JoinConversationModal
                 setShowModal={() => {
                     setShowModalJoin(false);
+                    setShowMenuModal(false);
+                }} /> )}
+            {showModalBlock && (<BlockUserModal
+                setShowModal={() => {
+                    setShowModalBlock(false);
                     setShowMenuModal(false);
                 }} /> )}
             <ConversationSidebarStyle>

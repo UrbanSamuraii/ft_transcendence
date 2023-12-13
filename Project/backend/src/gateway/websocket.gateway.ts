@@ -139,4 +139,15 @@ export class MessagingGateway implements OnGatewayConnection {
         removedMemberSocket.leave(payload.conversationId.toString());
         this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
     }
+
+    @OnEvent('block.user')
+    async blockUser(payload: any) {
+        // console.log("The server is alerting that a user has been blocked", payload.target);
+        const userSocket = await this.sessions.getUserSocket(payload.user.id);
+        const targetSocket = await this.sessions.getUserSocket(payload.target.id);
+        
+        this.server.to(userSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
+        this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
+    }
+
 }

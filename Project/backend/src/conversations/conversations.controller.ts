@@ -63,9 +63,11 @@ export class ConversationsController {
 	}
 
 	@Get(':id')
-	async GetConversationById(@Param('id') id: string) {
+	async GetConversationById(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		// const block = user.blockedUsers;
 		const idConv = parseInt(id);
-		const conversation = await this.convService.getConversationWithAllMessagesById(idConv);
+		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, user);
 		if (conversation) { return conversation; } 
 		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
@@ -184,6 +186,24 @@ export class ConversationsController {
 			}
 		else {
 			res.status(403).json({ message: "Wrong password." }); return;}
+	}
+
+	@Post('block_user')
+	async BlockUser(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		if (!target) {
+			res.status(400).json({ message: "User not found." }); return;}
+		else {
+			const isBlocked = await this.convService.blockUser(user, target);
+			if (isBlocked) {
+				res.status(201).json({ message: "You have successfully blocked the user." }); 
+				this.eventEmitter.emit('block.user', {user, target});
+				return;
+			}
+			else {
+				res.status(403).json({ message: "The user is already blocked." }); return;}
+		}
 	}
 
 	@Get(':id/leave_conversation')

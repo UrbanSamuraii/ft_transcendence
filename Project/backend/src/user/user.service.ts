@@ -38,7 +38,7 @@ export class UserService {
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },
-                include: { conversations: true },
+                include: { conversations: true, blockedUsers: true },
             });
             if (!user) {
                 throw new HttpException({

@@ -116,9 +116,6 @@ export class ConversationsService {
 					where: { id: conversationId },
 					data: { members: { disconnect: [{ id: userId }] } },
 				});
-				// const member = await this.userService.getUserById(userId);
-				// this.eventEmitter.emit('leave.room', member, conversationId);
-				// this.eventEmitter.emit('remove.member', {conversationId, member});
 				return true; 
 			} else { return false; }
 		} else {
@@ -172,10 +169,6 @@ export class ConversationsService {
 						},
 					},
 				});
-				
-				// const member = await this.userService.getUserById(userId);
-				// this.eventEmitter.emit('leave.room', member, conversationId);
-				// this.eventEmitter.emit('remove.member', {conversationId, member});
 				return true; 
 			} else { return false;
 			}
@@ -328,6 +321,39 @@ export class ConversationsService {
 		return !!conversation?.banned.length;
     }
 
+	/////////////////// ADD / REMOVE BLOCK USER ///////////////////
+
+	async blockUser(user: User, target: User): Promise<boolean> {
+		const userId = user.id;
+		const targetId = target.id;
+		const userWithBlockedUsers = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			include: { blockedUsers: true },
+		});
+		const isAlreadyBlock = userWithBlockedUsers.blockedUsers.some((blocked) => blocked.id === targetId);
+		if (!isAlreadyBlock) {
+				await this.prismaService.user.update({
+					where: { id: userId },
+					data: { blockedUsers: { connect: [{ id: targetId }] } },
+				});
+				await this.prismaService.user.update({
+					where: { id: targetId },
+					data: { blockedUsers: { connect: [{ id: userId }] } },
+				});
+				return true;
+		} else { return false; }
+	}
+
+	async isBlockedByUsername(user: User, usernameTarget: string): Promise<boolean> {
+		const target = await this.userService.getUserByUsername(usernameTarget);
+		if (!target) { return false; }
+		const isBlocked = await this.prismaService.user.findUnique({
+			where: { id: user.id },
+			include: { blockedUsers: { where: { id: target.id } } },
+		});
+		return !!isBlocked?.blockedUsers.length;
+	}
+
 	/////////////////// MESSAGE SERVICE ///////////////////
 
 	async addMessageToConversation(conversationId: number, newMessageId: number) {
@@ -338,13 +364,7 @@ export class ConversationsService {
 
 		const updatedConversation = await this.prismaService.conversation.update({
 			where: { id: conversation.id },
-			data: {
-			messages: {
-				connect: {
-				id: newMessageId,
-				},
-			},
-			},
+			data: { messages: { connect: { id: newMessageId } } },
 		});
 	}
 
@@ -404,7 +424,7 @@ export class ConversationsService {
 		});
 	}
 	
-	async getConversationWithAllMessagesById(convId: number) {
+	async getConversationWithAllMessagesById(convId: number, user: any) {
 
 		const conversationFound = await this.prismaService.conversation.findUnique({
 			where: { id: convId },
@@ -426,13 +446,16 @@ export class ConversationsService {
 						}, 
 					},
 					messages: { orderBy: { updatedAt: 'desc' },
-					include: {
-						author: {
-						select: {
-							id: true
-						}
-						}
-					}
+					include: { author: { select: { id: true }}},
+					where: {
+                        author: {
+                            id: {
+                                not: {
+                                    in: user.blockedUsers.map((blockedUser) => blockedUser.id),
+                                },
+                            },
+                        },
+                    },
 					},
 				},
 			});
