@@ -28,9 +28,12 @@ export const ConversationPage = () => {
 
         socket?.on('onJoinRoom', fetchConversations);
         socket?.on('onRemovedMember', fetchConversations);
+        socket?.on('onBeingBlockedorBlocked', fetchConversations);
+
         return () => {
             socket?.off('onJoinRoom', fetchConversations);
             socket?.off('onRemovedMember', fetchConversations);
+            socket?.off('onBeingBlockedorBlocked', fetchConversations);
         };
 
     }, [socket, chatSocketContextData, newMessageReceived, isLastMessageDeleted]);

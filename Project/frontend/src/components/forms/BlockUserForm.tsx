@@ -13,7 +13,7 @@ type BlockUserFormProps = {
     setShowModal: (show: boolean) => void;
 };
 
-export const BlockConversationForm: React.FC<BlockUserFormProps> = ({ setShowModal }) => {
+export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) => {
 
 	const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
 	const [convId, setConversationId] = useState<number | null>(null);

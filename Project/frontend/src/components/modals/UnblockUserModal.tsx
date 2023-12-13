@@ -1,12 +1,12 @@
 import { OverlayStyle, OverlayContent  } from '../../utils/styles';
-import { BlockUserForm } from '../forms/BlockUserForm';
+import { UnblockUserForm } from '../forms/UnblockUserForm';
 import OutsideClickHandler from 'react-outside-click-handler';
 
-type BlockConversationModalProps = {
+type UnblockConversationModalProps = {
 	setShowModal: (show: boolean) => void;
 };
 
-export const BlockUserModal: React.FC<BlockConversationModalProps> = ({ setShowModal }) => {
+export const UnblockUserModal: React.FC<UnblockConversationModalProps> = ({ setShowModal }) => {
 
 	return (
 		<OverlayStyle>
@@ -15,7 +15,7 @@ export const BlockUserModal: React.FC<BlockConversationModalProps> = ({ setShowM
 				setShowModal(false);
 			}}>
 				<OverlayContent>
-					<BlockUserForm setShowModal={setShowModal}/>
+					<UnblockUserForm setShowModal={setShowModal}/>
 				</OverlayContent>
 			</OutsideClickHandler>
 		</OverlayStyle>
