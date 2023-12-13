@@ -113,64 +113,68 @@ export const RegisterForm = () => {
             </head>
 
             <body className='some-class'>
-                <form className="form-container" onSubmit={handleSignUp}>
-                    <section className="nameFieldRow">
-                        <InputContainer>
-                            <InputField
-                                placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
-                            {formErrors.email && <div className="error-message">{formErrors.email}</div>}
-                            <i className='bx bx-user'></i>
-                        </InputContainer>
-                    </section>
-
-                    <section className="nameFieldRow">
-                        <div className="nameFieldContainerFirst">
+                <div className='animation-box-register'>
+                    <span className='borderline'></span>
+                    <form className="form-container" onSubmit={handleSignUp}>
+                        <h1 className='zagolovok'>Create Account</h1>
+                        <section className="nameFieldRow">
                             <InputContainer>
                                 <InputField
-                                    placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
-                                />
-                                {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
+                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                                <i className='bx bx-user'></i>
                             </InputContainer>
-                        </div>
-                        <div className="nameFieldContainerLast">
-                            <InputContainer>
-                                <InputField
-                                    placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
-                                />
-                                {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
-                            </InputContainer>
-                        </div>
-                    </section>
+                        </section>
 
-                    <section className="nameFieldRow">
-                        <div className="nameFieldContainerFirst">
-                            <InputContainer>
-                                <InputField
-                                    placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
-                                />
-                                {formErrors.username && <div className="error-message">{formErrors.username}</div>}
-                            </InputContainer>
+                        <section className="nameFieldRow">
+                            <div className="nameFieldContainerFirst">
+                                <InputContainer>
+                                    <InputField
+                                        placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
+                                    />
+                                    {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
+                                </InputContainer>
+                            </div>
+                            <div className="nameFieldContainerLast">
+                                <InputContainer>
+                                    <InputField
+                                        placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
+                                    />
+                                    {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
+                                </InputContainer>
+                            </div>
+                            <div className="nameFieldContainerFirst">
+                                <InputContainer>
+                                    <InputField
+                                        placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
+                                        />
+                                    {formErrors.username && <div className="error-message">{formErrors.username}</div>}
+                                </InputContainer>
+                            </div>
+                        </section>
+                        <section className="nameFieldRow">
+                            <div className="nameFieldContainerLast">
+                                <InputContainer>
+                                    <InputField
+                                        placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
+                                    {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                                    <i className='bx bxs-lock-alt'></i>
+                                </InputContainer>
+                            </div>
+                        </section>
+
+                        <div className="button-login-container">
+                            <Button type="submit" >Create My Account</Button>
                         </div>
-                        <div className="nameFieldContainerLast">
-                            <InputContainer>
-                                <InputField
-                                    placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
-                                {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                            </InputContainer>
+
+                        <div className="existingUserOrNot">
+                            <span>Already have an account? </span>
+                            <Link to="/Login">Login</Link>
                         </div>
-                    </section>
 
-                    <section className="nameFieldRow">
-                        <Button type="submit" >Create My Account</Button>
-                    </section>
-
-                    <div className="existingUserOrNot">
-                        <span>Already have an account? </span>
-                        <Link to="/Login">Login</Link>
-                    </div>
-
-                    <Button42 className="button42" onClick={handleSignUp42Click}>42 Identification</Button42>
-                </form>
+                        <Button42 className="button42" onClick={handleSignUp42Click}>42 Identification</Button42>
+                    </form>
+                </div>
             </body>
         </div>
     );

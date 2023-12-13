@@ -6,14 +6,213 @@
 }
 
 .form-container {
-	background-color: transparent;
-	border: 2px solid rgba(255, 255, 255, 0.137);
-	border-radius: 10px;
-	backdrop-filter: blur(20px);
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-	width: 420px;
-	/* padding: 30px 40px; */
+	/* background-color: pink; */
+	/* border: 2px solid rgba(255, 255, 255, 0.137); */
+	/* border-radius: 10px; */
+	/* backdrop-filter: blur(20px); */
+	/* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+	/* width: 420px; */
+	/* height: 365px; */
+	position: relative;
 }
+
+.animation-box {
+	background-color: rgb(30, 5, 60);
+	position: relative;
+	width: 428px;
+	height: 373px;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+
+.animation-box-register {
+	background-color: rgb(30, 5, 60);
+	position: relative;
+	width: 428px;
+	height: 500px;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.animation-box-register form {
+	position: absolute;
+	inset: 4px;
+	background: rgb(42, 10, 83);
+	padding: 50px, 40px;
+	border-radius: 10px;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+}
+
+.animation-box-register::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 400px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#45f3ff,#45f3ff,#45f3ff);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+}
+@keyframes animate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.animation-box-register::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#45f3ff,#45f3ff,#45f3ff);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -3s;
+}
+.borderline {
+	position: absolute;
+	top: 0;
+	inset: 0;
+}
+.borderline::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#ff2770,#ff2770,#ff2770);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -1.5s;
+}
+.borderline::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#ff2770,#ff2770,#ff2770);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -4.5s;
+}
+@keyframes animate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.animation-box form {
+	position: absolute;
+	inset: 4px;
+	background: rgb(42, 10, 83);
+	padding: 50px, 40px;
+	border-radius: 10px;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+}
+
+.animation-box::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#45f3ff,#45f3ff,#45f3ff);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+}
+@keyframes animate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.animation-box::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#45f3ff,#45f3ff,#45f3ff);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -3s;
+}
+.borderline {
+	position: absolute;
+	top: 0;
+	inset: 0;
+}
+.borderline::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#ff2770,#ff2770,#ff2770);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -1.5s;
+}
+.borderline::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -40%;
+	width: 370px;
+	height: 350px;
+	background: linear-gradient(0deg,transparent,
+	transparent,#ff2770,#ff2770,#ff2770);
+	z-index: 1;
+	transform-origin: bottom right;
+	animation: animate 6s linear infinite;
+	animation-delay: -4.5s;
+}
+@keyframes animate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
 
 .TwoFA-form-container {
 	display: flex;
@@ -74,10 +273,8 @@
 }
 
 .nameFieldRow {
-	margin-top: 30px;
 	margin-left: 30px;
 	margin-right: 30px;
-	/* width: 100%; */
 	display: flex;
 }
 
@@ -138,7 +335,7 @@
 }
 
 .existingUserOrNot {
-	margin: 20px 0;
+	margin-top: 20px;
 	text-align: center;
 	width: 100%;
 	color: #fff;

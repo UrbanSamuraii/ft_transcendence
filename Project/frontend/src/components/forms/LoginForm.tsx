@@ -85,36 +85,39 @@ export const LoginForm = () => {
             </head>
         
             <body className='some-class'>
-                <form className="form-container" onSubmit={handleSignIn}>
-                <h1 className='zagolovok'>Login</h1>
-                    <div className="input-login-container">
-                        <InputContainer>
-                                <InputField
-                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
-                                {formErrors.email && <div className="error-message">{formErrors.email}</div>}
-                                <i className='bx bx-user'></i>
-                        </InputContainer>
-                    </div>
+                <div className='animation-box'>
+                    <span className='borderline'></span>
+                    <form className="form-container" onSubmit={handleSignIn}>
+                    <h1 className='zagolovok'>Login</h1>
+                        <div className="input-login-container">
+                            <InputContainer>
+                                    <InputField
+                                        placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                    {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                                    <i className='bx bx-user'></i>
+                            </InputContainer>
+                        </div>
 
-                    <div className="input-login-container">
-                        <InputContainer>
-                                <InputField
-                                    placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
-                                {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                                <i className='bx bxs-lock-alt'></i>
-                        </InputContainer>
-                    </div>
+                        <div className="input-login-container">
+                            <InputContainer>
+                                    <InputField
+                                        placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
+                                    {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                                    <i className='bx bxs-lock-alt'></i>
+                            </InputContainer>
+                        </div>
 
-                    <div className="button-login-container">
-                        <Button type="submit" >Login</Button>
-                    </div>
-        
-                    <div className="existingUserOrNot">
-                        <span>Don't have an account? </span>
-                        <Link to="/signup">Register</Link>
-                    </div>
-        
-                </form>
+                        <div className="button-login-container">
+                            <Button type="submit" >Login</Button>
+                        </div>
+            
+                        <div className="existingUserOrNot">
+                            <span>Don't have an account? </span>
+                            <Link to="/signup">Register</Link>
+                        </div>
+            
+                    </form>
+                </div>
             </body>
         </div>
     );
