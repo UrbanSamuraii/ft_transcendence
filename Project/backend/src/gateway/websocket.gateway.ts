@@ -5,6 +5,7 @@ import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
 import { UserService } from "src/user/user.service";
 import { MembersService } from "src/members/members.service";
+import { ConversationsService } from "src/conversations/conversations.service";
 import { GatewaySessionManager } from "./gateway.session";
 import { AuthenticatedSocket } from "../utils/interfaces";
 import { User } from "@prisma/client";
@@ -19,7 +20,8 @@ import { User } from "@prisma/client";
 export class MessagingGateway implements OnGatewayConnection {
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
-        private readonly sessions: GatewaySessionManager) { }
+        private readonly sessions: GatewaySessionManager,
+        private readonly convService: ConversationsService) { }
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -80,19 +82,26 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('message.create')
     async handleMessageCreatedEvent(payload: any) {
-        if (payload.author) {
-            const isMute = await this.memberService.isMuteMember(payload.conversation_id, payload.author.id);
-            console.log({ "Mute author ?": isMute });
-            if (isMute === false) {
-                console.log("SENDING MESSAGE");
-                this.server.to(payload.conversation_id.toString()).emit('onMessage', payload);
+        // console.log("PAYLOAD message.create : ", payload);
+        if (payload.newMessage.author) {
+            const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
+            if (!isMute) {
+                const authorSocket = await this.sessions.getUserSocket(payload.user.id);
+                // console.log("Author Socket : ", authorSocket);
+                this.server.to(authorSocket.id.toString()).emit('onMessage', payload);
+                const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
+                for (const member of conversationOtherMembers) {
+                    if (!(await this.convService.isBlockedByUser(payload.user, member))) {
+                        const memberSocket = await this.sessions.getUserSocket(member.id);
+                        // console.log("Member Socket : ", memberSocket);
+                        this.server.to(memberSocket.id.toString()).emit('onMessage', payload);
+                    }
+                }
             }
-        }
-        else {
-            this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION - 
+        } else {
+            this.server.emit('onMessage', payload); // WHEN CREATING THE CONVERSATION -
         }
     }
-
     @OnEvent('message.deleted')
     handleMessageDeletedEvent(payload: any) {
         if (payload.author) {

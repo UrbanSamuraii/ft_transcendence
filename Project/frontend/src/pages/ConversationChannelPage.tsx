@@ -59,7 +59,7 @@ export const ConversationChannelPage = () => {
         return () => {
             chatSocketContextData?.socket?.off('onMessage');
         };
-    }, [[chatSocketContextData, conversationId]]);
+    }, [[chatSocketContextData.socket, conversationId]]);
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {

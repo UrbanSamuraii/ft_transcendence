@@ -354,6 +354,14 @@ export class ConversationsService {
 		return !!isBlocked?.blockedUsers.length;
 	}
 
+	async isBlockedByUser(user: User, userTarget: User): Promise<boolean> {
+		const isBlocked = await this.prismaService.user.findUnique({
+			where: { id: user.id },
+			include: { blockedUsers: { where: { id: userTarget.id } } },
+		});
+		return !!isBlocked?.blockedUsers.length;
+	}
+
 	/////////////////// MESSAGE SERVICE ///////////////////
 
 	async addMessageToConversation(conversationId: number, newMessageId: number) {
