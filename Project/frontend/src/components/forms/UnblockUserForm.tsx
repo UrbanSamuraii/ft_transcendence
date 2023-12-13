@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 
@@ -13,7 +12,6 @@ type Member = {
   
   export const UnblockUserForm: React.FC<MemberFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
-	const conversationId = useParams().id;
   
 	useEffect(() => {
 	  const fetchMemberList = async () => {
@@ -23,7 +21,7 @@ type Member = {
 			});
 			setMemberList(response.data);
 		} catch (error) {
-		  console.error('Error fetching member list:', error);
+		  console.error('Error fetching the list:', error);
 		}
 	  };
   
@@ -42,13 +40,13 @@ type Member = {
 		  } else if (error.response && error.response.data && error.response.data.message) {
 			alert(error.response.data.message);
 		  } else {
-			console.error('Error un-muting member:', error);
+			console.error('Error un-blocking member:', error);
 	  }
 	};};
   
 	return (
 	  <div className="member-list-container">
-		<h2>Banned Users from the Conversation</h2>
+		<h2>Blocked Users</h2>
 		{memberList.length > 0 ? (
 			<div className="member-list">
 			<ul>
@@ -65,7 +63,7 @@ type Member = {
 			</ul>
 			</div>
 		) : (
-			<p>No user is banned from this conversation.</p>
+			<p>No user is blocked.</p>
 		)}
 		</div>
 	);

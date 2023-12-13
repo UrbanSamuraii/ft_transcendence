@@ -9,6 +9,7 @@ import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
 import { BlockUserModal } from '../modals/BlockUserModal';
+import { UnblockUserModal } from '../modals/UnblockUserModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -23,6 +24,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
     const [showModalBlock, setShowModalBlock] = useState(false);
+    const [showModalUnblock, setShowModalUnblock] = useState(false);
 
 
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
@@ -53,6 +55,9 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         }
         else if (option === 'block') {
             setShowModalBlock(true);
+        }
+        else if (option === 'unblock') {
+            setShowModalUnblock(true);
         }
     };
       
@@ -85,6 +90,11 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             {showModalBlock && (<BlockUserModal
                 setShowModal={() => {
                     setShowModalBlock(false);
+                    setShowMenuModal(false);
+                }} /> )}
+            {showModalUnblock && (<UnblockUserModal
+                setShowModal={() => {
+                    setShowModalUnblock(false);
                     setShowMenuModal(false);
                 }} /> )}
             <ConversationSidebarStyle>

@@ -206,6 +206,13 @@ export class ConversationsController {
 		}
 	}
 
+	@Get('blocked_users_list')
+	async GetBlockedUsersList(@Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		if (user) { return user.blockedUsers; } 
+		else { throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Get(':id/leave_conversation')
 	async LeaveTheConversation(
 		@Param('id') conversationId: string, 
