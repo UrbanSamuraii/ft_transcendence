@@ -207,39 +207,6 @@ export class UserService {
         }));
     }
 
-    async getUserLeaderboard(username: string) {
-        const allUsers = await this.prisma.user.findMany({
-            select: {
-                username: true,
-                eloRating: true,
-                totalGamesWon: true,
-                totalGamesLost: true,
-            },
-            orderBy: {
-                eloRating: 'desc',
-            },
-        });
-
-        const userIndex = allUsers.findIndex(user => user.username === username);
-
-        if (userIndex === -1) {
-            // Handle case where user is not found
-            throw new Error('User not found');
-        }
-
-        // Define a range around the user's rank to display
-        const range = 5;
-        const start = Math.max(0, userIndex - range);
-        const end = Math.min(userIndex + range, allUsers.length - 1);
-
-        return allUsers.slice(start, end + 1).map(user => ({
-            ...user,
-            winPercentage: user.totalGamesWon + user.totalGamesLost > 0
-                ? Math.round((user.totalGamesWon / (user.totalGamesWon + user.totalGamesLost)) * 100)
-                : 0,
-        }));
-    }
-
     //////////////// 2FA SETTNGS //////////////////
 
     // Update our user with the 2FA secret generated in the auth.service

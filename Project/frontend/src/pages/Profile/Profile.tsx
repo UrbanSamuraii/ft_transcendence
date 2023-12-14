@@ -35,9 +35,6 @@ function Profile() {
             <p>Username: {userInfo.username}</p>
             <p>Email: {userInfo.email}</p>
             <p>Games Won: {userInfo.totalGamesWon}</p>
-            <Link to={`/@/${username}/leaderboard`} className="profile-button">
-                View Leaderboard
-            </Link>
             <button className="profile-button">Edit Profile</button>
         </div>
     );

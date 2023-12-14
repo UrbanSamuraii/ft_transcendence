@@ -18,7 +18,6 @@ import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-import UserLeaderboard from './pages/Profile/UserLeaderboard';
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
@@ -121,32 +120,14 @@ function Content({ setBackgroundStyle }: ContentProps) {
 
     function handleLoginClick() {
         navigate("/login");
-      }
-    
-      function handleSignupClick() {
+    }
+
+    function handleSignupClick() {
         navigate("/signup");
-      }
+    }
 
     return (
         <Routes>
-            {/* <Route path="/" element={
-                <div className="App">
-                <header className="App-header">
-                <p>
-                {
-                    // !data ? "Loading..." : data
-                }
-                </p>
-                <link rel="preconnect" href="https://fonts.gstatic.com"/>
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet"/>
-            <button className='glitch-button'>ULTIMATE PONG</button>
-            <div className="button-container">
-                <button className='log-button' data-text="LOG IN" onClick={handleLoginClick}>log in</button>
-                <button className='log-button' data-text="SIGN UP" onClick={handleSignupClick}>sign up</button>
-            </div>
-            </header>
-            </div>
-            } /> */}
             {/* Public routes */}
             <Route path="/game/:id" element={<SquareGame />} />
             <Route path="/signup" element={<Signup />} />
@@ -164,9 +145,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
-                    <Route path="/@/:username" element={<Profile />}>
-                        <Route path="leaderboard" element={<UserLeaderboard />} />
-                    </Route>
+                    <Route path="/@/:username" element={<Profile />} />
                     <Route path="/leaderboard" element={<GlobalLeaderboard />} />
                     <Route path="/matchmaking" element={<Matchmaking />} />
                     <Route path="/signout" element={<Signout />} />
