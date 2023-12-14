@@ -19,17 +19,18 @@ const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
 function SquareGame({ }) {
-    const canvasRef = useRef(null);
-    const [gameData, setGameData] = useState(null);
-    const [activeKeys, setActiveKeys] = useState([]);
-    const activeKeysRef = useRef(activeKeys);  // useRef to hold activeKeys
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [activeKeys, setActiveKeys] = useState<string[]>([]);
+    const activeKeysRef = useRef<string[]>(activeKeys);
     const [isGamePaused, setGamePaused] = useState(false);
-    const { socket } = useSocket();  // Get the socket from context
-    const { id: gameId } = useParams(); // Get the game ID from the URL
+    const { socket } = useSocket();
+    const { id: gameId } = useParams<{ id: string }>(); // Specify type for useParams
     const navigate = useNavigate();
-    const [intervalId, setIntervalId] = useState(null);
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const lastSentWasEmptyRef = useRef(true);
     const { user } = useAuth();
+    const [gameData, setGameData] = useState(null);
+
 
     // Update the interval based on active keys
     useEffect(() => {
@@ -48,7 +49,7 @@ function SquareGame({ }) {
     useEffect(() => {
         if (!socket) return;
 
-        const handleGameDataUpdate = (data) => {
+        const handleGameDataUpdate = (data: any) => {
             setGameData(data);
             drawGame(data);
 
@@ -80,7 +81,7 @@ function SquareGame({ }) {
     }, [socket, gameId]);
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: any) => {
 
             console.log(`Key down: ${event.key}`);
 
@@ -98,11 +99,11 @@ function SquareGame({ }) {
                     if (isGamePaused) {
                         // Resume the game
                         setGamePaused(false);
-                        socket.emit('resumeGame'); // Inform backend to resume sending updates
+                        socket?.emit('resumeGame'); // Inform backend to resume sending updates
                     } else {
                         // Pause the game
                         setGamePaused(true);
-                        socket.emit('pauseGame'); // Inform backend to pause sending updates
+                        socket?.emit('pauseGame'); // Inform backend to pause sending updates
                     }
                     break;
                 default:
@@ -110,7 +111,7 @@ function SquareGame({ }) {
             }
         };
 
-        const handleKeyUp = (event) => {
+        const handleKeyUp = (event: any) => {
 
             console.log(`Key up: ${event.key}`);
 
@@ -135,13 +136,17 @@ function SquareGame({ }) {
         };
     }, [activeKeys, isGamePaused]);
 
-    const buttons = [];
+    const buttons: any = [];
 
-    const drawButton = (x, y, width, height, text, callback) => {
+    const drawButton = (x: number, y: number, width: number, height: number, text: string, callback: () => void) => {
         console.log(`Drawing button with text: ${text}`);
 
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
+        if (!canvas) return;
+
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) return; // Check if ctx is not null
+
         const borderThickness = width / 50; // Adjust the divisor to achieve desired scaling. 
         ctx.lineWidth = borderThickness;
 
@@ -174,16 +179,19 @@ function SquareGame({ }) {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         canvas.addEventListener('click', handleCanvasClick);
 
         return () => {
             canvas.removeEventListener('click', handleCanvasClick);
         };
-        // Removed dependency on buttons
     }, []);
 
-    const handleCanvasClick = (e) => {
+    const handleCanvasClick = (e: MouseEvent) => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -198,9 +206,12 @@ function SquareGame({ }) {
         }
     }
 
-    const drawNet = (data) => {
+    const drawNet = (data: any) => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
+        if (!ctx) return; // Check if ctx is not null
 
         const numberOfSquares = 15; // Adjust this number as per your requirement
 
@@ -231,7 +242,7 @@ function SquareGame({ }) {
         }
     }
 
-    const drawGame = (data) => {
+    const drawGame = (data: any) => {
         if (!canvasRef.current) return;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -240,7 +251,7 @@ function SquareGame({ }) {
 
         const canvasAspectRatio = canvas.width / canvas.height;
 
-        let gameWidth, gameHeight;
+        let gameWidth: number, gameHeight: number;
 
         if (canvasAspectRatio > targetAspectRatio) {
             gameHeight = canvas.height;
@@ -254,7 +265,7 @@ function SquareGame({ }) {
         const offsetY = (canvas.height - gameHeight) / 2;
 
         // Draw squares
-        data.squares.forEach(square => {
+        data.squares.forEach((square: any) => {
             const pixelX = offsetX + square.x * gameWidth / 100;
             const pixelY = offsetY + square.y * gameHeight / 100;
             const pixelSize = square.size * gameWidth / 100; // Assuming square sizes are relative to width
@@ -334,9 +345,10 @@ function SquareGame({ }) {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
 
         function handleResize() {
-            const navbar = document.querySelector('.navbar');
+            const navbar = document.querySelector('.navbar') as HTMLElement; // Type assertion
             const navbarHeight = navbar ? navbar.offsetHeight : 50;
 
             let containerWidth = window.innerWidth;
@@ -362,8 +374,10 @@ function SquareGame({ }) {
             newCanvasWidth = Math.min(newCanvasWidth, TARGET_WIDTH, containerWidth);
             newCanvasHeight = Math.min(newCanvasHeight, TARGET_HEIGHT, containerHeight - navbarHeight);
 
-            canvas.width = newCanvasWidth;
-            canvas.height = newCanvasHeight;
+            if (canvas) {
+                canvas.width = newCanvasWidth;
+                canvas.height = newCanvasHeight;
+            }
 
             if (gameData) {
                 drawGame(gameData);
@@ -377,6 +391,7 @@ function SquareGame({ }) {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         canvas.addEventListener('click', handleCanvasClick);
 
         return () => {
