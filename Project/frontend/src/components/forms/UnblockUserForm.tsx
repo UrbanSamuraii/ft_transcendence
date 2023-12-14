@@ -28,10 +28,10 @@ type Member = {
 	  fetchMemberList();
 	}, []);
   
-	const allowMember = async (username: string) => {
+	const unblockMember = async (username: string) => {
 	  try {
 	    const response = await axios.post(`http://localhost:3001/conversations/unblock_user`, 
-		{ userToAllow: username }, 
+		{ userToUnblock: username }, 
 		{ withCredentials: true });
 		// console.log("USER SELECTED ", response)
 	  } catch (error: any) {
@@ -54,7 +54,7 @@ type Member = {
 				<li key={member.username}>
 					<button
 					className="username-button"
-					onClick={() => allowMember(member.username)}
+					onClick={() => unblockMember(member.username)}
 					>
 					{member.username}
 					</button>

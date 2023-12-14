@@ -73,13 +73,6 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(userSocket.id.toString()).emit('onJoinRoom', user, conversationId);
     }
 
-    // @OnEvent('leave.room')
-    // leaveSpecificConversation(user: User, conversationId: number) {
-    //     const userSocket = this.sessions.getUserSocket(user.id);
-    //     userSocket.leave(conversationId.toString());
-    //     console.log({ "User socket left to the room !": userSocket.id });
-    // }
-
     @OnEvent('message.create')
     async handleMessageCreatedEvent(payload: any) {
         // console.log("PAYLOAD message.create : ", payload);
@@ -87,13 +80,13 @@ export class MessagingGateway implements OnGatewayConnection {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
                 const authorSocket = await this.sessions.getUserSocket(payload.user.id);
-                // console.log("Author Socket : ", authorSocket);
+                // console.log("Author Socket : ", authorSocket.id.toString());
                 this.server.to(authorSocket.id.toString()).emit('onMessage', payload);
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
                 for (const member of conversationOtherMembers) {
                     if (!(await this.convService.isBlockedByUser(payload.user, member))) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
-                        // console.log("Member Socket : ", memberSocket);
+                        // console.log("Member Socket : ", memberSocket.id.toString());
                         this.server.to(memberSocket.id.toString()).emit('onMessage', payload);
                     }
                 }

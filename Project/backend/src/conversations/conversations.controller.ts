@@ -24,14 +24,12 @@ export class ConversationsController {
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		
-		// Get the users associated to the username or emails ...
 		const invitedMembers = await Promise.all(
 			req.body.users.map(async (usernameOrEmail) => {
 				const member = await this.userService.getUserByUsernameOrEmail(usernameOrEmail);
 				return member;
 			})
 		);
-		// console.log({"Members joigning the conversation at its creation": invitedMembers});
 		let convName = null;
 		if (req.body.name) { 
 			convName = await this.convService.establishConvName(req.body.name); }
@@ -65,9 +63,9 @@ export class ConversationsController {
 	@Get(':id')
 	async GetConversationById(@Param('id') id: string, @Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		// const block = user.blockedUsers;
+		const blockedUsers = user.blockedUsers || [];
 		const idConv = parseInt(id);
-		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, user);
+		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, blockedUsers);
 		if (conversation) { return conversation; } 
 		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
@@ -211,6 +209,21 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		if (user) { return user.blockedUsers; } 
 		else { throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
+	}
+
+	@Post('unblock_user')
+	async UnblockUser(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const target = await this.userService.getUserByUsernameOrEmail(req.body.userToUnblock);
+		if (!target) {
+			res.status(403).json({ message: "User not found." });}
+		else {
+			const unblockedUser = await this.convService.removeUserFromBlockList(user, target);
+			if (unblockedUser) {
+				res.status(201).json({ message: "User is now allowed in this conversation." });}
+			else {
+				res.status(403).json({ message: "User wasn't banned from the conversation." });}
+		}
 	}
 
 	@Get(':id/leave_conversation')

@@ -362,6 +362,23 @@ export class ConversationsService {
 		return !!isBlocked?.blockedUsers.length;
 	}
 
+	async removeUserFromBlockList(user: any, target: User): Promise<boolean> {
+		const isBlocked = user.blockedUsers.some((blocked) => blocked.id === target.id);
+		if (isBlocked) {
+			await this.prismaService.user.update({
+				where: { id: user.id },
+				data: {
+					blockedUsers: {
+						disconnect: [{ id: target.id }],
+					},
+				},
+			});
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/////////////////// MESSAGE SERVICE ///////////////////
 
 	async addMessageToConversation(conversationId: number, newMessageId: number) {
@@ -432,8 +449,8 @@ export class ConversationsService {
 		});
 	}
 	
-	async getConversationWithAllMessagesById(convId: number, user: any) {
-
+	async getConversationWithAllMessagesById(convId: number, blockedUsers: User[]) {
+		// console.log("ConvId when retrieving messages : ", convId);
 		const conversationFound = await this.prismaService.conversation.findUnique({
 			where: { id: convId },
 			include: { messages: true },
@@ -459,7 +476,7 @@ export class ConversationsService {
                         author: {
                             id: {
                                 not: {
-                                    in: user.blockedUsers.map((blockedUser) => blockedUser.id),
+                                    in: blockedUsers.map((blockedUser) => blockedUser.id),
                                 },
                             },
                         },

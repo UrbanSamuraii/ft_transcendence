@@ -2,7 +2,7 @@ import { Controller, Post, Delete, Get, Res, UseGuards, Req, Param, HttpExceptio
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { MessagesService } from './messages.service';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { ConversationsService } from 'src/conversations/conversations.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -41,7 +41,8 @@ export class MessagesController {
 	@Get(':conversationId')
 	async getMessagesFromConversationId(@Param('conversationId') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId), user);
+		const blockedUsers = user.blockedUsers || [];
+		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId), blockedUsers);
 		if (!conversation) {res.status(404); return;}
 		const messagesInTheConversationId = conversation.messages;
 		return messagesInTheConversationId;
