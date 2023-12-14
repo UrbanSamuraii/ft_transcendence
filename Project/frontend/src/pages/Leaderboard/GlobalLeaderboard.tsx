@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './GlobalLeaderboard.css'
+import './GlobalLeaderboard.css';
 
 interface LeaderboardEntry {
     username: string;
@@ -11,6 +11,7 @@ interface LeaderboardEntry {
 
 function GlobalLeaderboard() {
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
@@ -26,9 +27,20 @@ function GlobalLeaderboard() {
         fetchLeaderboard();
     }, []);
 
+    const filteredLeaderboard = leaderboard.filter(user =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div>
             <h1>Global Leaderboard</h1>
+            <input
+                type="text"
+                placeholder="Search by username..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="search-input"
+            />
             <table>
                 <thead>
                     <tr>
@@ -41,7 +53,7 @@ function GlobalLeaderboard() {
                     </tr>
                 </thead>
                 <tbody>
-                    {leaderboard.map((user, index) => (
+                    {filteredLeaderboard.map((user, index) => (
                         <tr key={user.username}>
                             <td>{index + 1}</td>
                             <td>{user.username}</td>
