@@ -102,9 +102,7 @@ export class MessagingGateway implements OnGatewayConnection {
         if (payload.author) {
             this.server.to(payload.conversation_id.toString()).emit('onDeleteMessage', payload);
         }
-        else {
-            this.server.emit('onDeleteMessage', payload);
-        }
+        else { this.server.emit('onDeleteMessage', payload); }
     }
 
     @OnEvent('last.message.deleted')
@@ -112,9 +110,7 @@ export class MessagingGateway implements OnGatewayConnection {
         if (payload.author) {
             this.server.to(payload.conversation_id.toString()).emit('onDeleteLastMessage', payload);
         }
-        else {
-            this.server.emit('onDeleteLastMessage', payload);
-        }
+        else { this.server.emit('onDeleteLastMessage', payload); }
     }
 
     @OnEvent('change.privacy')
@@ -128,7 +124,6 @@ export class MessagingGateway implements OnGatewayConnection {
         console.log("The server has detect a change in status of member :", payload.member);
         const memberId = payload.member.id;
         const memberSocket = await this.sessions.getUserSocket(memberId);
-        // console.log(memberSocket);
         if (memberSocket) {
             this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);}
     }
@@ -157,8 +152,10 @@ export class MessagingGateway implements OnGatewayConnection {
     async alertRemoveMember(payload: any) {
         console.log("The server is alerting that a member left the room", payload.conversationId);
         const removedMemberSocket = await this.sessions.getUserSocket(payload.member.id);
-        removedMemberSocket.leave(payload.conversationId.toString());
-        this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
+        if (removedMemberSocket) {
+            removedMemberSocket.leave(payload.conversationId.toString());
+            this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
+        };
     }
 
     @OnEvent('block.user')
@@ -167,7 +164,7 @@ export class MessagingGateway implements OnGatewayConnection {
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
         
         this.server.to(userSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
-        this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
+        if (targetSocket) {this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);};
     }
 
     @OnEvent('unblock.user')
@@ -176,7 +173,7 @@ export class MessagingGateway implements OnGatewayConnection {
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
         
         this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
-        this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
+        if (targetSocket) {this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);};
     }
 
     @OnEvent('mute.member')
@@ -191,5 +188,12 @@ export class MessagingGateway implements OnGatewayConnection {
         const user = await this.userService.getUserByEmail(payload.user.email);
         const userSocket = await this.sessions.getUserSocket(user.id);
         this.server.to(userSocket.id.toString()).emit('onUnmuteMember');
+    }
+
+    @OnEvent('unban.user')
+    async unbanUserEvent(payload: any) {
+        const user = await this.userService.getUserByEmail(payload.user.email);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(userSocket.id.toString()).emit('onUnbanUser');
     }
 }

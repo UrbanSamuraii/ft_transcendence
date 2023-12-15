@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import { useSocket } from '../../SocketContext';
 
 type Member = {
 	username: string;
@@ -14,6 +15,7 @@ type Member = {
   export const AllowMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
 	const conversationId = useParams().id;
+	const { socket } = useSocket();
   
 	useEffect(() => {
 	  const fetchMemberList = async () => {
@@ -28,7 +30,13 @@ type Member = {
 	  };
   
 	  fetchMemberList();
-	}, []);
+	  
+	  socket?.on('onUnbanUser', fetchMemberList);
+	  return () => {
+		  socket?.off('onUnbanUser', fetchMemberList);
+  }; 
+  }, [socket]);
+
   
 	const allowMember = async (username: string) => {
 	  try {

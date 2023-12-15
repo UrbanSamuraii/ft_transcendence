@@ -450,9 +450,11 @@ export class ConversationsController {
 				const userId = member.id;
 			const allowedUser = await this.convService.removeUserFromBannedList(userId, parseInt(conversationId))
 			if (allowedUser) {
-				res.status(201).json({ message: "User is now allowed in this conversation." });}
+				res.status(201).json({ message: "User is now allowed in this conversation." }); 
+				this.eventEmitter.emit('unban.user', {user});
+				return ;}
 			else {
-				res.status(403).json({ message: "User wasn't banned from the conversation." });}
+				res.status(403).json({ message: "User wasn't banned from the conversation." }); return; }
 		}
 	}
 
