@@ -145,7 +145,6 @@ export class UserService {
         let member = null;
 
         const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
-        console.log("Found ? ", memberByEmail);
         if (memberByEmail) {
             return memberByEmail;
         } else {

@@ -168,4 +168,11 @@ export class MessagingGateway implements OnGatewayConnection {
         const userSocket = await this.sessions.getUserSocket(user.id);
         this.server.to(userSocket.id.toString()).emit('onMuteMember');
     }
+
+    @OnEvent('unmute.member')
+    async unmuteMember(payload: any) {
+        const user = await this.userService.getUserByEmail(payload.user.email);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(userSocket.id.toString()).emit('onUnmuteMember');
+    }
 }

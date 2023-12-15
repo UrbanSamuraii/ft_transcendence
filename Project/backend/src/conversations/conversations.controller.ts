@@ -321,7 +321,6 @@ export class ConversationsController {
 		else if (member?.username === user.username) {
 			res.status(403).json({ message: "You can't mute yoursel." }); return;}
 		else {
-			console.log("Member to be muted : ", member.username);
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
 			if (muted) {
@@ -348,7 +347,9 @@ export class ConversationsController {
 			const userId = member.id;
 			muted = await this.convService.removeMemberFromMutedList(userId, parseInt(conversationId))
 			if (muted) {
-				res.status(201).json({ message: "User unmuted from the conversation." }); return;}
+				res.status(201).json({ message: "User unmuted from the conversation." }); 
+				this.eventEmitter.emit('unmute.member', {user});
+				return;}
 			else {
 				res.status(401).json({ message: "User is already unmuted." }); return;}
 		}

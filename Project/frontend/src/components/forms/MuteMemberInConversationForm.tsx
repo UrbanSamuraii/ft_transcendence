@@ -4,7 +4,6 @@ import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useSocket } from '../../SocketContext';
-import { useNavigate } from "react-router-dom";
 
 // http://localhost:3001/conversations/${conversationId}/get_member_mute
 
