@@ -111,6 +111,16 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/not_admin_members')
+	async GetNotAdminOtherMembers(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const userList = await this.convService.getNotAdminOtherMembers(idConv, userId);
+		if (userList) { return userList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Get(':id/banned_users')
 	async GetBannedUserFromTheConversation(@Param('id') id: string, @Req() req) {
 		const idConv = parseInt(id);
@@ -373,6 +383,7 @@ export class ConversationsController {
 			if (upgradedUser) {
 				res.status(201).json({ message: "User is now an admin of the conversation." });
 				this.eventEmitter.emit('admin.status.member', {conversationId, member});
+				this.eventEmitter.emit('admin.status.update', {user});
 				return ;}
 			else {
 				res.status(403).json({ message: "Can't update this user to admin of the conversation (is already an administrator ?)." }); return; }
@@ -396,6 +407,7 @@ export class ConversationsController {
 			if (downgradedUser) {
 				res.status(201).json({ message: "User is not an admin of the conversation anymore." });
 				this.eventEmitter.emit('admin.status.member', {conversationId, member});
+				this.eventEmitter.emit('admin.status.downgrade', {user});
 				return ;}
 			else {
 				res.status(403).json({ message: "User wasn't an admin of the conversation." }); return ;}

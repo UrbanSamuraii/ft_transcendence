@@ -126,8 +126,25 @@ export class MessagingGateway implements OnGatewayConnection {
     @OnEvent('admin.status.member')
     async displayChangeOfStatusMemberEvent(payload: any) {
         console.log("The server has detect a change in status of member :", payload.member);
-        const memberSocket = await this.sessions.getUserSocket(payload.member.id);
-        this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);
+        const memberId = payload.member.id;
+        const memberSocket = await this.sessions.getUserSocket(memberId);
+        // console.log(memberSocket);
+        if (memberSocket) {
+            this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);}
+    }
+
+    @OnEvent('admin.status.update')
+    async displayUpdateStatusMemberEvent(payload: any) {
+        const user = await this.userService.getUserByEmail(payload.user.email);
+        const memberSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(memberSocket.id.toString()).emit('onUpdateAdminStatus');
+    }
+
+    @OnEvent('admin.status.downgrade')
+    async displayDowngradeStatusMemberEvent(payload: any) {
+        const user = await this.userService.getUserByEmail(payload.user.email);
+        const memberSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(memberSocket.id.toString()).emit('onDowngradeAdminStatus');
     }
 
     @OnEvent('change.password')

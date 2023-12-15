@@ -538,6 +538,24 @@ export class ConversationsService {
 		}
 	}
 
+	async getNotAdminOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, admins: true },
+		});
+		if (conversation) {
+			const notAdmins: User[] = [];
+			for (const member of conversation.members) {
+				const isMuted = conversation.admins.some((regular) => regular.id === member.id);
+				if (!isMuted) { notAdmins.push(member); }
+			}
+			const notAdminsWithoutUser = notAdmins.filter((regular) => regular.id !== userIdToExclude);
+			return (notAdminsWithoutUser);
+		} else {
+			return null;
+		}
+	}
+
 	async getMutedOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
