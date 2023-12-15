@@ -80,8 +80,9 @@ export class MessagingGateway implements OnGatewayConnection {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
                 const authorSocket = await this.sessions.getUserSocket(payload.user.id);
-                console.log("Author Socket : ", authorSocket.id.toString());
+                // console.log("Author Socket : ", authorSocket.id.toString());
                 this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage);
+                this.server.to(authorSocket.id.toString()).emit('onNewMessage');
                 // console.log("Message ConvId : ", payload.newMessage.conversation_id);
                 // console.log("Author id : ", payload.user.id);
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
@@ -93,8 +94,9 @@ export class MessagingGateway implements OnGatewayConnection {
                     if (isBlocked == false) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
                         if (memberSocket !== undefined) {
-                            console.log("Member Socket : ", memberSocket.id.toString());
-                            this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);}
+                            // console.log("Member Socket : ", memberSocket.id.toString());
+                            this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);
+                            this.server.to(memberSocket.id.toString()).emit('onNewMessage');}
                     }
                 }
             }

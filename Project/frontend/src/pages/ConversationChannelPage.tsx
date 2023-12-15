@@ -20,7 +20,7 @@ export const ConversationChannelPage = () => {
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {
-            console.log({ "REMOVED FROM A CONV !": payload });
+            // console.log({ "REMOVED FROM A CONV !": payload });
             if (conversationId === payload.conversationId) {
                 navigate('/ConversationPage');
             }
@@ -49,7 +49,7 @@ export const ConversationChannelPage = () => {
     useEffect(() => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(false);
-            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload.conversation_id });
+            // console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload.conversation_id });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
                 setConversationsArray(prevConversations => {
