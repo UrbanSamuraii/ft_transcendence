@@ -35,7 +35,6 @@ function Navbar() {
                 <Link to="/" className="navbar-logo">MyLogo</Link>
             </div>
             <div className="navbar-center">
-                <Link to="/games">Games</Link>
                 <Link to="/tournaments">Tournaments</Link>
                 <Link to="/leaderboard">Leaderboard</Link>
             </div>

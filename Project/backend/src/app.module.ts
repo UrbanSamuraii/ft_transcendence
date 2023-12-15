@@ -11,6 +11,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { MessagesModule } from './messages/messages.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
+import { PowerPongGameService } from './game/game.power.pong.service';
 
 @Module({
     imports: [
@@ -18,13 +19,13 @@ import { GatewayModule } from './gateway/gateway.module';
         ConversationsModule,
         MessagesModule,
         UserModule,
-        GatewayModule, 
+        GatewayModule,
         PrismaModule,
         EventEmitterModule.forRoot(),
-        ConfigModule.forRoot({ isGlobal: true }), 
+        ConfigModule.forRoot({ isGlobal: true }),
         ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', '..', 'dist', 'client') }),
     ],
-    providers: [GameGateway, SquareGameService],
+    providers: [GameGateway, SquareGameService, PowerPongGameService],
 })
 
 

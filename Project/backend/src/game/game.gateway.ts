@@ -2,6 +2,7 @@ import { OnModuleInit } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, OnGatewayInit, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SquareGameService } from './game.square.service';
+import { PowerPongGameService } from './game.power.pong.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from '@nestjs/common';
@@ -28,14 +29,15 @@ export interface PlayerInfo {
 })
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
-    private queue: Socket[] = [];
-    // private playerInfoMap = new Map<number, PlayerInfo>();
+    // private queue: Socket[] = [];
+    private queue: { socket: Socket, gameMode: string }[] = [];
     private playerInfoMap = new Map<number, Map<string, PlayerInfo>>();
     private gameLoop: NodeJS.Timeout;
     private userInGameMap = new Map<string, boolean>();
     private userCurrentGameMap = new Map<string, number>(); // username -> gameId
 
-    constructor(private gameService: SquareGameService,
+    constructor(private classicGameService: SquareGameService,
+        private PowerPongGameService: PowerPongGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
         private prisma: PrismaService // Inject Prisma service here
@@ -43,11 +45,11 @@ export class GameGateway implements OnGatewayInit {
     ) { }
 
     private removeFromQueue(clientToRemove: Socket) {
-        console.log("Queue before removal:", this.queue.map(client => client.id)); // Print queue before removal
-        this.queue = this.queue.filter(client => client !== clientToRemove);
-        console.log("Queue after removal:", this.queue.map(client => client.id)); // Print queue after removal
-
+        console.log("Queue before removal:", this.queue.map(client => client.socket.id)); // Adjusted for new queue structure
+        this.queue = this.queue.filter(client => client.socket !== clientToRemove);
+        console.log("Queue after removal:", this.queue.map(client => client.socket.id)); // Adjusted for new queue structure
     }
+
 
     afterInit(server: Server) {
         console.log("Socket.io initialized");
@@ -123,7 +125,6 @@ export class GameGateway implements OnGatewayInit {
         });
     }
 
-
     @SubscribeMessage('leaveMatchmaking')
     handleLeaveMatchmaking(client: Socket) {
         console.log("handleLeaveMatchmaking");
@@ -152,11 +153,12 @@ export class GameGateway implements OnGatewayInit {
     }
 
     private isUserInQueue(username: string): boolean {
-        return this.queue.some(client => client.data.user.username === username);
+        return this.queue.some(client => client.socket.data.user.username === username);
     }
 
-    private async addUserToQueue(client: Socket, userInfo: User): Promise<void> {
-        client.data.user = userInfo;
+
+    private async addUserToQueue(client: { socket: Socket, gameMode: string }, userInfo: User): Promise<void> {
+        client.socket.data.user = userInfo;
 
         if (this.userInGameMap.get(userInfo.username)) {
             console.log('User is already in a game, user:', userInfo.username);
@@ -186,82 +188,90 @@ export class GameGateway implements OnGatewayInit {
             potentialEloLoss: 0,
         };
 
-        client.data.playerInfo = playerInfo;
+        client.socket.data.playerInfo = playerInfo;
     }
-
-
 
     private resetUserGameStatus(username: string): void {
         this.userInGameMap.set(username, false);
     }
 
     private async startMatchmaking(): Promise<void> {
-        // Ensure that we have at least two players in the queue
-        if (this.queue.length < 2) {
-            return;
-        }
-        // Dequeue the first two players
-        const player1 = this.queue.shift();
-        const player2 = this.queue.shift();
+        while (this.queue.length >= 2) {
+            // Find two players with the same game mode
+            const index = this.findMatchingPlayerIndex();
+            if (index === -1) break;
 
-        // Basic validation
-        if (!player1 || !player2) {
-            return;
-        }
+            const player1 = this.queue.splice(index, 1)[0];
+            const player2 = this.queue.shift();
 
-        this.userInGameMap.set(player1.data.user.username, true);
-        this.userInGameMap.set(player2.data.user.username, true);
+            if (!player1 || !player2) continue;
 
-        // Create a new game in your database or game management system
-        const newGame = await this.createGame(player1, player2);
+            this.userInGameMap.set(player1.socket.data.user.username, true);
+            this.userInGameMap.set(player2.socket.data.user.username, true);
 
-        const gameId = newGame.id;
+            let newGame;
+            let gameService;
+            if (player1.gameMode === 'powerpong') {
+                newGame = await this.createGame(player1.socket, player2.socket);
+                gameService = this.PowerPongGameService;
+            } else {
+                newGame = await this.createGame(player1.socket, player2.socket);
+                gameService = this.classicGameService;
+            }
 
-        const eloChanges = await this.calculatePotentialEloChanges(player1.data.user.id, player2.data.user.id);
+            const gameId = newGame.id;
 
-        // Update playerInfo with ELO changes
-        const updatedPlayer1Info = { ...player1.data.playerInfo, ...eloChanges.player1 };
-        const updatedPlayer2Info = { ...player2.data.playerInfo, ...eloChanges.player2 };
+            const eloChanges = await this.calculatePotentialEloChanges(player1.socket.data.user.id, player2.socket.data.user.id);
 
-        const gamePlayerInfoMap = new Map<string, PlayerInfo>();
-        gamePlayerInfoMap.set(player1.data.user.username, updatedPlayer1Info);
-        gamePlayerInfoMap.set(player2.data.user.username, updatedPlayer2Info);
+            // Update playerInfo with ELO changes
+            const updatedPlayer1Info = { ...player1.socket.data.playerInfo, ...eloChanges.player1 };
+            const updatedPlayer2Info = { ...player2.socket.data.playerInfo, ...eloChanges.player2 };
 
-        this.playerInfoMap.set(gameId, gamePlayerInfoMap);
+            const gamePlayerInfoMap = new Map<string, PlayerInfo>();
+            gamePlayerInfoMap.set(player1.socket.data.user.username, updatedPlayer1Info);
+            gamePlayerInfoMap.set(player2.socket.data.user.username, updatedPlayer2Info);
 
-        player1.join(gameId.toString());
-        player2.join(gameId.toString());
-        console.log('%s player1 has joined %s room', player1.data.user.username, gameId.toString())
-        console.log('%s player2 has joined %s room', player2.data.user.username, gameId.toString())
-        player1.emit('matchFound', { opponent: player2.data.user, gameId });
-        player2.emit('matchFound', { opponent: player1.data.user, gameId });
+            this.playerInfoMap.set(gameId, gamePlayerInfoMap);
 
-        // this.gameService.updateGameState(gameId, this.playerInfoMap, (data) => {
-        this.gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
-            this.server.to(gameId.toString()).emit('updateGameData', {
-                ...data,
+            player1.socket.join(gameId.toString());
+            player2.socket.join(gameId.toString());
+            console.log('%s player1 has joined %s room', player1.socket.data.user.username, gameId.toString())
+            console.log('%s player2 has joined %s room', player2.socket.data.user.username, gameId.toString())
+            player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId });
+            player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId });
+
+
+            gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
+                this.server.to(gameId.toString()).emit('updateGameData', {
+                    ...data,
+                });
+
+                if (data.isGameOver && data.winnerUsername && data.loserUsername) {
+                    this.resetUserGameStatus(player1.socket.data.user.username);
+                    this.resetUserGameStatus(player2.socket.data.user.username);
+                    player1.socket.leave(gameId.toString());
+                    player2.socket.leave(gameId.toString());
+                    this.playerInfoMap.delete(player1.socket.data.user.username);
+                    this.playerInfoMap.delete(player2.socket.data.user.username);
+                    this.userCurrentGameMap.delete(player1.socket.data.user.username);
+                    this.userCurrentGameMap.delete(player2.socket.data.user.username);
+                    this.handleGameOver(data.winnerUsername, data.loserUsername, gameId).catch((error) => {
+                        console.error('Error handling game over:', error);
+                    });
+                }
             });
 
+            console.log(`Matched ${player1.socket.data.user.username} with ${player2.socket.data.user.username}`);
+        }
+    }
 
-            if (data.isGameOver && data.winnerUsername && data.loserUsername) {
-                this.resetUserGameStatus(player1.data.user.username);
-                this.resetUserGameStatus(player2.data.user.username);
-                player1.leave(gameId.toString());
-                player2.leave(gameId.toString());
-                // console.log('%s player1 has left %s room', player1.data.user.username, gameId.toString())
-                // console.log('%s player2 has left %s room', player2.data.user.username, gameId.toString())
-                this.playerInfoMap.delete(player1.data.user.username);
-                this.playerInfoMap.delete(player2.data.user.username);
-                this.userCurrentGameMap.delete(player1.data.user.username);
-                this.userCurrentGameMap.delete(player2.data.user.username);
-                this.handleGameOver(data.winnerUsername, data.loserUsername, gameId).catch((error) => {
-                    console.error('Error handling game over:', error);
-                });
+    private findMatchingPlayerIndex(): number {
+        for (let i = 1; i < this.queue.length; i++) {
+            if (this.queue[0].gameMode === this.queue[i].gameMode) {
+                return i;
             }
-        });
-
-        // console.log(`Matched ${player1.id} with ${player2.id}`);
-        console.log(`Matched ${player1.data.user.username} with ${player2.data.user.username}`);
+        }
+        return -1;
     }
 
     private async createGame(player1: Socket, player2: Socket): Promise<Game> {
@@ -287,8 +297,7 @@ export class GameGateway implements OnGatewayInit {
     }
 
     @SubscribeMessage('enterMatchmaking')
-    async handleEnterMatchmaking(client: Socket) {
-
+    async handleEnterMatchmaking(client: Socket, payload: { gameMode: string }) {
 
         const userInfo = await this.verifyTokenAndGetUserInfo(client);
         if (!userInfo) {
@@ -301,7 +310,7 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        this.addUserToQueue(client, userInfo);
+        this.addUserToQueue({ socket: client, gameMode: payload.gameMode }, userInfo);
 
         if (this.queue.length >= 2) {
             this.startMatchmaking();
@@ -347,12 +356,12 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('pauseGame')
     handlePauseGame(client: Socket) {
-        this.gameService.isGamePaused = true;
+        this.classicGameService.isGamePaused = true;
     }
 
     @SubscribeMessage('resumeGame')
     handleResumeGame(client: Socket) {
-        this.gameService.isGamePaused = false;
+        this.classicGameService.isGamePaused = false;
     }
 
     @SubscribeMessage('checkGameStatus')

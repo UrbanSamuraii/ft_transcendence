@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Matchmaking.css';
 import { useSocket } from '../../SocketContext';
 
 function Matchmaking() {
     const { socket } = useSocket();
     const navigate = useNavigate();
+    const location = useLocation();
     const matchFoundRef = useRef(false);
     const [ongoingGameId, setOngoingGameId] = useState(null);
     const [isGameStatusChecked, setIsGameStatusChecked] = useState(false);
     const isGameStatusCheckedRef = useRef(isGameStatusChecked);
     const ongoingGameIdRef = useRef(ongoingGameId);
+    const { gameMode, champion } = location.state || { gameMode: 'classic', champion: null };
 
     useEffect(() => {
         if (!socket) {
@@ -24,8 +26,9 @@ function Matchmaking() {
                 setOngoingGameId(data.gameId);
                 ongoingGameIdRef.current = data.gameId;
             } else {
-                console.log("Emitting enterMatchmaking");
-                socket.emit('enterMatchmaking');
+                console.log(`Emitting enterMatchmaking for ${gameMode} mode`);
+                // socket.emit('enterMatchmaking');
+                socket.emit('enterMatchmaking', { gameMode, championId: champion?.id });
                 socket.on('matchFound', handleMatchFound);
             }
             setIsGameStatusChecked(true); // Update when the check is complete
