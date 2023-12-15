@@ -11,42 +11,33 @@ export const ConversationPage = () => {
 
     const { id } = useParams();
     const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
-    const { socket, setNewMessageReceived, newMessageReceived, isLastMessageDeleted } = useSocket();  
+    const { socket, isLastMessageDeleted } = useSocket();  
     const chatSocketContextData = useSocket();
 
     useEffect(() => {
         const fetchConversations = async () => {
+            console.log("ConversationPage WORKING ON");
             try {
                 const prismaConversations = await getConversations();
+                console.log("Fetched Conversations: ", prismaConversations);
                 setPrismaConversations(prismaConversations);
-                setNewMessageReceived(false);
             } catch (error) {
                 console.error('Error fetching conversations:', error);
             }
         };
         fetchConversations();
 
-        socket?.on('onJoinRoom', fetchConversations);
-        socket?.on('onRemovedMember', fetchConversations);
-        socket?.on('onBeingBlockedorBlocked', fetchConversations);
-
+        chatSocketContextData?.socket?.on('onMessage', fetchConversations);
+        chatSocketContextData?.socket?.on('onJoinRoom', fetchConversations);
+        chatSocketContextData?.socket?.on('onRemovedMember', fetchConversations);
+        chatSocketContextData?.socket?.on('onBeingBlockedorBlocked', fetchConversations);
         return () => {
-            socket?.off('onJoinRoom', fetchConversations);
-            socket?.off('onRemovedMember', fetchConversations);
-            socket?.off('onBeingBlockedorBlocked', fetchConversations);
+            chatSocketContextData?.socket?.off('onMessage', fetchConversations);
+            chatSocketContextData?.socket?.off('onJoinRoom', fetchConversations);
+            chatSocketContextData?.socket?.off('onRemovedMember', fetchConversations);
+            chatSocketContextData?.socket?.off('onBeingBlockedorBlocked', fetchConversations);
         };
-
-    }, [socket, chatSocketContextData, newMessageReceived, isLastMessageDeleted]);
-
-    useEffect(() => {
-        socket?.on('onMessage', (payload: any) => {
-            setNewMessageReceived(true);
-        });
-        return () => {
-            socket?.off('onMessage');
-        };
-    }, [socket, newMessageReceived]);
-
+    }, [chatSocketContextData, isLastMessageDeleted]);
 
     return (
         <Page>

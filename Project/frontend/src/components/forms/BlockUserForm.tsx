@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 import { BlockUserModal } from "../modals/BlockUserModal";
 
 interface ConvDataInput {

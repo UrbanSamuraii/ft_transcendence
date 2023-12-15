@@ -1,6 +1,6 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection } from "@nestjs/websockets";
 import { Response as ExpressResponse } from 'express';
-import { Res, Req } from '@nestjs/common';
+import { Res, Req, Next } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
 import { UserService } from "src/user/user.service";
@@ -80,14 +80,21 @@ export class MessagingGateway implements OnGatewayConnection {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
                 const authorSocket = await this.sessions.getUserSocket(payload.user.id);
-                // console.log("Author Socket : ", authorSocket.id.toString());
-                this.server.to(authorSocket.id.toString()).emit('onMessage', payload);
+                console.log("Author Socket : ", authorSocket.id.toString());
+                this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage);
+                // console.log("Message ConvId : ", payload.newMessage.conversation_id);
+                // console.log("Author id : ", payload.user.id);
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
+                // console.log("Array Length: ", conversationOtherMembers.length);
                 for (const member of conversationOtherMembers) {
-                    if (!(await this.convService.isBlockedByUser(payload.user, member))) {
+                    // console.log("MEMBER : ", member.username);
+                    const isBlocked = await this.convService.isBlockedByUser(payload.user, member); 
+                    // console.log("isBlocked ? :", isBlocked);
+                    if (isBlocked == false) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
-                        // console.log("Member Socket : ", memberSocket.id.toString());
-                        this.server.to(memberSocket.id.toString()).emit('onMessage', payload);
+                        if (memberSocket !== undefined) {
+                            console.log("Member Socket : ", memberSocket.id.toString());
+                            this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);}
                     }
                 }
             }
@@ -144,7 +151,6 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('block.user')
     async blockUser(payload: any) {
-        // console.log("The server is alerting that a user has been blocked", payload.target);
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
         
@@ -152,4 +158,12 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
     }
 
+    @OnEvent('unblock.user')
+    async unblockUser(payload: any) {
+        const userSocket = await this.sessions.getUserSocket(payload.user.id);
+        const targetSocket = await this.sessions.getUserSocket(payload.target.id);
+        
+        this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
+        this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
+    }
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import { useSocket } from '../../SocketContext';
 
 type Member = {
 	username: string;
@@ -12,28 +13,31 @@ type Member = {
   
   export const UnblockUserForm: React.FC<MemberFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
-  
+	const { socket } = useSocket();
+
 	useEffect(() => {
 	  const fetchMemberList = async () => {
 		try {
-		  const response = await axios.get(`http://localhost:3001/conversations/blocked_users_list`, {
-				withCredentials: true,
-			});
+		  const response = await axios.post(`http://localhost:3001/conversations/blocked_users_list`, null, { withCredentials: true });
 			setMemberList(response.data);
 		} catch (error) {
 		  console.error('Error fetching the list:', error);
 		}
 	  };
-  
 	  fetchMemberList();
-	}, []);
+
+	  socket?.on('onBeingUnblockedorUnblocked', fetchMemberList);
+	  return () => {
+		socket?.off('onBeingUnblockedorUnblocked', fetchMemberList);
+	};
+	}, [socket]);
   
 	const unblockMember = async (username: string) => {
 	  try {
 	    const response = await axios.post(`http://localhost:3001/conversations/unblock_user`, 
 		{ userToUnblock: username }, 
 		{ withCredentials: true });
-		// console.log("USER SELECTED ", response)
+		console.log("USER SELECTED ", response)
 	  } catch (error: any) {
 		if (error.response && error.response.status === 403) {
 			alert("Unauthorized: Please log in.");

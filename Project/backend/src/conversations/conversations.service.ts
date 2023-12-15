@@ -323,9 +323,9 @@ export class ConversationsService {
 
 	/////////////////// ADD / REMOVE BLOCK USER ///////////////////
 
-	async blockUser(user: User, target: User): Promise<boolean> {
-		const userId = user.id;
-		const targetId = target.id;
+	async blockUser(userId: number, targetId: number): Promise<boolean> {
+		// const userId = user.id;
+		// const targetId = target.id;
 		const userWithBlockedUsers = await this.prismaService.user.findUnique({
 			where: { id: userId },
 			include: { blockedUsers: true },
@@ -505,9 +505,9 @@ export class ConversationsService {
 		  where: { id: conversationId },
 		  include: { members: true },
 		});
-	  
 		if (conversation) {
-		  const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
+			const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
+			// console.log("Members : ", membersWithoutUser);
 		  return membersWithoutUser; 
 		} 
 		else { return null; }

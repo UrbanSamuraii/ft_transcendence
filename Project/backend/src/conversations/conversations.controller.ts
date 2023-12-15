@@ -193,7 +193,7 @@ export class ConversationsController {
 		if (!target) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
-			const isBlocked = await this.convService.blockUser(user, target);
+			const isBlocked = await this.convService.blockUser(user.id, target.id);
 			if (isBlocked) {
 				res.status(201).json({ message: "You have successfully blocked the user." }); 
 				this.eventEmitter.emit('block.user', {user, target});
@@ -204,10 +204,11 @@ export class ConversationsController {
 		}
 	}
 
-	@Get('blocked_users_list')
+	@Post('blocked_users_list')
 	async GetBlockedUsersList(@Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		if (user) { return user.blockedUsers; } 
+		console.log("Username retrieving its block user list : ", user.username);
+		if (user) { console.log("Blocked Users List : ", user.blockedUsers); return user.blockedUsers; } 
 		else { throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
 	}
 
@@ -220,7 +221,9 @@ export class ConversationsController {
 		else {
 			const unblockedUser = await this.convService.removeUserFromBlockList(user, target);
 			if (unblockedUser) {
-				res.status(201).json({ message: "User is now allowed in this conversation." });}
+				res.status(201).json({ message: "User is now allowed in this conversation." });
+				this.eventEmitter.emit('unblock.user', {user, target});
+			}
 			else {
 				res.status(403).json({ message: "User wasn't banned from the conversation." });}
 		}

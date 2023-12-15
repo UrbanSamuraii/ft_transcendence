@@ -48,12 +48,14 @@ export const ConversationChannelPage = () => {
     // To get last message sent - need to not socket emit to the user who blocked the author
     useEffect(() => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
-            chatSocketContextData.setNewMessageReceived(true);
             chatSocketContextData.setLastMessageDeleted(false);
-            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
+            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload.conversation_id });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
-                setConversationsArray(prevConversations => [payload, ...prevConversations]);
+                setConversationsArray(prevConversations => {
+                    const newState = [payload, ...prevConversations];
+                    return newState;
+                });
             }
         });
         return () => {
