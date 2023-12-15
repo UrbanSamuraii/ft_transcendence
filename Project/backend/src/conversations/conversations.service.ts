@@ -551,6 +551,25 @@ export class ConversationsService {
 		}
 	}
 
+	async getNotMutedOtherMembers(conversationId: number, userIdToExclude: number): Promise<User[] | null> {
+		const conversation = await this.prismaService.conversation.findUnique({
+			where: { id: conversationId },
+			include: { members: true, muted: true },
+		});
+		if (conversation) {
+			const unMutes: User[] = [];
+			for (const member of conversation.members) {
+				const isMuted = conversation.muted.some((mutedMember) => mutedMember.id === member.id);
+				if (!isMuted) { unMutes.push(member); }
+			}
+			const notMutesWithoutUser = unMutes.filter((unmute) => unmute.id !== userIdToExclude);
+			// console.log("UNMUTES user in the conv'", unMutes);
+			return (notMutesWithoutUser);
+		} else {
+			return null;
+		}
+	}
+
 	async getOwner(conversationId: number): Promise<User | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },

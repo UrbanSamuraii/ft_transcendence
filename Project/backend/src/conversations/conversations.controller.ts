@@ -91,6 +91,16 @@ export class ConversationsController {
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
+	@Get(':id/not_muted_members')
+	async GetUnmutedMembersInTheConversation(@Param('id') id: string, @Req() req) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const userId = user.id;
+		const idConv = parseInt(id);
+		const notMutesMemberList = await this.convService.getNotMutedOtherMembers(idConv, userId);
+		if (notMutesMemberList) { return notMutesMemberList; } 
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+	}
+
 	@Get(':id/admin_members')
 	async GetAdminOtherMembers(@Param('id') id: string, @Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
@@ -311,10 +321,13 @@ export class ConversationsController {
 		else if (member?.username === user.username) {
 			res.status(403).json({ message: "You can't mute yoursel." }); return;}
 		else {
+			console.log("Member to be muted : ", member.username);
 			const userId = member.id;
 			muted = await this.convService.muteMemberFromConversation(userId, parseInt(conversationId))
 			if (muted) {
-				res.status(201).json({ message: "User muted from the conversation." }); return;}
+				res.status(201).json({ message: "User muted from the conversation." }); 
+				this.eventEmitter.emit('mute.member', {user});
+				return;}
 			else {
 				res.status(403).json({ message: "User is already in mute." }); return;}
 		}

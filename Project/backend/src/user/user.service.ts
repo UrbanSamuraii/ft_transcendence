@@ -80,6 +80,26 @@ export class UserService {
         }
     }
 
+    async getUserByEmail(email: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email: email }
+            });
+            if (!user) {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: "Error: User not found"
+                }, HttpStatus.BAD_REQUEST);
+            }
+            return user;
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: "Error: Unable to retrieve user"
+            }, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     async getUserIdByUsername(username: string): Promise<number | null> {
         const user = await this.prisma.user.findUnique({
             where: { username },
@@ -125,6 +145,7 @@ export class UserService {
         let member = null;
 
         const memberByEmail = usersArray[0] !== "" ? await this.getUser({ email }) : null;
+        console.log("Found ? ", memberByEmail);
         if (memberByEmail) {
             return memberByEmail;
         } else {

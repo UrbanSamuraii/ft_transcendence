@@ -80,21 +80,14 @@ export class MessagingGateway implements OnGatewayConnection {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
                 const authorSocket = await this.sessions.getUserSocket(payload.user.id);
-                // console.log("Author Socket : ", authorSocket.id.toString());
                 this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage);
                 this.server.to(authorSocket.id.toString()).emit('onNewMessage');
-                // console.log("Message ConvId : ", payload.newMessage.conversation_id);
-                // console.log("Author id : ", payload.user.id);
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
-                // console.log("Array Length: ", conversationOtherMembers.length);
                 for (const member of conversationOtherMembers) {
-                    // console.log("MEMBER : ", member.username);
                     const isBlocked = await this.convService.isBlockedByUser(payload.user, member); 
-                    // console.log("isBlocked ? :", isBlocked);
                     if (isBlocked == false) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
                         if (memberSocket !== undefined) {
-                            // console.log("Member Socket : ", memberSocket.id.toString());
                             this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);
                             this.server.to(memberSocket.id.toString()).emit('onNewMessage');}
                     }
@@ -167,5 +160,12 @@ export class MessagingGateway implements OnGatewayConnection {
         
         this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
         this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
+    }
+
+    @OnEvent('mute.member')
+    async muteMember(payload: any) {
+        const user = await this.userService.getUserByEmail(payload.user.email);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(userSocket.id.toString()).emit('onMuteMember');
     }
 }
