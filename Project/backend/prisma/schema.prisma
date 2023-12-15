@@ -8,104 +8,105 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-	  id  	Int   @id @default(autoincrement())
-    id42  Int?  @unique  
+    id   Int  @id @default(autoincrement())
+    id42 Int? @unique
 
-	  createdAt	DateTime	@default(now())
-	  updatedAt	DateTime	@updatedAt
-	  first_name  String    @db.VarChar(255)
-    last_name   String    @db.VarChar(255)
-    email       String		@unique @db.VarChar(255)
-	  username	  String		@unique @db.VarChar(255)
-    img_url     String?   @db.VarChar(255)
-    hash          String  @default("noTokenBecause42Identification")
-    accessToken   String  @default("noToken")
-    isRegistered  Boolean @default(false)
+    createdAt              DateTime  @default(now())
+    updatedAt              DateTime  @updatedAt
+    first_name             String    @db.VarChar(255)
+    last_name              String    @db.VarChar(255)
+    email                  String    @unique @db.VarChar(255)
+    username               String    @unique @db.VarChar(255)
+    img_url                String?   @db.VarChar(255)
+    hash                   String    @default("noTokenBecause42Identification")
+    accessToken            String    @default("noToken")
+    isRegistered           Boolean   @default(false)
     is_two_factor_activate Boolean?  @default(false)
     two_factor_secret      String?
-    status                status_t?    @default(OFFLINE)
-    eloRating               Int       @default(1000)
-    gamesWon          Game[] @relation("WinnerRelation")
-    totalGamesWon           Int       @default(0)
-    totalGamesLost           Int       @default(0)
-    
-    messages      Message[] @relation("author")
-    
-    conversationsOwner  Conversation[] @relation("ownedConversations")
-    conversations       Conversation[] @relation("member")
-    conversationsAdmin  Conversation[] @relation("admin")
-    bannedFrom          Conversation[] @relation("banned")
-    mutedFrom           Conversation[] @relation("muted")
+    status                 status_t? @default(OFFLINE)
+    eloRating              Int       @default(1000)
+    gamesWon               Game[]    @relation("WinnerRelation")
+    totalGamesWon          Int       @default(0)
+    totalGamesLost         Int       @default(0)
 
-    blockedUsers   User[] @relation("blockedUsers")
-    blockedBy User[] @relation("blockedUsers")
+    messages Message[] @relation("author")
 
-  @@unique([id, email, username])
-	@@map("users")
+    conversationsOwner Conversation[] @relation("ownedConversations")
+    conversations      Conversation[] @relation("member")
+    conversationsAdmin Conversation[] @relation("admin")
+    bannedFrom         Conversation[] @relation("banned")
+    mutedFrom          Conversation[] @relation("muted")
+
+    blockedUsers User[] @relation("blockedUsers")
+    blockedBy    User[] @relation("blockedUsers")
+
+    @@unique([id, email, username])
+    @@map("users")
 }
 
 model Game {
-  id        Int      @id @default(autoincrement())
-  uniqueId  String   @unique
-  player1Id Int
-  player2Id Int
-  winnerId  Int?
-  createdAt DateTime @default(now())
+    id        Int      @id @default(autoincrement())
+    uniqueId  String   @unique
+    player1Id Int
+    player2Id Int
+    winnerId  Int?
+    createdAt DateTime @default(now())
+    gameMode  String   @default("classic")
 
-  winner    User? @relation("WinnerRelation", fields: [winnerId], references: [id])
+    winner User? @relation("WinnerRelation", fields: [winnerId], references: [id])
 
-  @@map("games")
+    @@map("games")
 }
 
 model Conversation {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique 
+    id   Int    @id @default(autoincrement())
+    name String @unique
 
-  createdAt	DateTime	@default(now())
-	updatedAt	DateTime	@updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  privacy   privacy_t @default(PUBLIC)
-  protected Boolean @default(false)
-  password  String?
+    privacy   privacy_t @default(PUBLIC)
+    protected Boolean   @default(false)
+    password  String?
 
-  owner     User?     @relation("ownedConversations", fields: [ownerId],  references: [id])
-  ownerId   Int?
+    owner   User? @relation("ownedConversations", fields: [ownerId], references: [id])
+    ownerId Int?
 
-  members   User[]    @relation("member")
-  admins    User[]    @relation("admin")
-  banned    User[]    @relation("banned")
-  muted     User[]    @relation("muted")
-  
-  messages  Message[] 
+    members User[] @relation("member")
+    admins  User[] @relation("admin")
+    banned  User[] @relation("banned")
+    muted   User[] @relation("muted")
 
-  @@unique([id, name])
-  @@map("conversations")
+    messages Message[]
+
+    @@unique([id, name])
+    @@map("conversations")
 }
 
 model Message {
-  id                    Int          @id @default(autoincrement())
-  createdAt	DateTime	  @default(now())
-	updatedAt	DateTime	  @updatedAt
-  
-  message               String?
-  author                User         @relation("author", fields: [authorName], references: [username])
-  authorName            String
-  conversation          Conversation      @relation(fields: [conversation_id], references:[id])
-  conversation_id       Int
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    message         String?
+    author          User         @relation("author", fields: [authorName], references: [username])
+    authorName      String
+    conversation    Conversation @relation(fields: [conversation_id], references: [id])
+    conversation_id Int
 }
 
 enum status_t {
-  ONLINE
-  OFFLINE
-  PLAYING
+    ONLINE
+    OFFLINE
+    PLAYING
 }
 
 enum privacy_t {
-  PUBLIC
-  PRIVATE
+    PUBLIC
+    PRIVATE
 }

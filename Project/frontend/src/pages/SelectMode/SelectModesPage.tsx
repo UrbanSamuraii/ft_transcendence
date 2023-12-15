@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../../SocketContext';
-import './SelectMode.css'
+import './SelectMode.css';
 
 interface Champion {
     name: string;
     specialAbility: string;
-    // Add more properties as needed, e.g., image, stats, etc.
+    // Add more properties as needed
 }
 
 const SelectModePage = () => {
     const navigate = useNavigate();
     const { socket } = useSocket();
     const [ongoingGameId, setOngoingGameId] = useState(null);
+    const [gameMode, setGameMode] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // New loading state
     const [showChampionSelection, setShowChampionSelection] = useState(false);
     const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
 
@@ -25,15 +27,19 @@ const SelectModePage = () => {
     useEffect(() => {
         if (!socket) {
             console.error('Socket is not available');
+            setIsLoading(false); // Set loading to false if socket is not available
             return;
         }
 
+        setIsLoading(true); // Start loading before emitting 'checkGameStatus'
         socket.emit('checkGameStatus');
 
         const handleGameStatusResponse = (data: any) => {
             if (data.inGame) {
                 setOngoingGameId(data.gameId);
+                setGameMode(data.gameMode);
             }
+            setIsLoading(false); // Stop loading after receiving the response
         };
 
         socket.on('gameStatusResponse', handleGameStatusResponse);
@@ -59,31 +65,37 @@ const SelectModePage = () => {
 
     const handleReconnectClick = () => {
         if (ongoingGameId) {
-            navigate(`/game/${ongoingGameId}`);
+            const gameModePath = gameMode === 'powerpong' ? '/powerpong/' : '/classic/';
+            navigate(`${gameModePath}${ongoingGameId}`);
         }
     };
 
+    if (isLoading) {
+        return <div>Loading...</div>; // Or your custom loading indicator
+    }
+
     return (
         <div className="mode-selection">
-            <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
-            <button className="mode-button power-pong-mode" onClick={handlePowerPongModeClick}>POWER PONG</button>
-            {showChampionSelection && (
-                <div className="champion-selection">
-                    {/* Render buttons for each champion */}
-                    {champions.map((champion) => (
-                        <button key={champion.name} onClick={() => handleChampionSelect(champion)}>
-                            {champion.name}
-                        </button>
-                    ))}
-                </div>
+            {!ongoingGameId && (
+                <>
+                    <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
+                    <button className="mode-button power-pong-mode" onClick={handlePowerPongModeClick}>POWER PONG</button>
+                    {showChampionSelection && (
+                        <div className="champion-selection">
+                            {champions.map((champion) => (
+                                <button key={champion.name} onClick={() => handleChampionSelect(champion)}>
+                                    {champion.name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
             {ongoingGameId && (
                 <button className="mode-button reconnect-button" onClick={handleReconnectClick}>RECONNECT</button>
             )}
-            {/* Other buttons or components */}
         </div>
     );
-
 };
 
 export default SelectModePage;

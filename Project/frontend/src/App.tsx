@@ -22,6 +22,7 @@ import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 import { OnlySocketProvider, useSocket } from './SocketContext';
+import PowerPongGame from './pages/Game/PowerPongGame'; // Import the new PowerPongGame component
 
 const defaultBackgroundStyle = {
     background: '#1a1a1a',
@@ -129,7 +130,8 @@ function Content({ setBackgroundStyle }: ContentProps) {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/game/:id" element={<SquareGame />} />
+            <Route path="/classic/:id" element={<SquareGame />} />
+            <Route path="/powerpong/:id" element={<PowerPongGame />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/ConversationPage" element={<ConversationPage />} >

@@ -34,7 +34,9 @@ export class GameGateway implements OnGatewayInit {
     private playerInfoMap = new Map<number, Map<string, PlayerInfo>>();
     private gameLoop: NodeJS.Timeout;
     private userInGameMap = new Map<string, boolean>();
-    private userCurrentGameMap = new Map<string, number>(); // username -> gameId
+    // private userCurrentGameMap = new Map<string, number>();
+    // private userCurrentGameMap = new Map<string, Map<string, number>>();
+    private userCurrentGameMap = new Map<string, { gameId: number, gameMode: string }>();
 
     constructor(private classicGameService: SquareGameService,
         private PowerPongGameService: PowerPongGameService,
@@ -209,15 +211,10 @@ export class GameGateway implements OnGatewayInit {
             this.userInGameMap.set(player1.socket.data.user.username, true);
             this.userInGameMap.set(player2.socket.data.user.username, true);
 
-            let newGame;
-            let gameService;
-            if (player1.gameMode === 'powerpong') {
-                newGame = await this.createGame(player1.socket, player2.socket);
-                gameService = this.PowerPongGameService;
-            } else {
-                newGame = await this.createGame(player1.socket, player2.socket);
-                gameService = this.classicGameService;
-            }
+            const gameMode = player1.gameMode; // Store the game mode
+
+            const newGame = await this.createGame(player1.socket, player2.socket, gameMode);
+            const gameService = gameMode === 'powerpong' ? this.PowerPongGameService : this.classicGameService;
 
             const gameId = newGame.id;
 
@@ -237,9 +234,9 @@ export class GameGateway implements OnGatewayInit {
             player2.socket.join(gameId.toString());
             console.log('%s player1 has joined %s room', player1.socket.data.user.username, gameId.toString())
             console.log('%s player2 has joined %s room', player2.socket.data.user.username, gameId.toString())
-            player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId });
-            player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId });
 
+            player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId, gameMode: player1.gameMode });
+            player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId, gameMode: player1.gameMode });
 
             gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
                 this.server.to(gameId.toString()).emit('updateGameData', {
@@ -274,7 +271,8 @@ export class GameGateway implements OnGatewayInit {
         return -1;
     }
 
-    private async createGame(player1: Socket, player2: Socket): Promise<Game> {
+    // private async createGame(player1: Socket, player2: Socket): Promise<Game> {
+    private async createGame(player1: Socket, player2: Socket, gameMode: string): Promise<Game> {
         // Implement the logic to create a new game instance
         // This could involve creating a record in the database, initializing game state, etc.
         // For example, using a Prisma client:
@@ -284,17 +282,25 @@ export class GameGateway implements OnGatewayInit {
                 uniqueId: uuidv4(),
                 player1Id: player1.data.user.id,
                 player2Id: player2.data.user.id,
+                gameMode: gameMode, // Include the gameMode field
                 // Other game-related data...
             }
         });
-        this.userCurrentGameMap.set(player1.data.user.username, newGame.id);
-        this.userCurrentGameMap.set(player2.data.user.username, newGame.id);
+
+        this.userCurrentGameMap.set(player1.data.user.username, {
+            gameId: newGame.id,
+            gameMode: gameMode,
+        });
+        this.userCurrentGameMap.set(player2.data.user.username, {
+            gameId: newGame.id,
+            gameMode: gameMode,
+        });
         return newGame;
     }
 
-    private getCurrentGameIdForUser(username: string): number | null {
-        return this.userCurrentGameMap.get(username) || null;
-    }
+    // private getCurrentGameIdForUser(username: string): number | null {
+    //     return this.userCurrentGameMap.get(username) || null;
+    // }
 
     @SubscribeMessage('enterMatchmaking')
     async handleEnterMatchmaking(client: Socket, payload: { gameMode: string }) {
@@ -331,12 +337,12 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        const gameId = this.userCurrentGameMap.get(playerUsername);
+        const userGameInfo = this.userCurrentGameMap.get(playerUsername);
+        const gameId = userGameInfo.gameId; // Extract gameId from the userGameInfo object
         if (gameId === null || gameId === undefined) {
             console.error(`Game ID not found for username: ${playerUsername}`);
             return;
         }
-
         const gamePlayerInfoMap = this.playerInfoMap.get(gameId);
         if (!gamePlayerInfoMap) {
             console.error(`Player info map not found for game ID: ${gameId}`);
@@ -372,19 +378,16 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        const inGame = this.userInGameMap.get(userInfo.username);
-        const gameId = inGame ? this.getCurrentGameIdForUser(userInfo.username) : null;
+        const userGameData = this.userCurrentGameMap.get(userInfo.username);
+        const inGame = !!userGameData;
+        const gameId = inGame ? userGameData.gameId : null;
+        const gameMode = inGame ? userGameData.gameMode : null;
 
-        client.emit('gameStatusResponse', { inGame, gameId });
+        client.emit('gameStatusResponse', { inGame, gameId, gameMode });
     }
 
     @SubscribeMessage('attemptReconnect')
     async handleAttemptReconnect(client: Socket, payload: { username: string; gameId: string }): Promise<void> {
-        // Check if the user is supposed to be in the game room
-        // if (this.isUserInGame(payload.username, payload.gameId) && !this.isUserInRoom(client, payload.gameId)) {
         client.join(payload.gameId.toString());
-        // const gameState = this.getGameState(payload.gameId);
-        // client.emit('gameStateUpdate', gameState);
-        // }
     }
 }
