@@ -114,12 +114,12 @@ export const RegisterForm = () => {
 
             <body className='some-class'>
                 <div className='animation-box-register'>
-                    <span className='borderline'></span>
+                    <span className='borderline-register'></span>
                     <form className="form-container" onSubmit={handleSignUp}>
                         <h1 className='zagolovok'>Create Account</h1>
                         <section className="nameFieldRow">
                             <InputContainer>
-                                <InputField
+                                <InputField className='input'
                                     placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
                                 {formErrors.email && <div className="error-message">{formErrors.email}</div>}
                                 <i className='bx bx-user'></i>
@@ -129,7 +129,7 @@ export const RegisterForm = () => {
                         <section className="nameFieldRow">
                             <div className="nameFieldContainerFirst">
                                 <InputContainer>
-                                    <InputField
+                                    <InputField className='input'
                                         placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
                                     />
                                     {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
@@ -137,7 +137,7 @@ export const RegisterForm = () => {
                             </div>
                             <div className="nameFieldContainerLast">
                                 <InputContainer>
-                                    <InputField
+                                    <InputField className='input'
                                         placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
                                     />
                                     {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
@@ -145,7 +145,7 @@ export const RegisterForm = () => {
                             </div>
                             <div className="nameFieldContainerFirst">
                                 <InputContainer>
-                                    <InputField
+                                    <InputField className='input'
                                         placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
                                         />
                                     {formErrors.username && <div className="error-message">{formErrors.username}</div>}
@@ -172,7 +172,9 @@ export const RegisterForm = () => {
                             <Link to="/Login">Login</Link>
                         </div>
 
-                        <Button42 className="button42" onClick={handleSignUp42Click}>42 Identification</Button42>
+                        <div className='button42'>
+                            <Button42 onClick={handleSignUp42Click}></Button42>
+                        </div>
                     </form>
                 </div>
             </body>

@@ -86,12 +86,12 @@ export const LoginForm = () => {
         
             <body className='some-class'>
                 <div className='animation-box'>
-                    <span className='borderline'></span>
+                    <span className='borderline-login'></span>
                     <form className="form-container" onSubmit={handleSignIn}>
                     <h1 className='zagolovok'>Login</h1>
                         <div className="input-login-container">
                             <InputContainer>
-                                    <InputField
+                                    <InputField className='input'
                                         placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
                                     {formErrors.email && <div className="error-message">{formErrors.email}</div>}
                                     <i className='bx bx-user'></i>

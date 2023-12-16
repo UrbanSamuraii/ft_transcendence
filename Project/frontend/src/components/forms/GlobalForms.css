@@ -16,18 +16,19 @@
 	position: relative;
 }
 
+
 .animation-box {
-	background-color: rgb(30, 5, 60);
+	/* background-color: rgb(30, 5, 60); */
 	position: relative;
 	width: 428px;
-	height: 373px;
+	height: 383px;
 	border-radius: 10px;
 	overflow: hidden;
 }
 
 
 .animation-box-register {
-	background-color: rgb(30, 5, 60);
+	/* background-color: rgb(30, 5, 60); */
 	position: relative;
 	width: 428px;
 	height: 500px;
@@ -49,7 +50,7 @@
 .animation-box-register::before {
 	content: '';
 	position: absolute;
-	top: -50%;
+	top: -35%;
 	left: -40%;
 	width: 370px;
 	height: 400px;
@@ -71,10 +72,10 @@
 .animation-box-register::after {
 	content: '';
 	position: absolute;
-	top: -50%;
+	top: -35%;
 	left: -40%;
 	width: 370px;
-	height: 350px;
+	height: 400px;
 	background: linear-gradient(0deg,transparent,
 	transparent,#45f3ff,#45f3ff,#45f3ff);
 	z-index: 1;
@@ -82,18 +83,18 @@
 	animation: animate 6s linear infinite;
 	animation-delay: -3s;
 }
-.borderline {
+.borderline-register {
 	position: absolute;
 	top: 0;
 	inset: 0;
 }
-.borderline::before {
+.borderline-register::before {
 	content: '';
 	position: absolute;
-	top: -50%;
+	top: -35%;
 	left: -40%;
 	width: 370px;
-	height: 350px;
+	height: 400px;
 	background: linear-gradient(0deg,transparent,
 	transparent,#ff2770,#ff2770,#ff2770);
 	z-index: 1;
@@ -101,13 +102,13 @@
 	animation: animate 6s linear infinite;
 	animation-delay: -1.5s;
 }
-.borderline::after {
+.borderline-register::after {
 	content: '';
 	position: absolute;
-	top: -50%;
+	top: -35%;
 	left: -40%;
 	width: 370px;
-	height: 350px;
+	height: 400px;
 	background: linear-gradient(0deg,transparent,
 	transparent,#ff2770,#ff2770,#ff2770);
 	z-index: 1;
@@ -171,12 +172,12 @@
 	animation: animate 6s linear infinite;
 	animation-delay: -3s;
 }
-.borderline {
+.borderline-login {
 	position: absolute;
 	top: 0;
 	inset: 0;
 }
-.borderline::before {
+.borderline-login::before {
 	content: '';
 	position: absolute;
 	top: -50%;
@@ -190,7 +191,7 @@
 	animation: animate 6s linear infinite;
 	animation-delay: -1.5s;
 }
-.borderline::after {
+.borderline-login::after {
 	content: '';
 	position: absolute;
 	top: -50%;
@@ -289,6 +290,14 @@
 	margin-top: 10px;
 }
 
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active{
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #ffffff;
+}
+
 .nameFieldContainerFirst {
 	flex: 1; 
 	margin-right: 3px;
@@ -310,20 +319,8 @@
 }
 
 .button42 {
-	margin: 20px 0;
+	margin: 15px 187px 10px 187px;
 	transition: background-color 0.2s ease; 
-  	cursor: pointer;
-	font-weight: bold;
-	background-color: #000;
-	color: #fff;
-  	border: none;
-  	outline: none;
-  	width: 100%;
-  	height: 90px;
-
-	&:hover {
-		background-color: #111; 
-	}
 }
 
 .zagolovok {

@@ -43,27 +43,35 @@ export const InputLabel = styled.label`
 export const Button = styled.button`
   width: 100%;
   height: 57px;
-  background-color: rgb(255, 255, 255);
+	background-color: rgb(188, 143, 243, 0.5);
   color: rgb(0, 0, 0);
   outline: none !important;
   border: none !important;
   border-radius: 50px;
-  transition: background-color 0.3s ease; /* Add a smooth transition effect */
+  transition: background-color 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(188, 143, 243);
+    transform: scale(1.05);
   }
 `;
 
 export const Button42 = styled.button`
   width: 100%;
-  height: 90px; !important;
-  background-color: #000;
-  color: #fff
-  outline: none !important;
-  border: none !important;
-  transition: background-color 0.2s ease;
+  height: 46px;
+  background-image: url(https://miro.medium.com/v2/resize:fit:2400/1*pyTVFh65W-y3JACaqGfIFQ.jpeg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+	background-color: transparent;
+  border-radius: 50px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   cursor: pointer;
+
+  &:hover {
+    background-color: transparent;
+    transform: scale(1.1);
+  }
 `;
 
 export const Page = styled.div`
