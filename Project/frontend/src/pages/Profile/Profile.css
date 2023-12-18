@@ -2,9 +2,9 @@
 
 .some-class {
 	display: flex;
+	/* background-image: url(https://i.gifer.com/HU32.gif); */
 	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
 	background-size: cover;
-/* importanttttttttttttttt */
 }
 
 .rounded-image {
@@ -15,9 +15,8 @@
 .card {
   width: 450px;
   height: 250px;
-  background-color: #fff;
-  background: linear-gradient(#f3f3f3, #fff);
-  box-shadow: 0 8px 16px -8px rgba(0,0,0,0.8);
+  background: linear-gradient(#0d0053, #4d50da);
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -26,13 +25,15 @@
 
 .card h1 {
   text-align: center;
+  color: #ff276fc0;
 }
 
 .card .additional {
   position: absolute;
   width: 150px;
   height: 100%;
-  background: linear-gradient(rgb(42, 10, 83), rgb(86, 20, 173));
+  background: linear-gradient(rgb(4, 0, 56), rgb(0, 0, 0));
+  background-size: cover;
   transition: width 0.4s;
   overflow: hidden;
   z-index: 2;
@@ -44,37 +45,37 @@
 }
 
 .card .additional .user-card {
+  background-image: url(./8c43e2e621f03025f332ecb7bf2efdb1.gif);
+  background-size: cover;
+  background-position: -90px;
   width: 150px;
   height: 100%;
   position: relative;
   float: left;
 }
 
-.card .additional .user-card::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 10%;
-  right: -2px;
-  height: 80%;
-  border-left: 2px solid rgba(0,0,0,0.025);
-}
-
 .card .additional .user-card .level,
 .card .additional .user-card .points {
-  top: 15%;
+  position: absolute;
+  /* text-align: center; */
+  top: 5%;
   color: #fff;
   text-transform: uppercase;
   font-size: 0.75em;
   font-weight: bold;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   padding: 0.125rem 0.75rem;
-  border-radius: 100px;
   white-space: nowrap;
 }
 
 .card .additional .user-card .points {
-  top: 85%;
+  top: 90%;
+}
+
+.card .additional .user-card .profile-picture {
+  align-items: center;
+  margin-top: 60px;
+  margin-left: 20px;
 }
 
 .card .additional .more-info {
@@ -100,41 +101,42 @@
   float: right;
 }
 
-.card .general .stats {
+.card .additional .stats {
   font-size: 2rem;
   display: flex;
-  /* position: relative; */
+  margin-top: 10px;
+  /* position: absolute; */
   bottom: 1rem;
   left: 1rem;
   right: 1rem;
   top: auto;
-  color: rgb(42, 10, 83);
+  color: #ff276faf;
   flex: 1 1;
   text-align: center;
 }
 
-.card .general .stats > div {
+.card .additional .stats > div {
   flex: 1;
   text-align: center;
 }
 
-.card .general .stats i {
+.card .additional .stats i {
   display: block;
 }
 
-.card .general .stats .title {
+.card .additional .stats .title {
   font-size: 0.75rem;
   font-weight: bold;
   text-transform: uppercase;
 }
 
-.card .general .stats .value {
+.card .additional .stats .value {
   font-size: 1.5rem;
   font-weight: bold;
   line-height: 1.5rem;
 }
 
-.card .general .stats .value.infinity {
+.card .additional .stats .value.infinity {
   font-size: 2.5rem;
 }
 
@@ -149,7 +151,47 @@
 
 .card .general .more {
   position: absolute;
+  color: #ff276fbb;
   bottom: 1rem;
   right: 1rem;
   font-size: 0.9em;
+}
+
+.buttons {
+  margin-top: 40px;
+  display: flex;
+  position: relative;
+}
+
+.edit-profile {
+  width: 40px;
+  height: 40px;
+  background-color: #ff276fbb;
+  color: #fff;
+  padding: 0.5rem;
+  border: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.edit-profile i {
+	color: #fff;
+  position: relative;
+  align-items: center;
+}
+
+.edit-profile:hover {
+  background-color: #ff276fdc;
+}
+
+.leaderboard-button {
+  margin: 5px;
+  width: 120px;
+  height: 35px;
+  border: 1px solid white;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 17px;
+  color: white;
 }

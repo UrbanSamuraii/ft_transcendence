@@ -41,51 +41,50 @@ function Profile() {
         <div className="card">
             <div className="additional">
                 <div className="user-card">
-                    <div className="level center">Level 13</div>
-                    <div className="points center">5,312 Points</div>
+                    {/* <div className="level center">Level 13</div> */}
+                    {/* <div className='profile-picture'>
                     <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"
-                    className="center rounded-image" width="115" height="115"/>
+                    className="center rounded-image" width="115" height="115"/></div> */}
+                    {/* <div className="points center">5,312 Points</div> */}
                 </div>
                 <div className="more-info">
                     <h1>{userInfo.username}</h1>
                     <div className="coords">
-                        <span>Group Name</span>
-                        <span>Joined January 2019</span>
-                    </div>
-                    <div className="coords">
                         <span>E-mail</span>
                         <span>{userInfo.email}</span>
-                        <button className="profile-button">Edit Profile</button>
-                        <Link to={`/@/${username}/leaderboard`} className="profile-button">
+                    </div>
+                    <div className="stats">
+                        <div>
+                            <div className="title">Games won</div>
+                            <i className='bx bxs-trophy'></i>
+                            <div className="value">{userInfo.totalGamesWon}</div>
+                        </div>
+                        <div>
+                            <div className="title">Matches</div>
+                            <i className='bx bxs-joystick'></i>
+                            <div className="value">todo</div>
+                        </div>
+                        <div>
+                            <div className="title">Pals</div>
+                            <i className='bx bxs-group'></i>
+                            <div className="value">todo</div>
+                        </div>
+                        <div>
+                            <div className="title">Beer</div>
+                            <i className='bx bxs-beer'></i>
+                            <div className="value infinity">∞</div>
+                        </div>
+                    </div>
+                    <div className="buttons">
+                        <button className="edit-profile">
+                        <i className='bx bxs-pencil'></i></button>
+                        <Link to={`/@/${username}/leaderboard`} className="leaderboard-button">
                         Leaderboard</Link>
                     </div>
                 </div>
             </div>
             <div className="general">
                 <h1>{userInfo.username}</h1>
-                <div className="stats">
-                    <div>
-                        <div className="title">Games won</div>
-                        <i className='bx bxs-trophy'></i>
-                        <div className="value">{userInfo.totalGamesWon}</div>
-                    </div>
-                    <div>
-                        <div className="title">Matches</div>
-                        <i className='bx bxs-joystick'></i>
-                        <div className="value">todo</div>
-                    </div>
-                    <div>
-                        <div className="title">Pals</div>
-                        <i className='bx bxs-group'></i>
-                        <div className="value">todo</div>
-                    </div>
-                    <div>
-                        <div className="title">Beer</div>
-                        <i className='bx bxs-beer'></i>
-                        <div className="value infinity">∞</div>
-                    </div>
-                </div>
-                <span className="more">Mouse over the card for more info</span>
             </div>
         </div>
         </body>
