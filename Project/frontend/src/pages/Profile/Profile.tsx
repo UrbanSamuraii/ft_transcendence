@@ -5,6 +5,7 @@ import './Profile.css'
 function Profile() {
     const [userInfo, setUserInfo] = useState({ username: '', email: '', totalGamesWon: 0 });
     const { username } = useParams(); // Extract the username from the URL
+    const totalGamesPlayed = 15; //example
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -30,6 +31,21 @@ function Profile() {
         }
     }, [username]);
 
+    const getSkillBarWidth = () => {
+        if (userInfo.totalGamesWon) {
+            const winRate = (userInfo.totalGamesWon / totalGamesPlayed) * 100;
+            return {
+                width: `${winRate}%`,
+                maxWidth: `${winRate}%`,
+            }
+        } else {
+            return {
+                width: '60%',
+                maxWidth: '60%',
+            };
+        }
+    };
+
     return (
 
     <div className="bruh">
@@ -39,16 +55,18 @@ function Profile() {
 
         <body className='some-class'>
         <div className="card">
-            <div className="additional">
                 <div className="user-card">
-                    {/* <div className="level center">Level 13</div> */}
-                    {/* <div className='profile-picture'>
+                    {/* <div className="level">Level 13</div> */}
+                    <div className='profile-picture'>
                     <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"
-                    className="center rounded-image" width="115" height="115"/></div> */}
-                    {/* <div className="points center">5,312 Points</div> */}
+                className="rounded-image" width="115" height="115"/></div>
+                    {/* <div className="points">5,312 Points</div> */}
                 </div>
                 <div className="more-info">
                     <h1>{userInfo.username}</h1>
+                    <button className="edit-profile">
+                    <i className='bx bxs-pencil'></i></button>
+                    <div className='separator'></div>
                     <div className="coords">
                         <span>E-mail</span>
                         <span>{userInfo.email}</span>
@@ -62,7 +80,7 @@ function Profile() {
                         <div>
                             <div className="title">Matches</div>
                             <i className='bx bxs-joystick'></i>
-                            <div className="value">todo</div>
+                            <div className="value">{totalGamesPlayed}</div>
                         </div>
                         <div>
                             <div className="title">Pals</div>
@@ -75,17 +93,13 @@ function Profile() {
                             <div className="value infinity">∞</div>
                         </div>
                     </div>
-                    <div className="buttons">
-                        <button className="edit-profile">
-                        <i className='bx bxs-pencil'></i></button>
-                        <Link to={`/@/${username}/leaderboard`} className="leaderboard-button">
-                        Leaderboard</Link>
+                    <div className='skill-name'>Winrate</div>
+                    <div className='skill-bar'>
+                        <div className='skill-per' style={getSkillBarWidth()}></div>
                     </div>
+                    <Link to={`/@/${username}/leaderboard`} className="leaderboard-button">
+                    Leaderboard</Link>
                 </div>
-            </div>
-            <div className="general">
-                <h1>{userInfo.username}</h1>
-            </div>
         </div>
         </body>
     </div>
