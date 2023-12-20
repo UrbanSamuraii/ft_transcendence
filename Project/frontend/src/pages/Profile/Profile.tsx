@@ -3,9 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
 
 function Profile() {
-    const [userInfo, setUserInfo] = useState({ username: '', email: '', totalGamesWon: 0 });
+    const [theme, setTheme] = useState('bw-style'); // Default theme
+    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0 });
     const { username } = useParams(); // Extract the username from the URL
-    const totalGamesPlayed = 15; //example
+    const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -31,6 +32,10 @@ function Profile() {
         }
     }, [username]);
 
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === 'bw-style' ? 'cyber-style' : 'bw-style');
+    };
+
     const getSkillBarWidth = () => {
         if (userInfo.totalGamesWon) {
             const winRate = (userInfo.totalGamesWon / totalGamesPlayed) * 100;
@@ -40,9 +45,33 @@ function Profile() {
             }
         } else {
             return {
-                width: '60%',
-                maxWidth: '60%',
+                width: '0%',
+                maxWidth: '0%',
             };
+        }
+    };
+
+    let winrateValue = '0%';
+
+    if (totalGamesPlayed !== 0) {
+        winrateValue = `${((userInfo.totalGamesWon / totalGamesPlayed) * 100).toFixed(2)}%`;
+    }
+
+    const getEloRank = (eloRating: number): string => {
+        if (eloRating < 1000 || totalGamesPlayed == 0) {
+            return 'just beginning';
+        } else if (eloRating < 1100) {
+            return 'getting there';
+        } else if (eloRating < 1200) {
+            return 'rock solid';
+        } else if (eloRating < 1300) {
+            return 'got swagger';
+        } else if (eloRating < 1400) {
+            return 'the hotness';
+        } else if (eloRating < 1500) {
+            return 'simply amazing';
+        } else {
+            return 'pinnacle of awesomeness';
         }
     };
 
@@ -52,20 +81,23 @@ function Profile() {
         <head>
             <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
         </head>
-
-        <body className='some-class'>
+        
+        {/* bw  cyber  rainbow  retrowave */}
+        <body className={theme}>
         <div className="card">
-                <div className="user-card">
-                    {/* <div className="level">Level 13</div> */}
+                {/* <div className="user-card rainbow"> */}
+                {/* <div className="user-card retrowave"> */}
+                <div className={`user-card ${theme}`}>
+                    <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                     <div className='profile-picture'>
                     <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"
-                className="rounded-image" width="115" height="115"/></div>
-                    {/* <div className="points">5,312 Points</div> */}
+                className="rounded-image" width="135" height="135"/></div>
+                <div className="points">{userInfo.eloRating}</div>
                 </div>
                 <div className="more-info">
                     <h1>{userInfo.username}</h1>
-                    <button className="edit-profile">
-                    <i className='bx bxs-pencil'></i></button>
+                    <button className="edit-profile" onClick={toggleTheme}>
+                    <i className='bx bxs-palette'></i></button>
                     <div className='separator'></div>
                     <div className="coords">
                         <span>E-mail</span>
@@ -93,7 +125,7 @@ function Profile() {
                             <div className="value infinity">∞</div>
                         </div>
                     </div>
-                    <div className='skill-name'>Winrate</div>
+                    <div className='skill-name'>Winrate {winrateValue}</div>
                     <div className='skill-bar'>
                         <div className='skill-per' style={getSkillBarWidth()}></div>
                     </div>

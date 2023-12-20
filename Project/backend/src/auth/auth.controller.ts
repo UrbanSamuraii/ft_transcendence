@@ -111,7 +111,9 @@ export class AuthController {
             return res.status(200).json({
                 username: user.username,
                 email: user.email,
-                totalGamesWon: user.totalGamesWon
+                totalGamesWon: user.totalGamesWon,
+                totalGamesLost: user.totalGamesLost,
+                eloRating: user.eloRating
 
                 // other fields you want to include
             });
