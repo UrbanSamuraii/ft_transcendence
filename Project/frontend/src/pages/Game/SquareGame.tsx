@@ -42,8 +42,8 @@ function SquareGame({ }) {
         navigate("/");
     }
 
-    function goBackToMatchmaking() {
-        navigate("/matchmaking");
+    function goBackToSelectMode() {
+        navigate("/select-mode");
     }
 
     useEffect(() => {
@@ -66,10 +66,10 @@ function SquareGame({ }) {
         const intervalId = setInterval(() => {
             const currentKeys = activeKeysRef.current;
             if (currentKeys.length > 0) {
-                socket.emit('paddleMovements', currentKeys);
+                socket.emit('playerActions', currentKeys);
                 lastSentWasEmptyRef.current = false;
             } else if (!lastSentWasEmptyRef.current) {
-                socket.emit('paddleMovements', []);
+                socket.emit('playerActions', []);
                 lastSentWasEmptyRef.current = true;
             }
         }, 1000 / 60);
@@ -324,7 +324,7 @@ function SquareGame({ }) {
 
             // Draw buttons
             drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', goBackToMainMenu);
-            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToMatchmaking);
+            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToSelectMode);
 
             // Other game over logic
             console.log('Game over detected.');

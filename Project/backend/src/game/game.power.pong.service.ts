@@ -27,7 +27,11 @@ export class PowerPongGameService {
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
     public isGamePaused = false; // To keep track of the paused state
 
-    private initializeGameState() {
+    private initializeGameState(playerInfoMap: any) {
+        const playerInfos = Array.from(playerInfoMap.values());
+        const leftPlayerInfoUse = playerInfos[0] as { username: string }; // Adjust the type as needed
+        const rightPlayerInfoUse = playerInfos[0] as { username: string }; // Adjust the type as needed
+
         return {
             squares: Array.from({ length: nbrOfSquares }, (_, index) => {
                 return {
@@ -38,6 +42,16 @@ export class PowerPongGameService {
                     size: squareSize
                 };
             }),
+            leftPlayerInfo: {
+                username: leftPlayerInfoUse.username, // Will be set when the game starts
+                powerBarLevel: 0,
+                // ... other player-specific properties
+            },
+            rightPlayerInfo: {
+                username: rightPlayerInfoUse.username, // Will be set when the game starts
+                powerBarLevel: 0,
+                // ... other player-specific properties
+            },
             leftPaddle: {
                 x: leftPaddleX,
                 y: leftPaddleY,
@@ -84,7 +98,7 @@ export class PowerPongGameService {
         let gameState = this.gameStates.get(gameId.toString());
         if (!gameState) {
             // Initialize game state for new gameId
-            gameState = this.initializeGameState();
+            gameState = this.initializeGameState(playerInfoMap);
             this.gameStates.set(gameId.toString(), gameState);
 
         }

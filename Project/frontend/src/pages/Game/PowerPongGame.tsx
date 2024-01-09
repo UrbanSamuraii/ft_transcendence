@@ -30,7 +30,7 @@ function PowerPongGame({ }) {
     const lastSentWasEmptyRef = useRef(true);
     const { user } = useAuth();
     const [gameData, setGameData] = useState(null);
-
+    const [powerBarLevel, setPowerBarLevel] = useState(0); // State to track the power bar level
 
     // Update the interval based on active keys
     useEffect(() => {
@@ -42,8 +42,8 @@ function PowerPongGame({ }) {
         navigate("/");
     }
 
-    function goBackToMatchmaking() {
-        navigate("/matchmaking");
+    function goBackToSelectMode() {
+        navigate("/select-mode");
     }
 
     useEffect(() => {
@@ -66,10 +66,10 @@ function PowerPongGame({ }) {
         const intervalId = setInterval(() => {
             const currentKeys = activeKeysRef.current;
             if (currentKeys.length > 0) {
-                socket.emit('paddleMovements', currentKeys);
+                socket.emit('playerActions', currentKeys);
                 lastSentWasEmptyRef.current = false;
             } else if (!lastSentWasEmptyRef.current) {
-                socket.emit('paddleMovements', []);
+                socket.emit('playerActions', []);
                 lastSentWasEmptyRef.current = true;
             }
         }, 1000 / 60);
@@ -82,29 +82,22 @@ function PowerPongGame({ }) {
 
     useEffect(() => {
         const handleKeyDown = (event: any) => {
-
             console.log(`Key down: ${event.key}`);
 
+            // Adding spacebar to the switch case
             switch (event.key) {
                 case "w":
                 case "s":
                 case "ArrowUp":
                 case "ArrowDown":
+                case " ": // Spacebar
                     if (!activeKeys.includes(event.key)) {
                         setActiveKeys(prevKeys => [...prevKeys, event.key]);
                     }
                     break;
                 case "p":
                 case "P":
-                    if (isGamePaused) {
-                        // Resume the game
-                        setGamePaused(false);
-                        socket?.emit('resumeGame'); // Inform backend to resume sending updates
-                    } else {
-                        // Pause the game
-                        setGamePaused(true);
-                        socket?.emit('pauseGame'); // Inform backend to pause sending updates
-                    }
+                    // Existing pause game logic
                     break;
                 default:
                     break;
@@ -112,14 +105,13 @@ function PowerPongGame({ }) {
         };
 
         const handleKeyUp = (event: any) => {
-
-            console.log(`Key up: ${event.key}`);
-
+            // Adding spacebar to the switch case
             switch (event.key) {
                 case "w":
                 case "s":
                 case "ArrowUp":
                 case "ArrowDown":
+                case " ": // Spacebar
                     setActiveKeys(prevKeys => prevKeys.filter(key => key !== event.key));
                     break;
                 default:
@@ -324,7 +316,7 @@ function PowerPongGame({ }) {
 
             // Draw buttons
             drawButton(buttonX, offsetY + buttonOffsetY, buttonWidth, buttonHeight, 'MAIN MENU', goBackToMainMenu);
-            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToMatchmaking);
+            drawButton(buttonX, offsetY + buttonOffsetY + buttonHeight * 1.5, buttonWidth, buttonHeight, 'PLAY AGAIN', goBackToSelectMode);
 
             // Other game over logic
             console.log('Game over detected.');
@@ -402,13 +394,17 @@ function PowerPongGame({ }) {
     return (
         <div style={{
             display: 'flex',
-            justifyContent: 'center',
+            flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             height: '100vh',
             width: '100vw',
             position: 'relative'
         }}>
-            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e', position: 'absolute' }} />
+            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
+            <div className="power-bar-container">
+                <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
+            </div>
         </div>
     );
 

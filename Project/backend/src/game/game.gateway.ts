@@ -323,17 +323,17 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
-    @SubscribeMessage('paddleMovements')
-    handlePaddleMovements(client: Socket, activeKeys: string[]) {
+    @SubscribeMessage('playerActions')
+    handlePlayerActions(client: Socket, activeKeys: string[]) {
         if (!client.data || !client.data.user) {
-            console.error('User data is not available in handlePaddleMovements');
+            console.error('User data is not available in handlePlayerActions');
             return;
         }
 
         const playerUsername = client.data.user.username;
 
         if (!playerUsername) {
-            console.error('Player username is not available in handlePaddleMovements');
+            console.error('Player username is not available in handlePlayerActions');
             return;
         }
 
