@@ -128,9 +128,9 @@ export class AuthController {
         return this.userService.getGlobalLeaderboard();
     }
 
-    // // Endpoint for user-specific leaderboard
-    // @Get('/leaderboard/:username')
-    // async getUserLeaderboard(@Param('username') username: string) {
-    //     return this.userService.getUserLeaderboard(username);
-    // }
+    // Endpoint for user-specific leaderboard
+    @Get('/leaderboard/:username')
+    async getUserLeaderboard(@Param('username') username: string) {
+        return this.userService.getUserLeaderboard(username);
+    }
 }

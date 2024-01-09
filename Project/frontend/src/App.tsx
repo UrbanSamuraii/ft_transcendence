@@ -18,10 +18,7 @@ import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
-<<<<<<< HEAD
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
-=======
->>>>>>> Anna
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 import { OnlySocketProvider, useSocket } from './SocketContext';
