@@ -107,67 +107,77 @@ export const RegisterForm = () => {
     };
 
     return (
-        <form className="form-container" onSubmit={handleSignUp}>
-            <section className="nameFieldRow">
-                <InputContainer>
-                    <InputLabel htmlFor="email">Email</InputLabel>
-                    <InputField
-                        type="email" name="email" value={formData.email} onChange={handleInputChange} />
-                    {formErrors.email && <div className="error-message">{formErrors.email}</div>}
-                </InputContainer>
-            </section>
+        <div className="app-container">
+            <head>
+                <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
+            </head>
 
-            <section className="nameFieldRow">
-                <div className="nameFieldContainerFirst">
-                    <InputContainer>
-                        <InputLabel htmlFor="first_name">First Name</InputLabel>
-                        <InputField
-                            type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
-                        />
-                        {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
-                    </InputContainer>
+            <body className='some-class'>
+                <div className='animation-box-register'>
+                    <span className='borderline-register'></span>
+                    <form className="form-container" onSubmit={handleSignUp}>
+                        <h1 className='zagolovok'>Create Account</h1>
+                        <section className="nameFieldRow">
+                            <InputContainer>
+                                <InputField className='input'
+                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                                <i className='bx bx-user'></i>
+                            </InputContainer>
+                        </section>
+
+                        <section className="nameFieldRow">
+                            <div className="nameFieldContainerFirst">
+                                <InputContainer>
+                                    <InputField className='input'
+                                        placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
+                                    />
+                                    {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
+                                </InputContainer>
+                            </div>
+                            <div className="nameFieldContainerLast">
+                                <InputContainer>
+                                    <InputField className='input'
+                                        placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
+                                    />
+                                    {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
+                                </InputContainer>
+                            </div>
+                            <div className="nameFieldContainerFirst">
+                                <InputContainer>
+                                    <InputField className='input'
+                                        placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
+                                        />
+                                    {formErrors.username && <div className="error-message">{formErrors.username}</div>}
+                                </InputContainer>
+                            </div>
+                        </section>
+                        <section className="nameFieldRow">
+                            <div className="nameFieldContainerLast">
+                                <InputContainer>
+                                    <InputField
+                                        placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
+                                    {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                                    <i className='bx bxs-lock-alt'></i>
+                                </InputContainer>
+                            </div>
+                        </section>
+
+                        <div className="button-login-container">
+                            <Button type="submit" >Create My Account</Button>
+                        </div>
+
+                        <div className="existingUserOrNot">
+                            <span>Already have an account? </span>
+                            <Link to="/Login">Login</Link>
+                        </div>
+
+                        <div className='button42'>
+                            <Button42 onClick={handleSignUp42Click}></Button42>
+                        </div>
+                    </form>
                 </div>
-                <div className="nameFieldContainerLast">
-                    <InputContainer>
-                        <InputLabel htmlFor="last_name">Last Name</InputLabel>
-                        <InputField
-                            type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
-                        />
-                        {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
-                    </InputContainer>
-                </div>
-            </section>
-
-            <section className="nameFieldRow">
-                <div className="nameFieldContainerFirst">
-                    <InputContainer>
-                        <InputLabel htmlFor="username">Username</InputLabel>
-                        <InputField
-                            type="text" name="username" value={formData.username} onChange={handleInputChange}
-                        />
-                        {formErrors.username && <div className="error-message">{formErrors.username}</div>}
-                    </InputContainer>
-                </div>
-                <div className="nameFieldContainerLast">
-                    <InputContainer>
-                        <InputLabel htmlFor="password">Password</InputLabel>
-                        <InputField
-                            type="password" name="password" value={formData.password} onChange={handleInputChange} />
-                        {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                    </InputContainer>
-                </div>
-            </section>
-
-            <section className="nameFieldRow">
-                <Button type="submit" >Create My Account</Button>
-            </section>
-
-            <div className="existingUserOrNot">
-                <span>Already have an account? </span>
-                <Link to="/Login">Login</Link>
-            </div>
-
-            <Button42 className="button42" onClick={handleSignUp42Click}>42 Identification</Button42>
-        </form>
+            </body>
+        </div>
     );
 };

@@ -10,7 +10,9 @@ const HomePage = () => {
 
     return (
         <div className="homepage">
-            <button className="play-button" onClick={handlePlayClick}>Play</button>
+            <div className='content'>
+            <button className="text" data-text='Play' onClick={handlePlayClick}>Play</button>
+            </div>
         </div>
     );
 };

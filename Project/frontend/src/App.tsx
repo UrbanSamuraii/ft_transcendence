@@ -18,7 +18,10 @@ import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
+<<<<<<< HEAD
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
+=======
+>>>>>>> Anna
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 import axios from 'axios';
 import { OnlySocketProvider, useSocket } from './SocketContext';
@@ -38,17 +41,23 @@ interface RouteBackgroundStyles {
 
 const routeBackgroundStyles: RouteBackgroundStyles = {
     '/': {
-        background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
-        // backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-        backgroundColor: '#1a1a1a',
+        // background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
+        // // backgroundSize: 'cover',
+        // backgroundRepeat: 'no-repeat',
+        // backgroundPosition: 'center center',
+        // backgroundColor: '#1a1a1a',
     },
     '/select-mode': { background: '#1a1a1a' },
     '/game': { background: '#1a1a1a' },
     '/add-user': { background: '#1a1a1a)' },
     '/signup': { background: '#1a1a1a' },
-    '/Login': { background: '#1a1a1a' },
+    // '/Login': { background: '#1a1a1a' },
+    '/login': {
+        background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+    },
     '/ConversationPage': { background: '#1a1a1a' },
     '/ConversationChannelPage': { background: '#1a1a1a' },
     '/TwoFAEnablingPage': { background: '#1a1a1a' },

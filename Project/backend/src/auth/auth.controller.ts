@@ -111,7 +111,9 @@ export class AuthController {
             return res.status(200).json({
                 username: user.username,
                 email: user.email,
-                totalGamesWon: user.totalGamesWon
+                totalGamesWon: user.totalGamesWon,
+                totalGamesLost: user.totalGamesLost,
+                eloRating: user.eloRating
 
                 // other fields you want to include
             });
@@ -126,4 +128,9 @@ export class AuthController {
         return this.userService.getGlobalLeaderboard();
     }
 
+    // // Endpoint for user-specific leaderboard
+    // @Get('/leaderboard/:username')
+    // async getUserLeaderboard(@Param('username') username: string) {
+    //     return this.userService.getUserLeaderboard(username);
+    // }
 }

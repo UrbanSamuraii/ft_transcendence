@@ -6,28 +6,29 @@ export const NAVBAR_HEIGHT: number = 2; // define in rem
 
 
 export const InputField = styled.input`
-  font-family: 'Inter';
-  background-color: white;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
   outline: none !important;
   border: none !important;
-  color: black !important;
+  color: white !important;
   font-size: 18px !important;
   width: 100% !important;
-  box-sizing: border-box;
   padding: 0 !important;
   margin: 4px 0 !important;
 
   ::placeholder {
-    color: white !important;
+    color: pink !important;
     background-color: inherit !important;
   }
 `;
 
 export const InputContainer = styled.div`
-  background-color: rgba(19, 19, 19, 0.7);
+  background-color: transparent;
   padding: 12px 16px;
-  border-radius: 10px;
+	border: 2px solid rgba(255, 255, 255, 0.137);
+  border-radius: 50px;
   width: 100%;
+  height: 57px;
   box-sizing: border-box;
 `;
 
@@ -41,32 +42,41 @@ export const InputLabel = styled.label`
 
 export const Button = styled.button`
   width: 100%;
-  height: 70px;
-  background-color: rgb(30, 30, 30);
-  color: #fff;
+  height: 57px;
+	background-color: rgb(188, 143, 243, 0.5);
+  color: rgb(0, 0, 0);
   outline: none !important;
   border: none !important;
-  transition: background-color 0.3s ease; /* Add a smooth transition effect */
+  border-radius: 50px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    background-color: rgba(30, 30, 30, 0.8); /* Adjust the alpha value for hover state */
+    background-color: rgba(188, 143, 243);
+    transform: scale(1.05);
   }
 `;
 
 export const Button42 = styled.button`
   width: 100%;
-  height: 90px; !important;
-  background-color: #000;
-  color: #fff
-  outline: none !important;
-  border: none !important;
-  transition: background-color 0.2s ease;
+  height: 46px;
+  background-image: url(https://miro.medium.com/v2/resize:fit:2400/1*pyTVFh65W-y3JACaqGfIFQ.jpeg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+	background-color: transparent;
+  border-radius: 50px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   cursor: pointer;
+
+  &:hover {
+    background-color: transparent;
+    transform: scale(1.1);
+  }
 `;
 
 export const Page = styled.div`
   width: 100%;
-  background-color: #1a1a1a;
+  background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
   height: 100%;
   display: flex;
   justify-content: center;

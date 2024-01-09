@@ -1,31 +1,275 @@
-.profile-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+@import url('https://fonts.googleapis.com/css?family=Abel');
+
+* {
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */ 
 }
 
-.profile-header {
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+/* :root {
+	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+  display: flex;
+  background-size: cover;
+  --text-color-main: #ff276fc0;
+  --text-color-dark: #ff276f79;
+  --text-color-hover: #ff276fdc;
+  --text-color-accent: #fff;
+} */
+
+.bw-style {
+  background-image: url(https://static.vecteezy.com/system/resources/previews/030/697/151/non_2x/gray-minimalist-wallpaper-high-quality-4k-hdr-free-photo.jpg);
+  display: flex;
+  background-size: cover;
+  --text-color-main: rgba(255, 255, 255, 0.877);
+  --text-color-dark: #ffffff75;
+  --text-color-hover: #ffffff;
+  --text-color-accent: #000000;
 }
 
-.profile-content {
-    display: flex;
-    justify-content: space-between;
+.cyber-style {
+	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+  display: flex;
+  background-size: cover;
+  --text-color-main: #ff276fc0;
+  --text-color-dark: #ff276f79;
+  --text-color-hover: #ff276fdc;
+  --text-color-accent: #fff;
 }
 
-.profile-info {
-    flex-basis: 60%;
+.rounded-image {
+  margin-top: 45px;
+  margin-left: 13px;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
-.profile-actions {
-    flex-basis: 35%;
-    text-align: right;
+.card {
+  width: 600px;
+  height: 350px;
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
+  /* background: linear-gradient(rgb(3, 0, 46), rgb(0, 0, 0)); */
+  background-color: rgb(15, 15, 15);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
 }
 
-/* You can add more styles as needed */
+.card h1 {
+  margin-top: 10px;
+  margin-bottom: 0px;
+  text-align: center;
+  font-size: 2rem;
+  color: var(--text-color-main);
+}
+
+.card .user-card {
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  height: 100%;
+  float: left;
+  width: 200px;
+}
+
+.card .user-card.cyber-style {
+  height: 110%;
+  background-image: url(./cyber.gif);
+}
+
+.card .user-card.rainbow {
+  background-color: rgba(0, 0, 0, 0.5);
+  background-blend-mode: color;
+  background-image: url(./rainbow.gif);
+}
+
+.card .user-card.retrowave {
+  background-color: rgba(0, 0, 0, 0.3);
+  background-blend-mode: color;
+  background-image: url(./retrowave.gif);
+}
+
+.card .user-card.bw-style {
+  background-color: black;
+  background-size: 300px;
+  background-repeat: repeat-x;
+  background-image: url(./bw-smoke.gif);
+}
+
+
+.card .user-card .level,
+.card .user-card .points {
+  position: absolute;
+  top: 40px;
+  left: 5%;
+  width: 90%;
+  color: var(--text-color-main);
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 0.125rem 0.75rem;
+  letter-spacing: 1px;
+}
+
+.card .user-card .points {
+  top: 290px;
+}
+
+.card .user-card .profile-picture {
+  align-items: center;
+  margin-top: 60px;
+  margin-left: 20px;
+}
+
+.card .more-info {
+  width: 400px;
+  position: absolute;
+  left: 200px;
+  height: 100%;
+}
+
+.card .coords {
+  margin: 1rem;
+  font-size: 1.3rem;
+  color: var(--text-color-main);
+  margin-bottom: 50px;
+}
+
+.card .coords span + span {
+  float: right;
+}
+
+.card .stats {
+  font-size: 3rem;
+  display: flex;
+  position: absolute;
+  /* bottom: 2rem; */
+  left: 1rem;
+  right: 1rem;
+  color: var(--text-color-main);
+  text-align: center;
+}
+
+.card .stats > div {
+  flex: 1;
+}
+
+.card .stats i {
+  display: block;
+}
+
+.card .stats .title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card .stats .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1.5rem;
+}
+
+.card .stats .value.infinity {
+  font-size: 2.5rem;
+}
+
+.edit-profile {
+  width: 40px;
+  height: 40px;
+  background-color: var(--text-color-main);
+  color: var(--text-color-accent);
+  padding: 0.5rem;
+  border-radius: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-right: 7px;
+  margin-top: 7px;
+}
+
+.edit-profile i {
+  position: relative;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.edit-profile:hover {
+  background-color: var(--text-color-hover);
+}
+
+.leaderboard-button {
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  width: 165px;
+  height: 40px;
+  background-color: var(--text-color-main);
+  color: var(--text-color-accent);
+  padding: 0.7rem;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 15px;
+  letter-spacing: 0.5px;
+  margin-left: 108px;
+}
+
+.leaderboard-button i {
+  position: relative;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.leaderboard-button:hover {
+  background-color: var(--text-color-hover);
+}
+
+.skill-name {
+  bottom: 20%;
+  left: 1%;
+  display: flex;
+  position: absolute;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color-main);
+  text-transform: uppercase;
+  margin: 20px 0;
+}
+
+.skill-bar {
+  display: flex;
+  position: absolute;
+  bottom: 20%;
+  left: 1%;
+  height: 14px;
+  width: 98%;
+  background-color: transparent;
+  border: 1px solid var(--text-color-dark);
+  border-radius: 5px;
+}
+
+.skill-per {
+  display: flex;
+  position: relative;
+  bottom: 8%;
+  height: 14px;
+  background-color: var(--text-color-main);
+  border-radius: 5px;
+  animation: fillBars 2.5s;
+}
+
+@keyframes fillBars {
+  from{
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.separator {
+  border-top: 1px solid var(--text-color-dark);
+  margin: 10px 10px;
+}
