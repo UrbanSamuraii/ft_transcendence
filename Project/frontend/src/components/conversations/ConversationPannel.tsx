@@ -3,8 +3,8 @@ import './GlobalConversations.css';
 
 export const ConversationPanel = () => {
 	return (
-		<ConversationPannelStyle>
-			WELCOME
-		</ConversationPannelStyle>
+		<div className="chat">
+   			WELCOME
+		</div>
 	);
 };
