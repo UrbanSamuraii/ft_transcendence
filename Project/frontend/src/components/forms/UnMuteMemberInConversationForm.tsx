@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import { useSocket } from '../../SocketContext';
+
 
 type Member = {
 	username: string;
@@ -14,14 +16,14 @@ type Member = {
   export const UnMuteMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
 	const conversationId = useParams().id;
+	const { socket } = useSocket();
   
 	useEffect(() => {
 	  const fetchMemberList = async () => {
 		try {
-		  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/members`, {
+		  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/muted_members`, {
 				withCredentials: true,
 			});
-		  	// console.log({"MEMBER LIST in the conversation": response});
 			setMemberList(response.data);
 		} catch (error) {
 		  console.error('Error fetching member list:', error);
@@ -29,7 +31,12 @@ type Member = {
 	  };
   
 	  fetchMemberList();
-	}, []);
+
+	  socket?.on('onUnmuteMember', fetchMemberList);
+	  return () => {
+		socket?.off('onUnmuteMember', fetchMemberList);
+	};
+	}, [socket]);
   
 	const unMuteMember = async (username: string) => {
 	  try {

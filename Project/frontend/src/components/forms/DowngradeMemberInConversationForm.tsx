@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from 'axios';
+import { useSocket } from '../../SocketContext';
 
 type Member = {
   username: string;
@@ -13,14 +14,14 @@ type MemberInConversationFormProps = {
 export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
   const [memberList, setMemberList] = useState<Member[]>([]);
   const conversationId = useParams().id;
+  const { socket } = useSocket();
 
   useEffect(() => {
     const fetchMemberList = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/members`, {
+        const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/admin_members`, {
 			  withCredentials: true,
 		  });
-        // console.log({"MEMBER LIST in the conversation": response});
 		  setMemberList(response.data);
       } catch (error) {
         console.error('Error fetching member list:', error);
@@ -28,14 +29,18 @@ export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFor
     };
 
     fetchMemberList();
-  }, []);
+
+    socket?.on('onDowngradeAdminStatus', fetchMemberList);
+	  return () => {
+		  socket?.off('onDowngradeAdminStatus', fetchMemberList);
+  }; 
+  }, [socket]);
 
   const downgradeAdminToMember = async (username: string) => {
     try {
 		await axios.post(`http://localhost:3001/conversations/${conversationId}/downgrade_admin_to_member`,
 		{ adminToDowngrade: username }, 
 		{ withCredentials: true });
-    //   console.log("USER SELECTED ", username);
     } catch (error) {
       console.error('Error upgrading member to admin:', error);
       

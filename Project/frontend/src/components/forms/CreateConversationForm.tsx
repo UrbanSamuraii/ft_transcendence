@@ -37,8 +37,8 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 	};
 
 	const handleAddUser = () => {
-		console.log("ADD USER:");
-		console.log({"username INPUT FORM": ConvDataInput.currentUsername});
+		// console.log("ADD USER:");
+		// console.log({"username INPUT FORM": ConvDataInput.currentUsername});
 		if (ConvDataInput.currentUsername.trim() !== '') {
 		  	setConvDataInput((prevData) => ({
 			...prevData,
@@ -62,10 +62,10 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
+				// console.log({"DATA" : ConvDataInput});
 				const response = await axios.post('http://localhost:3001/conversations/create', ConvDataInput, {
 					withCredentials: true });
-				console.log({"RESPONSE from creating CONVERSATION": response}); 
+				// console.log({"RESPONSE from creating CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);

@@ -3,8 +3,6 @@ import io, { Socket } from 'socket.io-client';
 
 type SocketContextType = {
     socket: Socket | null;
-    newMessageReceived: boolean;
-    setNewMessageReceived: Dispatch<SetStateAction<boolean>>;
     isLastMessageDeleted: boolean;
     setLastMessageDeleted: Dispatch<SetStateAction<boolean>>;
     conversationId: number | null,
@@ -21,7 +19,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
 
     console.log("In Only Socket Provider");
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [newMessageReceived, setNewMessageReceived] = useState(false);
     const [isLastMessageDeleted, setLastMessageDeleted] = useState(false);
     const [conversationId, setConversationId] = useState<number | null>(null);
     const [reinitializeSocket, setReinitializeSocket] = useState(false);
@@ -56,8 +53,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         <SocketContext.Provider
             value={{
                 socket,
-                newMessageReceived,
-                setNewMessageReceived,
                 isLastMessageDeleted,
                 setLastMessageDeleted,
                 conversationId,

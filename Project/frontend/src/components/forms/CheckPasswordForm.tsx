@@ -1,21 +1,25 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 
 interface ConvDataInput {
-	userToBan: string;
+	password: string;
+	convId: number | null;
 }
 
-type BanUserFromConversationFormProps = {
+type CheckPasswordFormProps = {
     setShowModal: (show: boolean) => void;
+	conversationId: number | null;
 };
 
-export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormProps> = ({ setShowModal }) => {
+export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowModal, conversationId }) => {
 
+	// console.log("THE CONV ID", conversationId);
+	
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
-		userToBan: '',
+		password: '',
+		convId: conversationId,
 	  });
 
 	const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
@@ -32,30 +36,28 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 		}));
 	};
 
-	const conversationId = useParams().id;
-
-	const handleJoinConversation = async (e: React.FormEvent) => {
+	const handleVerifyPassword = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.userToBan) {
-			newErrors.userToBan = 'Username is required';
+		if (!ConvDataInput.password) {
+			newErrors.password = 'Password is required';
 		}
 		if (Object.keys(newErrors).length > 0) {
 		  setFormErrors(newErrors);
 		} 
 		else {
 			try {
-				// console.log({"DATA" : ConvDataInput});
-				const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/ban_user`, ConvDataInput, {
+				// console.log({"DATA TO VALIDATE" : ConvDataInput});
+				const response = await axios.post(`http://localhost:3001/conversations/validate_password`, ConvDataInput, {
         			withCredentials: true });
-				// console.log({"RESPONSE from BANNING USER FROM CONVERSATION": response}); 
+				setShowModal(false);
+				// console.log({"RESPONSE from VALIDATING PASSWORD": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
 				} 
-				setShowModal(false);
 			} catch (error) {
-				console.error('Banning user to conversation error:', error);
+				console.error('Verify password conversation error:', error);
 				if (axios.isAxiosError(error)) {
 					if (error.response && error.response.data) {
 						const customError = error.response.data.message;
@@ -64,28 +66,28 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 						}
 					}
 				}
-			}
+			} 
 		}
 	};
 
 	return (
-		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-			<h2>Ban User from the Conversation</h2>
+		<form className="form-Create-Conversation" onSubmit={handleVerifyPassword}>
+			<h2>Password Verification</h2>
 			
 			<div className="input-createConv-container">
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
-						Username or email
+						Please enter the Password
 						<InputField
-						type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} />
-						{formErrors.userToBan && <div className="error-message">{formErrors.userToBan}</div>}
+						type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} />
+						{formErrors.password && <div className="error-message">{formErrors.password}</div>}
 					</InputLabel>
 				</InputContainer>
 			</div>
 
 
 			<div className="button-createConv-container">
-				<ButtonCreateConv type="submit" >Ban User</ButtonCreateConv>
+				<ButtonCreateConv type="submit" >Submit</ButtonCreateConv>
 			</div>
 
 		</form>

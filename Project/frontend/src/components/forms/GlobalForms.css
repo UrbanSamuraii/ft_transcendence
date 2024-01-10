@@ -397,4 +397,54 @@
 	background-color: #8d8f8d;
 	border: 1px solid #ffffff;
 }
+
+/* To disable the password */
+.disable-password-checkbox {
+	display: flex;
+	align-items: center;
+	margin-top: 10px;
+	color: white;
+}
+  
+.disable-password-checkbox label {
+	margin-left: 5px;
+	user-select: none;
+	cursor: pointer;
+	color: white;
+}
+  
+.disable-password-checkbox input {
+	margin-right: 5px;
+}
+
+/* Leaving the conversation */
+
+.leave-confirmation-container {
+	background-color: #f0f0f0;
+	padding: 20px;
+	border-radius: 8px;
+	text-align: center;
+  }
+  
+  .button-container {
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+  }
+  
+  .yes-button, .no-button {
+	background-color: #ddd;
+	color: #333;
+	border: none;
+	padding: 10px 20px;
+	margin: 0 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: background-color 0.3s;
+  }
+  
+  .yes-button:hover, .no-button:hover {
+	background-color: #aaa;
+  }
+  
   

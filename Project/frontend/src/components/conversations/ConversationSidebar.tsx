@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
+import { BlockUserModal } from '../modals/BlockUserModal';
+import { UnblockUserModal } from '../modals/UnblockUserModal';
 import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
@@ -21,31 +23,20 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     const [showMenuModal, setShowMenuModal] = useState(false);
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showModalJoin, setShowModalJoin] = useState(false);
+    const [showModalBlock, setShowModalBlock] = useState(false);
+    const [showModalUnblock, setShowModalUnblock] = useState(false);
 
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
 
-    // useEffect(() => {
-    //     console.log({"Last message deleted": isLastMessageDeleted});
-    //     if (isLastMessageDeleted !== undefined) {
-    //         setLastMessageDeletedMap(prevMap => ({
-    //             ...prevMap,
-    //             [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
-    //         }));
-    //         setLastMessageDeleted(false);
-    //     }
-    // }, [isLastMessageDeleted, conversationId]);
-
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(true);
-            // console.log("Message du serveur LAST MESSAGE DELETED");
             setLastMessageDeletedMap(prevMap => ({
                 ...prevMap,
                 [chatSocketContextData.conversationId || ""]: chatSocketContextData.isLastMessageDeleted || false
             }));
-            // console.log({ "DELETING LAST !": deletedMessage });
         });
         return () => {
             chatSocketContextData.setLastMessageDeleted(false);
@@ -54,7 +45,6 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     }, [[chatSocketContextData, conversationId, isLastMessageDeleted]]);
 
     const handleMenuOptionClick = (option: string) => {
-        // console.log('Selected option:', option);
         setShowMenuModal(false);
         if (option === 'create') {
             setShowModalCreate(true);
@@ -62,15 +52,19 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         else if (option === 'join') {
             setShowModalJoin(true);
         }
+        else if (option === 'block') {
+            setShowModalBlock(true);
+        }
+        else if (option === 'unblock') {
+            setShowModalUnblock(true);
+        }
     };
-    
-      const openMenu = () => {
-        console.log("OPEN");
+      
+    const openMenu = () => {
         setShowMenuModal(true);
     };
-    
-      const closeMenu = () => {
-        console.log('Closing menu');
+      
+    const closeMenu = () => {
         setShowMenuModal(false);
     };
 
@@ -90,6 +84,16 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             {showModalJoin && (<JoinConversationModal
                 setShowModal={() => {
                     setShowModalJoin(false);
+                    setShowMenuModal(false);
+                }} /> )}
+            {showModalBlock && (<BlockUserModal
+                setShowModal={() => {
+                    setShowModalBlock(false);
+                    setShowMenuModal(false);
+                }} /> )}
+            {showModalUnblock && (<UnblockUserModal
+                setShowModal={() => {
+                    setShowModalUnblock(false);
                     setShowMenuModal(false);
                 }} /> )}
             <ConversationSidebarStyle>

@@ -14,6 +14,7 @@ export const CreateConversationMenu: FC<CreateConversationMenuProps> = ({ onClos
             <button className="menu-button" onClick={() => onOptionClick('create')}>Create a conversation</button>
             <button className="menu-button" onClick={() => onOptionClick('join')}>Join a conversation</button>
             <button className="menu-button" onClick={() => onOptionClick('block')}>Block a user</button>
+            <button className="menu-button" onClick={() => onOptionClick('unblock')}>Unblock a user</button>
             <button className="menu-button" onClick={onClose}>Cancel</button>
         </div>
     );

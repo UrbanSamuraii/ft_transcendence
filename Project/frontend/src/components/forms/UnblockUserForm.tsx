@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useSocket } from '../../SocketContext';
@@ -8,55 +7,50 @@ type Member = {
 	username: string;
   };
   
-  type MemberInConversationFormProps = {
+  type MemberFormProps = {
 	setShowModal: (show: boolean) => void;
   };
   
-  export const AllowMemberInConversationForm: React.FC<MemberInConversationFormProps> = ({ setShowModal }) => {
+  export const UnblockUserForm: React.FC<MemberFormProps> = ({ setShowModal }) => {
 	const [memberList, setMemberList] = useState<Member[]>([]);
-	const conversationId = useParams().id;
 	const { socket } = useSocket();
-  
+
 	useEffect(() => {
 	  const fetchMemberList = async () => {
 		try {
-		  const response = await axios.get(`http://localhost:3001/conversations/${conversationId}/banned_users`, {
-				withCredentials: true,
-			});
+		  const response = await axios.post(`http://localhost:3001/conversations/blocked_users_list`, null, { withCredentials: true });
 			setMemberList(response.data);
 		} catch (error) {
-		  console.error('Error fetching member list:', error);
+		  console.error('Error fetching the list:', error);
 		}
 	  };
-  
 	  fetchMemberList();
-	  
-	  socket?.on('onUnbanUser', fetchMemberList);
-	  return () => {
-		  socket?.off('onUnbanUser', fetchMemberList);
-  }; 
-  }, [socket]);
 
+	  socket?.on('onBeingUnblockedorUnblocked', fetchMemberList);
+	  return () => {
+		socket?.off('onBeingUnblockedorUnblocked', fetchMemberList);
+	};
+	}, [socket]);
   
-	const allowMember = async (username: string) => {
+	const unblockMember = async (username: string) => {
 	  try {
-	    const response = await axios.post(`http://localhost:3001/conversations/${conversationId}/allow_user`, 
-		{ userToAllow: username }, 
+	    const response = await axios.post(`http://localhost:3001/conversations/unblock_user`, 
+		{ userToUnblock: username }, 
 		{ withCredentials: true });
-		// console.log("USER SELECTED ", response)
+		console.log("USER SELECTED ", response)
 	  } catch (error: any) {
 		if (error.response && error.response.status === 403) {
 			alert("Unauthorized: Please log in.");
 		  } else if (error.response && error.response.data && error.response.data.message) {
 			alert(error.response.data.message);
 		  } else {
-			console.error('Error un-muting member:', error);
+			console.error('Error un-blocking member:', error);
 	  }
 	};};
   
 	return (
 	  <div className="member-list-container">
-		<h2>Banned Users from the Conversation</h2>
+		<h2>Blocked Users</h2>
 		{memberList.length > 0 ? (
 			<div className="member-list">
 			<ul>
@@ -64,7 +58,7 @@ type Member = {
 				<li key={member.username}>
 					<button
 					className="username-button"
-					onClick={() => allowMember(member.username)}
+					onClick={() => unblockMember(member.username)}
 					>
 					{member.username}
 					</button>
@@ -73,7 +67,7 @@ type Member = {
 			</ul>
 			</div>
 		) : (
-			<p>No user is banned from this conversation.</p>
+			<p>No user is blocked.</p>
 		)}
 		</div>
 	);

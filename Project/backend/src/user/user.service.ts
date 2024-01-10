@@ -38,7 +38,7 @@ export class UserService {
         try {
             const user = await this.prisma.user.findFirst({
                 where: { accessToken: token },
-                include: { conversations: true },
+                include: { conversations: true, blockedUsers: true },
             });
             if (!user) {
                 throw new HttpException({
@@ -95,6 +95,26 @@ export class UserService {
         } catch (error) {
             console.error("Error retrieving ELO rating:", error);
             throw error;
+        }
+    }
+
+    async getUserByEmail(email: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email: email }
+            });
+            if (!user) {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: "Error: User not found"
+                }, HttpStatus.BAD_REQUEST);
+            }
+            return user;
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: "Error: Unable to retrieve user"
+            }, HttpStatus.BAD_REQUEST);
         }
     }
 

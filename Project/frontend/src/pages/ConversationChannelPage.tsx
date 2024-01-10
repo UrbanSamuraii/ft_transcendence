@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { ConversationChannelPageStyle } from "../utils/styles"
 import { getConversationsIdentified } from "../utils/hooks/getConversationsIdentified";
@@ -15,47 +15,67 @@ export const ConversationChannelPage = () => {
     const conversationId = useParams().id;
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
-    // const chatSocketContextData = useChatSocket();
     const chatSocketContextData = useSocket();
+    const navigate = useNavigate()
 
+    useEffect(() => {
+        chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {
+            // console.log({ "REMOVED FROM A CONV !": payload });
+            if (conversationId === payload.conversationId) {
+                navigate('/ConversationPage');
+            }
+        });
+        return () => {
+            chatSocketContextData?.socket?.off('onRemovedMember');
+        };
+    }, [[chatSocketContextData, conversationId]]);
+
+    // To set all messages from the conv - need to sort on the getter at the backend
     useEffect(() => {
         const fetchConversations = async () => {
             const conversations = await getConversationsIdentified(conversationId);
             setConversationsArray(conversations);
         };
-
         fetchConversations();
-    }, [conversationId]);
+    
+        const socket = chatSocketContextData?.socket;
+        if (socket) { socket.on('onBeingBlockedorBlocked', fetchConversations) }
+        return () => {
+            if (socket) { socket.off('onBeingBlockedorBlocked', fetchConversations) }
+        };
+    }, [chatSocketContextData, conversationId]);
 
+    // To get last message sent - need to not socket emit to the user who blocked the author
     useEffect(() => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
-            chatSocketContextData.setNewMessageReceived(true);
             chatSocketContextData.setLastMessageDeleted(false);
-            console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload });
+            // console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload.conversation_id });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
-                setConversationsArray(prevConversations => [payload, ...prevConversations]);
+                setConversationsArray(prevConversations => {
+                    const newState = [payload, ...prevConversations];
+                    return newState;
+                });
             }
         });
         return () => {
             chatSocketContextData?.socket?.off('onMessage');
         };
-    }, [[chatSocketContextData, conversationId]]);
+    }, [[chatSocketContextData.socket, conversationId]]);
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteMessage', (deletedMessage: ConversationMessage) => {
             const isMessageInConversation = deletedMessage.conversation_id === Number(conversationId);
-
             if (isMessageInConversation) {
                 setConversationsArray(prevConversations => {
                     return prevConversations.filter(message => message.id !== deletedMessage.id);
-                });
-            }
+                });}
         });
         return () => {
             chatSocketContextData?.socket?.off('onDeleteMessage');
         };
     }, [chatSocketContextData, conversationId]);
+
 
     return (
         <ConversationChannelPageStyle>

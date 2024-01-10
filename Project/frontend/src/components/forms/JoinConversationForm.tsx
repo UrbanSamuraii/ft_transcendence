@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { CheckPasswordModal } from "../modals/CheckPasswordModal";
 
 interface ConvDataInput {
 	conversationName: string;
@@ -14,6 +15,9 @@ type JoinConversationFormProps = {
 
 export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setShowModal }) => {
 
+	const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
+	const [convId, setConversationId] = useState<number | null>(null);
+	// let convId: number | null = null;
 	const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
 		conversationName: '',
 	  });
@@ -45,14 +49,24 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 		} 
 		else {
 			try {
-				console.log({"DATA" : ConvDataInput});
+				// console.log({"DATA" : ConvDataInput});
 				const response = await axios.post('http://localhost:3001/conversations/join', ConvDataInput, {
 					withCredentials: true });
-				console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
+				// console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
 				if (response.status === 403) {
 					const customWarning = response.data.message;
 					alert(`Warning: ${customWarning}`);
-				} else {
+				} 
+				else if (response.status === 202) {
+					// console.log("There is a password protecting the conversation");
+					const id = response.data.conversationId;
+					setConversationId(id);
+					// convId = id;
+					// console.log("Id of the protected conversation : ", convId);
+					setShowCheckPasswordModal(true);
+					// setShowModal(false);
+				}
+				else {
 					const conversationId = response.data.conversationId;
 					setShowModal(false);
 					navigate(`channel/${conversationId}`);
@@ -72,6 +86,12 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 	};
 
 	return (
+		<>
+		{showCheckPasswordModal && convId !== null && (<CheckPasswordModal
+			setShowModal={() => {
+				setShowCheckPasswordModal(false);
+				setShowModal(false);
+			}} convId={convId} /> )}
 		<form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
 			<h2>Join Conversation</h2>
 			
@@ -92,5 +112,6 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 			</div>
 
 		</form>
+		</>
 	);
 };

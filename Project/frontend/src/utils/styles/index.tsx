@@ -293,6 +293,7 @@ export const MessageContainerPersonnalStyle = styled.div`
 export const MessageContainerHeaderStyle = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background: black;
   width: 100%;
   height: 80px;

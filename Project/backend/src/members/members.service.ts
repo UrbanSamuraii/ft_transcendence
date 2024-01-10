@@ -24,40 +24,6 @@ export class MembersService implements IMembersService {
 		
 		return memberFinded || null; // Return the found member or null if not found
 	}
-
-	// async addConversationInMembership(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 	  where: { id: userId },
-	// 	  include: { conversations: true },
-	// 	});
-	  
-	// 	if (existingUser) {
-	// 		const updatedConversations = [
-	// 			...existingUser.conversations.map((conv) => ({ id: conv.id })),
-	// 			{ id: conversationId }];
-	  
-	// 	  await this.prismaService.user.update({
-	// 		where: { id: userId },
-	// 		data: { conversations: { set: updatedConversations } },
-	// 	  });
-	// 	}
-	//   }
-
-	// async removeConversationFromMembership(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { conversations: true },
-	// 	});
-
-	// 	if (existingUser) {
-	// 		const updatedConversations = existingUser.conversations.filter((conv) => conv.id !== conversationId);
-		  
-	// 		await this.prismaService.user.update({
-	// 		  where: { id: userId },
-	// 		  data: { conversations: { set: updatedConversations } },
-	// 		});
-	// 	}
-	// }
 	
 	// To return the conversations into the profil 
 	async getMemberWithConversationsHeIsMemberOf(user: User) {
@@ -95,40 +61,6 @@ export class MembersService implements IMembersService {
 
 	///////// ADMIN RELATION ////////
 
-	// async addConversationInAdministratedList(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { conversationsAdmin: true },
-	// 	  });
-		
-	// 	  if (existingUser) {
-	// 		  const updatedConversationsAdministrated = [
-	// 			  ...existingUser.conversationsAdmin.map((conv) => ({ id: conv.id })),
-	// 			  { id: conversationId }];
-		
-	// 		await this.prismaService.user.update({
-	// 		  where: { id: userId },
-	// 		  data: { conversationsAdmin: { set: updatedConversationsAdministrated } },
-	// 		});
-	// 	}
-	// }
-
-	// async removeAdminStatus(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { conversations: true, conversationsAdmin: true },
-	// 	});
-
-	// 	if (existingUser) {
-	// 		const updatedAdmins = existingUser.conversationsAdmin.filter((conv) => conv.id !== conversationId);
-		  
-	// 		await this.prismaService.user.update({
-	// 		  where: { id: userId },
-	// 		  data: { conversations: { set: updatedAdmins } },
-	// 		});
-	// 	}
-	// }
-
 	async isAdmin(conversationId: number, userId: number): Promise<boolean | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -144,40 +76,6 @@ export class MembersService implements IMembersService {
 
 	///////// MUTE RELATION ////////
 
-	// async addMemberToMutedList(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { mutedFrom: true },
-	// 	});
-		
-	// 	if (existingUser) {
-	// 			const updatedConversationsMutedFrom = [
-	// 				...existingUser.mutedFrom.map((conv) => ({ id: conv.id })),
-	// 				{ id: conversationId }];
-		
-	// 		await this.prismaService.user.update({
-	// 			where: { id: userId },
-	// 			data: { mutedFrom: { set: updatedConversationsMutedFrom } },
-	// 		});
-	// 	}
-	// }
-
-	// async removeMutedStatus(userId: number, conversationId: number) {
-	// 	const existingUser = await this.prismaService.user.findUnique({
-	// 		where: { id: userId },
-	// 		include: { conversations: true, mutedFrom: true },
-	// 	});
-
-	// 	if (existingUser) {
-	// 		const updatedMuteMembers = existingUser.mutedFrom.filter((conv) => conv.id !== conversationId);
-		  
-	// 		await this.prismaService.user.update({
-	// 		  where: { id: userId },
-	// 		  data: { mutedFrom: { set: updatedMuteMembers } },
-	// 		});
-	// 	}
-	// }
-
 	async isMuteMember(conversationId: number, userId: number): Promise<boolean | null> {
 		const conversation = await this.prismaService.conversation.findUnique({
 			where: { id: conversationId },
@@ -191,5 +89,7 @@ export class MembersService implements IMembersService {
 		else { return false; }
 	}
 
+	///////// BLOCK RELATION ////////
+	
 }
 
