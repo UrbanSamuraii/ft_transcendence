@@ -7,28 +7,43 @@
   user-select: none;          /* Likely future */ 
 }
 
-/* :root {
-	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
-  display: flex;
-  background-size: cover;
-  --text-color-main: #ff276fc0;
-  --text-color-dark: #ff276f79;
-  --text-color-hover: #ff276fdc;
-  --text-color-accent: #fff;
-} */
+body {
+  overflow: hidden;
+}
 
 .bw-style {
   background-image: url(https://static.vecteezy.com/system/resources/previews/030/697/151/non_2x/gray-minimalist-wallpaper-high-quality-4k-hdr-free-photo.jpg);
   display: flex;
   background-size: cover;
-  --text-color-main: rgba(255, 255, 255, 0.877);
-  --text-color-dark: #ffffff75;
-  --text-color-hover: #ffffff;
+  --text-color-main: #ffffffc0;
+  --text-color-dark: #ffffff79;
+  --text-color-hover: #ffffffdc;
   --text-color-accent: #000000;
 }
 
 .cyber-style {
 	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+  display: flex;
+  background-size: cover;
+  --text-color-main: #3250fdc0;
+  --text-color-dark: #4652fd79;
+  --text-color-hover: #4652fddc;
+  --text-color-accent: #fff;
+}
+
+.rainbow-style {
+	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+  display: flex;
+  background-size: cover;
+  --text-color-main: #27e6ffc0;
+  --text-color-dark: #27e6ff79;
+  --text-color-hover: #27e6ffdc;
+  --text-color-accent: #fff;
+}
+
+.retrowave-style {
+	background-image: url(https://rare-gallery.com/thumbs/101168-retrowave-lines-sunset-4k.jpg);
+  background-position: 50%;
   display: flex;
   background-size: cover;
   --text-color-main: #ff276fc0;
@@ -48,12 +63,16 @@
   width: 600px;
   height: 350px;
   box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
-  /* background: linear-gradient(rgb(3, 0, 46), rgb(0, 0, 0)); */
-  background-color: rgb(15, 15, 15);
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
   border-radius: 10px;
   overflow: hidden;
-  position: relative;
+  position: absolute;
 }
+
+/* .card .bw-style {
+  background-color: #000000;
+} */
 
 .card h1 {
   margin-top: 10px;
@@ -73,17 +92,19 @@
 }
 
 .card .user-card.cyber-style {
+  background-color: rgba(27, 0, 16, 0.2);
+  background-blend-mode: color;
   height: 110%;
   background-image: url(./cyber.gif);
 }
 
-.card .user-card.rainbow {
+.card .user-card.rainbow-style {
   background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: color;
   background-image: url(./rainbow.gif);
 }
 
-.card .user-card.retrowave {
+.card .user-card.retrowave-style {
   background-color: rgba(0, 0, 0, 0.3);
   background-blend-mode: color;
   background-image: url(./retrowave.gif);
@@ -223,6 +244,28 @@
 }
 
 .leaderboard-button:hover {
+  background-color: var(--text-color-hover);
+}
+
+.signout-button {
+  width: 40px;
+  height: 40px;
+  background-color: var(--text-color-main);
+  color: var(--text-color-accent);
+  padding: 0.5rem;
+  border-radius: 10px;
+  position: absolute;
+  right: 7px;
+  margin-top: 285px;
+}
+
+.signout-button i {
+  position: relative;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.signout-button:hover {
   background-color: var(--text-color-hover);
 }
 

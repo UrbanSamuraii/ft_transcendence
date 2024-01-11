@@ -33,8 +33,22 @@ function Profile() {
     }, [username]);
 
     const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'bw-style' ? 'cyber-style' : 'bw-style');
+        setTheme(prevTheme => {
+            switch (prevTheme) {
+                case 'bw-style':
+                    return 'cyber-style';
+                case 'cyber-style':
+                    return 'rainbow-style';
+                case 'rainbow-style':
+                    return 'retrowave-style';
+                case 'retrowave-style':
+                    return 'bw-style';
+                default:
+                    return 'bw-style';
+            }
+        });
     };
+    
 
     const getSkillBarWidth = () => {
         if (userInfo.totalGamesWon) {
@@ -82,11 +96,8 @@ function Profile() {
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
             </head>
 
-            {/* bw  cyber  rainbow  retrowave */}
             <body className={theme}>
                 <div className="card">
-                    {/* <div className="user-card rainbow"> */}
-                    {/* <div className="user-card retrowave"> */}
                     <div className={`user-card ${theme}`}>
                         <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                         <div className='profile-picture'>
@@ -129,8 +140,10 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        <Link to={`/@/${username}/leaderboard`} className="leaderboard-button">
+                        <Link to={`/leaderboard`} className="leaderboard-button">
                             Leaderboard</Link>
+                        <Link to={`/signout`} className="signout-button">
+                            <i className='bx bx-exit'></i></Link>
                     </div>
                 </div>
             </body>
