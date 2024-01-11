@@ -3,12 +3,13 @@ import { Response as ExpressResponse } from 'express';
 import { Res, Req, Next } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
+import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { MembersService } from "src/members/members.service";
 import { ConversationsService } from "src/conversations/conversations.service";
 import { GatewaySessionManager } from "./gateway.session";
 import { AuthenticatedSocket } from "../utils/interfaces";
-import { User } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 
 @WebSocketGateway({
     cors: {
@@ -21,6 +22,7 @@ export class MessagingGateway implements OnGatewayConnection {
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
         private readonly sessions: GatewaySessionManager,
+        private readonly prismaService: PrismaService,
         private readonly convService: ConversationsService) { }
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
@@ -33,6 +35,11 @@ export class MessagingGateway implements OnGatewayConnection {
             if (identifiedUser) {
                 client = this.associateUserToAuthSocket(client, identifiedUser);
                 this.sessions.setUserSocket(identifiedUser.id, client);
+                const updatedUser = await this.prismaService.user.update({
+                    where: { id: identifiedUser.id },
+                    data: { last_known_socket: client.id },
+                });
+                console.log({ "SOCKET id of our IDENTIFIED user": updatedUser.last_known_socket });
             }
 
             // To make my userSocket join all the room the user is member of
