@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Button, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 // import './LoginForm.css';
 
 interface FormData {
@@ -51,7 +52,7 @@ export const LoginForm = () => {
         }
         else {
             try {
-                const response = await axios.post('http://localhost:3001/auth/login', { email: formData.email, password: formData.password }, {
+                const response = await axios.post(`http://${server_adress}:3001/auth/login`, { email: formData.email, password: formData.password }, {
                     withCredentials: true,
                 });
                 if (response.status == 200) {

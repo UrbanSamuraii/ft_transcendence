@@ -8,6 +8,7 @@ interface LeaderboardEntry {
     totalGamesLost: number;
     winPercentage: number;
 }
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 function GlobalLeaderboard() {
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -15,7 +16,7 @@ function GlobalLeaderboard() {
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
-            const response = await fetch('http://localhost:3001/auth/leaderboard');
+            const response = await fetch(`http://${server_adress}:3001/auth/leaderboard`);
             const data = await response.json();
             if (response.ok) {
                 setLeaderboard(data);

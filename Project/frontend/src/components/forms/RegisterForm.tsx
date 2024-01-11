@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface FormData {
     email: string;
@@ -45,7 +46,7 @@ export const RegisterForm = () => {
 
     async function handleSignUp42Click() {
         try {
-            window.location.href = 'http://localhost:3001/auth/signup42';
+            window.location.href = `http://${server_adress}:3001/auth/signup42`;
         }
         catch (error) {
             console.error('Sign up request error:', error);
@@ -84,7 +85,7 @@ export const RegisterForm = () => {
         }
         else {
             try {
-                const response = await axios.post('http://localhost:3001/auth/signup', formData, {
+                const response = await axios.post(`http://${server_adress}:3001/auth/signup`, formData, {
                     withCredentials: true,
                 });
                 // console.log(response.status, response.data.token);
@@ -147,7 +148,7 @@ export const RegisterForm = () => {
                                 <InputContainer>
                                     <InputField className='input'
                                         placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
-                                        />
+                                    />
                                     {formErrors.username && <div className="error-message">{formErrors.username}</div>}
                                 </InputContainer>
                             </div>

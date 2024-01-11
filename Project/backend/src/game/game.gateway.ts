@@ -10,6 +10,7 @@ import { UserService } from '../user/user.service';
 import { PrismaService } from "src/prisma/prisma.service";
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma, User, Game } from '@prisma/client';
+const server_adress = process.env.SERVER_ADRESS;
 
 export interface PlayerInfo {
     username: string;
@@ -22,7 +23,7 @@ export interface PlayerInfo {
 
 @WebSocketGateway({
     cors: {
-        origin: ["http://localhost:3000", "*"], // allowed origins
+        origin: [`http://${server_adress}:3000`, "*"], // allowed origins
         methods: ["GET", "POST"], // allowed methods
         credentials: true, // enable credentials
     },

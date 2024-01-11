@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 function Profile() {
     const [theme, setTheme] = useState('bw-style'); // Default theme
@@ -12,7 +13,7 @@ function Profile() {
         const fetchUserInfo = async () => {
             try {
                 // Use the username from the URL in the API request
-                const response = await fetch(`http://localhost:3001/auth/user-info/${username}`, {
+                const response = await fetch(`http://${server_adress}:3001/auth/user-info/${username}`, {
                     method: 'GET',
                     credentials: 'include' // To send cookies along with the request
                 });

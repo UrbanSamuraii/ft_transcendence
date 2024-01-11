@@ -45,6 +45,8 @@ services:
     restart: always
     ports:
       - 3000:3000
+    env_file:
+      - ./frontend/.env
     depends_on:
       - backend
     networks:
@@ -55,6 +57,7 @@ services:
 
 networks:
   transcendance:
+
 
 volumes:
   postgres:

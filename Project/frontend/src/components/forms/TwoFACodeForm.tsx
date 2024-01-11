@@ -3,6 +3,7 @@ import { Button2FA, Text2FA } from '../../utils/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 export const TwoFACodeForm = () => {
 
@@ -23,7 +24,7 @@ export const TwoFACodeForm = () => {
 
     const handleLogin42FAClick = async () => {
         try {
-            const response = await axios.post('http://localhost:3001/auth/2fa/login', { two_factor_athentication_password: TwoFACode, email: user.email }, {
+            const response = await axios.post(`http://${server_adress}:3001/auth/2fa/login`, { two_factor_athentication_password: TwoFACode, email: user.email }, {
                 withCredentials: true,
             });
             navigate('/');

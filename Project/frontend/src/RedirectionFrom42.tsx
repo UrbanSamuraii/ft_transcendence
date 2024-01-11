@@ -11,7 +11,9 @@ const CustomRedirectionFrom42Route: React.FC<CustomRedirectionFrom42RouteProps> 
     ...props
 }) => {
     if (cameFromSignup42 && props.path === '/') {
-        return <Navigate to="http://localhost:3000" />;
+        const server_adress = process.env.REACT_APP_SERVER_ADRESS;
+        const s_adress = `http://${server_adress}:3000`;
+        return <Navigate to={s_adress} />;
     } else {
         return <Route {...props} />;
     }

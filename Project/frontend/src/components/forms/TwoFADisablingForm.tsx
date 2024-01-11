@@ -3,6 +3,7 @@ import { Button2FA, Text2FA } from '../../utils/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 export const TwoFADisablingForm = () => {
 
@@ -12,7 +13,7 @@ export const TwoFADisablingForm = () => {
 
     const handleDisableClick = async () => {
         try {
-            const response = await axios.post('http://localhost:3001/auth/2fa/turn_off', null, {
+            const response = await axios.post(`http://${server_adress}:3001/auth/2fa/turn_off`, null, {
                 withCredentials: true,
             });
             console.log({ "RESPONSE FROM DISABLING 2FA": response });

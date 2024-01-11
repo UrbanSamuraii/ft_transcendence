@@ -12,13 +12,14 @@ async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
     const port = +process.env.APP_PORT || 3001;
+    const server_adress = process.env.SERVER_ADRESS;
 
     const adapter = new WebsocketAdapter(app);
     app.useWebSocketAdapter(adapter);
 
     app.use(passport.initialize());
     app.enableCors({
-        origin: 'http://localhost:3000',
+        origin: `http://${server_adress}:3000`,
         credentials: true,
     });
     app.useGlobalPipes(new ValidationPipe({

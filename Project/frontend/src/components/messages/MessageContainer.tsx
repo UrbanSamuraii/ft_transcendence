@@ -3,8 +3,8 @@ import { ConversationMessage } from '../../utils/types';
 import { FC, useState, useContext } from 'react';
 import axios from 'axios';
 import { useSocket } from '../../SocketContext';
-
 import './GlobalMessages.css'
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 type ConversationMessageProps = {
     message: ConversationMessage;
@@ -26,7 +26,7 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
 
     const handleDelete = async (messageToDelete: ConversationMessage) => {
         console.log('Deleting Message:', messageToDelete);
-        const response = await axios.post('http://localhost:3001/messages/deleteMessage', { messageToDelete: messageToDelete }, {
+        const response = await axios.post(`http://${server_adress}:3001/messages/deleteMessage`, { messageToDelete: messageToDelete }, {
             withCredentials: true,
         });
         if (response.data.isLastMessageDeleted === true) {
