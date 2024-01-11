@@ -39,7 +39,7 @@ export class MessagingGateway implements OnGatewayConnection {
                     where: { id: identifiedUser.id },
                     data: { last_known_socket: client.id },
                 });
-                console.log({ "SOCKET id of our IDENTIFIED user": updatedUser.last_known_socket });
+                // console.log({ "SOCKET id of our IDENTIFIED user": updatedUser.last_known_socket });
             }
 
             // To make my userSocket join all the room the user is member of

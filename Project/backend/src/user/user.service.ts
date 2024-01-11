@@ -260,6 +260,9 @@ export class UserService {
         }));
     }
 
+    ////////////////  //////////////////
+
+
     //////////////// 2FA SETTNGS //////////////////
 
     // Update our user with the 2FA secret generated in the auth.service

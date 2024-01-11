@@ -31,6 +31,12 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         const socketConnection = io(serverAddress, { withCredentials: true });
         setSocket(socketConnection);
 
+        // ping from server
+        socketConnection.on('ping', () => {
+            console.log('Received ping from server');
+            socketConnection.emit('pong');
+        });
+
         socketConnection.on('disconnect', (reason) => {
             console.log("Socket disconnected, reason:", reason);
             if (reason === "io server disconnect" || reason === "io client disconnect") {
