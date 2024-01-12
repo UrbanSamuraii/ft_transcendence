@@ -5,7 +5,7 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     const handlePlayClick = () => {
-        navigate('/select-mode');
+        navigate('/matchmaking');
     };
 
     return (

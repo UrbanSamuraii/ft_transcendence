@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+// import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { useAuth } from '../../AuthContext'; // Update the path accordingly
@@ -6,21 +6,21 @@ import { useAuth } from '../../AuthContext'; // Update the path accordingly
 function Navbar() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [showNavbar, setShowNavbar] = useState(false);
+    // const [showNavbar, setShowNavbar] = useState(false);
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-        if (e.clientY < 80) {
-            setShowNavbar(true);
-        } else {
-            setShowNavbar(false);
-        }
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-    };
-    }, []);
+    // useEffect(() => {
+    //     const handleMouseMove = (e: MouseEvent) => {
+    //     if (e.clientY < 80) {
+    //         setShowNavbar(true);
+    //     } else {
+    //         setShowNavbar(false);
+    //     }
+    // };
+    // window.addEventListener('mousemove', handleMouseMove);
+    // return () => {
+    //     window.removeEventListener('mousemove', handleMouseMove);
+    // };
+    // }, []);
 
     return (
         // <div className={`navbar ${showNavbar ? 'show' : ''}`}>
@@ -29,7 +29,8 @@ function Navbar() {
             <div className="navbar-left">
                 <div className='navbar-button'>
                 <Link to="/" className="navbar-logo">
-                    <i className='bx bxs-tennis-ball' ></i></Link>
+                    {/* <i className='bx bxs-tennis-ball' ></i> */}
+                    </Link>
                 </div>
             </div>
             <div className="navbar-center">

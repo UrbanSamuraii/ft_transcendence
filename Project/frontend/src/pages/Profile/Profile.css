@@ -21,15 +21,15 @@ body {
   --text-color-accent: #000000;
 }
 
-.cyber-style {
+/* .cyber-style {
 	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
   display: flex;
   background-size: cover;
-  --text-color-main: #3250fdc0;
-  --text-color-dark: #4652fd79;
-  --text-color-hover: #4652fddc;
-  --text-color-accent: #fff;
-}
+  --text-color-main: #45f3ffc0;
+  --text-color-dark: #45f3ff79;
+  --text-color-hover: #45f3ffdc;
+  --text-color-accent: #000000;
+} */
 
 .rainbow-style {
 	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
@@ -46,9 +46,9 @@ body {
   background-position: 50%;
   display: flex;
   background-size: cover;
-  --text-color-main: #ff276fc0;
-  --text-color-dark: #ff276f79;
-  --text-color-hover: #ff276fdc;
+  --text-color-main: #ff2770c0;
+  --text-color-dark: #ff277079;
+  --text-color-hover: #ff2770dc;
   --text-color-accent: #fff;
 }
 
@@ -70,10 +70,6 @@ body {
   position: absolute;
 }
 
-/* .card .bw-style {
-  background-color: #000000;
-} */
-
 .card h1 {
   margin-top: 10px;
   margin-bottom: 0px;
@@ -91,12 +87,12 @@ body {
   width: 200px;
 }
 
-.card .user-card.cyber-style {
+/* .card .user-card.cyber-style {
   background-color: rgba(27, 0, 16, 0.2);
   background-blend-mode: color;
   height: 110%;
   background-image: url(./cyber.gif);
-}
+} */
 
 .card .user-card.rainbow-style {
   background-color: rgba(0, 0, 0, 0.5);
@@ -197,6 +193,28 @@ body {
   font-size: 2.5rem;
 }
 
+.signout-button {
+  width: 40px;
+  height: 40px;
+  background-color: var(--text-color-main);
+  color: var(--text-color-accent);
+  padding: 0.5rem;
+  border-radius: 10px;
+  position: absolute;
+  right: 7px;
+  top: 7px;
+}
+
+.signout-button i {
+  position: relative;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.signout-button:hover {
+  background-color: var(--text-color-hover);
+}
+
 .edit-profile {
   width: 40px;
   height: 40px;
@@ -205,10 +223,8 @@ body {
   padding: 0.5rem;
   border-radius: 10px;
   position: absolute;
-  top: 0;
-  right: 0;
-  margin-right: 7px;
-  margin-top: 7px;
+  right: 74px;
+  bottom: 15px;
 }
 
 .edit-profile i {
@@ -244,28 +260,6 @@ body {
 }
 
 .leaderboard-button:hover {
-  background-color: var(--text-color-hover);
-}
-
-.signout-button {
-  width: 40px;
-  height: 40px;
-  background-color: var(--text-color-main);
-  color: var(--text-color-accent);
-  padding: 0.5rem;
-  border-radius: 10px;
-  position: absolute;
-  right: 7px;
-  margin-top: 285px;
-}
-
-.signout-button i {
-  position: relative;
-  align-items: center;
-  font-size: 1.5rem;
-}
-
-.signout-button:hover {
   background-color: var(--text-color-hover);
 }
 

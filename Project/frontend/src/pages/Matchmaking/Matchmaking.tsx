@@ -50,14 +50,19 @@ function Matchmaking() {
                 socket.emit('leaveMatchmaking');
             }
         };
-    }, []);
+    }, [socket, gameMode, champion?.id, navigate]);
 
     return (
-        <div className="paddle-container">
-            <div className="searching-text">Searching for a game...</div>
-            <div className="paddle"></div>
-            <div className="ball"></div>
-            <div className="paddle"></div>
+        <div className="background">
+            <div className="container">
+                <div className="ball"></div>
+                <div className="ball"></div>
+                <div className="ball"></div>
+                <div className="shadow"></div>
+                <div className="shadow"></div>
+                <div className="shadow"></div>
+                <div className="searching-text">Searching for a game...</div>
+            </div>
         </div>
     );
 }

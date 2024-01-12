@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { useState, useEffect, FC, useRef } from 'react';
-import { BrowserRouter as Router, Navigate, Route, Routes, useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import Play from './pages/Play/Play';
-import SelectModePage from './pages/SelectMode/SelectModesPage';
+// import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import { Signup } from './pages/Signup';
@@ -20,8 +20,8 @@ import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
-import axios from 'axios';
-import { OnlySocketProvider, useSocket } from './SocketContext';
+// import axios from 'axios';
+import { OnlySocketProvider } from './SocketContext';
 import PowerPongGame from './pages/Game/PowerPongGame'; // Import the new PowerPongGame component
 
 const defaultBackgroundStyle = {
@@ -44,7 +44,6 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
         // backgroundPosition: 'center center',
         // backgroundColor: '#1a1a1a',
     },
-    '/select-mode': { background: '#1a1a1a' },
     '/game': { background: '#1a1a1a' },
     '/add-user': { background: '#1a1a1a)' },
     '/signup': { background: '#1a1a1a' },
@@ -125,13 +124,13 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
 
-    function handleLoginClick() {
-        navigate("/login");
-    }
+    // function handleLoginClick() {
+    //     navigate("/login");
+    // }
 
-    function handleSignupClick() {
-        navigate("/signup");
-    }
+    // function handleSignupClick() {
+    //     navigate("/signup");
+    // }
 
     return (
         <Routes>
@@ -149,7 +148,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
             {/* Protected routes */}
             {user && (
                 <>
-                    <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />

@@ -1,12 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
 
-/* Base navbar styling */
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 2rem;
-    background-color: #1a1a1a;
+    background-color: #000000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     color: white;
     font-family: 'Roboto', sans-serif;
@@ -15,10 +14,6 @@
 		color: white;
         text-decoration: none;
 	}
-    /* position: fixed;
-    top: -50px;
-    width: 100%;
-    transition: top 0.3s; */
 }
 
 .navbar.show {
@@ -47,9 +42,17 @@
 }
 
 .navbar-logo {
-    font-weight: bold;
-    font-size: 2rem;
+    background-image: url('https://cdn2.iconfinder.com/data/icons/ping-pong-table-tennis-player/128/ping-pong-table-tennis-player-016-512.png');
+    background-repeat: no-repeat;
+    background-size: 93%;
+    background-position: 1px 1.5px;
+    background-color: #ffffffdc;
+    border-radius: 50%;
+    width: 42px;
+    height: 40px;
+    display: block;
 }
+
 
 /* Media Query for small screens */
 @media screen and (max-width: 600px) {

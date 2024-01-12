@@ -36,8 +36,8 @@ function Profile() {
         setTheme(prevTheme => {
             switch (prevTheme) {
                 case 'bw-style':
-                    return 'cyber-style';
-                case 'cyber-style':
+                //     return 'cyber-style';
+                // case 'cyber-style':
                     return 'rainbow-style';
                 case 'rainbow-style':
                     return 'retrowave-style';
@@ -72,7 +72,7 @@ function Profile() {
     }
 
     const getEloRank = (eloRating: number): string => {
-        if (eloRating < 1000 || totalGamesPlayed == 0) {
+        if (eloRating < 1000 || totalGamesPlayed === 0) {
             return 'just beginning';
         } else if (eloRating < 1100) {
             return 'getting there';
@@ -101,14 +101,14 @@ function Profile() {
                     <div className={`user-card ${theme}`}>
                         <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                         <div className='profile-picture'>
-                            <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"
+                            <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png" alt='shrek'
                                 className="rounded-image" width="135" height="135" /></div>
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
                     <div className="more-info">
                         <h1>{userInfo.username}</h1>
-                        <button className="edit-profile" onClick={toggleTheme}>
-                            <i className='bx bxs-palette'></i></button>
+                        <Link to={`/signout`} className="signout-button">
+                            <i className='bx bx-exit'></i></Link>
                         <div className='separator'></div>
                         <div className="coords">
                             <span>E-mail</span>
@@ -142,9 +142,9 @@ function Profile() {
                         </div>
                         <Link to={`/leaderboard`} className="leaderboard-button">
                             Leaderboard</Link>
-                        <Link to={`/signout`} className="signout-button">
-                            <i className='bx bx-exit'></i></Link>
-                    </div>
+                        </div>
+                        <button className="edit-profile" onClick={toggleTheme}>
+                            <i className='bx bxs-palette'></i></button>
                 </div>
             </body>
         </div>
