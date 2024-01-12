@@ -35,11 +35,12 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         setSocket(socketConnection);
 
         // ping from server
-        socketConnection.on('ping', () => {
-            console.log('Received ping from server');
-            socketConnection.emit('pong', 'pong message');
-            console.log('Sent pong to server');
-        });
+        socketConnection.emit("ping", "pong");
+        // () => {
+        //     console.log('Received ping from server');
+        //     socketConnection.emit('pong', 'pong message');
+        //     console.log('Sent pong to server');
+        // });
 
         socketConnection.on('disconnect', (reason) => {
             console.log("Socket disconnected, reason:", reason);

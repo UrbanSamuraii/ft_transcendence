@@ -41,8 +41,8 @@ export class MessagingGateway implements OnGatewayConnection {
                 // PING my user
                 // this.startPingTest(client);
                 
-                const userSocket = this.sessions.getUserSocket(identifiedUser.id);
-                this.server.to(userSocket.id.toString()).emit('ping')
+                // const userSocket = this.sessions.getUserSocket(identifiedUser.id);
+                // this.server.to(userSocket.id.toString()).emit('ping')
                 // , (arg) => {
                 //     console.log(arg); // world
                 //   });
@@ -56,7 +56,11 @@ export class MessagingGateway implements OnGatewayConnection {
 
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
-        this.server.on('pong', (arg) => { console.log(arg); });
+        this.server.on("connection", (client) => {
+            console.log("ping the client");
+            client.on("ping", (arg) => {
+              console.log(arg); // pong
+            });});
         return;
     }
 
