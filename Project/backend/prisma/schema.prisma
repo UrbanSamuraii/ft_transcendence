@@ -28,8 +28,6 @@ model User {
     isRegistered           Boolean   @default(false)
     is_two_factor_activate Boolean?  @default(false)
     two_factor_secret      String?
-    status                 status_t? @default(OFFLINE)
-    last_known_socket      String?
     eloRating              Int       @default(1000)
     gamesWon               Game[]    @relation("WinnerRelation")
     totalGamesWon          Int       @default(0)
@@ -45,6 +43,10 @@ model User {
 
     blockedUsers User[] @relation("blockedUsers")
     blockedBy    User[] @relation("blockedUsers")
+
+    friends     User[]  @relation("FriendsRelation")
+    friendOf    User[]  @relation("FriendsRelation")
+    status      status_t?  @default(OFFLINE)
 
     @@unique([id, email, username])
     @@map("users")

@@ -260,8 +260,18 @@ export class UserService {
         }));
     }
 
-    ////////////////  //////////////////
+    //////////////// FRIENDSHIP RELATIONS //////////////////
 
+    async addNewFriend(userId: number, targetId: number) {
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { friends: { connect: [{ id: targetId }] }, },
+        });
+        await this.prisma.user.update({
+            where: { id: targetId },
+            data: { friendOf: { connect: [{ id: userId }] } },
+        });
+    }
 
     //////////////// 2FA SETTNGS //////////////////
 

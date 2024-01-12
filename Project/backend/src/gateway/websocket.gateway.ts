@@ -18,7 +18,9 @@ import { Prisma, User } from "@prisma/client";
         credentials: true,
     }
 })
+
 export class MessagingGateway implements OnGatewayConnection {
+    
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
         private readonly sessions: GatewaySessionManager,
@@ -35,13 +37,16 @@ export class MessagingGateway implements OnGatewayConnection {
             if (identifiedUser) {
                 client = this.associateUserToAuthSocket(client, identifiedUser);
                 this.sessions.setUserSocket(identifiedUser.id, client);
-                const updatedUser = await this.prismaService.user.update({
-                    where: { id: identifiedUser.id },
-                    data: { last_known_socket: client.id },
-                });
-                // console.log({ "SOCKET id of our IDENTIFIED user": updatedUser.last_known_socket });
+                
+                // PING my user
+                // this.startPingTest(client);
+                
+                const userSocket = this.sessions.getUserSocket(identifiedUser.id);
+                this.server.to(userSocket.id.toString()).emit('ping')
+                // , (arg) => {
+                //     console.log(arg); // world
+                //   });
             }
-
             // To make my userSocket join all the room the user is member of
             const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
             for (const conversation of userWithConversations.conversations) {
@@ -50,8 +55,8 @@ export class MessagingGateway implements OnGatewayConnection {
         }
 
         console.log({ "SOCKET id of our user": client.id });
-        client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' });
-
+        client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
+        this.server.on('pong', (arg) => { console.log(arg); });
         return;
     }
 
@@ -203,4 +208,45 @@ export class MessagingGateway implements OnGatewayConnection {
         const userSocket = await this.sessions.getUserSocket(user.id);
         this.server.to(userSocket.id.toString()).emit('onUnbanUser');
     }
+
+    // private readonly pingInterval = 1000; // 1 seconds
+    // // @OnEvent('startPingTest')
+    // private startPingTest(client: AuthenticatedSocket) {
+    //     console.log(`Start ping test for user ${client.user?.id}`);
+        
+    //     const pingIntervalId = setInterval(() => {
+    //         // this.server.to(client.id.toString()).emit('ping');
+    //         if (client.connected) {
+    //             client.on('ping', (arg) => {
+    //                 console.log(arg); // pong
+    //             });
+    //             this.prismaService.user.update({
+    //                 where: { id: client.user?.id },
+    //                 data: { status: 'ONLINE' },
+    //             });
+    //             console.log(`Ping emited to ${client.user?.id}.`);
+    //         } else {
+    //             console.log(`Pong not received from user ${client.user?.id} within timeout`);
+    //             clearInterval(pingIntervalId); // Stop ping test if client is no longer connected
+    //             this.handlePongTimeout(client); // Set his status to Offline 
+    //         }
+    //     }, this.pingInterval);
+    // }
+
+    // @OnEvent('pong')
+    // handlePong(client: AuthenticatedSocket) {
+    //     console.log(`Received pong from user ${client.user?.id}`);
+    //     this.prismaService.user.update({
+    //         where: { id: client.user?.id },
+    //         data: { status: 'ONLINE' },
+    //     });
+    // }
+
+    // private handlePongTimeout(client: AuthenticatedSocket) {
+    //     console.log(`Pong not received from user ${client.user?.id} within timeout`);
+    //     this.prismaService.user.update({
+    //       where: { id: client.user?.id },
+    //       data: { status: 'OFFLINE' },
+    //     });
+    //   }
 }

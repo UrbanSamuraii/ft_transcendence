@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useRef, Dispatch, SetStateAction, useEffect } from 'react';
+import { FALSE } from 'sass';
 import io, { Socket } from 'socket.io-client';
 
 type SocketContextType = {
@@ -28,13 +29,16 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         `http://${window.location.hostname}:3001`;
 
     useEffect(() => {
+
         const socketConnection = io(serverAddress, { withCredentials: true });
+        
         setSocket(socketConnection);
 
         // ping from server
         socketConnection.on('ping', () => {
             console.log('Received ping from server');
-            socketConnection.emit('pong');
+            socketConnection.emit('pong', 'pong message');
+            console.log('Sent pong to server');
         });
 
         socketConnection.on('disconnect', (reason) => {
@@ -46,7 +50,6 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
                 console.log("Socket disconnected... attempting to reconnect");
             }
         });
-
 
 
         return () => {
