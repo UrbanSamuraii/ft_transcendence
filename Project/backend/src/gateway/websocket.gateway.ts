@@ -39,13 +39,7 @@ export class MessagingGateway implements OnGatewayConnection {
                 this.sessions.setUserSocket(identifiedUser.id, client);
                 
                 // PING my user
-                // this.startPingTest(client);
-                
-                // const userSocket = this.sessions.getUserSocket(identifiedUser.id);
-                // this.server.to(userSocket.id.toString()).emit('ping')
-                // , (arg) => {
-                //     console.log(arg); // world
-                //   });
+                this.initPing(client);
             }
             // To make my userSocket join all the room the user is member of
             const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
@@ -56,12 +50,20 @@ export class MessagingGateway implements OnGatewayConnection {
 
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
-        this.server.on("connection", (client) => {
-            console.log("ping the client");
-            client.on("ping", (arg) => {
-              console.log(arg); // pong
-            });});
+
+        // Listen for "pong" event from the client
+        client.on('pong', (message: string) => {
+            console.log(`Received pong from user ${client.user?.id} with message: ${message}`);
+            // Handle the pong response as needed
+        });
+        
         return;
+    }
+
+    // Initialization method to emit ping once
+    initPing(client: AuthenticatedSocket) {
+        console.log("ping the client");
+        this.server.to(client.id.toString()).emit('ping');
     }
 
     ////////////////////// PRIVATE METHODE //////////////////////

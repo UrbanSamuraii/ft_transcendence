@@ -12,9 +12,9 @@ export class WebsocketAdapter extends IoAdapter {
             next();
         });
 
-        server.on('pong', (client: AuthenticatedSocket) => {
-            console.log(`Received pong from user ${client.user?.id}`);
-        })
+        // server.on('pong', (client: AuthenticatedSocket) => {
+        //     console.log(`Received pong from user ${client.user?.id}`);
+        // })
 
         return server;
     }

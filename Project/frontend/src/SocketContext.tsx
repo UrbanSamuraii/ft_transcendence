@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useRef, Dispatch, SetStateAction, useEffect } from 'react';
-import { FALSE } from 'sass';
+// import { FALSE } from 'sass';
 import io, { Socket } from 'socket.io-client';
 
 type SocketContextType = {
@@ -34,13 +34,13 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
         
         setSocket(socketConnection);
 
-        // ping from server
-        socketConnection.emit("ping", "pong");
-        // () => {
-        //     console.log('Received ping from server');
-        //     socketConnection.emit('pong', 'pong message');
-        //     console.log('Sent pong to server');
-        // });
+        socketConnection.on('ping', () => {
+            console.log('Received ping from server');
+            // Respond with a pong
+            socketConnection.emit('pong', 'pong message');
+            console.log('Sent pong to server');
+        });
+        
 
         socketConnection.on('disconnect', (reason) => {
             console.log("Socket disconnected, reason:", reason);
@@ -51,6 +51,12 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
                 console.log("Socket disconnected... attempting to reconnect");
             }
         });
+
+        // Emit the "ping" event only once on connection
+        // socketConnection.on("connect", () => {
+        //     console.log("Connected to the server, emitting ping");
+        //     socketConnection.emit("ping", "pong");
+        // });
 
 
         return () => {
