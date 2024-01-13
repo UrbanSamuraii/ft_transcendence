@@ -263,6 +263,9 @@ export class UserService {
     //////////////// FRIENDSHIP RELATIONS //////////////////
 
     async addNewFriend(userId: number, targetId: number) {
+        const isFriend = await this.isAlreadyFriend(userId, targetId);
+        if (isFriend) { return false; }
+
         await this.prisma.user.update({
             where: { id: userId },
             data: { friends: { connect: [{ id: targetId }] }, },
@@ -271,7 +274,44 @@ export class UserService {
             where: { id: targetId },
             data: { friendOf: { connect: [{ id: userId }] } },
         });
+        return true;
     }
+
+    async removeFriend(userId: number, targetId: number) {
+        const isFriend = await this.isAlreadyFriend(userId, targetId);
+        if (!isFriend) { return false; }
+
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { friends: { disconnect: [{ id: targetId }] }, },
+        });
+        await this.prisma.user.update({
+            where: { id: targetId },
+            data: { friendOf: { disconnect: [{ id: userId }] } },
+        });
+        return true;
+    }
+
+
+    async isAlreadyFriend(userId: number, targetId: number) {
+        const friend = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { friends: { where: { id: targetId }} },
+          });
+          return !!friend?.friends.length;
+    }
+
+    async getUserFriendsList(userId: number): Promise<User[] | null> {
+		const user = await this.prisma.user.findUnique({
+		  where: { id: userId },
+		  include: { friends: true },
+		});
+		if (user) {
+			const friendsList = user.friends;
+		    return friendsList; 
+		} 
+		else { return null; }
+	}
 
     //////////////// 2FA SETTNGS //////////////////
 

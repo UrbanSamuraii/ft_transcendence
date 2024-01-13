@@ -24,8 +24,11 @@ export class MessagingGateway implements OnGatewayConnection {
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
         private readonly sessions: GatewaySessionManager,
-        private readonly prismaService: PrismaService,
+        private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
+
+    private readonly pingInterval = 4000; // 5 seconds
+    private readonly pongTimeout = 2000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -38,8 +41,8 @@ export class MessagingGateway implements OnGatewayConnection {
                 client = this.associateUserToAuthSocket(client, identifiedUser);
                 this.sessions.setUserSocket(identifiedUser.id, client);
                 
-                // PING my user
-                this.initPing(client);
+                // start to PING my user
+                this.startPingRoutine(client);
             }
             // To make my userSocket join all the room the user is member of
             const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
@@ -50,20 +53,54 @@ export class MessagingGateway implements OnGatewayConnection {
 
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
-
-        // Listen for "pong" event from the client
-        client.on('pong', (message: string) => {
-            console.log(`Received pong from user ${client.user?.id} with message: ${message}`);
-            // Handle the pong response as needed
-        });
         
         return;
     }
 
-    // Initialization method to emit ping once
-    initPing(client: AuthenticatedSocket) {
+    private startPingRoutine(client: AuthenticatedSocket) {
+        console.log(`Start ping routine for user ${client.user?.id}`);
+
+        const pingRoutine = () => {
+            this.pingClient(client);
+
+            const pongTimeoutId = setTimeout(() => {
+                console.log(`Pong not received from user ${client.user?.id} within timeout`);
+                this.handlePongTimeout(client);
+                console.log("Client offline");
+            }, this.pongTimeout);
+
+            // Listen for pong from the client
+            client.once('pong', () => {
+                console.log(`Received pong from user ${client.user?.id}`);
+                clearTimeout(pongTimeoutId);
+                this.handlePongInTime(client);
+                console.log("Client online");
+                pingRoutine();
+            });
+        };
+
+        pingRoutine();
+    }
+
+    pingClient(client: AuthenticatedSocket) {
         console.log("ping the client");
         this.server.to(client.id.toString()).emit('ping');
+    }
+
+    async handlePongInTime(client: AuthenticatedSocket) {
+        const user = client.user;
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'ONLINE' },
+        });
+    }
+
+    async handlePongTimeout(client: AuthenticatedSocket) {
+        const user = client.user;
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'OFFLINE' },
+        });
     }
 
     ////////////////////// PRIVATE METHODE //////////////////////
