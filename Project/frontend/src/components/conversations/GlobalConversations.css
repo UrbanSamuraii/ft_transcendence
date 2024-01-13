@@ -44,7 +44,7 @@
 .form-Create-Conversation {
 	display: block;
 	width: 430px;
-	height: 330px;
+	height: 320px;
 	background-color: rgb(33, 34, 36);
 	text-align: center; 
 	display: flex;
@@ -64,8 +64,21 @@
 }
 
 .button-createConv-container {
-	padding: 15px;
-	height: 90px;
+	padding: 40px;
+	height: 50px;
+}
+
+.button-add-user {
+	background-color: #ababb4;
+	color: #181c50;
+	border: none;
+	padding: 10px 0px;
+	font-size: 15px;
+	border-radius: 10px;
+	height: 40px;
+	width: 120px;
+	cursor: pointer;
+	margin-top: 20px; 
 }
 
 /* To allow user to create / join a conv or block a user */

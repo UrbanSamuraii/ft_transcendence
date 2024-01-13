@@ -259,11 +259,8 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('signout')
     async signoutApp(payload: any) {
-        console.log("SIGNOUT payload", payload.id)
         const user = await this.userService.getUserById(payload.id);
-        console.log("SIGNOUT User", user);
         const userSocket = await this.sessions.getUserSocket(user.id);
-        console.log("userSocket", userSocket.id.toString());
         this.server.to(userSocket.id.toString()).emit('signout');
     }
 }

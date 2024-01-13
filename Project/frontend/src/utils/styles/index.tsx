@@ -251,17 +251,19 @@ export const ButtonCreateConv = styled.button`
   border-radius: 5px;
   height: 40px;
   width: 200px;
+  margin-bottom: 40px; 
 `;
 
 export const ButtonAddUser = styled.button`
-  background-color: #3c3c9c;
+  background-color: ##181c50;
   color: #fff; 
   border: none;
   padding: 0px 0px; 
-  font-size: 12px; 
-  border-radius: 0px;
+  font-size: 15px; 
+  border-radius: 5px;
   height: 30px;
-  width: 100px;
+  width: 120px;
+  cursor: pointer;
 `;
 
 export const MessageContainerStyle = styled.div`

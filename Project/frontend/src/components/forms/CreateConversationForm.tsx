@@ -26,8 +26,9 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = event.target;
+		console.log("Input change detected", value);
 		setConvDataInput((prevData) => ({
-		  ...prevData,
+			...prevData,
 		  [name]: value,
 		}));
 		setFormErrors((prevErrors) => ({
@@ -37,8 +38,6 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 	};
 
 	const handleAddUser = () => {
-		// console.log("ADD USER:");
-		// console.log({"username INPUT FORM": ConvDataInput.currentUsername});
 		if (ConvDataInput.currentUsername.trim() !== '') {
 		  	setConvDataInput((prevData) => ({
 			...prevData,
@@ -52,14 +51,12 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	const handleCreateConversation = async (e: React.FormEvent) => {
 		e.preventDefault();
+		// console.log("Conv Data Input name", ConvDataInput.name);
+		// console.log("Conv Data Input users length", ConvDataInput.users);
 		const newErrors: Partial<ConvDataInput> = {};
-		if (!ConvDataInput.name || ConvDataInput.users.length === 0) {
-			newErrors.name = 'Conversation Name is required';
-			newErrors.currentUsername = 'At least one User is required';
-		  }
-		if (Object.keys(newErrors).length > 0) {
-		  setFormErrors(newErrors);
-		} 
+		if (!ConvDataInput.name ) { newErrors.name = 'Conversation Name is required'; }
+		else if (ConvDataInput.users.length === 0) { newErrors.currentUsername = 'At least one User is required'; }
+		if (Object.keys(newErrors).length > 0) { setFormErrors(newErrors); } 
 		else {
 			try {
 				// console.log({"DATA" : ConvDataInput});
@@ -110,11 +107,11 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 						<InputField
 						type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange} />
 					</InputLabel>
-					<ButtonAddUser type="button" onClick={handleAddUser}>
-            			Add User
-          			</ButtonAddUser>
 						{formErrors.currentUsername && <div className="error-message">{formErrors.currentUsername}</div>}
 				</InputContainer>
+				<button className="button-add-user" type="button" onClick={handleAddUser}>
+  					Add User
+				</button>
 			</div>
 
 			<div className="button-createConv-container">
