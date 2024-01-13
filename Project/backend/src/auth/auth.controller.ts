@@ -7,10 +7,13 @@ import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService, private userService: UserService) { }
+    constructor(private authService: AuthService, 
+        private eventEmitter: EventEmitter2,
+        private userService: UserService) { }
 
     @UseGuards(FortyTwoAuthGuard)
     @Get('signup42')
@@ -41,6 +44,8 @@ export class AuthController {
     @Get('signout')
     async signout(@Req() req, @Res() res: ExpressResponse) {
         try {
+            const user = await this.userService.getUserByToken(req.cookies.token);
+            this.eventEmitter.emit('signout', user);
             res.clearCookie('token');
             return res.status(200).json({ message: 'Logout successful' });
 

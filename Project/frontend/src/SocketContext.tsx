@@ -36,12 +36,10 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
 
         socketConnection.on('ping', () => {
             console.log('Received ping from server');
-            // Respond with a pong
             socketConnection.emit('pong', 'pong message');
             console.log('Sent pong to server');
         });
         
-
         socketConnection.on('disconnect', (reason) => {
             console.log("Socket disconnected, reason:", reason);
             if (reason === "io server disconnect" || reason === "io client disconnect") {
@@ -51,14 +49,12 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
                 console.log("Socket disconnected... attempting to reconnect");
             }
         });
-
-        // Emit the "ping" event only once on connection
-        // socketConnection.on("connect", () => {
-        //     console.log("Connected to the server, emitting ping");
-        //     socketConnection.emit("ping", "pong");
-        // });
-
-
+       
+        socketConnection.on('signout', () => {
+            console.log('Client signout from the app');
+            socketConnection.disconnect();
+        });
+    
         return () => {
             socketConnection.disconnect();
         };

@@ -27,8 +27,8 @@ export class MessagingGateway implements OnGatewayConnection {
         private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
 
-    private readonly pingInterval = 4000; // 5 seconds
-    private readonly pongTimeout = 2000; // 3 seconds
+    private readonly pingInterval = 10000; // 5 seconds
+    private readonly pongTimeout = 6000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -70,16 +70,21 @@ export class MessagingGateway implements OnGatewayConnection {
             }, this.pongTimeout);
 
             // Listen for pong from the client
-            client.once('pong', () => {
+            client.once('pong', async () => {
                 console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
                 this.handlePongInTime(client);
                 console.log("Client online");
+                await this.sleep(this.pingInterval);
                 pingRoutine();
             });
         };
 
         pingRoutine();
+    }
+
+    async sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     pingClient(client: AuthenticatedSocket) {
@@ -252,44 +257,13 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(userSocket.id.toString()).emit('onUnbanUser');
     }
 
-    // private readonly pingInterval = 1000; // 1 seconds
-    // // @OnEvent('startPingTest')
-    // private startPingTest(client: AuthenticatedSocket) {
-    //     console.log(`Start ping test for user ${client.user?.id}`);
-        
-    //     const pingIntervalId = setInterval(() => {
-    //         // this.server.to(client.id.toString()).emit('ping');
-    //         if (client.connected) {
-    //             client.on('ping', (arg) => {
-    //                 console.log(arg); // pong
-    //             });
-    //             this.prismaService.user.update({
-    //                 where: { id: client.user?.id },
-    //                 data: { status: 'ONLINE' },
-    //             });
-    //             console.log(`Ping emited to ${client.user?.id}.`);
-    //         } else {
-    //             console.log(`Pong not received from user ${client.user?.id} within timeout`);
-    //             clearInterval(pingIntervalId); // Stop ping test if client is no longer connected
-    //             this.handlePongTimeout(client); // Set his status to Offline 
-    //         }
-    //     }, this.pingInterval);
-    // }
-
-    // @OnEvent('pong')
-    // handlePong(client: AuthenticatedSocket) {
-    //     console.log(`Received pong from user ${client.user?.id}`);
-    //     this.prismaService.user.update({
-    //         where: { id: client.user?.id },
-    //         data: { status: 'ONLINE' },
-    //     });
-    // }
-
-    // private handlePongTimeout(client: AuthenticatedSocket) {
-    //     console.log(`Pong not received from user ${client.user?.id} within timeout`);
-    //     this.prismaService.user.update({
-    //       where: { id: client.user?.id },
-    //       data: { status: 'OFFLINE' },
-    //     });
-    //   }
+    @OnEvent('signout')
+    async signoutApp(payload: any) {
+        console.log("SIGNOUT payload", payload.id)
+        const user = await this.userService.getUserById(payload.id);
+        console.log("SIGNOUT User", user);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        console.log("userSocket", userSocket.id.toString());
+        this.server.to(userSocket.id.toString()).emit('signout');
+    }
 }
