@@ -23,10 +23,10 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
     const [conversationId, setConversationId] = useState<number | null>(null);
     const [reinitializeSocket, setReinitializeSocket] = useState(false);
 
-    const server_adress = process.env.REACT_APP_SERVER_ADRESS;
-    const serverAddress = window.location.hostname === 'localhost' ?
-        'http://localhost:3001' :
-        `http://${server_adress}:3001`;
+    const serverAddress = process.env.REACT_APP_SERVER_ADRESS || 'http://localhost:3001';
+    // const serverAddress = window.location.hostname === 'localhost' ?
+    //     'http://localhost:3001' :
+    //     `http://${server_adress}:3001`;
 
     useEffect(() => {
         const socketConnection = io(serverAddress, { withCredentials: true });
