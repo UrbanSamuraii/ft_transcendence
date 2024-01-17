@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { PageProps } from './styleType';
+import React, { MouseEvent, useState } from 'react';
 
 export const CSB_WIDTH: number = 350;
 export const NAVBAR_HEIGHT: number = 2; // define in rem
@@ -440,6 +441,18 @@ const FriendItemContainer = styled.div`
   display: flex;
   align-items: center;
   background-color: #4e4747;
+  position: relative;
+`;
+
+const ContextMenuButton = styled.button`
+  position: absolute;
+  top: 4px;
+  right: 10px;
+  background-color: rgba(255, 0, 0, 0.5); /* Red with 50% transparency */
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
 `;
 
 const BlueCircle = styled.div`
@@ -461,13 +474,41 @@ const Username = styled.div`
   font-size: 20px; /* Adjust the font size as needed */
 `;
 
-export const FriendItem: React.FC<{ friend: Record<string, any> }> = ({ friend }) => {
+interface FriendItemProps {
+  friend: {
+    id: number;
+    username: string;
+    status: string;
+  };
+  removeFriend: (friendId: number) => void;
+}
+
+export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) => {
   const { id, username, status } = friend;
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
+
+  const handleMouseEnter = () => {
+    setShowDeleteButton(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowDeleteButton(false);
+  };
+
+  const handleRemoveFriend = () => {
+    removeFriend(id);
+    setShowDeleteButton(false);
+  };
 
   return (
-    <FriendItemContainer>
+    <FriendItemContainer
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}>
       <BlueCircle />
       <Username>{username}</Username>
+      {showDeleteButton && (
+        <ContextMenuButton onClick={handleRemoveFriend}>Remove from friends</ContextMenuButton>
+      )}
       <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
     </FriendItemContainer>
   );

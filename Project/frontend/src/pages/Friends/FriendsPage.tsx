@@ -1,9 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Friendspage,FriendsListContainer, FriendsListTitle, FriendItem } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
-import { getFriendsList } from '../../utils/hooks/getFriendsList'
+import { getFriendsList } from '../../utils/hooks/getFriendsList';
+
 
 export const FriendsPage = () => {
 
@@ -30,6 +32,16 @@ export const FriendsPage = () => {
         };
     }, [chatSocketContextData]);
 
+    const handleRemoveFriend = async (friendId: number) => {
+        try {
+          const removed_friend = await axios.post('http://localhost:3001/users/remove_friend', { friendId: friendId }, {
+            withCredentials: true,
+        });
+        } catch (error) {
+          console.error('Error removing friend:', error);
+        }
+      };
+
     return (
         <Friendspage>
             <FriendsListContainer>
@@ -43,6 +55,7 @@ export const FriendsPage = () => {
                         username: friend.username,
                         status: friend.status,
                         }}
+                        removeFriend={handleRemoveFriend}
                     />
                     ))}
                 </div>

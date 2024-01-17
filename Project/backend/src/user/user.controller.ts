@@ -80,7 +80,7 @@ export class UserController {
     @Post('remove_friend')
 	async RemoveFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		const target = await this.userService.getUserById(req.body.friendId);
 		if (!target) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
