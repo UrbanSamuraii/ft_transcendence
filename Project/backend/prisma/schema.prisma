@@ -44,6 +44,8 @@ model User {
     blockedUsers User[] @relation("blockedUsers")
     blockedBy    User[] @relation("blockedUsers")
 
+    invited_by  User[]  @relation("invitedBy")
+    inviting    User[]  @relation("invitedBy")
     friends     User[]  @relation("FriendsRelation")
     friendOf    User[]  @relation("FriendsRelation")
     status      status_t?  @default(OFFLINE)

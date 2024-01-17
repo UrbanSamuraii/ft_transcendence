@@ -262,17 +262,49 @@ export class UserService {
 
     //////////////// FRIENDSHIP RELATIONS //////////////////
 
+    async sendInvitation(userId: number, targetId: number) {
+        const isFriend = await this.isAlreadyFriend(userId, targetId);
+        if (isFriend) { return false; }
+
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { invited_by: { connect: [{ id: targetId }] }, },
+        });
+        await this.prisma.user.update({
+            where: { id: targetId },
+            data: { inviting: { connect: [{ id: userId }] } },
+        });
+        return true;
+    }
+
+    async declineInvitation(userId: number, targetId: number) {
+        const isFriend = await this.isAlreadyFriend(userId, targetId);
+        if (isFriend) { return false; }
+
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { invited_by: { disconnect: [{ id: targetId }] }, },
+        });
+        await this.prisma.user.update({
+            where: { id: targetId },
+            data: { inviting: { disconnect: [{ id: userId }] } },
+        });
+        return true;
+    }
+
     async addNewFriend(userId: number, targetId: number) {
         const isFriend = await this.isAlreadyFriend(userId, targetId);
         if (isFriend) { return false; }
 
         await this.prisma.user.update({
             where: { id: userId },
-            data: { friends: { connect: [{ id: targetId }] }, },
+            data: { friends: { connect: [{ id: targetId }] },
+                    invited_by: { disconnect: [{id: targetId}]} },
         });
         await this.prisma.user.update({
             where: { id: targetId },
-            data: { friendOf: { connect: [{ id: userId }] } },
+            data: { friendOf: { connect: [{ id: userId }] },
+                    inviting: { disconnect: [{id: targetId}]} },
         });
         return true;
     }

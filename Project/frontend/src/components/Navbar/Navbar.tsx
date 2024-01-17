@@ -48,6 +48,7 @@ function Navbar() {
                                     <Link to={`/@/${user.username}`}>Profile</Link>
                                     <Link to="/ConversationPage">Chat</Link>
                                     <Link to="/preferences">Preferences</Link>
+                                    <Link to="/Friends">Friends</Link>
                                     <Link to="/signout">Sign out</Link>
                                     {/* <button onClick={handleSignoutClick}>Sign Out</button> */}
                                 </div>

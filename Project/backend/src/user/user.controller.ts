@@ -18,6 +18,36 @@ export class UserController {
         return user;
     }
 
+    @Post('send_invitation')
+	async InviteNewFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		if (!target) {
+			res.status(400).json({ message: "User not found." }); return;}
+		else {
+            const invitation_sent = await this.userService.sendInvitation(user.id, target.id);
+            if (invitation_sent) {
+                res.status(201).json({ message: "Invitation has been sent." }); return;} 
+            else {
+                res.status(400).json({ message: "This user is already a friend." }); return;} 
+        }
+    }
+
+    @Post('refuse_invitation')
+	async DeclineInvitation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		if (!target) {
+			res.status(400).json({ message: "User not found." }); return;}
+		else {
+            const decline_invitation = await this.userService.declineInvitation(user.id, target.id);
+            if (decline_invitation) {
+                res.status(201).json({ message: "Invitation has been declined." }); return;} 
+            else {
+                res.status(400).json({ message: "An issue on the invitation has raised." }); return;} 
+        }
+    }
+
     @Post('add_friend')
 	async AddNewFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);

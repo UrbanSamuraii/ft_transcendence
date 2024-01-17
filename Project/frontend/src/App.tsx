@@ -11,6 +11,7 @@ import { Signup } from './pages/Signup';
 import Signout from './pages/Signout/Signout';
 import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
+import { FriendsPage } from './pages/Friends/FriendsPage';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { TwoFAEnablingPage } from './pages/TwoFAEnablingPage';
 import { TwoFADisablingPage } from './pages/TwoFADisablingPage';
@@ -48,7 +49,7 @@ const routeBackgroundStyles: RouteBackgroundStyles = {
     '/game': { background: '#1a1a1a' },
     '/add-user': { background: '#1a1a1a)' },
     '/signup': { background: '#1a1a1a' },
-    // '/Login': { background: '#1a1a1a' },
+    '/Friends': { background: '#1a1a1a' },
     '/login': {
         background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
         backgroundSize: 'cover',
@@ -140,15 +141,15 @@ function Content({ setBackgroundStyle }: ContentProps) {
             <Route path="/powerpong/:id" element={<PowerPongGame />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/ConversationPage" element={<ConversationPage />} >
-                <Route path="channel/:id" element={<ConversationChannelPage />} />
-            </Route>
-            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
             <Route path="/" element={<HomePage />} />
-
             {/* Protected routes */}
             {user && (
                 <>
+                    <Route path="/ConversationPage" element={<ConversationPage />} >
+                        <Route path="channel/:id" element={<ConversationChannelPage />} />
+                    </Route>
+                    <Route path="/Friends" element={<FriendsPage />} />
+                    <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
                     <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
