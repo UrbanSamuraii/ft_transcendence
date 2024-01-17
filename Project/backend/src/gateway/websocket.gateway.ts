@@ -263,4 +263,14 @@ export class MessagingGateway implements OnGatewayConnection {
         const userSocket = await this.sessions.getUserSocket(user.id);
         this.server.to(userSocket.id.toString()).emit('signout');
     }
+
+    @OnEvent('friend')
+    async changeInFriendRelations(payload: any) {
+        const user = await this.userService.getUserById(payload.userId);
+        const target = await this.userService.getUserById(payload.targetId);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        const targetSocket = await this.sessions.getUserSocket(target.id);
+        this.server.to(userSocket.id.toString()).emit('changeInFriendship');
+        this.server.to(targetSocket.id.toString()).emit('changeInFriendship');
+    }
 }

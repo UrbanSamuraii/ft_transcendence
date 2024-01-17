@@ -1,50 +1,52 @@
 import { Outlet } from 'react-router-dom';
-import { Page } from '../../utils/styles';
-import { ConversationSidebar } from '../../components/conversations/ConversationSidebar';
 import { useParams } from 'react-router-dom';
-import { ConversationPanel } from '../../components/conversations/ConversationPannel';
-import { ConversationMessage } from "../../utils/types";
 import { useEffect, useState, useContext } from 'react';
-import { getConversations } from '../../utils/hooks/getConversations';
+import { Friendspage,FriendsListContainer, FriendsListTitle, FriendItem } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
+import { getFriendsList } from '../../utils/hooks/getFriendsList'
 
 export const FriendsPage = () => {
 
-    const { id } = useParams();
-    // const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
-    // const { socket, isLastMessageDeleted } = useSocket();  
     const chatSocketContextData = useSocket();
+    const [friendsList, setFriendsList] = useState<any[]>([]);
 
-    // useEffect(() => {
-    //     const fetchConversations = async () => {
-    //         console.log("ConversationPage WORKING ON");
-    //         try {
-    //             const prismaConversations = await getConversations();
-    //             // console.log("Fetched Conversations: ", prismaConversations);
-    //             setPrismaConversations(prismaConversations);
-    //         } catch (error) {
-    //             console.error('Error fetching conversations:', error);
-    //         }
-    //     };
-    //     fetchConversations();
+    useEffect(() => {
+        const fetchFriendsList = async () => {
+            console.log("FriendsPage WORKING ON");
+            try {
+                const friendsList = await getFriendsList();
+                console.log("Fetched Friends List: ", friendsList);
+                setFriendsList(friendsList);
+            } catch (error) {
+                console.error('Error fetching friends list:', error);
+            }
+        };
+        fetchFriendsList();
 
-    //     chatSocketContextData?.socket?.on('onNewMessage', fetchConversations);
-    //     chatSocketContextData?.socket?.on('onJoinRoom', fetchConversations);
-    //     chatSocketContextData?.socket?.on('onRemovedMember', fetchConversations);
-    //     chatSocketContextData?.socket?.on('onBeingBlockedorBlocked', fetchConversations);
-    //     return () => {
-    //         chatSocketContextData?.socket?.off('onNewMessage', fetchConversations);
-    //         chatSocketContextData?.socket?.off('onJoinRoom', fetchConversations);
-    //         chatSocketContextData?.socket?.off('onRemovedMember', fetchConversations);
-    //         chatSocketContextData?.socket?.off('onBeingBlockedorBlocked', fetchConversations);
-    //     };
-    // }, [chatSocketContextData.socket, chatSocketContextData, isLastMessageDeleted]);
+        const socket = chatSocketContextData?.socket;
+        if (socket) { socket.on('changeInFriendship', fetchFriendsList) }
+        return () => {
+            if (socket) { socket.off('changeInFriendship', fetchFriendsList) }
+        };
+    }, [chatSocketContextData]);
 
     return (
-        <Page>
-            {/* <ConversationSidebar conversations={prismaConversations} />
-            {!id && <ConversationPanel />}
-            <Outlet /> */}
-        </Page>
+        <Friendspage>
+            <FriendsListContainer>
+                <FriendsListTitle>Friends</FriendsListTitle>
+                <div>
+                    {friendsList.map((friend) => (
+                    <FriendItem
+                        key={friend.id}
+                        friend={{
+                        id: friend.id,
+                        username: friend.username,
+                        status: friend.status,
+                        }}
+                    />
+                    ))}
+                </div>
+            </FriendsListContainer>
+        </Friendspage>
     );
 };

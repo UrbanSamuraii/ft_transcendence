@@ -393,3 +393,82 @@ border: none;
 border-radius: 4px;
 cursor: pointer;
 `;
+
+/////// Friend Page ///////
+
+export const Friendspage = styled.div`
+  width: 100%;
+  background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const FriendsListContainer = styled.div`
+  width: 40%;
+  height: 70%;
+  background-color: #3d3434;
+  margin-left: -40%;
+  border-radius: 8px;
+  overflow-y: auto; /* SCROLLBAR */
+  
+  &::-webkit-scrollbar {
+    width: 2px; /* Adjust the width as needed */
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Make the thumb transparent */
+    border: 1px solid #000; /* Thin black line around the thumb */
+  }
+`;
+
+export const FriendsListTitle = styled.div`
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const FriendItemContainer = styled.div`
+  padding: 30px;
+  border-bottom: 1px solid #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  background-color: #4e4747;
+`;
+
+const BlueCircle = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: blue;
+  margin-right: 30px;
+`;
+
+const StatusCircle = styled.div`
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin-left: auto;
+`;
+
+const Username = styled.div`
+  font-size: 20px; /* Adjust the font size as needed */
+`;
+
+export const FriendItem: React.FC<{ friend: Record<string, any> }> = ({ friend }) => {
+  const { id, username, status } = friend;
+
+  return (
+    <FriendItemContainer>
+      <BlueCircle />
+      <Username>{username}</Username>
+      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
+    </FriendItemContainer>
+  );
+};
