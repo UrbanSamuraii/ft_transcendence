@@ -24,7 +24,7 @@ export class UserController {
 	async InviteNewFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
-		if (!target) {
+		if (!target || target.id == user.id) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
             const invitation_sent = await this.userService.sendInvitation(user.id, target.id);
@@ -42,7 +42,7 @@ export class UserController {
     @Post('refuse_invitation')
 	async DeclineInvitation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		const target = await this.userService.getUserById(req.body.invitationId);
 		if (!target) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
@@ -58,10 +58,18 @@ export class UserController {
         }
     }
 
+    @Get('get_invitations')
+	async GetInvitationsList(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const invitationsList = await this.userService.getInvitations(user.id);
+        if (invitationsList) { return invitationsList; } 
+		else { throw new HttpException('Friend List not found', HttpStatus.NOT_FOUND); }
+    }
+
     @Post('add_friend')
 	async AddNewFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
+		const target = await this.userService.getUserById(req.body.invitationId);
 		if (!target || !user) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {

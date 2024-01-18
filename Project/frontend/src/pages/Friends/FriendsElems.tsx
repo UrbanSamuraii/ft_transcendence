@@ -16,10 +16,10 @@ export const MainContentContainer = styled.div`
 `;
 
 export const FriendsListContainer = styled.div`
-  width: 100%;
-  height: 70%;
-  background-color: #3d3434;
-  margin-left: -50%;
+  width: 150%;
+  height: 500px;
+  background-color: rgba(39, 39, 39, 0.7);
+  margin-left: -80%;
   border-radius: 8px;
   overflow-y: auto; /* SCROLLBAR */
   
@@ -33,7 +33,7 @@ export const FriendsListContainer = styled.div`
 `;
 
 export const FriendsListTitle = styled.div`
-  background-color: #333;
+  background-color: rgba(39, 39, 39, 0.7);
   color: white;
   padding: 10px;
   text-align: center;
@@ -124,15 +124,31 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
   );
 };
 
+//////////////////////////////////////////////////////////////
+				///////// INVITATION /////////
+//////////////////////////////////////////////////////////////
+
+
+export const InvitationContainer = styled.div`
+  display: flex;
+  flex-direction: column; 
+  width: 40%; 
+  margin-left: 30px; 
+`;
+
+
 ///////// INVITATION BAR /////////
 
 export const InvitationBarContainer = styled.div`
+  width: 130%;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding: 10px;
   background-color: rgba(169, 169, 169, 0.5); /* Grey transparent 50% */
-  margin-left: 100px; /* Push to the right */
+  margin-left: 100px;
+  margin-right: -100px;
 `;
 
 const Input = styled.input`
@@ -146,10 +162,12 @@ const Message = styled.div`
 `;
 
 export const SendButton = styled.button`
-  background-color: #999;
+  height: 20%;  
+  background-color: #222;
   color: white;
+  margin-top: 5px;
   border: none;
-  padding: 50px 10px;
+  padding: 10px 10px;
   cursor: pointer;
 `;
 
@@ -189,3 +207,94 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 	</div>
   );
 };
+
+///////// INVITATION LIST /////////
+
+
+export const InvitationsListContainer = styled.div`
+width: 200%;
+height: 350px;
+background-color: rgba(69, 69, 69, 0.5);;
+border-radius: 8px;
+overflow-y: auto; /* SCROLLBAR */
+margin-left: 100px;
+margin-right: -100px;
+margin-top: 30px;
+
+&::-webkit-scrollbar {
+	width: 2px; /* Adjust the width as needed */
+}
+&::-webkit-scrollbar-thumb {
+	background-color: transparent; /* Make the thumb transparent */
+    border: 1px solid #000; /* Thin black line around the thumb */
+}
+`;
+
+const InvitationItemContainer = styled.div`
+  padding: 10px;
+  border-bottom: 1px solid #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  background-color: #4e4747;
+  position: relative;
+`;
+
+const ActionButton = styled.button`
+  border: none;
+  color: white;
+  margin-left: 10px;
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+`;
+
+const AcceptButton = styled(ActionButton)`
+  background-color: #24703b;
+  margin-left: 90px;
+  &:before {
+    content: '✔';
+  }
+`;
+
+const RefuseButton = styled(ActionButton)`
+  background-color: #ad2929;
+  &:before {
+    content: '✖';
+  }
+`;
+
+const invitUsername = styled.div`
+  font-size: 20px; /* Adjust the font size as needed */
+`;
+
+interface InvitationItemProps {
+	invitation: {
+	  id: number;
+	  username: string;
+	};
+	acceptInvitation: (invitationId: number) => void;
+	refuseInvitation: (invitationId: number) => void;
+  }
+  
+  export const InvitationItem: React.FC<InvitationItemProps> = ({ invitation, acceptInvitation, refuseInvitation }) => {
+	const { id, username } = invitation;
+
+	const handleRefuseInvitation = () => {
+		refuseInvitation(id);
+	};
+
+	const handleAcceptInvitation = () => {
+		acceptInvitation(id);
+	};
+  
+	return (
+	  <InvitationItemContainer>
+		<BlueCircle />
+		<Username>{username}</Username>
+		<AcceptButton onClick={handleAcceptInvitation} />
+      	<RefuseButton onClick={handleRefuseInvitation} />
+	  </InvitationItemContainer>
+	);
+  };
+  
