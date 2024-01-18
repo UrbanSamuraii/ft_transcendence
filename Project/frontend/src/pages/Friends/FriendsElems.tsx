@@ -11,11 +11,15 @@ export const Friendspage = styled.div`
   align-items: center;
 `;
 
+export const MainContentContainer = styled.div`
+  display: flex;
+`;
+
 export const FriendsListContainer = styled.div`
-  width: 40%;
+  width: 100%;
   height: 70%;
   background-color: #3d3434;
-  margin-left: -40%;
+  margin-left: -50%;
   border-radius: 8px;
   overflow-y: auto; /* SCROLLBAR */
   
@@ -117,5 +121,71 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
       )}
       <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
     </FriendItemContainer>
+  );
+};
+
+///////// INVITATION BAR /////////
+
+export const InvitationBarContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: rgba(169, 169, 169, 0.5); /* Grey transparent 50% */
+  margin-left: 100px; /* Push to the right */
+`;
+
+const Input = styled.input`
+  margin-right: 10px;
+  padding: 5px;
+`;
+
+const Message = styled.div`
+  margin-right: auto;
+  color: white;
+`;
+
+export const SendButton = styled.button`
+  background-color: #999;
+  color: white;
+  border: none;
+  padding: 50px 10px;
+  cursor: pointer;
+`;
+
+interface InvitationBarProps {
+  sendInvitation: (invitationDetails: { usernameOrEmail: string }) => void;
+}
+
+export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) => {
+  const [inputValue, setInputValue] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    setMessage('');
+  };
+
+  const handleSendInvitation = () => {
+    if (inputValue.trim() === '') {
+      setMessage('Please enter the username or email.');
+    } else {
+      sendInvitation({ usernameOrEmail: inputValue });
+      setInputValue('');
+      setMessage('');
+    }
+  };
+
+  return (
+	<div>
+	  <Input
+		type="text"
+		placeholder="Username or Email"
+		value={inputValue}
+		onChange={handleInputChange}
+	  />
+	  <Message>{message}</Message>
+	  <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
+	</div>
   );
 };

@@ -30,8 +30,8 @@ export class UserController {
             const invitation_sent = await this.userService.sendInvitation(user.id, target.id);
             if (invitation_sent) {
                 res.status(201).json({ message: "Invitation has been sent." }); 
-                const userId = user.id;
-                const targetId = target.id;
+                const userId = user ? user.id : null;
+                const targetId = target ? target.id : null;
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
@@ -49,8 +49,8 @@ export class UserController {
             const decline_invitation = await this.userService.declineInvitation(user.id, target.id);
             if (decline_invitation) {
                 res.status(201).json({ message: "Invitation has been declined." }); 
-                const userId = user.id;
-                const targetId = target.id;
+                const userId = user ? user.id : null;
+                const targetId = target ? target.id : null;
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
@@ -62,14 +62,14 @@ export class UserController {
 	async AddNewFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
-		if (!target) {
+		if (!target || !user) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
             const friend_added = await this.userService.addNewFriend(user.id, target.id);
             if (friend_added) {
                 res.status(201).json({ message: "New friendship established." }); 
-                const userId = user.id;
-                const targetId = target.id;
+                const userId = user ? user.id : null;
+                const targetId = target ? target.id : null;
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
@@ -81,14 +81,14 @@ export class UserController {
 	async RemoveFriend(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserById(req.body.friendId);
-		if (!target) {
+		if (!target || !user) {
 			res.status(400).json({ message: "User not found." }); return;}
 		else {
             const friend_removed = await this.userService.removeFriend(user.id, target.id);
             if (friend_removed) {
                 res.status(201).json({ message: "This user have been removed from your friends." }); 
-                const userId = user.id;
-                const targetId = target.id;
+                const userId = user ? user.id : null;
+                const targetId = target ? target.id : null;
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {

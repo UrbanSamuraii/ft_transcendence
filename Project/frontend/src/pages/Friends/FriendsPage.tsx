@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState, useContext } from 'react';
-import { Friendspage,FriendsListContainer, FriendsListTitle, FriendItem } from './FriendsElems';
+import { Friendspage, MainContentContainer, InvitationBarContainer, FriendsListContainer, FriendsListTitle, FriendItem, InvitationBar} from './FriendsElems';
 import { useSocket } from '../../SocketContext';
 import { getFriendsList } from '../../utils/hooks/getFriendsList';
 
@@ -39,22 +39,37 @@ export const FriendsPage = () => {
         } catch (error) {
           console.error('Error removing friend:', error);
         }
-      };
+    };
+
+    const handleSendInvitation = async (invitationDetails: { usernameOrEmail: string }) => {
+        try {
+            const removed_friend = await axios.post('http://localhost:3001/users/send_invitation', { userName: invitationDetails.usernameOrEmail }, {
+              withCredentials: true });
+        } catch (error) {
+            console.error('Error inviting friend:', error);
+        }
+    };
+    
 
     return (
         <Friendspage>
-            <FriendsListContainer>
-                <FriendsListTitle>Friends</FriendsListTitle>
-                <div>
-                    {friendsList.map((friend) => (
-                    <FriendItem
-                        key={friend.id}
-                        friend={{ id: friend.id, username: friend.username, status: friend.status }}
-                        removeFriend={handleRemoveFriend}
-                    />
-                    ))}
-                </div>
-            </FriendsListContainer>
+            <MainContentContainer>
+                <FriendsListContainer>
+                    <FriendsListTitle>Friends</FriendsListTitle>
+                    <div>
+                        {friendsList.map((friend) => (
+                        <FriendItem
+                            key={friend.id}
+                            friend={{ id: friend.id, username: friend.username, status: friend.status }}
+                            removeFriend={handleRemoveFriend}
+                        />
+                        ))}
+                    </div>
+                </FriendsListContainer>
+                <InvitationBarContainer>
+                    <InvitationBar sendInvitation={handleSendInvitation} />
+                </InvitationBarContainer>
+            </MainContentContainer>
         </Friendspage>
     );
 };
