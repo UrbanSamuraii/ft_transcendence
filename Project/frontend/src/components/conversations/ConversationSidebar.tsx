@@ -10,7 +10,7 @@ import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
 import { BlockUserModal } from '../modals/BlockUserModal';
 import { UnblockUserModal } from '../modals/UnblockUserModal';
-import { ButtonOverlay } from '../../utils/styles';
+// import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
 type Props = {
@@ -96,13 +96,13 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                     setShowModalUnblock(false);
                     setShowMenuModal(false);
                 }} /> )}
-            <ConversationSidebarStyle>
+            <div className='sideMenuHeader'>
                 <header>
                     <div className="header-content">
                         <h2>Conversations</h2>
-                        <ButtonOverlay onClick={openMenu}>
+                        <button className='openMenuButton' onClick={openMenu}>
                             <MdPostAdd size={30} />{' '}
-                        </ButtonOverlay>
+                        </button>
                     </div>
                 </header>
                 <ConversationSidebarContainer>
@@ -122,7 +122,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                             </ConversationSidebarTexts>
                         </ ConversationSidebarItem>))}
                 </ConversationSidebarContainer>
-            </ConversationSidebarStyle>
+            </div>
         </>
     );
 };

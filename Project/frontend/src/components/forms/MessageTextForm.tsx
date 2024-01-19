@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import '../conversations/GlobalConversations.css';
 import { MessageInputFieldProps } from '../messages/MessageInputField';
 import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton, MessageSendIcon } from '../../utils/styles';
 
@@ -48,21 +49,21 @@ export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps)
   return (
     <form onSubmit={handleSubmit}>
       <MessageInputFieldStyle>
-       <MessageInputContainer>
-        <MessageInputTextArea
-          id="message-input"
-          rows={3}
-          placeholder="Type your message..."
-          spellCheck={false}
-          value={content}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyPress}
-        />
+        <MessageInputContainer>
+          <MessageInputTextArea
+            id="message-input"
+            rows={3}
+            placeholder="Type your message..."
+            spellCheck={false}
+            value={content}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyPress}
+          />
         <MessageSendButton type="submit" disabled={loading}>
-      <MessageSendIcon>📨</MessageSendIcon>
-    </MessageSendButton>
-  </MessageInputContainer>
-</MessageInputFieldStyle>
+        <MessageSendIcon>📨</MessageSendIcon>
+      </MessageSendButton>
+    </MessageInputContainer>
+    </MessageInputFieldStyle>
     </form>
   );
 };

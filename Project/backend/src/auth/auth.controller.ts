@@ -118,7 +118,8 @@ export class AuthController {
                 email: user.email,
                 totalGamesWon: user.totalGamesWon,
                 totalGamesLost: user.totalGamesLost,
-                eloRating: user.eloRating
+                eloRating: user.eloRating,
+                nbrFriends: user.friends.length
 
                 // other fields you want to include
             });

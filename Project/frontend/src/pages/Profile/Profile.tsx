@@ -4,7 +4,7 @@ import './Profile.css'
 
 function Profile() {
     const [theme, setTheme] = useState('bw-style'); // Default theme
-    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0 });
+    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0, nbrFriends: 0 });
     const { username } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
 
@@ -128,7 +128,7 @@ function Profile() {
                             <div>
                                 <div className="title">Pals</div>
                                 <i className='bx bxs-group'></i>
-                                <div className="value">todo</div>
+                                <div className="value">{userInfo.nbrFriends}</div>
                             </div>
                             <div>
                                 <div className="title">Beer</div>

@@ -1,7 +1,7 @@
 import './GlobalMessages.css';
 import axios from 'axios';
 import { useEffect, useState, FC, useRef } from "react";
-import { MessageContainerHeaderStyle } from '../../utils/styles';
+// import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../../SocketContext';
@@ -265,7 +265,8 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
                 setShowModal={() => {
                     setShowLeavingConversationModal(false);
                 }} /> )}
-			<MessageContainerHeaderStyle>
+			<div className='messagePanelHeader'>
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
 				<div className="messagePanelTitle">
 					{conversationName}
 				</div>
@@ -274,7 +275,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 				<OutsideClickHandler onOutsideClick={handleOutsideClick}>
 					{user ? (
 						<>
-								<div onClick={toggleDropdown} className="profile-name"> <HamburgerIcon />
+								<div onClick={toggleDropdown} className="profile-name"><i className='bx bxs-cog'></i>
 									{isDropdownOpen && ( <div className="dropdown-menu">
 									{isAdmin && (<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>)}
 									{isAdmin && (<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>)}
@@ -285,6 +286,11 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 									{isAdmin && (<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>)}
 									{isAdmin && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>)}
 									<button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave the conversation</button>
+									{isOwner && (<button className="convMenuButton" onClick={() => { 
+										if (isProtected) { setShowVerifyPasswordModal(true); } 
+										else { setShowNewPasswordModal(true); }
+										}}> 
+										<LockIcon /> </button>)}
 									<div className="privacy-toggle">
 										<button
 										className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
@@ -292,11 +298,6 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 										</button>
 									</div>
 									
-									{isOwner && (<button className="convMenuButton" onClick={() => { 
-										if (isProtected) { setShowVerifyPasswordModal(true); } 
-										else { setShowNewPasswordModal(true); }
-										}}> 
-										<LockIcon /> </button>)}
 								</div>
 							)}
 							</div>
@@ -307,7 +308,7 @@ export const MessagePanelHeader : FC<MessagePanelHeaderProps> = ({ conversationI
 
 				</OutsideClickHandler>
 				</div>
-			</MessageContainerHeaderStyle>
+			</div>
 		</>
 	);
 }

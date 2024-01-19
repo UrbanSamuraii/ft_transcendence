@@ -18,7 +18,7 @@ export class UserService {
         }
     }
 
-    // USE IT LIKE : const user = await this.userService.getUser({ email or username });
+
     async getUser(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where,
@@ -62,7 +62,8 @@ export class UserService {
             const user = await this.prisma.user.findUnique({
                 where: { username: username },
                 include: {
-                    gamesWon: true
+                    gamesWon: true,
+                    friends: true,
                 }
             });
             if (!user) {
@@ -379,6 +380,21 @@ export class UserService {
 		} 
 		else { return null; }
 	}
+
+    // async getNbrOfFriends(userId: number) {
+	// 	const user = await this.prisma.user.findUnique({
+    //         where: { id: userId },
+    //         include: { friends: true },
+    //     });
+    // if (user && user.friends) {
+    //     const numberOfFriends = user.friends.length;
+    //     console.log(`Number of friends: ${numberOfFriends}`);
+    //     return numberOfFriends;
+    // } else {
+    //     console.error("User or friends array not found.");
+    //     return 0;
+    // }
+    // }
 
     //////////////// 2FA SETTNGS //////////////////
 

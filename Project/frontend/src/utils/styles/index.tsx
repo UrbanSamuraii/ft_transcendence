@@ -126,6 +126,7 @@ export const ConversationSidebarStyle = styled.aside`
     & .header-content {
       display: flex;
       align-items: center;
+      color: #111;
     }
   }
 `;
@@ -135,9 +136,10 @@ export const ConversationChannelPageStyle = styled.div`
   left: 0;
   top: ${NAVBAR_HEIGHT}rem;
   width: 100%;
-  height: 90%;
+  height: 100%;
   margin-left: ${CSB_WIDTH}px; 
-  background-color: #777777;
+  background-color: gray;
+  // background-color: transparent;
 `;
 
 export const ConversationPannelStyle = styled.div`
@@ -219,29 +221,29 @@ export const OverlayContent = styled.div`
   align-items: center;
 `;
 
-export const ButtonOverlay = styled.button`
-  background-color: #1a1a1a;
-  color: #fff; 
-  border: none;
-  padding: 0px 0px; 
-  font-size: 16px; 
-  border-radius: 5px;
+// export const ButtonOverlay = styled.button`
+//   background-color: #1a1a1a;
+//   color: #fff; 
+//   border: none;
+//   padding: 0px 0px; 
+//   font-size: 16px; 
+//   border-radius: 5px;
 
-  &:hover::before {
-    content: "Click to open Conversations Menu";
-    position: absolute;
-    top: 60px;
-    left: 70%;
-    transform: translateX(-55%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    border-radius: 3px;
-    opacity: 0.8;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-`;
+//   &:hover::before {
+//     content: "Click to open Conversations Menu";
+//     position: absolute;
+//     top: 60px;
+//     left: 70%;
+//     transform: translateX(-55%);
+//     background-color: #333;
+//     color: #fff;
+//     padding: 5px;
+//     border-radius: 3px;
+//     opacity: 0.8;
+//     font-size: 14px;
+//     white-space: nowrap;
+//   }
+// `;
 
 export const ButtonCreateConv = styled.button`
   background-color: #1a1a1a;
@@ -293,43 +295,6 @@ export const MessageContainerPersonnalStyle = styled.div`
   margin-right: 100px;
 `;
 
-export const MessageContainerHeaderStyle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: black;
-  width: 100%;
-  height: 80px;
-  border-bottom: 1px solid #606060;
-
-  .messagePanelTitle {
-    margin-left: 100px;
-    color: white;
-  }
-
-  .navbar-right {
-    display: flex;
-    align-items: center;
-
-    button {
-      font-size: 8rem;
-      margin-left: 10px;
-    }
-
-    .profile-name {
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-      font-size: 8rem;
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      right: 0;
-    }
-  }
-`;
-
 export const MessageInputFieldStyle = styled.div`
   flex-grow: 1;
   min-width: 300px;   
@@ -346,11 +311,14 @@ export const MessageInputFieldStyle = styled.div`
 export const MessageInputContainer = styled.div`
   display: flex;
   width: 100%;
+  background: red;
+  // color: black;
 `;
 
 export const MessageInputTextArea = styled.textarea`
-  min-width: 200px;   
-  background: transparent;
+  min-width: 200px;
+  background: pink;
+  // color: black;
   border: none;
   color: white;
   font-size: 16px;
@@ -365,7 +333,8 @@ export const MessageInputTextArea = styled.textarea`
 
 export const MessageSendButton = styled.button`
   background: #2c333d;
-  color: white;
+  // color: pink;
+  background: black;
   border: none;
   border-radius: 50%; 
   margin-top: 5px;
