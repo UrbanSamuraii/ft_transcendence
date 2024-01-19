@@ -49,6 +49,21 @@ function Navbar() {
                 <div className='navbar-button'>
                     <Link to={`/@/${user.username}`} className='navbar-button'>{user.username}</Link>
                 </div>
+                    <>
+                        <div onClick={toggleDropdown} className="profile-name">
+                            {user.username}
+                            {isDropdownOpen && (
+                                <div className="dropdown-menu">
+                                    <Link to={`/@/${user.username}`}>Profile</Link>
+                                    <Link to="/ConversationPage">Chat</Link>
+                                    <Link to="/preferences">Preferences</Link>
+                                    <Link to="/Friends">Friends</Link>
+                                    <Link to="/signout">Sign out</Link>
+                                    {/* <button onClick={handleSignoutClick}>Sign Out</button> */}
+                                </div>
+                            )}
+                        </div>
+                    </>
                 ) : (
                     <div className='navbar-button'>
                         <button onClick={() => navigate('/login')}>SIGN IN</button>
