@@ -66,8 +66,8 @@ export class GameGateway implements OnGatewayInit {
         const expectedWinnerScore = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 400));
         const expectedLoserScore = 1 / (1 + Math.pow(10, (winnerRating - loserRating) / 400));
 
-        const newWinnerRating = winnerRating + kFactor * (1 - expectedWinnerScore);
-        const newLoserRating = loserRating + kFactor * (0 - expectedLoserScore);
+        const newWinnerRating = Math.round(winnerRating + kFactor * (1 - expectedWinnerScore));
+        const newLoserRating = Math.round(loserRating + kFactor * (0 - expectedLoserScore));
 
         return { newWinnerRating, newLoserRating };
     }
@@ -76,6 +76,8 @@ export class GameGateway implements OnGatewayInit {
         const kFactor = 32; // K-factor for ELO calculation. Adjust as needed.
         const player1Rating = await this.userService.getEloRating(player1Id);
         const player2Rating = await this.userService.getEloRating(player2Id);
+        // console.log(`player1Rating: ${player1Rating}`)
+        // console.log(`player2Rating: ${player2Rating}`)
 
         // Calculate expected scores
         const expectedScorePlayer1 = 1 / (1 + Math.pow(10, (player2Rating - player1Rating) / 400));
@@ -86,6 +88,10 @@ export class GameGateway implements OnGatewayInit {
         const potentialLossPlayer1 = Math.round(kFactor * (0 - expectedScorePlayer1));
         const potentialGainPlayer2 = Math.round(kFactor * (1 - expectedScorePlayer2));
         const potentialLossPlayer2 = Math.round(kFactor * (0 - expectedScorePlayer2));
+        // console.log(`potentialGainPlayer1: ${potentialGainPlayer1}`)
+        // console.log(`potentialLossPlayer1: ${potentialLossPlayer1}`)
+        // console.log(`potentialGainPlayer2: ${potentialGainPlayer2}`)
+        // console.log(`potentialLossPlayer2: ${potentialLossPlayer2}`)
 
         return {
             player1: { potentialEloGain: potentialGainPlayer1, potentialEloLoss: potentialLossPlayer1 },
@@ -245,6 +251,7 @@ export class GameGateway implements OnGatewayInit {
                 });
 
                 if (data.isGameOver && data.winnerUsername && data.loserUsername) {
+                    // console.log("GameOver Data:", data);
                     this.resetUserGameStatus(player1.socket.data.user.username);
                     this.resetUserGameStatus(player2.socket.data.user.username);
                     player1.socket.leave(gameId.toString());

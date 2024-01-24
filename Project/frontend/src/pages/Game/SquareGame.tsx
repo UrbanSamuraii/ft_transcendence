@@ -314,12 +314,21 @@ function SquareGame({ }) {
             // Determine if the local player is the winner or loser
             const isLocalPlayerWinner = localPlayerUsername === data.winnerUsername;
             const isLocalPlayerLoser = localPlayerUsername === data.loserUsername;
+            console.log("Is Local Player Winner:", isLocalPlayerWinner);
+            console.log("Is Local Player Loser:", isLocalPlayerLoser);
+            console.log("data.winnerEloChange:", data.winnerEloChange);
+            console.log("data.loserEloChange:", data.loserEloChange);
+
             const localPlayerCurrentElo = isLocalPlayerWinner ? data.winnerCurrentElo : (isLocalPlayerLoser ? data.loserCurrentElo : null);
-            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? -data.loserEloChange : 0);
+            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? data.loserEloChange : 0);
+            console.log("Local Player Current ELO:", localPlayerCurrentElo);
+            console.log("Local Player ELO Change:", localPlayerEloChange);
+
             const newElo = localPlayerCurrentElo + localPlayerEloChange;
+            console.log("New ELO:", newElo);
 
             ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`; // Update font size
-            const eloChangeText = `Your ELO: ${Math.round(newElo)}`;
+            const eloChangeText = `Your ELO: ${newElo}`;
             ctx.fillText(eloChangeText, textX, offsetY + eloTextOffsetY);
 
             // Draw buttons
