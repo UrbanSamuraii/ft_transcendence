@@ -307,7 +307,7 @@ function PowerPongGame({ }) {
             const isLocalPlayerWinner = localPlayerUsername === data.winnerUsername;
             const isLocalPlayerLoser = localPlayerUsername === data.loserUsername;
             const localPlayerCurrentElo = isLocalPlayerWinner ? data.winnerCurrentElo : (isLocalPlayerLoser ? data.loserCurrentElo : null);
-            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? -data.loserEloChange : 0);
+            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? data.loserEloChange : 0);
             const newElo = localPlayerCurrentElo + localPlayerEloChange;
 
             ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`; // Update font size

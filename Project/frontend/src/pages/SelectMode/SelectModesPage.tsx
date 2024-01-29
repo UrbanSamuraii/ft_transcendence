@@ -6,7 +6,6 @@ import './SelectMode.css';
 interface Champion {
     name: string;
     specialAbility: string;
-    // Add more properties as needed
 }
 
 const SelectModePage = () => {
