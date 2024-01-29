@@ -7,6 +7,7 @@ import { ForbiddenExceptionFilter } from './auth/filters/forbidden-exception.fil
 import * as cookieParser from 'cookie-parser';
 import * as passport from "passport";
 import { WebsocketAdapter } from './gateway/gateway.adapter';
+import { join } from 'path';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -30,6 +31,9 @@ async function bootstrap() {
         new UnauthorizedExceptionFilter(),
         new ForbiddenExceptionFilter(),
     );
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+        prefix: '/uploads/', // Virtual prefix to access files in the browser
+    });
     await app.listen(port);
 
     // Gracefully shutdown the server.
@@ -37,7 +41,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-
-// Instanciate a global Validation Pipe - validate the data before treating it as a paramater (dto)
-// Setting the whitelist to True to get only the data required and designed in the dto

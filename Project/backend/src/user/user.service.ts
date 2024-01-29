@@ -282,5 +282,18 @@ export class UserService {
         });
         return updateUser;
     }
+
+    async updateUserAvatar(userId: number, avatarPath: string): Promise<void> {
+        try {
+            // Assuming you are using Prisma or a similar ORM/library, update the user's avatar field in the database
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: { img_url: avatarPath },
+            });
+        } catch (error) {
+            // Handle any database-related errors here
+            throw new Error('Error updating user avatar');
+        }
+    }
 }
 

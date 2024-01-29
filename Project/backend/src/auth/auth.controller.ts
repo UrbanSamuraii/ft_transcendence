@@ -1,12 +1,15 @@
 import {
-    Controller, Post, Get, Res, UseGuards,
-    Req, Request, Param
-} from "@nestjs/common";
+    Controller, Get, UseGuards, Req, Post, UseInterceptors, UploadedFile, HttpException, HttpStatus,
+    Res, Request, Param
+} from '@nestjs/common';
 import { AuthService } from "./auth.service";
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { FortyTwoAuthGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { imageFileFilter } from '../utils/file-upload.utils';
 
 @Controller('auth')
 export class AuthController {
@@ -113,9 +116,8 @@ export class AuthController {
                 email: user.email,
                 totalGamesWon: user.totalGamesWon,
                 totalGamesLost: user.totalGamesLost,
-                eloRating: user.eloRating
-
-                // other fields you want to include
+                eloRating: user.eloRating,
+                img_url: user.img_url
             });
         } catch (error) {
             return res.status(500).json({ error: 'Internal server error' });
@@ -132,5 +134,51 @@ export class AuthController {
     @Get('/leaderboard/:username')
     async getUserLeaderboard(@Param('username') username: string) {
         return this.userService.getUserLeaderboard(username);
+    }
+
+    @Post('upload-avatar')
+    @UseInterceptors(
+        FileInterceptor('avatar', {
+            storage: diskStorage({
+                destination: './uploads', // Ensure this directory exists and is writable
+                filename: (req, file, callback) => {
+                    const uniqueName = `${Date.now()}-avatar-${file.originalname}`;
+                    callback(null, uniqueName);
+                },
+            }),
+            fileFilter: imageFileFilter,
+            limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+        }),
+    )
+
+    async uploadAvatar(@UploadedFile() file, @Req() request) {
+        const username = request.body.username; // Get the username from the request body
+
+        if (!file || !username) {
+            throw new HttpException('Error uploading file', HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Retrieve the user's ID by username using your UserService or Prisma method
+            const userId = await this.userService.getUserIdByUsername(username);
+
+            if (!userId) {
+                throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+            }
+
+            // Implement your logic to handle the file, save the path to the database, etc.
+            // For example, you can save the file path to the user's avatar field in the database.
+            const filePath = `./uploads/${file.filename}`;
+            const fileUrl = `${request.protocol}://${request.get('host')}/uploads/${file.filename}`;
+            console.log(fileUrl)
+            // Update the user's avatar using the retrieved userId
+            // await this.userService.updateUserAvatar(userId, filePath);
+            await this.userService.updateUserAvatar(userId, fileUrl); // Pass fileUrl instead of filePath
+            // return { message: 'File uploaded successfully', filePath: file.filename };
+            return { message: 'File uploaded successfully', fileUrl }; // Return fileUrl in the response
+        } catch (error) {
+            // Handle any errors that occur during file handling, user retrieval, or database update
+            throw new HttpException('Error uploading file', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

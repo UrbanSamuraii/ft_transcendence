@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 function Profile() {
     const [theme, setTheme] = useState('bw-style'); // Default theme
-    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0 });
-    const { username } = useParams(); // Extract the username from the URL
+    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0, img_url: "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png" });
+    const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
 
     useEffect(() => {
@@ -59,7 +59,7 @@ function Profile() {
     }
 
     const getEloRank = (eloRating: number): string => {
-        if (eloRating < 1000 || totalGamesPlayed == 0) {
+        if (eloRating < 1000 || totalGamesPlayed === 0) {
             return 'just beginning';
         } else if (eloRating < 1100) {
             return 'getting there';
@@ -73,6 +73,49 @@ function Profile() {
             return 'simply amazing';
         } else {
             return 'pinnacle of awesomeness';
+        }
+    };
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File is too big. Please select a file smaller than 2MB.");
+                return;
+            }
+
+            // Upload the avatar and refresh user information when it's done
+            uploadAvatar(file, username);
+        }
+    };
+
+    const uploadAvatar = async (file: File, username: string) => {
+        const formData = new FormData();
+        formData.append('avatar', file);
+        formData.append('username', username); // Include the username
+
+        try {
+            const response = await fetch(`http://${server_adress}:3001/auth/upload-avatar`, {
+                method: 'POST',
+                credentials: 'include', // To send cookies along with the request
+                body: formData // Automatically sets `Content-Type: multipart/form-data`
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                // Refresh user information after successful avatar upload
+                setUserInfo((prevUserInfo) => ({
+                    ...prevUserInfo,
+                    img_url: data.fileUrl // Update img_url with the new URL
+                }));
+                console.log(data.fileUrl);
+            } else {
+                console.error('Failed to upload avatar:', data.error);
+            }
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
         }
     };
 
@@ -91,8 +134,9 @@ function Profile() {
                     <div className={`user-card ${theme}`}>
                         <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                         <div className='profile-picture'>
-                            <img src="https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"
-                                className="rounded-image" width="135" height="135" /></div>
+                            <img src={userInfo.img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"} className="rounded-image" width="135" height="135" alt="User avatar" />
+                            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".png" onChange={handleAvatarChange} />
+                            <button onClick={() => fileInputRef.current?.click()}>Change Avatar</button>                        </div>
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
                     <div className="more-info">
