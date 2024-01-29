@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 
@@ -76,7 +76,7 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
 						Username or email
-						<InputField
+						<InputFieldCCF
 						type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} />
 						{formErrors.userToBan && <div className="error-message">{formErrors.userToBan}</div>}
 					</InputLabel>

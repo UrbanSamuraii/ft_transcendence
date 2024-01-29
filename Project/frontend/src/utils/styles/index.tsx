@@ -23,6 +23,26 @@ export const InputField = styled.input`
   }
 `;
 
+
+export const InputFieldCCF = styled.input`
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+  outline: none !important;
+  border: none !important;
+  color: white !important;
+  font-size: 18px !important;
+  text-align: center;
+  width: 100% !important;
+  padding: 0 !important;
+
+  ::placeholder {
+    color: pink !important;
+    background-color: inherit !important;
+  }
+`;
+
 export const InputContainer = styled.div`
   background-color: transparent;
   padding: 12px 16px;
@@ -246,15 +266,12 @@ export const OverlayContent = styled.div`
 // `;
 
 export const ButtonCreateConv = styled.button`
-  background-color: #1a1a1a;
-  color: #fff; 
-  border: none;
-  padding: 0px 0px; 
-  font-size: 16px; 
-  border-radius: 5px;
-  height: 40px;
-  width: 200px;
-  margin-bottom: 40px; 
+  background-color: black;
+  color: #fff;
+  font-size: 20px;
+  border-radius: 10px;
+  height: 50px;
+  width: 130px;
 `;
 
 export const ButtonAddUser = styled.button`

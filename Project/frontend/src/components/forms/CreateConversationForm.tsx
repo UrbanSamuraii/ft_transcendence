@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
@@ -87,14 +87,14 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
 	return (
 		<form className="form-Create-Conversation" onSubmit={handleCreateConversation}>
-			<h2>New Conversation</h2>
+			<h2>new chat</h2>
 			
 			<div className="input-createConv-container">
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
-						Conversation Name
-						<InputField
-						type="text" name="name" value={ConvDataInput.name} onChange={handleInputChange} />
+						enter chat name
+						<InputFieldCCF
+						className='lets-try-this' type="text" name="name" value={ConvDataInput.name} onChange={handleInputChange} />
 						{formErrors.name && <div className="error-message">{formErrors.name}</div>}
 					</InputLabel>
 				</InputContainer>
@@ -103,19 +103,19 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 			<div className="input-createConv-container">
 				<InputContainer>
 					<InputLabel htmlFor="Username(s) or email(s) of the member(s)">
-						Username(s) or email(s) of the member(s)		
-						<InputField
+						Username(s) or email(s) of the member(s)
+						<InputFieldCCF
 						type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange} />
 					</InputLabel>
 						{formErrors.currentUsername && <div className="error-message">{formErrors.currentUsername}</div>}
 				</InputContainer>
 				<button className="button-add-user" type="button" onClick={handleAddUser}>
-  					Add User
+					Add User
 				</button>
 			</div>
 
 			<div className="button-createConv-container">
-				<ButtonCreateConv type="submit" >Create Conversation</ButtonCreateConv>
+				<ButtonCreateConv type="submit" >create chat</ButtonCreateConv>
 			</div>
 
 		</form>

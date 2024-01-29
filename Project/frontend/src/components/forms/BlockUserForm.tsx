@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { BlockUserModal } from "../modals/BlockUserModal";
@@ -81,7 +81,7 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
 				<InputContainer>
 					<InputLabel htmlFor="Conversation Name">
 						Username or email
-						<InputField
+						<InputFieldCCF
 						type="text" name="userName" value={ConvDataInput.userName} onChange={handleInputChange} />
 						{formErrors.userName && <div className="error-message">{formErrors.userName}</div>}
 					</InputLabel>

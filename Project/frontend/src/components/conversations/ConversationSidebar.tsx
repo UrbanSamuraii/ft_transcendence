@@ -99,7 +99,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             <div className='sideMenuHeader'>
                 <header>
                     <div className="header-content">
-                        <h2>Conversations</h2>
+                        <h2>conversations</h2>
                         <button className='openMenuButton' onClick={openMenu}>
                             <MdPostAdd size={30} />{' '}
                         </button>

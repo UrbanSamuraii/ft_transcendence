@@ -22,9 +22,7 @@
 
 .scrollablePanel {
 	overflow-y: scroll;
-	/* max-height: 100%; */
-	height: 1000px;
-	/* height: 1000px; */
+	height: 100px;
 	scrollbar-width: thin;
 	scrollbar-color: #ccc #f4f4f4;
 	scroll-behavior: smooth;
