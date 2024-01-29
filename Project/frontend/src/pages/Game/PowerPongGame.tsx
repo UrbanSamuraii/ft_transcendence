@@ -18,6 +18,11 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
+interface Champion {
+    name: string;
+    specialAbility: string;
+}
+
 function PowerPongGame({ }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -31,6 +36,17 @@ function PowerPongGame({ }) {
     const { user } = useAuth();
     const [gameData, setGameData] = useState(null);
     const [powerBarLevel, setPowerBarLevel] = useState(0); // State to track the power bar level
+    // const [isChampionSelectionActive, setIsChampionSelectionActive] = useState(false);
+    const [championSelectionTimer, setChampionSelectionTimer] = useState(2);
+    const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
+    const [isChampionSelectionActive, setIsChampionSelectionActive] = useState(true);
+    const [isWaitingForPlayer, setIsWaitingForPlayer] = useState(true);
+
+    const champions: Champion[] = [
+        { name: 'Champion1', specialAbility: 'Ability1' },
+        { name: 'Champion2', specialAbility: 'Ability2' },
+        // ...add more champions
+    ];
 
     // Update the interval based on active keys
     useEffect(() => {
@@ -46,21 +62,60 @@ function PowerPongGame({ }) {
         navigate("/select-mode");
     }
 
+    const handleChampionSelect = (champion: Champion) => {
+        setSelectedChampion(champion);
+        setIsChampionSelectionActive(false); // Hide champion selection screen
+        setChampionSelectionTimer(0); // Reset timer
+
+        // Emit the selected champion to the backend
+        socket?.emit('championSelected', { gameId, champion: champion.name });
+    };
+
+    useEffect(() => {
+        let timerId: NodeJS.Timeout;
+
+        if (isChampionSelectionActive && championSelectionTimer > 0) {
+            timerId = setTimeout(() => {
+                setChampionSelectionTimer(championSelectionTimer - 1);
+            }, 1000);
+        } else if (championSelectionTimer === 0 && isChampionSelectionActive) {
+            // Auto-select the first champion when timer expires
+            handleChampionSelect(champions[0]);
+        }
+        return () => {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        };
+    }, [championSelectionTimer, isChampionSelectionActive]);
+
     useEffect(() => {
         if (!socket) return;
 
         const handleGameDataUpdate = (data: any) => {
+            setIsChampionSelectionActive(false);
+            setIsWaitingForPlayer(false);
             setGameData(data);
             drawGame(data);
-
             if (data.isGameOver) {
                 clearInterval(intervalId);
             }
         };
+        setChampionSelectionTimer(10);
 
         socket.emit("attemptReconnect", { username: getCookie("username"), gameId });
 
         socket.on("updateGameData", handleGameDataUpdate);
+        socket.on('initiateChampionSelection', (data) => {
+            // Show champion selection interface
+            setSelectedChampion(null);
+            setIsChampionSelectionActive(true);
+            const gameid = data.gameId;
+            console.log(gameid);
+
+            // Start a countdown based on the timeout received from the backend
+            setChampionSelectionTimer(data.timeout);
+        });
 
         // A single interval is set up and maintained
         const intervalId = setInterval(() => {
@@ -77,6 +132,9 @@ function PowerPongGame({ }) {
         return () => {
             clearInterval(intervalId);
             socket.off("updateGameData", handleGameDataUpdate);
+            socket.off('initiateChampionSelection');
+            setIsChampionSelectionActive(false);
+            setSelectedChampion(null);
         };
     }, [socket, gameId]);
 
@@ -391,6 +449,21 @@ function PowerPongGame({ }) {
         };
     }, [buttons]);
 
+    const renderChampionSelection = () => {
+        return (
+            <div className="champion-selection-screen">
+                <h2>Select Your Champion ({championSelectionTimer})</h2>
+                <div className="champions">
+                    {champions.map((champion) => (
+                        <button key={champion.name} onClick={() => handleChampionSelect(champion)}>
+                            {champion.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -401,12 +474,24 @@ function PowerPongGame({ }) {
             width: '100vw',
             position: 'relative'
         }}>
-            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
-            <div className="power-bar-container">
-                <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
-            </div>
+            {isChampionSelectionActive ? (
+                renderChampionSelection()
+            ) : isWaitingForPlayer ? (
+                <div className="waiting-screen">
+                    Waiting for the other player...
+                </div>
+            ) : (
+                <>
+                    <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
+                    <div className="power-bar-container">
+                        <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
+                    </div>
+                </>
+            )}
         </div>
     );
 
+
 }
+
 export default PowerPongGame;

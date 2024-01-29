@@ -19,6 +19,7 @@ export interface PlayerInfo {
     currentElo: number;
     potentialEloGain: number;
     potentialEloLoss: number;
+    champion: string;
 }
 
 @WebSocketGateway({
@@ -195,6 +196,7 @@ export class GameGateway implements OnGatewayInit {
             currentElo: currentElo,
             potentialEloGain: 0,
             potentialEloLoss: 0,
+            champion: ""
         };
 
         client.socket.data.playerInfo = playerInfo;
@@ -202,6 +204,44 @@ export class GameGateway implements OnGatewayInit {
 
     private resetUserGameStatus(username: string): void {
         this.userInGameMap.set(username, false);
+    }
+
+    private async handleChampionSelection(gameId: number, players: { socket: Socket }[]): Promise<string[]> {
+        // Array to store the selected champions
+        const selectedChampions: string[] = [];
+
+        // Function to handle the champion selection for a single player
+        const selectChampionForPlayer = (player: { socket: Socket }, timeout: number): Promise<string> => {
+            return new Promise((resolve) => {
+                // Define the timeout function ahead of time so it can be cleared
+                const timeoutFunction = () => {
+                    player.socket.removeListener('championSelected', selectionListener); // Remove the listener
+                    resolve('DefaultChampion'); // Auto-select default champion
+                };
+
+                // Set up the timeout, but keep a reference so it can be cleared
+                const timeoutId = setTimeout(timeoutFunction, timeout);
+
+                // Listener for the 'championSelected' event
+                const selectionListener = (data: any) => {
+                    console.log("inside selectionListener")
+                    clearTimeout(timeoutId); // Clear the timeout
+                    resolve(data.champion); // Resolve with the selected champion
+                };
+
+                // Attach the listener
+                player.socket.once('championSelected', selectionListener);
+            });
+        };
+
+        // Initiate champion selection for each player and wait for the results
+        for (const player of players) {
+            // Set timeout to 10 seconds or any other appropriate value
+            const champion = await Promise.race([selectChampionForPlayer(player, 10000)]);
+            selectedChampions.push(champion);
+        }
+
+        return selectedChampions;
     }
 
     private async startMatchmaking(): Promise<void> {
@@ -244,6 +284,25 @@ export class GameGateway implements OnGatewayInit {
 
             player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId, gameMode: player1.gameMode });
             player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId, gameMode: player1.gameMode });
+
+
+            if (gameMode === 'powerpong') {
+                [player1, player2].forEach(player => {
+                    player.socket.emit('initiateChampionSelection', { gameId, timeout: 10 }); // timeout in seconds
+                });
+
+                // Step 2: Wait for both players to select their champions
+                const champions = await this.handleChampionSelection(gameId, [player1, player2]);
+
+                // Step 3: Store the Champion Information
+                champions.forEach((champion, index) => {
+                    const player = index === 0 ? player1 : player2;
+                    const playerInfo = this.playerInfoMap.get(gameId).get(player.socket.data.user.username);
+                    if (playerInfo) {
+                        playerInfo.champion = champion; // Assuming champion is just the name of the champion
+                    }
+                });
+            }
 
             gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
                 this.server.to(gameId.toString()).emit('updateGameData', {

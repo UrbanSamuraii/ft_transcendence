@@ -181,7 +181,7 @@ export class PowerPongGameService {
             gameState.leftScore = leftPlayerInfo.score;
             gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
 
-            if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
+            if (gameState.leftScore >= 1 || gameState.rightScore >= 1) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
                 const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
@@ -192,8 +192,6 @@ export class PowerPongGameService {
                 const winnerEloChange = winnerInfo.potentialEloGain;
                 const loserEloChange = loserInfo.potentialEloLoss;
 
-                // console.log("cl15: ", winnerUsername);
-                // console.log("cl15: ", gameState.isGameOver);
                 callback({
                     squares: gameState.squares,
                     leftPaddle: gameState.leftPaddle,
