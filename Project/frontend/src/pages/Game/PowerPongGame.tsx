@@ -95,8 +95,10 @@ function PowerPongGame({ }) {
             setGameData(data);
             if (data.leftPlayerInfo && data.leftPlayerInfo.username === user.username) {
                 setPowerBarLevel(data.leftPlayerInfo.powerBarLevel);
+                console.log(`powerBarLevel: ${powerBarLevel}`);
             } else if (data.rightPlayerInfo && data.rightPlayerInfo.username === user.username) {
                 setPowerBarLevel(data.rightPlayerInfo.powerBarLevel);
+                console.log(`powerBarLevel: ${powerBarLevel}`);
             }
             drawGame(data);
             if (data.isGameOver) {
@@ -489,7 +491,8 @@ function PowerPongGame({ }) {
                 <>
                     <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
                     <div className="power-bar-container">
-                        <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
+                        <div className="power-bar" key={powerBarLevel} style={{ width: `${powerBarLevel}%` }}>
+                        </div>
                     </div>
                 </>
             )}

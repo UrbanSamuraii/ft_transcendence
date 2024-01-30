@@ -81,7 +81,7 @@ export class PowerPongGameService {
             angleFactor: 5,
             isGamePaused: false,
             leftPlayerInfo: playerInfos[0],
-            rightPlayerInfo: playerInfos[1]
+            rightPlayerInfo: playerInfos[1],
         };
     }
 
@@ -90,8 +90,6 @@ export class PowerPongGameService {
         return (relativeDistance) * this.angleFactor;
     }
 
-    // updateGameState(gameId: any, clientInputs: any, callback: Function) {
-    // updateGameState(gameId: any, playerInfoMap: Map<number, PlayerInfo>, callback: Function) {
     updateGameState(gameId: number, playerInfoMap: Map<string, PlayerInfo>, callback: Function) {
         let gameState = this.gameStates.get(gameId.toString());
         if (!gameState) {
@@ -104,18 +102,27 @@ export class PowerPongGameService {
         // Assuming 2 players for left and right paddle
         const playerInfos = Array.from(playerInfoMap.values());
         // Assuming 2 players for left and right paddle
+        const currentTime = Date.now();
+        const fillRatePerSecond = 20;
+        const fillRatePerMs = fillRatePerSecond / 1000;
         if (playerInfos.length >= 2 && !gameState.isGamePaused) {
             let gameState = this.gameStates.get(gameId.toString());
             if (!gameState) {
                 // Initialize game state for new gameId
                 gameState = this.initializeGameState(playerInfoMap);
                 this.gameStates.set(gameId.toString(), gameState);
-
             }
-            gameState.leftPlayerInfo.powerBarLevel += gameState.leftPlayerInfo.powerBarLevel + 0.01;
-            gameState.rightPlayerInfo.powerBarLevel += gameState.rightPlayerInfo.powerBarLevel + 0.01;
-            gameState.leftPlayerInfo.powerBarLevel = Math.min(100, gameState.leftPlayerInfo.powerBarLevel);
-            gameState.rightPlayerInfo.powerBarLevel = Math.min(100, gameState.rightPlayerInfo.powerBarLevel);
+            if (gameState.leftPlayerInfo.powerBarLevel < 100) {
+                const timeSinceLastActivationLeft = currentTime - gameState.leftPlayerInfo.lastPowerActivation;
+                // console.log(`timeSinceLastActivationLeft: ${timeSinceLastActivationLeft}`)
+                gameState.leftPlayerInfo.powerBarLevel = Math.min(100, timeSinceLastActivationLeft * fillRatePerMs);
+                // console.log(`gameState.leftPlayerInfo.powerBarLevel: ${gameState.leftPlayerInfo.powerBarLevel}`)
+            }
+
+            if (gameState.rightPlayerInfo.powerBarLevel < 100) {
+                const timeSinceLastActivationRight = currentTime - gameState.rightPlayerInfo.lastPowerActivation;
+                gameState.rightPlayerInfo.powerBarLevel = Math.min(100, timeSinceLastActivationRight * fillRatePerMs);
+            }
 
             // Handle left player paddle movement
             if (gameState.leftPlayerInfo.activeKeys.includes("w")) {
@@ -291,7 +298,7 @@ export class PowerPongGameService {
     }
 
     private activatePower(playerInfo: PlayerInfo, gameState: any) {
-        console.log("Entering activatePower function");
+        // console.log("Entering activatePower function");
         console.log("playerInfo:", playerInfo);
 
         if (!playerInfo || !playerInfo.selectedPower || playerInfo.powerBarLevel < 100) {
@@ -303,8 +310,7 @@ export class PowerPongGameService {
 
         // Apply the power effect immediately
         this.applyPowerEffect(playerInfo, gameState);
-
-        // Reset the power bar level
+        playerInfo.lastPowerActivation = Date.now();
         playerInfo.powerBarLevel = 0;
 
         // Set a timeout to end the power effect after its duration

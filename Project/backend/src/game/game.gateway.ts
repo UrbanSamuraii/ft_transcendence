@@ -32,6 +32,7 @@ export interface PlayerInfo {
     potentialEloLoss: number;
     selectedPower: Power | null;
     powerBarLevel: number;
+    lastPowerActivation: number;
 }
 
 @WebSocketGateway({
@@ -209,7 +210,8 @@ export class GameGateway implements OnGatewayInit {
             potentialEloGain: 0,
             potentialEloLoss: 0,
             selectedPower: null,
-            powerBarLevel: 0
+            powerBarLevel: 0,
+            lastPowerActivation: Date.now()
         };
 
         client.socket.data.playerInfo = playerInfo;
@@ -318,7 +320,7 @@ export class GameGateway implements OnGatewayInit {
                         // Create a Power object and assign it to selectedPower
                         playerInfo.selectedPower = {
                             type: powerType as PowerType,
-                            duration: 5000, // For example, 5000 ms for the power duration
+                            duration: 2000, // For example, 5000 ms for the power duration
                             effectApplied: false,
                         };
                         // Optionally, reset the power bar level
