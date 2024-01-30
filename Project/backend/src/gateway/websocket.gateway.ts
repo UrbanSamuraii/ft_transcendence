@@ -95,7 +95,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     async handlePongInTime(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status == 'OFFLINE')
+        if (user.status === 'OFFLINE')
         {
             await this.prisma.user.update({
                 where: { id: user.id },
@@ -113,7 +113,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status == 'ONLINE')
+        if (user.status === 'ONLINE')
         {
             await this.prisma.user.update({
                 where: { id: user.id },
