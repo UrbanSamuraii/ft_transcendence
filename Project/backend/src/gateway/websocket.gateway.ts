@@ -72,6 +72,7 @@ export class MessagingGateway implements OnGatewayConnection {
             }, this.pongTimeout);
 
             // Listen for pong from the client
+
             client.once('pong', async () => {
                 console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
@@ -96,18 +97,38 @@ export class MessagingGateway implements OnGatewayConnection {
 
     async handlePongInTime(client: AuthenticatedSocket) {
         const user = client.user;
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { status: 'ONLINE' },
-        });
+        if (user.status === 'OFFLINE')
+        {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { status: 'ONLINE' },
+            });
+            const friendsList = await this.userService.getUserFriendsList(user.id)
+            for (const friend of friendsList) {
+                const friendSocket = this.sessions.getUserSocket(friend.id);
+                if (friendSocket) {
+                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
+                }
+            }
+        }
     }
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { status: 'OFFLINE' },
-        });
+        if (user.status === 'ONLINE')
+        {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { status: 'OFFLINE' },
+            });
+            const friendsList = await this.userService.getUserFriendsList(user.id)
+            for (const friend of friendsList) {
+                const friendSocket = this.sessions.getUserSocket(friend.id);
+                if (friendSocket) {
+                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
+                }
+            }
+        }
     }
 
     ////////////////////// PRIVATE METHODE //////////////////////

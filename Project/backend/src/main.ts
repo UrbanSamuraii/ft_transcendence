@@ -35,6 +35,7 @@ async function bootstrap() {
         prefix: '/uploads/', // Virtual prefix to access files in the browser
     });
     await app.listen(port);
+    
 
     // Gracefully shutdown the server.
     app.enableShutdownHooks();
