@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
 import Play from './pages/Play/Play';
-// import SelectModePage from './pages/SelectMode/SelectModesPage';
+import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import { Signup } from './pages/Signup';
@@ -149,7 +149,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     </Route>
                     <Route path="/Friends" element={<FriendsPage />} />
                     <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
-                    {/* <Route path="/select-mode" element={<SelectModePage />} /> */}
+                    <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />

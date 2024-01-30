@@ -33,15 +33,15 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
     useEffect(() => {
 
         const socketConnection = io(serverAddress, { withCredentials: true });
-        
+
         setSocket(socketConnection);
 
         socketConnection.on('ping', () => {
-            console.log('Received ping from server');
+            // console.log('Received ping from server');
             socketConnection.emit('pong', 'pong message');
-            console.log('Sent pong to server');
+            // console.log('Sent pong to server');
         });
-        
+
         socketConnection.on('disconnect', (reason) => {
             console.log("Socket disconnected, reason:", reason);
             if (reason === "io server disconnect" || reason === "io client disconnect") {
@@ -51,12 +51,12 @@ export const OnlySocketProvider: React.FC<SocketProviderProps> = ({ children }) 
                 console.log("Socket disconnected... attempting to reconnect");
             }
         });
-       
+
         socketConnection.on('signout', () => {
             console.log('Client signout from the app');
             socketConnection.disconnect();
         });
-    
+
         return () => {
             socketConnection.disconnect();
         };

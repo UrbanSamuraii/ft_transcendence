@@ -5,13 +5,13 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     const handlePlayClick = () => {
-        navigate('/matchmaking');
+        navigate('/select-mode');
     };
 
     return (
         <div className="homepage">
             <div className='content'>
-            <button className="text" data-text='Play' onClick={handlePlayClick}>Play</button>
+                <button className="text" data-text='Play' onClick={handlePlayClick}>Play</button>
             </div>
         </div>
     );

@@ -66,18 +66,18 @@ export class MessagingGateway implements OnGatewayConnection {
             this.pingClient(client);
 
             const pongTimeoutId = setTimeout(() => {
-                console.log(`Pong not received from user ${client.user?.id} within timeout`);
+                // console.log(`Pong not received from user ${client.user?.id} within timeout`);
                 this.handlePongTimeout(client);
-                console.log("Client offline");
+                // console.log("Client offline");
             }, this.pongTimeout);
 
             // Listen for pong from the client
 
             client.once('pong', async () => {
-                console.log(`Received pong from user ${client.user?.id}`);
+                // console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
                 this.handlePongInTime(client);
-                console.log("Client online");
+                // console.log("Client online");
                 await this.sleep(this.pingInterval);
                 pingRoutine();
             });
@@ -91,14 +91,13 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     pingClient(client: AuthenticatedSocket) {
-        console.log("ping the client");
+        // console.log("ping the client");
         this.server.to(client.id.toString()).emit('ping');
     }
 
     async handlePongInTime(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'OFFLINE')
-        {
+        if (user.status === 'OFFLINE') {
             await this.prisma.user.update({
                 where: { id: user.id },
                 data: { status: 'ONLINE' },
@@ -115,8 +114,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'ONLINE')
-        {
+        if (user.status === 'ONLINE') {
             await this.prisma.user.update({
                 where: { id: user.id },
                 data: { status: 'OFFLINE' },

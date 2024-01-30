@@ -38,6 +38,7 @@ export class PowerPongGameService {
     public isGamePaused = false; // To keep track of the paused state
 
     private initializeGameState(playerInfoMap: any) {
+        const playerInfos = Array.from(playerInfoMap.values());
         return {
             squares: Array.from({ length: nbrOfSquares }, (_, index) => {
                 return {
@@ -78,8 +79,9 @@ export class PowerPongGameService {
             maxDyValue: 5,
             maxDxValue: 5,
             angleFactor: 5,
-            isGamePaused: false
-            // Add any other game-related initial state variables here
+            isGamePaused: false,
+            leftPlayerInfo: playerInfos[0],
+            rightPlayerInfo: playerInfos[1]
         };
     }
 
@@ -103,35 +105,40 @@ export class PowerPongGameService {
         const playerInfos = Array.from(playerInfoMap.values());
         // Assuming 2 players for left and right paddle
         if (playerInfos.length >= 2 && !gameState.isGamePaused) {
-            const leftPlayerInfo = playerInfos[0];
-            const rightPlayerInfo = playerInfos[1];
-            leftPlayerInfo.powerBarLevel += leftPlayerInfo.powerBarLevel + 0.01;
-            rightPlayerInfo.powerBarLevel += rightPlayerInfo.powerBarLevel + 0.01;
-            leftPlayerInfo.powerBarLevel = Math.min(100, leftPlayerInfo.powerBarLevel);
-            rightPlayerInfo.powerBarLevel = Math.min(100, rightPlayerInfo.powerBarLevel);
+            let gameState = this.gameStates.get(gameId.toString());
+            if (!gameState) {
+                // Initialize game state for new gameId
+                gameState = this.initializeGameState(playerInfoMap);
+                this.gameStates.set(gameId.toString(), gameState);
+
+            }
+            gameState.leftPlayerInfo.powerBarLevel += gameState.leftPlayerInfo.powerBarLevel + 0.01;
+            gameState.rightPlayerInfo.powerBarLevel += gameState.rightPlayerInfo.powerBarLevel + 0.01;
+            gameState.leftPlayerInfo.powerBarLevel = Math.min(100, gameState.leftPlayerInfo.powerBarLevel);
+            gameState.rightPlayerInfo.powerBarLevel = Math.min(100, gameState.rightPlayerInfo.powerBarLevel);
 
             // Handle left player paddle movement
-            if (leftPlayerInfo.activeKeys.includes("w")) {
+            if (gameState.leftPlayerInfo.activeKeys.includes("w")) {
                 const potentialY = gameState.leftPaddle.y - gameState.paddleMoveAmount;
                 gameState.leftPaddle.y = Math.max(potentialY, 0);
-            } else if (leftPlayerInfo.activeKeys.includes("s")) {
+            } else if (gameState.leftPlayerInfo.activeKeys.includes("s")) {
                 const potentialY = gameState.leftPaddle.y + gameState.paddleMoveAmount;
                 gameState.leftPaddle.y = Math.min(potentialY, 100 - gameState.leftPaddle.height);
             }
 
             // Handle right player paddle movement
-            if (rightPlayerInfo.activeKeys.includes("ArrowUp")) {
+            if (gameState.rightPlayerInfo.activeKeys.includes("ArrowUp")) {
                 const potentialY = gameState.rightPaddle.y - gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.max(potentialY, 0);
-            } else if (rightPlayerInfo.activeKeys.includes("ArrowDown")) {
+            } else if (gameState.rightPlayerInfo.activeKeys.includes("ArrowDown")) {
                 const potentialY = gameState.rightPaddle.y + gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.min(potentialY, 100 - gameState.rightPaddle.height);
             }
-            if (leftPlayerInfo.activeKeys.includes(" ") && leftPlayerInfo.powerBarLevel === 100) {
-                this.activatePower(leftPlayerInfo, gameState);
+            if (gameState.leftPlayerInfo.activeKeys.includes(" ") && gameState.leftPlayerInfo.powerBarLevel === 100) {
+                this.activatePower(gameState.leftPlayerInfo, gameState);
             }
 
-            if (rightPlayerInfo.activeKeys.includes(" ") && rightPlayerInfo.powerBarLevel === 100) {
+            if (gameState.rightPlayerInfo.activeKeys.includes(" ") && gameState.rightPlayerInfo.powerBarLevel === 100) {
                 this.activatePower(gameState.rightPlayerInfo, gameState);
             }
 
@@ -162,8 +169,8 @@ export class PowerPongGameService {
                 // Check for wall intersections
                 if (square.x + square.size < 0 || square.x > gameState.width) {
                     // Reset square position to the center
-                    if (square.x > gameState.width) leftPlayerInfo.score++;
-                    if (square.x + square.size < 0) rightPlayerInfo.score++;
+                    if (square.x > gameState.width) gameState.leftPlayerInfo.score++;
+                    if (square.x + square.size < 0) gameState.rightPlayerInfo.score++;
                     square.x = gameState.width / 2;
                     square.y = gameState.height / 2;
 
@@ -183,14 +190,14 @@ export class PowerPongGameService {
 
             });
 
-            gameState.leftScore = leftPlayerInfo.score;
-            gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
+            gameState.leftScore = gameState.leftPlayerInfo.score;
+            gameState.rightScore = gameState.rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
 
             if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
-                const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
-                const loserUsername = leftPlayerInfo.score < rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
+                const winnerUsername = gameState.leftPlayerInfo.score > gameState.rightPlayerInfo.score ? gameState.leftPlayerInfo.username : gameState.rightPlayerInfo.username;
+                const loserUsername = gameState.leftPlayerInfo.score < gameState.rightPlayerInfo.score ? gameState.leftPlayerInfo.username : gameState.rightPlayerInfo.username;
 
                 const winnerInfo = playerInfoMap.get(winnerUsername);
                 const loserInfo = playerInfoMap.get(loserUsername);
@@ -211,17 +218,15 @@ export class PowerPongGameService {
                     winnerCurrentElo: winnerInfo.currentElo,
                     loserCurrentElo: loserInfo.currentElo,
                     leftPlayerInfo: {
-                        username: leftPlayerInfo.username,
-                        powerBarLevel: leftPlayerInfo.powerBarLevel,
+                        username: gameState.leftPlayerInfo.username,
+                        powerBarLevel: gameState.leftPlayerInfo.powerBarLevel,
                     },
                     rightPlayerInfo: {
-                        username: rightPlayerInfo.username,
-                        powerBarLevel: rightPlayerInfo.powerBarLevel,
+                        username: gameState.rightPlayerInfo.username,
+                        powerBarLevel: gameState.rightPlayerInfo.powerBarLevel,
                     },
                 });
             } else {
-                // console.log(`leftPlayerInfo.username : ${leftPlayerInfo.username}`)
-                // console.log(`rightPlayerInfo.username : ${rightPlayerInfo.username}`)
                 callback({
                     squares: gameState.squares,
                     leftPaddle: gameState.leftPaddle,
@@ -230,12 +235,12 @@ export class PowerPongGameService {
                     rightScore: gameState.rightScore,
                     isGameOver: gameState.isGameOver,
                     leftPlayerInfo: {
-                        username: leftPlayerInfo.username,
-                        powerBarLevel: leftPlayerInfo.powerBarLevel,
+                        username: gameState.leftPlayerInfo.username,
+                        powerBarLevel: gameState.leftPlayerInfo.powerBarLevel,
                     },
                     rightPlayerInfo: {
-                        username: rightPlayerInfo.username,
-                        powerBarLevel: rightPlayerInfo.powerBarLevel,
+                        username: gameState.rightPlayerInfo.username,
+                        powerBarLevel: gameState.rightPlayerInfo.powerBarLevel,
                     },
                 });
 
@@ -254,16 +259,17 @@ export class PowerPongGameService {
     }
 
     private applyPowerEffect(playerInfo: PlayerInfo, gameState: any) {
-        // // const paddle = playerInfo.username === leftPlayerInfo.username
-        //     ?gameState.leftPaddle
-        //     : gameState.rightPaddle;
+        const paddle = playerInfo.username === gameState.leftPlayerInfo.username
+            ? gameState.leftPaddle
+            : gameState.rightPaddle;
 
         switch (playerInfo.selectedPower.type) {
             case PowerType.Expand:
-                gameState.leftPaddle.height *= 1.5; // Increase paddle height by 50%
+                paddle.height *= 1.5; // Increase paddle height by 50%
                 break;
             case PowerType.SpeedBoost:
                 gameState.squares.forEach(square => square.dx *= 1.5); // Increase ball speed by 50%
+                gameState.squares.forEach(square => square.dy *= 1.5); // Increase ball speed by 50%
                 break;
         }
     }
@@ -279,10 +285,10 @@ export class PowerPongGameService {
                 break;
             case PowerType.SpeedBoost:
                 gameState.squares.forEach(square => square.dx /= 1.5); // Revert ball speed to original
+                gameState.squares.forEach(square => square.dy /= 1.5); // Revert ball speed to original
                 break;
         }
     }
-
 
     private activatePower(playerInfo: PlayerInfo, gameState: any) {
         console.log("Entering activatePower function");
