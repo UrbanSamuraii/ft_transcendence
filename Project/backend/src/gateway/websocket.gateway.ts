@@ -70,6 +70,7 @@ export class MessagingGateway implements OnGatewayConnection {
             }, this.pongTimeout);
 
             // Listen for pong from the client
+            
             client.once('pong', async () => {
                 console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
