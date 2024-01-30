@@ -23,7 +23,6 @@
     width: 100%;
     height: 100%;
     /* background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D'); */
-/* tut mojno pomenyat kartinku fona */
   }
 
   .content{
@@ -42,6 +41,7 @@
     position: relative;
     color: #fff;
     background-color: transparent;
+    /* background-color: red; */
     font-weight: 700;
     font-size: 45px;
     transform: scale(2);
@@ -350,115 +350,66 @@ input[type="password"] {
 }
 
 button {
-    background-color: #0070c9;
+    background-color: transparent;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 12px;
     font-size: 18px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
-button:hover {
-    background-color: #0054a5;
-}
-
-.signout-button {
-    background-color: red;
-    /* Define the background color for the signout button */
-    color: white;
-    padding: 10px 20px;
-    /* Adjust padding as needed */
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    /* Adjust the top position to place it where you want */
-    right: 10px;
-    /* Adjust the right position to place it where you want */
-    z-index: 999;
-    /* Ensure it's above other elements */
-}
-
-.signout-button:hover {
-    background-color: darkred;
-    /* Define the hover color for the signout button */
-}
-
-.turn-on-2fa-button {
+/* .turn-on-2fa-button {
     background-color: green;
-    /* Define the background color for the setup 2FA button */
     color: white;
     padding: 10px 20px;
-    /* Adjust padding as needed */
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     position: absolute;
     top: 50px;
-    /* Adjust the top position to place it below the SIGNOUT button */
     right: 10px;
-    /* Adjust the right position to align with the SIGNOUT button */
     z-index: 999;
-    /* Ensure it's above other elements */
 }
 
 .turn-on-2fa-button:hover {
     background-color: darkgreen;
-    /* Define the hover color for the setup 2FA button */
-}
+} */
 
-.disable-2fa-button {
+/* .disable-2fa-button {
     background-color: blueviolet;
-    /* Define the background color for the disable 2FA button */
     color: white;
     padding: 10px 20px;
-    /* Adjust padding as needed */
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     position: absolute;
     top: 90px;
-    /* Adjust the top position to place it half a centimeter below the SIGNOUT button */
     right: 10px;
-    /* Adjust the right position to align with the SIGNOUT button */
     z-index: 999;
-    /* Ensure it's above other elements */
 }
 
 .disable-2fa-button:hover {
     background-color: darkslateblue;
-    /* Define the hover color for the disable 2FA button */
-}
+} */
 
-.conversations-button {
+/* .conversations-button {
     background-color: goldenrod;
-    /* Define the background color for the conversation button */
     color: rgb(58, 52, 52);
     padding: 10px 20px;
-    /* Adjust padding as needed */
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     position: absolute;
     top: 130px;
-    /* Adjust the top position to place it where you want */
     right: 10px;
-    /* Adjust the right position to place it where you want */
     z-index: 999;
-    /* Ensure it's above other elements */
-}
+} */
 
-.conversations-button:hover {
+/* .conversations-button:hover {
     background-color: darkgoldenrod;
-    /* Define the hover color for the conversation button */
-}
+} */
 
 
 body,
@@ -472,325 +423,30 @@ h2 {
     color: #fff;
 }
 
-.profile-container {
+/* .profile-container {
     max-width: 800px;
     margin: auto;
     padding: 20px;
     background: rgba(0, 0, 0, 0.7);
-    /* Semi-transparent black for visibility on a white page */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Optional: Adds a subtle shadow */
     border-radius: 8px;
-    /* Rounds the corners */
     color: #1a1a1a;
-    /* Sets text color to white */
-    /* Ensure there's no other conflicting background property */
-}
+} */
 
-
-
+/* 
 .profile-button {
     padding: 10px 20px;
     border: 1px solid #ffffff;
-    /* White border */
     background-color: transparent;
     color: #1a1a1a;
-    /* White text */
     margin-top: 20px;
-    /* Space above the button */
     cursor: pointer;
     border-radius: 5px;
     text-transform: uppercase;
-    /* Optional: Makes the button text uppercase */
     transition: background-color 0.3s, color 0.3s;
-    /* Transition for hover effects */
 }
 
 .profile-button:hover {
     background-color: #1a1a1a;
-    /* White background on hover */
     color: #ffffff;
-    /* Black text color on hover */
-}
-
-/* .App {
-    text-align: center;
-    background-image: url('https://i.gifer.com/HU32.gif');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.App-header {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-  }
-  
-  .button-container {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .separator {
-    font-size: 20px;
-    color: #61dafb;
-    margin: 0 10px;
-    transform: scaleY(8);
-  }
-  
-  .glitch-button {
-    position: relative;
-    width: 380px;
-    height: 86px;
-    font-size: 36px;
-    font-family: 'Bebas Neue', cursive;
-    background: linear-gradient(45deg, transparent 5%, #ff013c 5%);
-    border: 0;
-    color: #fff;
-    letter-spacing: 3px;
-    line-height: 88px;
-    box-shadow: 6px 0 #00e6f6;
-    transition: background-color 0.3s, transform 0.3s;
-    cursor: pointer;
-  }
-  
-  .glitch-button::before {
-    --slice-0: inset(50% 50% 50% 50%);
-    --slice-1: inset(80% -6px 0 0);
-    --slice-2: inset(50% -6px 30% 0);
-    --slice-3: inset(10% -6px 85% 0);
-    --slice-4: inset(40% -6px 43% 0);
-    --slice-5: inset(80% -6px 5% 0);
-    content: 'ULTIMATE PONG';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 3%, #00e6f6 3%, #00e6f6 5%, #ff013c 5%);
-    text-shadow: -3px -3px 0 #ff8de2, 3px 3px 0 #00e6f6;
-    clip-path: var(--slice-0);
-  }
-  
-  .glitch-button:hover::before {
-    animation: glitch-unique 1s steps(2, end);
-  }
-  
-  @keyframes glitch-unique {
-    0% {
-      clip-path: var(--slice-1);
-      transform: translate(-20px, -10px);
-    }
-    10% {
-      clip-path: var(--slice-3);
-      transform: translate(10px, 10px);
-    }
-    20% {
-      clip-path: var(--slice-1);
-      transform: translate(-10px, 10px);
-    }
-    30% {
-      clip-path: var(--slice-3);
-      transform: translate(0px, 5px);
-    }
-    40% {
-      clip-path: var(--slice-2);
-      transform: translate(-5px, 0px);
-    }
-    50% {
-      clip-path: var(--slice-3);
-      transform: translate(5px, 0px);
-    }
-    60% {
-      clip-path: var(--slice-4);
-      transform: translate(5px, 10px);
-    }
-    70% {
-      clip-path: var(--slice-2);
-      transform: translate(-10px, 10px);
-    }
-    80% {
-      clip-path: var(--slice-5);
-      transform: translate(20px, -10px);
-    }
-    90% {
-      clip-path: var(--slice-1);
-      transform: translate(-10px, 0px);
-    }
-    100% {
-      clip-path: var(--slice-1);
-      transform: translate(0);
-    }
-  }
-  
-  * {  
-    box-sizing: border-box;
-  }
-  
-  .log-button {
-      display: block;
-      position: relative;
-      background: #ffffff7a;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      margin-top: 10px;
-      padding: 8px 30px;
-      font-size: .75em;
-      letter-spacing: .35em;
-      text-align: center;
-      text-transform: uppercase;
-      border: 1px solid hsla(0,0%,100%,.2);
-      transition: all .2s ease;
-      margin: 0 auto;
-      margin-top: 100px;
-    
-      &:before, 
-      &:after {
-        content: attr(data-text);
-        position: absolute;
-          top: 0;
-          left: 0;
-        padding: 8px 0;
-        width: 100%;
-        -webkit-clip: rect(0px, 0px, 0px, 0px);
-        clip: rect(0px, 0px, 0px, 0px);
-        background: #fff;
-        color: #000;
-      }
-      
-      &:before {
-        left: -3px;
-        top: -2px;
-        text-shadow: 2px 0 #fff;
-        box-shadow: 2px 0 #fff;
-      }
-    
-      &:after {
-        left: 2px;
-        bottom: -2px;
-        text-shadow: -1px 0 #fff;
-        box-shadow: -1px 0 #fff;
-      }
-    
-      &:hover {
-        background: white;
-        color: black;
-      }
-    
-      &:hover:before {
-          animation: glitch-test 1.5s infinite linear alternate-reverse;
-      }
-      
-      &:hover:after {
-          animation: glitch-test 2s infinite linear alternate;
-      }
-    
-  }
-  
-  @keyframes glitch-test {
-    0% {
-      clip: rect(-3px, 600px, 0px, 0px);
-    }
-    5.88235% {
-      clip: rect(0px, 600px, 0px, 0px);
-    }
-    11.76471% {
-      clip: rect(-3px, 600px, 0px, 0px);
-    }
-    17.64706% {
-      clip: rect(-3px, 600px, 0px, 0px);
-    }
-    23.52941% {
-      clip: rect(100px, 600px, 100px, 0px);
-    }
-    clip: rect(-3px, 600px, 0px, 0px);
-}
-58.82353% {
-  clip: rect(100px, 450px,100px, 0px);
-}
-64.70588% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-70.58824% {
-  clip: rect(100px, 450px, 100px, 0px);
-}
-76.47059% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-82.35294% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-88.23529% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-94.11765% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-100% {
-  clip: rect(0px, 450px, 0px, 0px);
-}
-}
-
-#image-track > .image {
-width: 40vmin; height: 56vmin; object-fit: cover; object-position: center;
-}
-
-#image-track {
-display: flex; gap: 4vmin; position: absolute; left: 50%; top: 50%; transform: translate(0%, -50%);
-}
-29.41176% {
-      clip: rect(0px, 600px, 600px, 0px);
-    }
-    35.29412% {
-      clip: rect(100px, 600px, 0px, 0px);
-    }
-    41.17647% {
-      clip: rect(0px, 600px, 600px, 0px);
-    }
-    47.05882% {
-      clip: rect(100px, 600px, 0px, 0px);
-    }
-    52.94118% {
-      clip: rect(-3px, 600px, 0px, 0px);
-    }
-    58.82353% {
-      clip: rect(100px, 450px,100px, 0px);
-    }
-    64.70588% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-    70.58824% {
-      clip: rect(100px, 450px, 100px, 0px);
-    }
-    76.47059% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-    82.35294% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-    88.23529% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-    94.11765% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-    100% {
-      clip: rect(0px, 450px, 0px, 0px);
-    }
-  }
-  
-  #image-track > .image {
-    width: 40vmin; height: 56vmin; object-fit: cover; object-position: center;
-  }
-  
-  #image-track {
-    display: flex; gap: 4vmin; position: absolute; left: 50%; top: 50%; transform: translate(0%, -50%);
-  } */
+} */

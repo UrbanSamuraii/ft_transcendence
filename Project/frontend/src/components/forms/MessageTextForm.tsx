@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import '../conversations/GlobalConversations.css';
 import { MessageInputFieldProps } from '../messages/MessageInputField';
 import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton, MessageSendIcon } from '../../utils/styles';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;

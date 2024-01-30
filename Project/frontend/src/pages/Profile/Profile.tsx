@@ -5,7 +5,7 @@ const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 function Profile() {
     const [theme, setTheme] = useState('bw-style'); // Default theme
-    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0, img_url: "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png" });
+    const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0, img_url: "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png", nbrFriends: 0 });
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
 
@@ -34,8 +34,22 @@ function Profile() {
     }, [username]);
 
     const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'bw-style' ? 'cyber-style' : 'bw-style');
+        setTheme(prevTheme => {
+            switch (prevTheme) {
+                case 'bw-style':
+                    //     return 'cyber-style';
+                    // case 'cyber-style':
+                    return 'rainbow-style';
+                case 'rainbow-style':
+                    return 'retrowave-style';
+                case 'retrowave-style':
+                    return 'bw-style';
+                default:
+                    return 'bw-style';
+            }
+        });
     };
+
 
     const getSkillBarWidth = () => {
         if (userInfo.totalGamesWon) {
@@ -126,11 +140,8 @@ function Profile() {
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
             </head>
 
-            {/* bw  cyber  rainbow  retrowave */}
             <body className={theme}>
                 <div className="card">
-                    {/* <div className="user-card rainbow"> */}
-                    {/* <div className="user-card retrowave"> */}
                     <div className={`user-card ${theme}`}>
                         <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                         <div className='profile-picture'>
@@ -141,8 +152,8 @@ function Profile() {
                     </div>
                     <div className="more-info">
                         <h1>{userInfo.username}</h1>
-                        <button className="edit-profile" onClick={toggleTheme}>
-                            <i className='bx bxs-palette'></i></button>
+                        <Link to={`/signout`} className="signout-button">
+                            <i className='bx bx-exit'></i></Link>
                         <div className='separator'></div>
                         <div className="coords">
                             <span>E-mail</span>
@@ -162,7 +173,7 @@ function Profile() {
                             <div>
                                 <div className="title">Pals</div>
                                 <i className='bx bxs-group'></i>
-                                <div className="value">todo</div>
+                                <div className="value">{userInfo.nbrFriends}</div>
                             </div>
                             <div>
                                 <div className="title">Beer</div>
@@ -174,9 +185,11 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        <Link to={`/@/${username}/leaderboard`} className="leaderboard-button">
+                        <Link to={`/leaderboard`} className="leaderboard-button">
                             Leaderboard</Link>
                     </div>
+                    <button className="edit-profile" onClick={toggleTheme}>
+                        <i className='bx bxs-palette'></i></button>
                 </div>
             </body>
         </div>

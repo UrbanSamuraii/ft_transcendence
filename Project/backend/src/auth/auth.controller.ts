@@ -10,10 +10,13 @@ import { UserService } from "src/user/user.service";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { imageFileFilter } from '../utils/file-upload.utils';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService, private userService: UserService) { }
+    constructor(private authService: AuthService,
+        private eventEmitter: EventEmitter2,
+        private userService: UserService) { }
 
     @UseGuards(FortyTwoAuthGuard)
     @Get('signup42')
@@ -44,6 +47,8 @@ export class AuthController {
     @Get('signout')
     async signout(@Req() req, @Res() res: ExpressResponse) {
         try {
+            const user = await this.userService.getUserByToken(req.cookies.token);
+            this.eventEmitter.emit('signout', user);
             res.clearCookie('token');
             return res.status(200).json({ message: 'Logout successful' });
 
@@ -78,7 +83,7 @@ export class AuthController {
         return (await this.authService.turnOffTwoFactorAuthentication(req, res, user));
     }
 
-    @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated
+    @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated !
     @Get('me')
     async getMe(@Request() req) {
         const me = await this.userService.getUserByToken(req.cookies.token);
@@ -117,7 +122,10 @@ export class AuthController {
                 totalGamesWon: user.totalGamesWon,
                 totalGamesLost: user.totalGamesLost,
                 eloRating: user.eloRating,
-                img_url: user.img_url
+                img_url: user.img_url,
+                nbrFriends: user.friends.length
+
+                // other fields you want to include
             });
         } catch (error) {
             return res.status(500).json({ error: 'Internal server error' });

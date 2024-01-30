@@ -89,7 +89,5 @@ export class MembersService implements IMembersService {
 		else { return false; }
 	}
 
-	///////// BLOCK RELATION ////////
-	
 }
 

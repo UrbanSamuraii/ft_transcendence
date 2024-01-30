@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+// import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { useAuth } from '../../AuthContext'; // Update the path accordingly
@@ -6,56 +6,60 @@ import { useAuth } from '../../AuthContext'; // Update the path accordingly
 function Navbar() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null); // Typed as HTMLDivElement
+    // const [showNavbar, setShowNavbar] = useState(false);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-
-    useEffect(() => {
-        function handleClickOutside(event: any) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        }
-
-        // Add event listener
-        document.addEventListener('mousedown', handleClickOutside);
-
-        // Cleanup the event listener
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    // useEffect(() => {
+    //     const handleMouseMove = (e: MouseEvent) => {
+    //     if (e.clientY < 80) {
+    //         setShowNavbar(true);
+    //     } else {
+    //         setShowNavbar(false);
+    //     }
+    // };
+    // window.addEventListener('mousemove', handleMouseMove);
+    // return () => {
+    //     window.removeEventListener('mousemove', handleMouseMove);
+    // };
+    // }, []);
 
     return (
+        // <div className={`navbar ${showNavbar ? 'show' : ''}`}>
         <div className="navbar">
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
             <div className="navbar-left">
-                <Link to="/" className="navbar-logo">MyLogo</Link>
+                <div className='navbar-button'>
+                <Link to="/" className="navbar-logo">
+                    {/* <i className='bx bxs-tennis-ball' ></i> */}
+                    </Link>
+                </div>
             </div>
             <div className="navbar-center">
-                <Link to="/tournaments">Tournaments</Link>
-                <Link to="/leaderboard">Leaderboard</Link>
+            {user && (
+                    <>
+                        <div className='navbar-button'>
+                            <Link to="/tournaments">Tournaments</Link>
+                        </div>
+                        <div className='navbar-button'>
+                            <Link to="/ConversationPage">Chat</Link>
+                        </div>
+                        <div className='navbar-button'>
+                            <Link to="/leaderboard">Leaderboard</Link>
+                        </div>
+                        <div className='navbar-button'>
+                            <Link to="/friends">Friends</Link>
+                        </div>
+                    </>
+                )}
             </div>
             <div className="navbar-right">
                 {user ? (
-                    <>
-                        <div onClick={toggleDropdown} className="profile-name">
-                            {user.username}
-                            {isDropdownOpen && (
-                                <div className="dropdown-menu">
-                                    <Link to={`/@/${user.username}`}>Profile</Link>
-                                    <Link to="/ConversationPage">Chat</Link>
-                                    <Link to="/preferences">Preferences</Link>
-                                    <Link to="/signout">Sign out</Link>
-                                    {/* <button onClick={handleSignoutClick}>Sign Out</button> */}
-                                </div>
-                            )}
-                        </div>
-                    </>
+                <div className='navbar-button'>
+                    <Link to={`/@/${user.username}`} className='navbar-button'>{user.username}</Link>
+                </div>
                 ) : (
-                    <button onClick={() => navigate('/login')}>SIGN IN</button>
+                    <div className='navbar-button'>
+                        <button onClick={() => navigate('/login')}>SIGN IN</button>
+                    </div>
                 )}
             </div>
         </div>

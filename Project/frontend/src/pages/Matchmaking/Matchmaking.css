@@ -1,52 +1,106 @@
-.paddle-container {
+.background {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 80%;
-    max-width: 320px;
-    height: 100px;
-    position: relative;
-    margin: 100px auto;
+    background-image: url('https://i.gifer.com/HU32.gif');
+    background-color: #00000050;
+    background-blend-mode: color;
+    background-size: cover;
+    height: 100%;
 }
 
-.paddle {
-    width: 5%;
-    height: 60%;
-    background-color: #333;
-    min-width: 20px;
+.container {
+    position: relative;
+    width: 340px;
+    height: 180px;
+    margin: auto;
+    background-color: transparent;
+    /* background-color: red; */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    align-items: center;
 }
 
 .ball {
-    width: 20px;
-    height: 20px;
-    background-color: white;
+    height: 25px;
+    width: 25px;
+    margin-top: 15px;
     position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
-    animation: moveBall 2s linear infinite;
+    border-radius: 50%;
+    left: 20%;
+    animation: ball .5s alternate infinite ease;
+}
+@keyframes ball {
+    0% {
+        top: 90px;
+        height: 5px;
+        border-radius: 50px 50px 25px 25px;
+        transform: scaleX(1.7);
+        background-color: #45f3ff;
+    }
+    40% {
+        height: 20px;
+        border-radius: 50%;
+        transform: scaleX(1);
+        background-color: #b69ece;
+    }
+    100% {
+        top: 0%;
+        background-color: #ff2770;
+    }
+}
+.ball:nth-child(2) {
+    left: 45%;
+    animation-delay: .2s;
+}
+.ball:nth-child(3) {
+    left: auto;
+    right: 20%;
+    animation-delay: .3s;
 }
 
-@keyframes moveBall {
+.shadow {
+    width: 25px;
+    height: 5px;
+    border-radius: 50%;
+    margin-top: 45px;
+    position: absolute;
+    top: 64px;
+    left: 20%;
+    filter: blur(1px);
+    animation: shadow .5s alternate infinite ease;
+}
+@keyframes shadow {
     0% {
-        left: 5%;
+        transform: scaleX(1.5);
+        background-color: gray;
     }
-
-    50% {
-        left: 90%;
+    40% {
+        transform: scaleX(1);
+        opacity: .7;
+        background-color: gray;
     }
-
     100% {
-        left: 5%;
+        transform: scaleX(.2);
+        opacity: .4;
+        background-color: gray;
     }
+}
+.shadow:nth-child(4) {
+    left: 45%;
+    animation-delay: .2s;
+}
+.shadow:nth-child(5) {
+    left: auto;
+    right: 20%;
+    animation-delay: .3s;
 }
 
 .searching-text {
+    color: white;
     position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: Arial, sans-serif;
-    font-weight: bold;
+    top: 135px;
+    left: 63px;
+    font-weight: bolder;
+    letter-spacing: 1px;
     font-size: 18px;
 }

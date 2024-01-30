@@ -17,12 +17,12 @@
 	font-style: italic;
 	font-size: 12px;
 	margin-top: 8px;
-	color: rgb(121, 117, 117);
+	color: rgb(0, 0, 0);
 }
 
 .scrollablePanel {
 	overflow-y: scroll;
-	max-height: 80%;
+	height: 100px;
 	scrollbar-width: thin;
 	scrollbar-color: #ccc #f4f4f4;
 	scroll-behavior: smooth;
@@ -44,6 +44,7 @@
 	display: flex;
 	align-items: center;
 	margin-right: 450px;
+	/* background-color: rgb(211, 85, 85); */
 	margin-top: 25px;
 	&:hover::before {
 		content: "Click to handle conversation parameters";
@@ -61,47 +62,60 @@
 	}
   
 	button {
-	  font-size: 40px;
+	  font-size: 20px;
 	  margin-left: 10px;
 	}
   
 	.profile-name {
-	  cursor: pointer;
-	  position: relative;
-	  user-select: none;
+		color: black;
+		background-color: white;
+		border-radius: 10px;
+		cursor: pointer;
+		width: 50px;
+		height: 50px;
+		position: relative;
+		user-select: none;
+	}
+	.profile-name i {
+		font-size: 2.5rem;
+		padding: 4px;
 	}
   
 	.dropdown-menu {
-	  position: absolute;
-	  right: 0;
-	  display: flex;
-	  align-items: center;
-	  justify-content: space-around;
+		height: 538px;
+		position: absolute;
+		background-color: transparent;
+		backdrop-filter: blur(10px);
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		right: 0;
+		align-items: center;
+		justify-content: space-around;
 	}
 }
 
-  
 .owner-action-menu {
 	display: flex;
 	align-items: center;
 }
 
 .owner-action-menu button {
-	font-size: 20px;
+	font-size: 10px;
 	color: rgb(54, 49, 121);
 }
 
 .convMenuButton {
-	width: 300px !important;
-	height: 50px;
+	width: 200px;
+	height: 45px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: #444e55;
+	background-color: #4b6c85;
 	color: white;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+	margin-top: 3px;
+	margin-right: 10px;
 }
 
 /* Privacy button style */
@@ -119,11 +133,20 @@
   
   .toggle-button.private {
 	background-color: #f02a2a; /* Red for private */
+	height: 45px;
+	width: 200px;
+	font-size: 20px;
 	color: white;
-  }
-  
-  .toggle-button.public {
-	background-color: #276927; /* Green for public */
-	color: white;
+	border-radius: 5px;
+	margin-top: 3px;
 }
 
+.toggle-button.public {
+	background-color: #276927; /* Green for public */
+	color: white;
+	width: 200px;
+	height: 45px;
+	font-size: 20px;
+	border-radius: 5px;
+	margin-top: 3px;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ButtonCreateConv, InputContainer, InputField, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
@@ -101,7 +101,7 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
                     <InputContainer>
                         <InputLabel htmlFor="Conversation Name">
                             Conversation Name
-                            <InputField
+                            <InputFieldCCF
                                 type="text" name="conversationName" value={ConvDataInput.conversationName} onChange={handleInputChange} />
                             {formErrors.conversationName && <div className="error-message">{formErrors.conversationName}</div>}
                         </InputLabel>
@@ -112,7 +112,6 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
                 <div className="button-createConv-container">
                     <ButtonCreateConv type="submit" >Join Conversation</ButtonCreateConv>
                 </div>
-
             </form>
         </>
     );

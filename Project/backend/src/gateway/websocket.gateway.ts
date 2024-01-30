@@ -3,13 +3,14 @@ import { Response as ExpressResponse } from 'express';
 import { Res, Req, Next } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
+import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { MembersService } from "src/members/members.service";
 import { ConversationsService } from "src/conversations/conversations.service";
 import { GatewaySessionManager } from "./gateway.session";
 import { AuthenticatedSocket } from "../utils/interfaces";
-import { User } from "@prisma/client";
 const server_adress = process.env.SERVER_ADRESS;
+import { Prisma, User } from "@prisma/client";
 
 @WebSocketGateway({
     cors: {
@@ -18,11 +19,18 @@ const server_adress = process.env.SERVER_ADRESS;
         credentials: true,
     }
 })
+
+
 export class MessagingGateway implements OnGatewayConnection {
+
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
         private readonly sessions: GatewaySessionManager,
+        private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
+
+    private readonly pingInterval = 10000; // 5 seconds
+    private readonly pongTimeout = 6000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -34,8 +42,10 @@ export class MessagingGateway implements OnGatewayConnection {
             if (identifiedUser) {
                 client = this.associateUserToAuthSocket(client, identifiedUser);
                 this.sessions.setUserSocket(identifiedUser.id, client);
-            }
 
+                // start to PING my user
+                this.startPingRoutine(client);
+            }
             // To make my userSocket join all the room the user is member of
             const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
             for (const conversation of userWithConversations.conversations) {
@@ -44,9 +54,60 @@ export class MessagingGateway implements OnGatewayConnection {
         }
 
         console.log({ "SOCKET id of our user": client.id });
-        client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' });
+        client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
 
         return;
+    }
+
+    private startPingRoutine(client: AuthenticatedSocket) {
+        console.log(`Start ping routine for user ${client.user?.id}`);
+
+        const pingRoutine = () => {
+            this.pingClient(client);
+
+            const pongTimeoutId = setTimeout(() => {
+                console.log(`Pong not received from user ${client.user?.id} within timeout`);
+                this.handlePongTimeout(client);
+                console.log("Client offline");
+            }, this.pongTimeout);
+
+            // Listen for pong from the client
+            client.once('pong', async () => {
+                console.log(`Received pong from user ${client.user?.id}`);
+                clearTimeout(pongTimeoutId);
+                this.handlePongInTime(client);
+                console.log("Client online");
+                await this.sleep(this.pingInterval);
+                pingRoutine();
+            });
+        };
+
+        pingRoutine();
+    }
+
+    async sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    pingClient(client: AuthenticatedSocket) {
+        console.log("ping the client");
+        this.server.to(client.id.toString()).emit('ping');
+    }
+
+    async handlePongInTime(client: AuthenticatedSocket) {
+        const user = client.user;
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'ONLINE' },
+        });
+    }
+
+    async handlePongTimeout(client: AuthenticatedSocket) {
+        const user = client.user;
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'OFFLINE' },
+        });
     }
 
     ////////////////////// PRIVATE METHODE //////////////////////
@@ -198,5 +259,22 @@ export class MessagingGateway implements OnGatewayConnection {
         const user = await this.userService.getUserByEmail(payload.user.email);
         const userSocket = await this.sessions.getUserSocket(user.id);
         this.server.to(userSocket.id.toString()).emit('onUnbanUser');
+    }
+
+    @OnEvent('signout')
+    async signoutApp(payload: any) {
+        const user = await this.userService.getUserById(payload.id);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        this.server.to(userSocket.id.toString()).emit('signout');
+    }
+
+    @OnEvent('friend')
+    async changeInFriendRelations(payload: any) {
+        const user = await this.userService.getUserById(payload.userId);
+        const target = await this.userService.getUserById(payload.targetId);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        const targetSocket = await this.sessions.getUserSocket(target.id);
+        this.server.to(userSocket.id.toString()).emit('changeInFriendship');
+        this.server.to(targetSocket.id.toString()).emit('changeInFriendship');
     }
 }
