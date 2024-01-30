@@ -15,6 +15,7 @@ const server_adress = process.env.SERVER_ADRESS;
 enum PowerType {
     Expand = 'Expand',
     SpeedBoost = 'SpeedBoost',
+    MultiBall = 'MultiBall',
 }
 
 interface Power {

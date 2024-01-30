@@ -19,6 +19,7 @@ const squareDx = 1.25;
 enum PowerType {
     Expand = 'Expand',
     SpeedBoost = 'SpeedBoost',
+    MultiBall = 'MultiBall',
 }
 
 interface Power {
@@ -278,6 +279,15 @@ export class PowerPongGameService {
                 gameState.squares.forEach(square => square.dx *= 1.5); // Increase ball speed by 50%
                 gameState.squares.forEach(square => square.dy *= 1.5); // Increase ball speed by 50%
                 break;
+            case PowerType.MultiBall:
+                // Logic to duplicate the current squares (balls) in play
+                const dys = gameState.squares.map(_ => Math.random() * 3)
+                gameState.squares = [...gameState.squares, ...gameState.squares.map(square => ({ ...square }))];
+                for (let i = 0; i < dys.length; ++i) {
+                    gameState.squares[i].dy += dys[i]
+                    gameState.squares[i + dys.length].dy -= dys[i]
+                }
+                break;
         }
     }
 
@@ -293,6 +303,10 @@ export class PowerPongGameService {
             case PowerType.SpeedBoost:
                 gameState.squares.forEach(square => square.dx /= 1.5); // Revert ball speed to original
                 gameState.squares.forEach(square => square.dy /= 1.5); // Revert ball speed to original
+                break;
+            case PowerType.MultiBall:
+                // Logic to remove the additional squares (balls), assuming we duplicate them earlier
+                // gameState.squares.splice(gameState.squares.length / 2);
                 break;
         }
     }

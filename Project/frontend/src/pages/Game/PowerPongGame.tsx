@@ -44,6 +44,7 @@ function PowerPongGame({ }) {
     const powers: Power[] = [
         { name: 'Expand', specialAbility: 'Expand' },
         { name: 'SpeedBoost', specialAbility: 'SpeedBoost' },
+        { name: 'MultiBall', specialAbility: 'MultiBall' },
     ];
 
     // Update the interval based on active keys
