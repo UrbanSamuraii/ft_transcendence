@@ -208,7 +208,6 @@ export class PowerPongGameService {
 
             gameState.leftScore = gameState.leftPlayerInfo.score;
             gameState.rightScore = gameState.rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
-            console.log(`gameState.leftPlayerInfo.selectedPower.name : ${gameState.leftPlayerInfo.selectedPower.name}`)
             if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
