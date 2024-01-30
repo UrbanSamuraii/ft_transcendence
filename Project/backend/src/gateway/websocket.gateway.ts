@@ -9,18 +9,20 @@ import { MembersService } from "src/members/members.service";
 import { ConversationsService } from "src/conversations/conversations.service";
 import { GatewaySessionManager } from "./gateway.session";
 import { AuthenticatedSocket } from "../utils/interfaces";
+const server_adress = process.env.SERVER_ADRESS;
 import { Prisma, User } from "@prisma/client";
 
 @WebSocketGateway({
     cors: {
-        origin: ["http://localhost:3000", "*"],
+        origin: [`http://${server_adress}:3000`, "*"],
         methods: ["GET", "POST", "DELETE"],
         credentials: true,
     }
 })
 
+
 export class MessagingGateway implements OnGatewayConnection {
-    
+
     constructor(private readonly userService: UserService,
         private readonly memberService: MembersService,
         private readonly sessions: GatewaySessionManager,
@@ -40,7 +42,7 @@ export class MessagingGateway implements OnGatewayConnection {
             if (identifiedUser) {
                 client = this.associateUserToAuthSocket(client, identifiedUser);
                 this.sessions.setUserSocket(identifiedUser.id, client);
-                
+
                 // start to PING my user
                 this.startPingRoutine(client);
             }
@@ -53,7 +55,7 @@ export class MessagingGateway implements OnGatewayConnection {
 
         console.log({ "SOCKET id of our user": client.id });
         client.emit('connected', { status: 'GOOD CONNEXION ESTABLISHED' }); // ?? Usefull ??
-        
+
         return;
     }
 
@@ -165,12 +167,13 @@ export class MessagingGateway implements OnGatewayConnection {
                 this.server.to(authorSocket.id.toString()).emit('onNewMessage');
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
                 for (const member of conversationOtherMembers) {
-                    const isBlocked = await this.convService.isBlockedByUser(payload.user, member); 
+                    const isBlocked = await this.convService.isBlockedByUser(payload.user, member);
                     if (isBlocked == false) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
                         if (memberSocket !== undefined) {
                             this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);
-                            this.server.to(memberSocket.id.toString()).emit('onNewMessage');}
+                            this.server.to(memberSocket.id.toString()).emit('onNewMessage');
+                        }
                     }
                 }
             }
@@ -206,7 +209,8 @@ export class MessagingGateway implements OnGatewayConnection {
         const memberId = payload.member.id;
         const memberSocket = await this.sessions.getUserSocket(memberId);
         if (memberSocket) {
-            this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);}
+            this.server.to(memberSocket.id.toString()).emit('onAdminStatusMember', payload);
+        }
     }
 
     @OnEvent('admin.status.update')
@@ -243,18 +247,18 @@ export class MessagingGateway implements OnGatewayConnection {
     async blockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-        
+
         this.server.to(userSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
-        if (targetSocket) {this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);};
+        if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload); };
     }
 
     @OnEvent('unblock.user')
     async unblockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-        
+
         this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
-        if (targetSocket) {this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);};
+        if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload); };
     }
 
     @OnEvent('mute.member')

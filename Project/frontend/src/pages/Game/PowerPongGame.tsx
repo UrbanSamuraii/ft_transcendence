@@ -18,6 +18,11 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
+interface Power {
+    name: string;
+    specialAbility: string;
+}
+
 function PowerPongGame({ }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -31,6 +36,15 @@ function PowerPongGame({ }) {
     const { user } = useAuth();
     const [gameData, setGameData] = useState(null);
     const [powerBarLevel, setPowerBarLevel] = useState(0); // State to track the power bar level
+    const [powerSelectionTimer, setPowerSelectionTimer] = useState(2);
+    const [selectedPower, setSelectedPower] = useState<Power | null>(null);
+    const [isPowerSelectionActive, setIsPowerSelectionActive] = useState(true);
+    const [isWaitingForPlayer, setIsWaitingForPlayer] = useState(true);
+
+    const powers: Power[] = [
+        { name: 'Expand', specialAbility: 'Expand' },
+        { name: 'SpeedBoost', specialAbility: 'SpeedBoost' },
+    ];
 
     // Update the interval based on active keys
     useEffect(() => {
@@ -46,21 +60,66 @@ function PowerPongGame({ }) {
         navigate("/select-mode");
     }
 
+    const handlePowerSelect = (power: Power) => {
+        setSelectedPower(power);
+        setIsPowerSelectionActive(false); // Hide power selection screen
+        setPowerSelectionTimer(0); // Reset timer
+
+        // Emit the selected power to the backend
+        socket?.emit('powerSelected', { gameId, power: power.name });
+    };
+
+    useEffect(() => {
+        let timerId: NodeJS.Timeout;
+
+        if (isPowerSelectionActive && powerSelectionTimer > 0) {
+            timerId = setTimeout(() => {
+                setPowerSelectionTimer(powerSelectionTimer - 1);
+            }, 1000);
+        } else if (powerSelectionTimer === 0 && isPowerSelectionActive) {
+            // Auto-select the first power when timer expires
+            handlePowerSelect(powers[0]);
+        }
+        return () => {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        };
+    }, [powerSelectionTimer, isPowerSelectionActive]);
     useEffect(() => {
         if (!socket) return;
 
         const handleGameDataUpdate = (data: any) => {
+            setIsPowerSelectionActive(false);
+            setIsWaitingForPlayer(false);
             setGameData(data);
+            if (data.leftPlayerInfo && data.leftPlayerInfo.username === user.username) {
+                setPowerBarLevel(data.leftPlayerInfo.powerBarLevel);
+            } else if (data.rightPlayerInfo && data.rightPlayerInfo.username === user.username) {
+                setPowerBarLevel(data.rightPlayerInfo.powerBarLevel);
+            }
             drawGame(data);
-
             if (data.isGameOver) {
                 clearInterval(intervalId);
             }
+            console.log(`username :  ${user.username}`)
+            console.log(`data.leftPlayerInfo.username :  ${data.leftPlayerInfo.username}`)
+            console.log(`data.rightPlayerInfo.username :  ${data.rightPlayerInfo.username}`)
         };
+        setPowerSelectionTimer(10);
 
         socket.emit("attemptReconnect", { username: getCookie("username"), gameId });
 
         socket.on("updateGameData", handleGameDataUpdate);
+        socket.on('initiatePowerSelection', (data) => {
+            // Show power selection interface
+            setSelectedPower(null);
+            setIsPowerSelectionActive(true);
+            const gameid = data.gameId;
+            console.log(gameid);
+
+            setPowerSelectionTimer(data.timeout);
+        });
 
         // A single interval is set up and maintained
         const intervalId = setInterval(() => {
@@ -77,8 +136,12 @@ function PowerPongGame({ }) {
         return () => {
             clearInterval(intervalId);
             socket.off("updateGameData", handleGameDataUpdate);
+            socket.off('initiatePowerSelection');
+            setIsPowerSelectionActive(false);
+            setSelectedPower(null);
         };
     }, [socket, gameId]);
+
 
     useEffect(() => {
         const handleKeyDown = (event: any) => {
@@ -307,7 +370,7 @@ function PowerPongGame({ }) {
             const isLocalPlayerWinner = localPlayerUsername === data.winnerUsername;
             const isLocalPlayerLoser = localPlayerUsername === data.loserUsername;
             const localPlayerCurrentElo = isLocalPlayerWinner ? data.winnerCurrentElo : (isLocalPlayerLoser ? data.loserCurrentElo : null);
-            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? -data.loserEloChange : 0);
+            const localPlayerEloChange = isLocalPlayerWinner ? data.winnerEloChange : (isLocalPlayerLoser ? data.loserEloChange : 0);
             const newElo = localPlayerCurrentElo + localPlayerEloChange;
 
             ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`; // Update font size
@@ -391,6 +454,21 @@ function PowerPongGame({ }) {
         };
     }, [buttons]);
 
+    const renderPowerSelection = () => {
+        return (
+            <div className="power-selection-screen">
+                <h2>Select Your Power ({powerSelectionTimer})</h2>
+                <div className="powers">
+                    {powers.map((power) => (
+                        <button key={power.name} onClick={() => handlePowerSelect(power)}>
+                            {power.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -401,12 +479,24 @@ function PowerPongGame({ }) {
             width: '100vw',
             position: 'relative'
         }}>
-            <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
-            <div className="power-bar-container">
-                <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
-            </div>
+            {isPowerSelectionActive ? (
+                renderPowerSelection()
+            ) : isWaitingForPlayer ? (
+                <div className="waiting-screen">
+                    Waiting for the other player...
+                </div>
+            ) : (
+                <>
+                    <canvas ref={canvasRef} style={{ backgroundColor: '#0d0d0e' }} />
+                    <div className="power-bar-container">
+                        <div className="power-bar" style={{ width: `${powerBarLevel}%` }}></div>
+                    </div>
+                </>
+            )}
         </div>
     );
 
+
 }
+
 export default PowerPongGame;

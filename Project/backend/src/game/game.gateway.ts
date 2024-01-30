@@ -10,6 +10,18 @@ import { UserService } from '../user/user.service';
 import { PrismaService } from "src/prisma/prisma.service";
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma, User, Game } from '@prisma/client';
+const server_adress = process.env.SERVER_ADRESS;
+
+enum PowerType {
+    Expand = 'Expand',
+    SpeedBoost = 'SpeedBoost',
+}
+
+interface Power {
+    type: PowerType;
+    duration: number; // in milliseconds
+    effectApplied: boolean;
+}
 
 export interface PlayerInfo {
     username: string;
@@ -18,11 +30,13 @@ export interface PlayerInfo {
     currentElo: number;
     potentialEloGain: number;
     potentialEloLoss: number;
+    selectedPower: Power | null;
+    powerBarLevel: number;
 }
 
 @WebSocketGateway({
     cors: {
-        origin: ["http://localhost:3000", "*"], // allowed origins
+        origin: [`http://${server_adress}:3000`, "*"], // allowed origins
         methods: ["GET", "POST"], // allowed methods
         credentials: true, // enable credentials
     },
@@ -65,8 +79,8 @@ export class GameGateway implements OnGatewayInit {
         const expectedWinnerScore = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 400));
         const expectedLoserScore = 1 / (1 + Math.pow(10, (winnerRating - loserRating) / 400));
 
-        const newWinnerRating = winnerRating + kFactor * (1 - expectedWinnerScore);
-        const newLoserRating = loserRating + kFactor * (0 - expectedLoserScore);
+        const newWinnerRating = Math.round(winnerRating + kFactor * (1 - expectedWinnerScore));
+        const newLoserRating = Math.round(loserRating + kFactor * (0 - expectedLoserScore));
 
         return { newWinnerRating, newLoserRating };
     }
@@ -75,6 +89,8 @@ export class GameGateway implements OnGatewayInit {
         const kFactor = 32; // K-factor for ELO calculation. Adjust as needed.
         const player1Rating = await this.userService.getEloRating(player1Id);
         const player2Rating = await this.userService.getEloRating(player2Id);
+        // console.log(`player1Rating: ${player1Rating}`)
+        // console.log(`player2Rating: ${player2Rating}`)
 
         // Calculate expected scores
         const expectedScorePlayer1 = 1 / (1 + Math.pow(10, (player2Rating - player1Rating) / 400));
@@ -85,6 +101,10 @@ export class GameGateway implements OnGatewayInit {
         const potentialLossPlayer1 = Math.round(kFactor * (0 - expectedScorePlayer1));
         const potentialGainPlayer2 = Math.round(kFactor * (1 - expectedScorePlayer2));
         const potentialLossPlayer2 = Math.round(kFactor * (0 - expectedScorePlayer2));
+        // console.log(`potentialGainPlayer1: ${potentialGainPlayer1}`)
+        // console.log(`potentialLossPlayer1: ${potentialLossPlayer1}`)
+        // console.log(`potentialGainPlayer2: ${potentialGainPlayer2}`)
+        // console.log(`potentialLossPlayer2: ${potentialLossPlayer2}`)
 
         return {
             player1: { potentialEloGain: potentialGainPlayer1, potentialEloLoss: potentialLossPlayer1 },
@@ -188,6 +208,8 @@ export class GameGateway implements OnGatewayInit {
             currentElo: currentElo,
             potentialEloGain: 0,
             potentialEloLoss: 0,
+            selectedPower: null,
+            powerBarLevel: 0
         };
 
         client.socket.data.playerInfo = playerInfo;
@@ -196,6 +218,45 @@ export class GameGateway implements OnGatewayInit {
     private resetUserGameStatus(username: string): void {
         this.userInGameMap.set(username, false);
     }
+
+    private async handlePowerSelection(gameId: number, players: { socket: Socket }[]): Promise<string[]> {
+        // Array to store the selected powers
+        const selectedPowers: string[] = [];
+
+        // Function to handle the power selection for a single player
+        const selectPowerForPlayer = (player: { socket: Socket }, timeout: number): Promise<string> => {
+            return new Promise((resolve) => {
+                // Define the timeout function ahead of time so it can be cleared
+                const timeoutFunction = () => {
+                    player.socket.removeListener('powerSelected', selectionListener); // Remove the listener
+                    resolve('Expand'); // Auto-select default power if none is selected
+                };
+
+                // Set up the timeout, but keep a reference so it can be cleared
+                const timeoutId = setTimeout(timeoutFunction, timeout);
+
+                // Listener for the 'powerSelected' event
+                const selectionListener = (data: any) => {
+                    console.log("inside selectionListener");
+                    clearTimeout(timeoutId); // Clear the timeout
+                    resolve(data.power); // Resolve with the selected power
+                };
+
+                // Attach the listener
+                player.socket.once('powerSelected', selectionListener);
+            });
+        };
+
+        // Initiate power selection for each player and wait for the results
+        for (const player of players) {
+            // Set timeout to 10 seconds or any other appropriate value
+            const power = await Promise.race([selectPowerForPlayer(player, 10000)]);
+            selectedPowers.push(power);
+        }
+
+        return selectedPowers;
+    }
+
 
     private async startMatchmaking(): Promise<void> {
         while (this.queue.length >= 2) {
@@ -238,12 +299,41 @@ export class GameGateway implements OnGatewayInit {
             player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId, gameMode: player1.gameMode });
             player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId, gameMode: player1.gameMode });
 
+
+            if (gameMode === 'powerpong') {
+                [player1, player2].forEach(player => {
+                    player.socket.emit('initiatePowerSelection', { gameId, timeout: 10 }); // timeout in seconds
+                });
+
+                // Step 2: Wait for both players to select their powers
+                const powerTypes = await this.handlePowerSelection(gameId, [player1, player2]);
+
+                // Step 3: Store the Power Information
+                powerTypes.forEach((powerType, index) => {
+                    const player = index === 0 ? player1 : player2;
+                    const playerInfo = this.playerInfoMap.get(gameId).get(player.socket.data.user.username);
+                    console.log(`powertype as powertype : ${powerType as PowerType}`)
+                    if (playerInfo && Object.values(PowerType).includes(powerType as PowerType)) {
+                        console.log("In this specific condition we are");
+                        // Create a Power object and assign it to selectedPower
+                        playerInfo.selectedPower = {
+                            type: powerType as PowerType,
+                            duration: 5000, // For example, 5000 ms for the power duration
+                            effectApplied: false,
+                        };
+                        // Optionally, reset the power bar level
+                        playerInfo.powerBarLevel = 0;
+                    }
+                });
+            }
+
             gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
                 this.server.to(gameId.toString()).emit('updateGameData', {
                     ...data,
                 });
 
                 if (data.isGameOver && data.winnerUsername && data.loserUsername) {
+                    // console.log("GameOver Data:", data);
                     this.resetUserGameStatus(player1.socket.data.user.username);
                     this.resetUserGameStatus(player2.socket.data.user.username);
                     player1.socket.leave(gameId.toString());
@@ -338,7 +428,7 @@ export class GameGateway implements OnGatewayInit {
         }
 
         const userGameInfo = this.userCurrentGameMap.get(playerUsername);
-        const gameId = userGameInfo.gameId; // Extract gameId from the userGameInfo object
+        const gameId = userGameInfo.gameId || null; // Extract gameId from the userGameInfo object
         if (gameId === null || gameId === undefined) {
             console.error(`Game ID not found for username: ${playerUsername}`);
             return;

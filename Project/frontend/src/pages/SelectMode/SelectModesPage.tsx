@@ -6,7 +6,6 @@ import './SelectMode.css';
 interface Champion {
     name: string;
     specialAbility: string;
-    // Add more properties as needed
 }
 
 const SelectModePage = () => {
@@ -15,14 +14,6 @@ const SelectModePage = () => {
     const [ongoingGameId, setOngoingGameId] = useState(null);
     const [gameMode, setGameMode] = useState(null);
     const [isLoading, setIsLoading] = useState(true); // New loading state
-    const [showChampionSelection, setShowChampionSelection] = useState(false);
-    const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
-
-    const champions: Champion[] = [
-        { name: 'Champion1', specialAbility: 'Ability1' },
-        { name: 'Champion2', specialAbility: 'Ability2' },
-        // Add more champions as needed
-    ];
 
     useEffect(() => {
         if (!socket) {
@@ -54,13 +45,7 @@ const SelectModePage = () => {
     };
 
     const handlePowerPongModeClick = () => {
-        setShowChampionSelection(!showChampionSelection);
-    };
-
-    const handleChampionSelect = (champion: Champion) => {
-        setSelectedChampion(champion);
-        setShowChampionSelection(false);
-        navigate('/matchmaking', { state: { gameMode: 'powerpong', champion } });
+        navigate('/matchmaking', { state: { gameMode: 'powerpong' } });
     };
 
     const handleReconnectClick = () => {
@@ -80,15 +65,6 @@ const SelectModePage = () => {
                 <>
                     <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
                     <button className="mode-button power-pong-mode" onClick={handlePowerPongModeClick}>POWER PONG</button>
-                    {showChampionSelection && (
-                        <div className="champion-selection">
-                            {champions.map((champion) => (
-                                <button key={champion.name} onClick={() => handleChampionSelect(champion)}>
-                                    {champion.name}
-                                </button>
-                            ))}
-                        </div>
-                    )}
                 </>
             )}
             {ongoingGameId && (

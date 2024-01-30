@@ -37,3 +37,7 @@ prisma/migrations
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+#file uploads
+
+uploads/*.png

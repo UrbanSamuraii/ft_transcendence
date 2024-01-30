@@ -3,6 +3,7 @@ import { Button2FA, Text2FA } from '../../utils/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
+const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 export const TwoFAEnablingForm = () => {
 
@@ -15,7 +16,7 @@ export const TwoFAEnablingForm = () => {
     const handleSetupClick = async () => {
         try {
             console.log("LETS SET UP 2FA");
-            const response = await axios.post('http://localhost:3001/auth/2fa/generate', null, {
+            const response = await axios.post(`http://${server_adress}:3001/auth/2fa/generate`, null, {
                 withCredentials: true,
             });
             const updatedUser = response.data.user;
@@ -31,7 +32,7 @@ export const TwoFAEnablingForm = () => {
     const handleEnableClick = async () => {
         try {
             console.log({ "Enabling code": authenticationCode });
-            const response = await axios.post('http://localhost:3001/auth/2fa/turn_on', { twoFactorAuthenticationCode: authenticationCode }, {
+            const response = await axios.post(`http://${server_adress}:3001/auth/2fa/turn_on`, { twoFactorAuthenticationCode: authenticationCode }, {
                 withCredentials: true,
             });
             console.log({ "RESPONSE FROM ENABLING 2FA": response });
