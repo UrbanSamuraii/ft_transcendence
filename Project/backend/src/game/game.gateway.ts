@@ -209,7 +209,7 @@ export class GameGateway implements OnGatewayInit {
             potentialEloGain: 0,
             potentialEloLoss: 0,
             selectedPower: null,
-            powerBarLevel: 100
+            powerBarLevel: 0
         };
 
         client.socket.data.playerInfo = playerInfo;
@@ -229,7 +229,7 @@ export class GameGateway implements OnGatewayInit {
                 // Define the timeout function ahead of time so it can be cleared
                 const timeoutFunction = () => {
                     player.socket.removeListener('powerSelected', selectionListener); // Remove the listener
-                    resolve('DefaultPower'); // Auto-select default power if none is selected
+                    resolve('Expand'); // Auto-select default power if none is selected
                 };
 
                 // Set up the timeout, but keep a reference so it can be cleared
@@ -312,8 +312,9 @@ export class GameGateway implements OnGatewayInit {
                 powerTypes.forEach((powerType, index) => {
                     const player = index === 0 ? player1 : player2;
                     const playerInfo = this.playerInfoMap.get(gameId).get(player.socket.data.user.username);
-
+                    console.log(`powertype as powertype : ${powerType as PowerType}`)
                     if (playerInfo && Object.values(PowerType).includes(powerType as PowerType)) {
+                        console.log("In this specific condition we are");
                         // Create a Power object and assign it to selectedPower
                         playerInfo.selectedPower = {
                             type: powerType as PowerType,
@@ -427,7 +428,7 @@ export class GameGateway implements OnGatewayInit {
         }
 
         const userGameInfo = this.userCurrentGameMap.get(playerUsername);
-        const gameId = userGameInfo.gameId; // Extract gameId from the userGameInfo object
+        const gameId = userGameInfo.gameId || null; // Extract gameId from the userGameInfo object
         if (gameId === null || gameId === undefined) {
             console.error(`Game ID not found for username: ${playerUsername}`);
             return;

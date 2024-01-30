@@ -93,10 +93,18 @@ function PowerPongGame({ }) {
             setIsPowerSelectionActive(false);
             setIsWaitingForPlayer(false);
             setGameData(data);
+            if (data.leftPlayerInfo && data.leftPlayerInfo.username === user.username) {
+                setPowerBarLevel(data.leftPlayerInfo.powerBarLevel);
+            } else if (data.rightPlayerInfo && data.rightPlayerInfo.username === user.username) {
+                setPowerBarLevel(data.rightPlayerInfo.powerBarLevel);
+            }
             drawGame(data);
             if (data.isGameOver) {
                 clearInterval(intervalId);
             }
+            console.log(`username :  ${user.username}`)
+            console.log(`data.leftPlayerInfo.username :  ${data.leftPlayerInfo.username}`)
+            console.log(`data.rightPlayerInfo.username :  ${data.rightPlayerInfo.username}`)
         };
         setPowerSelectionTimer(10);
 
