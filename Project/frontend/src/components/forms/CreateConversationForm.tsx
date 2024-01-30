@@ -61,7 +61,7 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
         else {
             try {
                 // console.log({"DATA" : ConvDataInput});
-                const response = await axios.post('http://localhost:3001/conversations/create', ConvDataInput, {
+                const response = await axios.post(`http://${process.env.SERVER_ADRESS}:3001/conversations/create`, ConvDataInput, {
                     withCredentials: true
                 });
                 // console.log({"RESPONSE from creating CONVERSATION": response});

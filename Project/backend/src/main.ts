@@ -18,9 +18,12 @@ async function bootstrap() {
     const adapter = new WebsocketAdapter(app);
     app.useWebSocketAdapter(adapter);
 
+
     app.use(passport.initialize());
     app.enableCors({
         origin: `http://${server_adress}:3000`,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     });
     app.useGlobalPipes(new ValidationPipe({
@@ -35,7 +38,7 @@ async function bootstrap() {
         prefix: '/uploads/', // Virtual prefix to access files in the browser
     });
     await app.listen(port);
-    
+
 
     // Gracefully shutdown the server.
     app.enableShutdownHooks();
