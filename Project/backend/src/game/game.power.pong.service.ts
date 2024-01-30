@@ -16,6 +16,16 @@ const squareSize = 2.2;
 const squareDy = 0;
 const squareDx = 1.25;
 
+enum PowerType {
+    Expand = 'Expand',
+    SpeedBoost = 'SpeedBoost',
+}
+
+interface Power {
+    type: PowerType;
+    duration: number; // in milliseconds
+    effectApplied: boolean;
+}
 
 @Injectable()
 export class PowerPongGameService {
@@ -45,11 +55,13 @@ export class PowerPongGameService {
             leftPlayerInfo: {
                 username: leftPlayerInfoUse.username, // Will be set when the game starts
                 powerBarLevel: 0,
+                power: null, // No power selected initially
                 // ... other player-specific properties
             },
             rightPlayerInfo: {
                 username: rightPlayerInfoUse.username, // Will be set when the game starts
                 powerBarLevel: 0,
+                power: null, // No power selected initially
                 // ... other player-specific properties
             },
             leftPaddle: {
@@ -106,12 +118,12 @@ export class PowerPongGameService {
 
         // Assuming 2 players for left and right paddle
         const playerInfos = Array.from(playerInfoMap.values());
-
+        gameState.leftPlayerInfo.powerBarLevel = Math.min(gameState.leftPlayerInfo.powerBarLevel + 1, 100);
+        gameState.rightPlayerInfo.powerBarLevel = Math.min(gameState.rightPlayerInfo.powerBarLevel + 1, 100);
         // Assuming 2 players for left and right paddle
         if (playerInfos.length >= 2 && !gameState.isGamePaused) {
             const leftPlayerInfo = playerInfos[0];
             const rightPlayerInfo = playerInfos[1];
-
             // Handle left player paddle movement
             if (leftPlayerInfo.activeKeys.includes("w")) {
                 const potentialY = gameState.leftPaddle.y - gameState.paddleMoveAmount;
@@ -128,6 +140,38 @@ export class PowerPongGameService {
             } else if (rightPlayerInfo.activeKeys.includes("ArrowDown")) {
                 const potentialY = gameState.rightPaddle.y + gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.min(potentialY, 100 - gameState.rightPaddle.height);
+            }
+            if (leftPlayerInfo.activeKeys.includes(" ") && gameState.leftPlayerInfo.powerBarLevel === 100) {
+                this.activatePower(gameState.leftPlayerInfo, gameState);
+            }
+
+            // Check and handle power activation for right player
+            if (rightPlayerInfo.activeKeys.includes(" ") && gameState.rightPlayerInfo.powerBarLevel === 100) {
+                this.activatePower(gameState.rightPlayerInfo, gameState);
+            }
+            if (gameState.leftPlayerInfo.power && !gameState.leftPlayerInfo.power.effectApplied) {
+                switch (gameState.leftPlayerInfo.power.type) {
+                    case PowerType.Expand:
+                        gameState.leftPaddle.height *= 1.5; // Increase paddle height by 50%
+                        break;
+                    case PowerType.SpeedBoost:
+                        gameState.squares.forEach(square => square.dx *= 1.5); // Increase ball speed by 50%
+                        break;
+                }
+                gameState.leftPlayerInfo.power.effectApplied = true;
+
+                // Set a timeout to end the power effect after its duration
+                setTimeout(() => {
+                    switch (gameState.leftPlayerInfo.power.type) {
+                        case PowerType.Expand:
+                            gameState.leftPaddle.height /= 1.5; // Revert paddle height to original
+                            break;
+                        case PowerType.SpeedBoost:
+                            gameState.squares.forEach(square => square.dx /= 1.5); // Revert ball speed to original
+                            break;
+                    }
+                    gameState.leftPlayerInfo.power = null; // Remove the power as it's no longer active
+                }, gameState.leftPlayerInfo.power.duration);
             }
 
             gameState.squares.forEach((square, idx) => {
@@ -181,7 +225,7 @@ export class PowerPongGameService {
             gameState.leftScore = leftPlayerInfo.score;
             gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
 
-            if (gameState.leftScore >= 1 || gameState.rightScore >= 1) {
+            if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
                 const winnerUsername = leftPlayerInfo.score > rightPlayerInfo.score ? leftPlayerInfo.username : rightPlayerInfo.username;
@@ -229,6 +273,50 @@ export class PowerPongGameService {
             rectA.y < rectB.y + rectB.size &&
             rectA.y + rectA.size > rectB.y;
     }
+
+    private activatePower(playerInfo: PlayerInfo, gameState: any) {
+        if (!playerInfo.selectedPower) return; // Ensure there is a power to activate
+
+        const power = playerInfo.selectedPower;
+        playerInfo.selectedPower = {
+            ...power,
+            effectApplied: false,
+        };
+        playerInfo.powerBarLevel = 0; // Reset the power bar
+
+        // Apply the power effect immediately
+        switch (power.type) {
+            case PowerType.Expand:
+                if (playerInfo.username === gameState.leftPlayerInfo.username) {
+                    gameState.leftPaddle.height *= 1.5; // Increase paddle height by 50%
+                } else {
+                    gameState.rightPaddle.height *= 1.5; // Increase paddle height by 50%
+                }
+                break;
+            case PowerType.SpeedBoost:
+                gameState.squares.forEach(square => square.dx *= 1.5); // Increase ball speed by 50%
+                break;
+        }
+        playerInfo.selectedPower.effectApplied = true;
+
+        // Set a timeout to end the power effect after its duration
+        setTimeout(() => {
+            switch (power.type) {
+                case PowerType.Expand:
+                    if (playerInfo.username === gameState.leftPlayerInfo.username) {
+                        gameState.leftPaddle.height /= 1.5; // Revert paddle height to original
+                    } else {
+                        gameState.rightPaddle.height /= 1.5; // Revert paddle height to original
+                    }
+                    break;
+                case PowerType.SpeedBoost:
+                    gameState.squares.forEach(square => square.dx /= 1.5); // Revert ball speed to original
+                    break;
+            }
+            playerInfo.selectedPower = null; // Remove the power as it's no longer active
+        }, power.duration);
+    }
+
 
     intersects(square, paddle) {
         if (

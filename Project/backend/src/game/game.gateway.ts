@@ -12,6 +12,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { Prisma, User, Game } from '@prisma/client';
 const server_adress = process.env.SERVER_ADRESS;
 
+enum PowerType {
+    Expand = 'Expand',
+    SpeedBoost = 'SpeedBoost',
+}
+
+interface Power {
+    type: PowerType;
+    duration: number; // in milliseconds
+    effectApplied: boolean;
+}
+
 export interface PlayerInfo {
     username: string;
     score: number;
@@ -19,7 +30,8 @@ export interface PlayerInfo {
     currentElo: number;
     potentialEloGain: number;
     potentialEloLoss: number;
-    champion: string;
+    selectedPower: Power | null;
+    powerBarLevel: number;
 }
 
 @WebSocketGateway({
@@ -196,7 +208,8 @@ export class GameGateway implements OnGatewayInit {
             currentElo: currentElo,
             potentialEloGain: 0,
             potentialEloLoss: 0,
-            champion: ""
+            selectedPower: null,
+            powerBarLevel: 100
         };
 
         client.socket.data.playerInfo = playerInfo;
@@ -206,43 +219,44 @@ export class GameGateway implements OnGatewayInit {
         this.userInGameMap.set(username, false);
     }
 
-    private async handleChampionSelection(gameId: number, players: { socket: Socket }[]): Promise<string[]> {
-        // Array to store the selected champions
-        const selectedChampions: string[] = [];
+    private async handlePowerSelection(gameId: number, players: { socket: Socket }[]): Promise<string[]> {
+        // Array to store the selected powers
+        const selectedPowers: string[] = [];
 
-        // Function to handle the champion selection for a single player
-        const selectChampionForPlayer = (player: { socket: Socket }, timeout: number): Promise<string> => {
+        // Function to handle the power selection for a single player
+        const selectPowerForPlayer = (player: { socket: Socket }, timeout: number): Promise<string> => {
             return new Promise((resolve) => {
                 // Define the timeout function ahead of time so it can be cleared
                 const timeoutFunction = () => {
-                    player.socket.removeListener('championSelected', selectionListener); // Remove the listener
-                    resolve('DefaultChampion'); // Auto-select default champion
+                    player.socket.removeListener('powerSelected', selectionListener); // Remove the listener
+                    resolve('DefaultPower'); // Auto-select default power if none is selected
                 };
 
                 // Set up the timeout, but keep a reference so it can be cleared
                 const timeoutId = setTimeout(timeoutFunction, timeout);
 
-                // Listener for the 'championSelected' event
+                // Listener for the 'powerSelected' event
                 const selectionListener = (data: any) => {
-                    console.log("inside selectionListener")
+                    console.log("inside selectionListener");
                     clearTimeout(timeoutId); // Clear the timeout
-                    resolve(data.champion); // Resolve with the selected champion
+                    resolve(data.power); // Resolve with the selected power
                 };
 
                 // Attach the listener
-                player.socket.once('championSelected', selectionListener);
+                player.socket.once('powerSelected', selectionListener);
             });
         };
 
-        // Initiate champion selection for each player and wait for the results
+        // Initiate power selection for each player and wait for the results
         for (const player of players) {
             // Set timeout to 10 seconds or any other appropriate value
-            const champion = await Promise.race([selectChampionForPlayer(player, 10000)]);
-            selectedChampions.push(champion);
+            const power = await Promise.race([selectPowerForPlayer(player, 10000)]);
+            selectedPowers.push(power);
         }
 
-        return selectedChampions;
+        return selectedPowers;
     }
+
 
     private async startMatchmaking(): Promise<void> {
         while (this.queue.length >= 2) {
@@ -288,18 +302,26 @@ export class GameGateway implements OnGatewayInit {
 
             if (gameMode === 'powerpong') {
                 [player1, player2].forEach(player => {
-                    player.socket.emit('initiateChampionSelection', { gameId, timeout: 10 }); // timeout in seconds
+                    player.socket.emit('initiatePowerSelection', { gameId, timeout: 10 }); // timeout in seconds
                 });
 
-                // Step 2: Wait for both players to select their champions
-                const champions = await this.handleChampionSelection(gameId, [player1, player2]);
+                // Step 2: Wait for both players to select their powers
+                const powerTypes = await this.handlePowerSelection(gameId, [player1, player2]);
 
-                // Step 3: Store the Champion Information
-                champions.forEach((champion, index) => {
+                // Step 3: Store the Power Information
+                powerTypes.forEach((powerType, index) => {
                     const player = index === 0 ? player1 : player2;
                     const playerInfo = this.playerInfoMap.get(gameId).get(player.socket.data.user.username);
-                    if (playerInfo) {
-                        playerInfo.champion = champion; // Assuming champion is just the name of the champion
+
+                    if (playerInfo && Object.values(PowerType).includes(powerType as PowerType)) {
+                        // Create a Power object and assign it to selectedPower
+                        playerInfo.selectedPower = {
+                            type: powerType as PowerType,
+                            duration: 5000, // For example, 5000 ms for the power duration
+                            effectApplied: false,
+                        };
+                        // Optionally, reset the power bar level
+                        playerInfo.powerBarLevel = 0;
                     }
                 });
             }

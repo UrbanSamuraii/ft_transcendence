@@ -18,7 +18,7 @@ const TARGET_HEIGHT = 807;
 const widthRatio = TARGET_WIDTH / BASE_WIDTH;
 const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
-interface Champion {
+interface Power {
     name: string;
     specialAbility: string;
 }
@@ -36,16 +36,14 @@ function PowerPongGame({ }) {
     const { user } = useAuth();
     const [gameData, setGameData] = useState(null);
     const [powerBarLevel, setPowerBarLevel] = useState(0); // State to track the power bar level
-    // const [isChampionSelectionActive, setIsChampionSelectionActive] = useState(false);
-    const [championSelectionTimer, setChampionSelectionTimer] = useState(2);
-    const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
-    const [isChampionSelectionActive, setIsChampionSelectionActive] = useState(true);
+    const [powerSelectionTimer, setPowerSelectionTimer] = useState(2);
+    const [selectedPower, setSelectedPower] = useState<Power | null>(null);
+    const [isPowerSelectionActive, setIsPowerSelectionActive] = useState(true);
     const [isWaitingForPlayer, setIsWaitingForPlayer] = useState(true);
 
-    const champions: Champion[] = [
-        { name: 'Champion1', specialAbility: 'Ability1' },
-        { name: 'Champion2', specialAbility: 'Ability2' },
-        // ...add more champions
+    const powers: Power[] = [
+        { name: 'Expand', specialAbility: 'Expand' },
+        { name: 'SpeedBoost', specialAbility: 'SpeedBoost' },
     ];
 
     // Update the interval based on active keys
@@ -62,38 +60,37 @@ function PowerPongGame({ }) {
         navigate("/select-mode");
     }
 
-    const handleChampionSelect = (champion: Champion) => {
-        setSelectedChampion(champion);
-        setIsChampionSelectionActive(false); // Hide champion selection screen
-        setChampionSelectionTimer(0); // Reset timer
+    const handlePowerSelect = (power: Power) => {
+        setSelectedPower(power);
+        setIsPowerSelectionActive(false); // Hide power selection screen
+        setPowerSelectionTimer(0); // Reset timer
 
-        // Emit the selected champion to the backend
-        socket?.emit('championSelected', { gameId, champion: champion.name });
+        // Emit the selected power to the backend
+        socket?.emit('powerSelected', { gameId, power: power.name });
     };
 
     useEffect(() => {
         let timerId: NodeJS.Timeout;
 
-        if (isChampionSelectionActive && championSelectionTimer > 0) {
+        if (isPowerSelectionActive && powerSelectionTimer > 0) {
             timerId = setTimeout(() => {
-                setChampionSelectionTimer(championSelectionTimer - 1);
+                setPowerSelectionTimer(powerSelectionTimer - 1);
             }, 1000);
-        } else if (championSelectionTimer === 0 && isChampionSelectionActive) {
-            // Auto-select the first champion when timer expires
-            handleChampionSelect(champions[0]);
+        } else if (powerSelectionTimer === 0 && isPowerSelectionActive) {
+            // Auto-select the first power when timer expires
+            handlePowerSelect(powers[0]);
         }
         return () => {
             if (timerId) {
                 clearTimeout(timerId);
             }
         };
-    }, [championSelectionTimer, isChampionSelectionActive]);
-
+    }, [powerSelectionTimer, isPowerSelectionActive]);
     useEffect(() => {
         if (!socket) return;
 
         const handleGameDataUpdate = (data: any) => {
-            setIsChampionSelectionActive(false);
+            setIsPowerSelectionActive(false);
             setIsWaitingForPlayer(false);
             setGameData(data);
             drawGame(data);
@@ -101,20 +98,19 @@ function PowerPongGame({ }) {
                 clearInterval(intervalId);
             }
         };
-        setChampionSelectionTimer(10);
+        setPowerSelectionTimer(10);
 
         socket.emit("attemptReconnect", { username: getCookie("username"), gameId });
 
         socket.on("updateGameData", handleGameDataUpdate);
-        socket.on('initiateChampionSelection', (data) => {
-            // Show champion selection interface
-            setSelectedChampion(null);
-            setIsChampionSelectionActive(true);
+        socket.on('initiatePowerSelection', (data) => {
+            // Show power selection interface
+            setSelectedPower(null);
+            setIsPowerSelectionActive(true);
             const gameid = data.gameId;
             console.log(gameid);
 
-            // Start a countdown based on the timeout received from the backend
-            setChampionSelectionTimer(data.timeout);
+            setPowerSelectionTimer(data.timeout);
         });
 
         // A single interval is set up and maintained
@@ -132,11 +128,12 @@ function PowerPongGame({ }) {
         return () => {
             clearInterval(intervalId);
             socket.off("updateGameData", handleGameDataUpdate);
-            socket.off('initiateChampionSelection');
-            setIsChampionSelectionActive(false);
-            setSelectedChampion(null);
+            socket.off('initiatePowerSelection');
+            setIsPowerSelectionActive(false);
+            setSelectedPower(null);
         };
     }, [socket, gameId]);
+
 
     useEffect(() => {
         const handleKeyDown = (event: any) => {
@@ -449,14 +446,14 @@ function PowerPongGame({ }) {
         };
     }, [buttons]);
 
-    const renderChampionSelection = () => {
+    const renderPowerSelection = () => {
         return (
-            <div className="champion-selection-screen">
-                <h2>Select Your Champion ({championSelectionTimer})</h2>
-                <div className="champions">
-                    {champions.map((champion) => (
-                        <button key={champion.name} onClick={() => handleChampionSelect(champion)}>
-                            {champion.name}
+            <div className="power-selection-screen">
+                <h2>Select Your Power ({powerSelectionTimer})</h2>
+                <div className="powers">
+                    {powers.map((power) => (
+                        <button key={power.name} onClick={() => handlePowerSelect(power)}>
+                            {power.name}
                         </button>
                     ))}
                 </div>
@@ -474,8 +471,8 @@ function PowerPongGame({ }) {
             width: '100vw',
             position: 'relative'
         }}>
-            {isChampionSelectionActive ? (
-                renderChampionSelection()
+            {isPowerSelectionActive ? (
+                renderPowerSelection()
             ) : isWaitingForPlayer ? (
                 <div className="waiting-screen">
                     Waiting for the other player...
