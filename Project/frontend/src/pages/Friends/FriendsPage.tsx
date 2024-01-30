@@ -85,7 +85,7 @@ export const FriendsPage = () => {
 
     const handleRemoveFriend = async (friendId: number) => {
         try {
-            const removed_friend = await axios.post(`http://${process.env.SERVER_ADRESS}:3001/users/remove_friend`, { friendId: friendId }, {
+            const removed_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/remove_friend`, { friendId: friendId }, {
                 withCredentials: true
             });
         } catch (error) {
@@ -95,7 +95,7 @@ export const FriendsPage = () => {
 
     const handleSendInvitation = async (invitationDetails: { usernameOrEmail: string }) => {
         try {
-            const invitation = await axios.post(`http://${process.env.SERVER_ADRESS}:3001/users/send_invitation`, { userName: invitationDetails.usernameOrEmail }, {
+            const invitation = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/send_invitation`, { userName: invitationDetails.usernameOrEmail }, {
                 withCredentials: true
             });
         } catch (error) {
@@ -106,7 +106,7 @@ export const FriendsPage = () => {
     const handleAcceptInvitation = async (invitationId: number) => {
         console.log("Invitation from id USER :", invitationId);
         try {
-            const added_friend = await axios.post(`http://${process.env.SERVER_ADRESS}:3001/users/add_friend`, { invitationId: invitationId }, {
+            const added_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/add_friend`, { invitationId: invitationId }, {
                 withCredentials: true
             });
         } catch (error) {
@@ -116,7 +116,7 @@ export const FriendsPage = () => {
 
     const handleRefuseInvitation = async (invitationId: number) => {
         try {
-            const refused_friend = await axios.post(`http://${process.env.SERVER_ADRESS}:3001/users/refuse_invitation`, { invitationId: invitationId }, {
+            const refused_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/refuse_invitation`, { invitationId: invitationId }, {
                 withCredentials: true
             });
         } catch (error) {

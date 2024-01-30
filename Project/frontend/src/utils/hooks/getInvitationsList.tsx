@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 export async function getInvitationsList() {
     try {
-        const API_URL = `http://${process.env.SERVER_ADRESS}:3001/users`;
+        const API_URL = `http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users`;
         const config: AxiosRequestConfig = { withCredentials: true };
 
         const response = await axios.get(`${API_URL}/get_invitations`, config);
