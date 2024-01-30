@@ -34,3 +34,17 @@
     /* Adjust color as needed */
     transition: width 0.5s ease;
 }
+
+.current-power-display {
+    position: absolute;
+    bottom: 50px;
+    /* Adjust as needed */
+    left: 50%;
+    /* Center horizontally */
+    transform: translateX(-50%);
+    /* Center horizontally */
+    color: white;
+    font-size: 1.5em;
+    /* Adjust as needed */
+    text-align: center;
+}

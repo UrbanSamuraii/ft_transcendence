@@ -25,7 +25,6 @@ enum PowerType {
 interface Power {
     type: PowerType;
     duration: number; // in milliseconds
-    effectApplied: boolean;
 }
 
 @Injectable()
@@ -113,6 +112,15 @@ export class PowerPongGameService {
                 gameState = this.initializeGameState(playerInfoMap);
                 this.gameStates.set(gameId.toString(), gameState);
             }
+
+            if (!gameState.leftPlayerInfo.selectedPower) {
+                gameState.leftPlayerInfo.selectedPower = this.selectRandomPower();
+            }
+
+            if (!gameState.rightPlayerInfo.selectedPower) {
+                gameState.rightPlayerInfo.selectedPower = this.selectRandomPower();
+            }
+
             if (gameState.leftPlayerInfo.powerBarLevel < 100) {
                 const timeSinceLastActivationLeft = currentTime - gameState.leftPlayerInfo.lastPowerActivation;
                 // console.log(`timeSinceLastActivationLeft: ${timeSinceLastActivationLeft}`)
@@ -200,7 +208,7 @@ export class PowerPongGameService {
 
             gameState.leftScore = gameState.leftPlayerInfo.score;
             gameState.rightScore = gameState.rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
-
+            console.log(`gameState.leftPlayerInfo.selectedPower.name : ${gameState.leftPlayerInfo.selectedPower.name}`)
             if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
                 clearInterval(gameState.gameLoop); // Clear the game loop to stop the game
@@ -228,10 +236,12 @@ export class PowerPongGameService {
                     leftPlayerInfo: {
                         username: gameState.leftPlayerInfo.username,
                         powerBarLevel: gameState.leftPlayerInfo.powerBarLevel,
+                        currentPower: gameState.leftPlayerInfo.selectedPower
                     },
                     rightPlayerInfo: {
                         username: gameState.rightPlayerInfo.username,
                         powerBarLevel: gameState.rightPlayerInfo.powerBarLevel,
+                        currentPower: gameState.rightPlayerInfo.selectedPower
                     },
                 });
             } else {
@@ -245,10 +255,12 @@ export class PowerPongGameService {
                     leftPlayerInfo: {
                         username: gameState.leftPlayerInfo.username,
                         powerBarLevel: gameState.leftPlayerInfo.powerBarLevel,
+                        currentPower: gameState.leftPlayerInfo.selectedPower
                     },
                     rightPlayerInfo: {
                         username: gameState.rightPlayerInfo.username,
                         powerBarLevel: gameState.rightPlayerInfo.powerBarLevel,
+                        currentPower: gameState.rightPlayerInfo.selectedPower
                     },
                 });
 
@@ -311,6 +323,19 @@ export class PowerPongGameService {
         }
     }
 
+    private createPower(type: PowerType): Power {
+        return {
+            type: type,
+            duration: 5000, // Default duration for all powers, change if necessary
+        };
+    }
+
+    private selectRandomPower(exclude?: PowerType): Power {
+        const powers = Object.values(PowerType).filter(p => p !== exclude);
+        const randomType = powers[Math.floor(Math.random() * powers.length)];
+        return this.createPower(randomType);
+    }
+
     private activatePower(playerInfo: PlayerInfo, gameState: any) {
         // console.log("Entering activatePower function");
         console.log("playerInfo:", playerInfo);
@@ -326,7 +351,7 @@ export class PowerPongGameService {
         this.applyPowerEffect(playerInfo, gameState);
         playerInfo.lastPowerActivation = Date.now();
         playerInfo.powerBarLevel = 0;
-
+        playerInfo.selectedPower = this.selectRandomPower(playerInfo.selectedPower.type);
         // Set a timeout to end the power effect after its duration
         setTimeout(() => {
             this.removePowerEffect(playerInfo, gameState);

@@ -60,7 +60,7 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     private startPingRoutine(client: AuthenticatedSocket) {
-        console.log(`Start ping routine for user ${client.user?.id}`);
+        // console.log(`Start ping routine for user ${client.user?.id}`);
 
         const pingRoutine = () => {
             this.pingClient(client);

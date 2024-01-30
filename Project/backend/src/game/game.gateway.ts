@@ -21,7 +21,6 @@ enum PowerType {
 interface Power {
     type: PowerType;
     duration: number; // in milliseconds
-    effectApplied: boolean;
 }
 
 export interface PlayerInfo {
@@ -301,34 +300,6 @@ export class GameGateway implements OnGatewayInit {
 
             player1.socket.emit('matchFound', { opponent: player2.socket.data.user, gameId, gameMode: player1.gameMode });
             player2.socket.emit('matchFound', { opponent: player1.socket.data.user, gameId, gameMode: player1.gameMode });
-
-
-            if (gameMode === 'powerpong') {
-                [player1, player2].forEach(player => {
-                    player.socket.emit('initiatePowerSelection', { gameId, timeout: 10 }); // timeout in seconds
-                });
-
-                // Step 2: Wait for both players to select their powers
-                const powerTypes = await this.handlePowerSelection(gameId, [player1, player2]);
-
-                // Step 3: Store the Power Information
-                powerTypes.forEach((powerType, index) => {
-                    const player = index === 0 ? player1 : player2;
-                    const playerInfo = this.playerInfoMap.get(gameId).get(player.socket.data.user.username);
-                    console.log(`powertype as powertype : ${powerType as PowerType}`)
-                    if (playerInfo && Object.values(PowerType).includes(powerType as PowerType)) {
-                        console.log("In this specific condition we are");
-                        // Create a Power object and assign it to selectedPower
-                        playerInfo.selectedPower = {
-                            type: powerType as PowerType,
-                            duration: 2000, // For example, 5000 ms for the power duration
-                            effectApplied: false,
-                        };
-                        // Optionally, reset the power bar level
-                        playerInfo.powerBarLevel = 0;
-                    }
-                });
-            }
 
             gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
                 this.server.to(gameId.toString()).emit('updateGameData', {
