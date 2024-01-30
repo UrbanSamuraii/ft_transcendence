@@ -30,6 +30,7 @@ async function bootstrap() {
         new ForbiddenExceptionFilter(),
     );
     await app.listen(port);
+    
 
     // Gracefully shutdown the server.
     app.enableShutdownHooks();
