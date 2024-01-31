@@ -1,6 +1,8 @@
 import {
     Injectable, Body, Res, Req, ForbiddenException,
-    UnauthorizedException, HttpStatus, HttpCode
+    UnauthorizedException, HttpStatus, HttpCode, InternalServerErrorException,
+    Logger,
+    NotFoundException,
 } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
@@ -12,6 +14,7 @@ import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { UserNotFoundException } from '../common/custom-exception/user-not-found-exception';
 
 // import { pick } from 'lodash';
 // import * as cookie from 'cookie'; // Import the cookie library
@@ -23,6 +26,8 @@ export class AuthService {
         private jwt: JwtService,
         private config: ConfigService,
         private userService: UserService) { }
+    
+    private readonly logger = new Logger(AuthService.name);
 
     async signToken(userID: number, email: string): Promise<string> {
         const user = await this.userService.getUser({ email });
@@ -73,12 +78,13 @@ export class AuthService {
                 where: { id: user.id },
                 data: { accessToken: accessToken },
             });
-            res.status(200).cookie('token', accessToken, {
+            res.status(201).cookie('token', accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
             })
+            return { success: true, message: 'User created successfully' };
         }
         catch (error: any) {
             if (error instanceof PrismaClientKnownRequestError) {
@@ -93,6 +99,7 @@ export class AuthService {
                 }
             } else {
                 res.status(500).json({ error: 'Internal server error' });
+                throw new InternalServerErrorException();
             }
         }
     }

@@ -83,15 +83,15 @@ export const LoginForm = () => {
                     navigate(`/FortyTwoFA?userEmail=${response.data.user.email}`)
                 }
             } catch (error) {
-                console.error('Sign in request error:', error);
+                console.log("ERROR Login catched !", error);
                 if (axios.isAxiosError(error)) {
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.error;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
-                        }
+                      const customError = error.response.data.message; // Access the detailed error message
+                      if (customError) {
+                        alert(customError);
+                      }
                     }
-                }
+                  }
             }
         }
     };

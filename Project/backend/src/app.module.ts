@@ -13,20 +13,24 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
 import { PowerPongGameService } from './game/game.power.pong.service';
 
+
 @Module({
     imports: [
-        AuthModule,
-        ConversationsModule,
-        MessagesModule,
-        UserModule,
-        GatewayModule,
-        PrismaModule,
-        EventEmitterModule.forRoot(),
-        ConfigModule.forRoot({ isGlobal: true }),
-        ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', '..', 'dist', 'client') }),
+      AuthModule,
+      ConversationsModule,
+      MessagesModule,
+      UserModule,
+      GatewayModule,
+      PrismaModule,
+      EventEmitterModule.forRoot(),
+      ConfigModule.forRoot({ isGlobal: true }),
+      ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', '..', '..', 'dist', 'client') }),
     ],
-    providers: [GameGateway, SquareGameService, PowerPongGameService],
-})
+    providers: [
+      GameGateway,
+      SquareGameService,
+      PowerPongGameService,
+    ],
+  })
 
-
-export class AppModule { }
+  export class AppModule {}
