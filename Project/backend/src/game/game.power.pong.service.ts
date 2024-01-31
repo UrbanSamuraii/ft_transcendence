@@ -337,14 +337,14 @@ export class PowerPongGameService {
 
     private activatePower(playerInfo: PlayerInfo, gameState: any) {
         // console.log("Entering activatePower function");
-        console.log("playerInfo:", playerInfo);
+        // console.log("playerInfo:", playerInfo);
 
         if (!playerInfo || !playerInfo.selectedPower || playerInfo.powerBarLevel < 100) {
             console.log("Exiting activatePower due to condition check");
             return;
         }
 
-        console.log(`Activating power for ${playerInfo.username}: ${playerInfo.selectedPower.type}`);
+        // console.log(`Activating power for ${playerInfo.username}: ${playerInfo.selectedPower.type}`);
 
         // Apply the power effect immediately
         this.applyPowerEffect(playerInfo, gameState);
