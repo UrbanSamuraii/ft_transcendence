@@ -11,12 +11,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { imageFileFilter } from '../utils/file-upload.utils';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService,
         private eventEmitter: EventEmitter2,
-        private userService: UserService) { }
+        private userService: UserService,
+        private prisma: PrismaService // Inject Prisma service here
+    ) { }
 
     @UseGuards(FortyTwoAuthGuard)
     @Get('signup42')
@@ -142,6 +145,43 @@ export class AuthController {
     @Get('/leaderboard/:username')
     async getUserLeaderboard(@Param('username') username: string) {
         return this.userService.getUserLeaderboard(username);
+    }
+
+    @Get('match-history/:username')
+    async getMatchHistory(@Param('username') username: string, @Res() res: ExpressResponse) {
+        try {
+            const user = await this.userService.getUserByUsername(username);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const matchHistory = await this.prisma.game.findMany({
+                where: {
+                    OR: [
+                        { player1Id: user.id },
+                        { player2Id: user.id }
+                    ]
+                },
+                include: {
+                    winner: true,
+                    loser: true,
+                    player1: true,
+                    player2: true
+                }
+            });
+
+            const detailedMatchHistory = matchHistory.map(match => ({
+                ...match,
+                player1Username: match.player1.username,
+                player2Username: match.player2.username,
+                winnerUsername: match.winner ? match.winner.username : null,
+                loserUsername: match.loser ? match.loser.username : null
+            }));
+            // console.log(detailedMatchHistory)
+            return res.status(200).json(detailedMatchHistory);
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 
     @Post('upload-avatar')

@@ -8,6 +8,7 @@ import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
 import { Signup } from './pages/Signup';
+import MatchHistory from './pages/Match-History/Match-history';
 import Signout from './pages/Signout/Signout';
 import { Login } from './pages/Login';
 import { ConversationPage } from './pages/ConversationPage';
@@ -154,6 +155,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
                     <Route path="/@/:username" element={<Profile />} />
+                    <Route path="/@/:username/match-history" element={<MatchHistory />} />
                     <Route path="/leaderboard" element={<GlobalLeaderboard />} />
                     <Route path="/matchmaking" element={<Matchmaking />} />
                     <Route path="/signout" element={<Signout />} />

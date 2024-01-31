@@ -185,8 +185,10 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        <Link to={`/leaderboard`} className="leaderboard-button">
-                            Leaderboard</Link>
+                        {/* <Link to={`/leaderboard`} className="leaderboard-button">
+                            Leaderboard</Link> */}
+                        <Link to={`/@/${username}/match-history`} className="leaderboard-button">
+                            View Match History</Link>
                     </div>
                     <button className="edit-profile" onClick={toggleTheme}>
                         <i className='bx bxs-palette'></i></button>

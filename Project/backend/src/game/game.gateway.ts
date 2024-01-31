@@ -112,24 +112,45 @@ export class GameGateway implements OnGatewayInit {
         };
     }
 
-
-
     private async handleGameOver(winnerUsername: string, loserUsername: string, gameId: number): Promise<void> {
         try {
             const winnerId = await this.userService.getUserIdByUsername(winnerUsername);
             const loserId = await this.userService.getUserIdByUsername(loserUsername);
 
             if (winnerId && loserId) {
+                // Increment win/loss counts
                 await this.userService.incrementGamesWon(winnerId);
                 await this.userService.incrementGamesLost(loserId);
 
-                // Calculate new ELO ratings
+                // Get current ELO ratings
+                const winnerRating = await this.userService.getEloRating(winnerId);
+                const loserRating = await this.userService.getEloRating(loserId);
+
+                // Calculate new ELO ratings and changes
                 const eloRatings = await this.calculateEloRatings(winnerId, loserId);
                 const { newWinnerRating, newLoserRating } = eloRatings;
+
+                const eloChangeWinner = newWinnerRating - winnerRating;
+                const eloChangeLoser = newLoserRating - loserRating;
 
                 // Update ELO ratings
                 await this.userService.updateEloRating(winnerId, newWinnerRating);
                 await this.userService.updateEloRating(loserId, newLoserRating);
+
+                // Update the game record with the winner and ELO changes
+                // console.log(winnerId)
+                // console.log(eloChangeWinner)
+                // console.log(eloChangeLoser)
+                // console.log(gameId)
+                await this.prisma.game.update({
+                    where: { id: gameId },
+                    data: {
+                        winnerId: winnerId,
+                        loserId: loserId,
+                        eloChangeWinner: eloChangeWinner,
+                        eloChangeLoser: eloChangeLoser
+                    }
+                });
 
                 this.server.to(gameId.toString()).emit('gameOver', { winnerUsername });
             }
@@ -219,45 +240,6 @@ export class GameGateway implements OnGatewayInit {
     private resetUserGameStatus(username: string): void {
         this.userInGameMap.set(username, false);
     }
-
-    private async handlePowerSelection(gameId: number, players: { socket: Socket }[]): Promise<string[]> {
-        // Array to store the selected powers
-        const selectedPowers: string[] = [];
-
-        // Function to handle the power selection for a single player
-        const selectPowerForPlayer = (player: { socket: Socket }, timeout: number): Promise<string> => {
-            return new Promise((resolve) => {
-                // Define the timeout function ahead of time so it can be cleared
-                const timeoutFunction = () => {
-                    player.socket.removeListener('powerSelected', selectionListener); // Remove the listener
-                    resolve('Expand'); // Auto-select default power if none is selected
-                };
-
-                // Set up the timeout, but keep a reference so it can be cleared
-                const timeoutId = setTimeout(timeoutFunction, timeout);
-
-                // Listener for the 'powerSelected' event
-                const selectionListener = (data: any) => {
-                    console.log("inside selectionListener");
-                    clearTimeout(timeoutId); // Clear the timeout
-                    resolve(data.power); // Resolve with the selected power
-                };
-
-                // Attach the listener
-                player.socket.once('powerSelected', selectionListener);
-            });
-        };
-
-        // Initiate power selection for each player and wait for the results
-        for (const player of players) {
-            // Set timeout to 10 seconds or any other appropriate value
-            const power = await Promise.race([selectPowerForPlayer(player, 10000)]);
-            selectedPowers.push(power);
-        }
-
-        return selectedPowers;
-    }
-
 
     private async startMatchmaking(): Promise<void> {
         while (this.queue.length >= 2) {
