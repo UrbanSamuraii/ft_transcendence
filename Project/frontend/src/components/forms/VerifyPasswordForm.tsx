@@ -4,6 +4,7 @@ import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { ImplementNewPasswordModal } from "../modals/ImplementNewPasswordModal";
+import DOMPurify from 'dompurify';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -26,6 +27,9 @@ export const VerifyPasswordForm: React.FC<VerifyPasswordFormFormProps> = ({ setS
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 15;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -49,8 +53,11 @@ export const VerifyPasswordForm: React.FC<VerifyPasswordFormFormProps> = ({ setS
         }
         else {
             try {
-                console.log({ "DATA": ConvDataInput });
-                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/verify_password`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    password: DOMPurify.sanitize(ConvDataInput.password),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/verify_password`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
                 console.log({ "RESPONSE from VERIFYING PASSWORD": response });
@@ -59,7 +66,6 @@ export const VerifyPasswordForm: React.FC<VerifyPasswordFormFormProps> = ({ setS
                     alert(`Warning: ${customWarning}`);
                 }
                 setShowNewPasswordModal(true);
-                // setShowModal(false);
             } catch (error) {
                 console.error('Verify password conversation error:', error);
                 if (axios.isAxiosError(error)) {
@@ -89,7 +95,7 @@ export const VerifyPasswordForm: React.FC<VerifyPasswordFormFormProps> = ({ setS
                         <InputLabel htmlFor="Conversation Name">
                             Please enter the Password
                             <InputField
-                                type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} />
+                                type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={15}/>
                             {formErrors.password && <div className="error-message">{formErrors.password}</div>}
                         </InputLabel>
                     </InputContainer>

@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -23,6 +25,9 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 30;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -46,11 +51,13 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
         }
         else {
             try {
-                // console.log({"DATA" : ConvDataInput});
-                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/ban_user`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    userToBan: DOMPurify.sanitize(ConvDataInput.userToBan),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/ban_user`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                // console.log({"RESPONSE from BANNING USER FROM CONVERSATION": response}); 
                 if (response.status === 403) {
                     const customWarning = response.data.message;
                     alert(`Warning: ${customWarning}`);
@@ -79,7 +86,7 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
                     <InputLabel htmlFor="Conversation Name">
                         Username or email
                         <InputFieldCCF
-                            type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} />
+                            type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} maxLength={30}/>
                         {formErrors.userToBan && <div className="error-message">{formErrors.userToBan}</div>}
                     </InputLabel>
                 </InputContainer>

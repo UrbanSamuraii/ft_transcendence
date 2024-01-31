@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import { Button, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
-// import './LoginForm.css';
 
 interface FormData {
     email: string;
@@ -28,6 +29,17 @@ export const LoginForm = () => {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        
+        let maxCharacterLimit;
+        switch (name) {
+            case 'email':
+                maxCharacterLimit = 30;
+                break;
+            default:
+                maxCharacterLimit = 15;
+        }
+        if (value.length > maxCharacterLimit) { return; }
+        
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
@@ -52,7 +64,12 @@ export const LoginForm = () => {
         }
         else {
             try {
-                const response = await axios.post(`http://${server_adress}:3001/auth/login`, { email: formData.email, password: formData.password }, {
+                const sanitizedFormData = {
+                    ...formData,
+                    email: DOMPurify.sanitize(formData.email),
+                    password: DOMPurify.sanitize(formData.password),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/auth/login`, { email: sanitizedFormData.email, password: sanitizedFormData.password }, {
                     withCredentials: true,
                 });
                 if (response.status == 200) {
@@ -93,7 +110,7 @@ export const LoginForm = () => {
                         <div className="input-login-container">
                             <InputContainer>
                                 <InputField className='input'
-                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} maxLength={30}/>
                                 {formErrors.email && <div className="error-message">{formErrors.email}</div>}
                                 <i className='bx bx-user'></i>
                             </InputContainer>
@@ -102,7 +119,7 @@ export const LoginForm = () => {
                         <div className="input-login-container">
                             <InputContainer>
                                 <InputField
-                                    placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
+                                    placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} maxLength={15}/>
                                 {formErrors.password && <div className="error-message">{formErrors.password}</div>}
                                 <i className='bx bxs-lock-alt'></i>
                             </InputContainer>

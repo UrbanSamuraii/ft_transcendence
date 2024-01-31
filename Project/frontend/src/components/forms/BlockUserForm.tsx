@@ -3,6 +3,7 @@ import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLa
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { BlockUserModal } from "../modals/BlockUserModal";
+import DOMPurify from 'dompurify';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -26,6 +27,9 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 30;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -47,7 +51,11 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
         }
         else {
             try {
-                const response = await axios.post(`http://${server_adress}:3001/conversations/block_user`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    userName: DOMPurify.sanitize(ConvDataInput.userName),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/block_user`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
                 console.log({ "RESPONSE from BLOCKING USER": response });
@@ -83,7 +91,7 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
                         <InputLabel htmlFor="Conversation Name">
                             Username or email
                             <InputFieldCCF
-                                type="text" name="userName" value={ConvDataInput.userName} onChange={handleInputChange} />
+                                type="text" name="userName" value={ConvDataInput.userName} onChange={handleInputChange} maxLength={30}/>
                             {formErrors.userName && <div className="error-message">{formErrors.userName}</div>}
                         </InputLabel>
                     </InputContainer>

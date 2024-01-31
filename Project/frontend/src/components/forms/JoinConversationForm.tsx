@@ -18,7 +18,6 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 
     const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
     const [convId, setConversationId] = useState<number | null>(null);
-    // let convId: number | null = null;
     const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
         conversationName: '',
     });
@@ -27,6 +26,9 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 15;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -102,7 +104,7 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
                         <InputLabel htmlFor="Conversation Name">
                             Conversation Name
                             <InputFieldCCF
-                                type="text" name="conversationName" value={ConvDataInput.conversationName} onChange={handleInputChange} />
+                                type="text" name="conversationName" value={ConvDataInput.conversationName} onChange={handleInputChange} maxLength={15}/>
                             {formErrors.conversationName && <div className="error-message">{formErrors.conversationName}</div>}
                         </InputLabel>
                     </InputContainer>

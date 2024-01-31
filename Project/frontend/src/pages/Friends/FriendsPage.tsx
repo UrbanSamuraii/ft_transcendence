@@ -6,6 +6,7 @@ import { Friendspage, MainContentContainer, InvitationContainer, InvitationsList
 import { useSocket } from '../../SocketContext';
 import { getFriendsList } from '../../utils/hooks/getFriendsList';
 import { getInvitationsList } from '../../utils/hooks/getInvitationsList';
+import DOMPurify from 'dompurify';
 
 export const FriendsPage = () => {
 
@@ -49,38 +50,6 @@ export const FriendsPage = () => {
 
     }, [chatSocketContextData]);
 
-    useEffect(() => {
-        const fetchFriendsList = async () => {
-            try {
-                const friendsList = await getFriendsList();
-                console.log("Fetched Friends List: ", friendsList);
-                setFriendsList(friendsList);
-            } catch (error) {
-                console.error('Error fetching friends list:', error);
-            }
-        };
-        
-        const fetchInvitationsList = async () => {
-            try {
-                const invitationsList = await getInvitationsList();
-                console.log("Fetched Invitations List: ", invitationsList);
-                setInvitationsList(invitationsList);
-            } catch (error) {
-                console.error('Error fetching invitations list:', error);
-            }
-        };
-        
-        fetchInvitationsList();
-        fetchFriendsList();
-
-        const socket = chatSocketContextData?.socket;
-        if (socket) { socket.on('changeInFriendship', fetchFriendsList) }
-        return () => {
-            if (socket) { socket.off('changeInFriendship', fetchFriendsList) }
-        };
-        
-    }, [chatSocketContextData]);
-
     const handleRemoveFriend = async (friendId: number) => {
         try {
           const removed_friend = await axios.post('http://localhost:3001/users/remove_friend', { friendId: friendId }, {
@@ -92,7 +61,7 @@ export const FriendsPage = () => {
 
     const handleSendInvitation = async (invitationDetails: { usernameOrEmail: string }) => {
         try {
-            const invitation = await axios.post('http://localhost:3001/users/send_invitation', { userName: invitationDetails.usernameOrEmail }, {
+            const invitation = await axios.post('http://localhost:3001/users/send_invitation', { userName: DOMPurify.sanitize(invitationDetails.usernameOrEmail) }, {
               withCredentials: true });
         } catch (error) {
             console.error('Error inviting friend:', error);

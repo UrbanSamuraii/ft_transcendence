@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -25,6 +27,9 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 15;
+        if (value.length > maxCharacterLimit) { return; }
 
         if (type === 'checkbox') {
             setConvDataInput((prevData) => ({
@@ -61,11 +66,14 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
         }
         else {
             try {
-                // console.log({"DATA" : ConvDataInput});
-                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/set_newPassword`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    newPassword: DOMPurify.sanitize(ConvDataInput.newPassword),
+                    disablePassword: ConvDataInput.disablePassword
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/set_newPassword`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                // console.log({"RESPONSE from SETTING UP A NEW PASSWORD": response}); 
                 if (response.status === 403) {
                     const customWarning = response.data.message;
                     alert(`Warning: ${customWarning}`);
@@ -109,7 +117,7 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
                     <InputLabel htmlFor="Conversation Name">
 
                         <InputField
-                            type="text" name="newPassword" value={ConvDataInput.newPassword} onChange={handleInputChange} />
+                            type="text" name="newPassword" value={ConvDataInput.newPassword} onChange={handleInputChange} maxLength={10}/>
                         {formErrors.newPassword && <div className="error-message">{formErrors.newPassword}</div>}
                     </InputLabel>
                 </InputContainer>

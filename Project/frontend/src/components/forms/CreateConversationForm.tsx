@@ -3,6 +3,8 @@ import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLa
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -27,7 +29,6 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        console.log("Input change detected", value);
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -52,19 +53,22 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
     const handleCreateConversation = async (e: React.FormEvent) => {
         e.preventDefault();
-        // console.log("Conv Data Input name", ConvDataInput.name);
-        // console.log("Conv Data Input users length", ConvDataInput.users);
         const newErrors: Partial<ConvDataInput> = {};
         if (!ConvDataInput.name) { newErrors.name = 'Conversation Name is required'; }
         else if (ConvDataInput.users.length === 0) { newErrors.currentUsername = 'At least one User is required'; }
         if (Object.keys(newErrors).length > 0) { setFormErrors(newErrors); }
         else {
             try {
-                // console.log({"DATA" : ConvDataInput});
-                const response = await axios.post('http://localhost:3001/conversations/create', ConvDataInput, {
+                const sanitizedName = DOMPurify.sanitize(ConvDataInput.name);
+                const sanitizedUsers = ConvDataInput.users.map(user => DOMPurify.sanitize(user));
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    name: sanitizedName,
+                    users: sanitizedUsers,
+                };
+                const response = await axios.post('http://localhost:3001/conversations/create', sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                // console.log({"RESPONSE from creating CONVERSATION": response});
                 if (response.status === 403) {
                     const customWarning = response.data.message;
                     alert(`Warning: ${customWarning}`);
@@ -95,8 +99,8 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
                 <InputContainer>
                     <InputLabel htmlFor="Conversation Name">
                         enter chat name
-                        <InputFieldCCF
-                            className='lets-try-this' type="text" name="name" value={ConvDataInput.name} onChange={handleInputChange} />
+                        <InputFieldCCF maxLength={10}
+                            className='lets-try-this' type="text" name="name" value={ConvDataInput.name} onChange={handleInputChange}/>
                         {formErrors.name && <div className="error-message">{formErrors.name}</div>}
                     </InputLabel>
                 </InputContainer>
@@ -106,8 +110,8 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
                 <InputContainer>
                     <InputLabel htmlFor="Username(s) or email(s) of the member(s)">
                         Username(s) or email(s) of the member(s)
-                        <InputFieldCCF
-                            type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange} />
+                        <InputFieldCCF maxLength={30}
+                            type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange}/>
                     </InputLabel>
                     {formErrors.currentUsername && <div className="error-message">{formErrors.currentUsername}</div>}
                 </InputContainer>

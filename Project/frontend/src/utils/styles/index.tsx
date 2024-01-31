@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PageProps } from './styleType';
 import React, { MouseEvent, useState } from 'react';
 
@@ -41,6 +41,12 @@ export const InputFieldCCF = styled.input`
     color: pink !important;
     background-color: inherit !important;
   }
+  
+  ${({ maxLength }) =>
+    maxLength &&
+    css`
+      max-length: ${maxLength};
+    `}
 `;
 
 export const InputContainer = styled.div`

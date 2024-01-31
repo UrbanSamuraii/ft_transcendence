@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 
 interface ConvDataInput {
     userToAdd: string;
@@ -22,6 +23,9 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 30;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -45,9 +49,12 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
         }
         else {
             try {
-                console.log({ "DATA": ConvDataInput });
                 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
-                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/add_member`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    userToAdd: DOMPurify.sanitize(ConvDataInput.userToAdd),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/add_member`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
                 console.log({ "RESPONSE from ADDING USER TO CONVERSATION": response });
@@ -79,7 +86,7 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
                     <InputLabel htmlFor="Conversation Name">
                         Username or email
                         <InputField
-                            type="text" name="userToAdd" value={ConvDataInput.userToAdd} onChange={handleInputChange} />
+                            type="text" name="userToAdd" value={ConvDataInput.userToAdd} onChange={handleInputChange} maxLength={30}/>
                         {formErrors.userToAdd && <div className="error-message">{formErrors.userToAdd}</div>}
                     </InputLabel>
                 </InputContainer>

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PageProps } from '../../utils/styles/styleType';
 import React, { MouseEvent, useState } from 'react';
 
@@ -154,6 +154,11 @@ export const InvitationBarContainer = styled.div`
 const Input = styled.input`
   margin-right: 10px;
   padding: 5px;
+  ${({ maxLength }) =>
+    maxLength &&
+    css`
+      max-length: ${maxLength};
+    `}
 `;
 
 const Message = styled.div`
@@ -187,6 +192,8 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
   const handleSendInvitation = () => {
     if (inputValue.trim() === '') {
       setMessage('Please enter the username or email.');
+    } if (inputValue.length > 10) {
+      setMessage('Input exceeds the maximum character limit.');
     } else {
       sendInvitation({ usernameOrEmail: inputValue });
       setInputValue('');
@@ -196,7 +203,7 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 
   return (
 	<div>
-	  <Input
+	  <Input maxLength={30}
 		type="text"
 		placeholder="Username or Email"
 		value={inputValue}

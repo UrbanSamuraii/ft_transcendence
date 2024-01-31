@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 type Member = {
