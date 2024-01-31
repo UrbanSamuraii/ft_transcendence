@@ -132,16 +132,17 @@ export class GameGateway implements OnGatewayInit {
 
                 const eloChangeWinner = newWinnerRating - winnerRating;
                 const eloChangeLoser = newLoserRating - loserRating;
+                // console.log(`winnerRating: ${winnerRating}`)
+                // console.log(`loserRating: ${loserRating}`)
+                // console.log(`newWinnerRating: ${newWinnerRating}`)
+                // console.log(`newLoserRating: ${newLoserRating}`)
+                // console.log(`eloChangeWinner: ${eloChangeWinner}`)
+                // console.log(`eloChangeLoser: ${eloChangeLoser}`)
 
                 // Update ELO ratings
                 await this.userService.updateEloRating(winnerId, newWinnerRating);
                 await this.userService.updateEloRating(loserId, newLoserRating);
 
-                // Update the game record with the winner and ELO changes
-                // console.log(winnerId)
-                // console.log(eloChangeWinner)
-                // console.log(eloChangeLoser)
-                // console.log(gameId)
                 await this.prisma.game.update({
                     where: { id: gameId },
                     data: {

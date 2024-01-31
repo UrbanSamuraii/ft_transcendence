@@ -63,6 +63,8 @@ function PowerPongGame({ }) {
         if (!socket) return;
 
         const handleGameDataUpdate = (data: any) => {
+            if (!user)
+                return;
             // setIsPowerSelectionActive(false);
             setIsWaitingForPlayer(false);
             setGameData(data);
