@@ -67,9 +67,8 @@ export class GameGateway implements OnGatewayInit {
         console.log("Queue after removal:", this.queue.map(client => client.socket.id)); // Adjusted for new queue structure
     }
 
-
     afterInit(server: Server) {
-        console.log("Socket.io initialized");
+        // console.log("Socket.io initialized");
     }
 
     async calculateEloRatings(winnerId: number, loserId: number) {
