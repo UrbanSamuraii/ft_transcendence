@@ -1,6 +1,7 @@
 import React, { useState, useContext,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import  { AxiosError } from 'axios';
 import { Link } from 'react-router-dom';
 import { Button, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalForms.css';
@@ -17,9 +18,8 @@ interface FormData {
 
 export const LoginForm = () => {
 
-    const { socket } = useSocket();
-    
     const navigate = useNavigate();
+    const { socket } = useSocket();
     
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -68,6 +68,7 @@ export const LoginForm = () => {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: Partial<FormData> = {};
+        
         if (!formData.email) {
             newErrors.email = 'Email is required';
         }
@@ -97,7 +98,8 @@ export const LoginForm = () => {
                     console.log({ "User using 2FA authentication": response.data.user.email });
                     navigate(`/FortyTwoFA?userEmail=${response.data.user.email}`)
                 }
-            } catch (error) {
+            } catch (error: any) {
+                const err = error as AxiosError
                 if (axios.isAxiosError(error)) {
                     if (error.response && error.response.data) {
                         const receivedCustomError: string = error.response.data.message;

@@ -18,7 +18,7 @@ import {
 		const statusCode = exception.getStatus();
 		this.logger.log(`Exception caught in HttpExceptionFilter. Status: ${statusCode}. Request URL: ${request.url}`);
 		if (typeof exception.getResponse() === 'string') {
-		  response.status(statusCode).json({
+		  response.status(statusCode).send({
 			statusCode,
 			error: exception.getResponse(),
 			path: request.url,

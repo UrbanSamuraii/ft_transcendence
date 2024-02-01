@@ -9,7 +9,6 @@ import { useSocket } from './../../SocketContext';
 import { ErrorMessageModal } from '../modals/ErrorMessageModal';
 import DOMPurify from 'dompurify';
 
-
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface FormData {
@@ -88,6 +87,7 @@ export const RegisterForm = () => {
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: Partial<FormData> = {};
+
         if (!formData.email) {
             newErrors.email = 'Email is required';
         }
@@ -125,14 +125,13 @@ export const RegisterForm = () => {
                     last_name: DOMPurify.sanitize(formData.last_name),
                     password: DOMPurify.sanitize(formData.password),
                 };
-                const response = await axios.post(
-                    `http://${server_adress}:3001/auth/signup`, sanitizedFormData,
+                const response = await axios.post(`http://${server_adress}:3001/auth/signup`, sanitizedFormData,
                     { withCredentials: true });
                 if (socket) {
                     socket.disconnect()
                 }
-                // console.log(response);
-                // navigate('/');
+                navigate('/');
+                // }
             } catch (error) {
                 console.log("ERROR RegisterForm!");
                 if (axios.isAxiosError(error)) {

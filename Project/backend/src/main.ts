@@ -1,5 +1,7 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ForbiddenExceptionFilter } from './common/filters/forbidden-exception.filter';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception-filter';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -27,9 +29,11 @@ async function bootstrap() {
         whitelist: true,
     }));
     app.use(cookieParser());
+    const httpAdapterHost = app.get(HttpAdapterHost);
     app.useGlobalFilters(
         new UnauthorizedExceptionFilter(),
         new ForbiddenExceptionFilter(),
+        // new PrismaExceptionFilter(httpAdapterHost),
         // new HttpExceptionFilter(),
     );
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
