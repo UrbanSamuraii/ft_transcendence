@@ -372,7 +372,7 @@ export class GameGateway implements OnGatewayInit {
     @SubscribeMessage('playerActions')
     handlePlayerActions(client: Socket, activeKeys: string[]) {
         if (!client.data || !client.data.user) {
-            console.error('User data is not available in handlePlayerActions');
+            // console.error('User data is not available in handlePlayerActions');
             return;
         }
 
