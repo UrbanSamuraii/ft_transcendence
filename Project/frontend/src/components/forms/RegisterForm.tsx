@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+import { ErrorMessageModal } from '../modals/ErrorMessageModal';
 import DOMPurify from 'dompurify';
 
 
@@ -33,6 +34,20 @@ export const RegisterForm = () => {
     });
 
     const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModal, setShowModal] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+      };
+    
+      const handleShowModal = () => {
+        setShowModal(true);
+      };
+    
+      const handleCloseModal = () => {
+        setShowModal(false);
+      };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -113,21 +128,20 @@ export const RegisterForm = () => {
                 const response = await axios.post(
                     `http://${server_adress}:3001/auth/signup`, sanitizedFormData,
                     { withCredentials: true });
-                // const response = await axios.post(`http://${server_adress}:3001/auth/signup`, formData, {
-                //     withCredentials: true,
-                // });
-                // console.log(response.status, response.data.token);
                 if (socket) {
                     socket.disconnect()
                 }
-                navigate('/');
+                // console.log(response);
+                // navigate('/');
             } catch (error) {
-                console.error('Sign up request error:', error);
+                console.log("ERROR RegisterForm!");
                 if (axios.isAxiosError(error)) {
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.error;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
+                        const receivedCustomError: string = error.response.data.message;
+                        console.log("Error when register: ", receivedCustomError);
+                        if (receivedCustomError) {
+                            setCustomError(receivedCustomError);
+                            handleShowModal();
                         }
                     }
                 }
@@ -136,6 +150,8 @@ export const RegisterForm = () => {
     };
 
     return (
+        <>
+        {customError && showModal && <ErrorMessageModal setShowModal={handleCloseModal} errorMessage={customError} />}
         <div className="app-container">
             <head>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
@@ -208,5 +224,6 @@ export const RegisterForm = () => {
                 </div>
             </body>
         </div>
+        </>
     );
 };

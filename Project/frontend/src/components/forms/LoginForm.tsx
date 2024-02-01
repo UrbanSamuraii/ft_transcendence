@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Button, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+import { ErrorMessageModal } from '../modals/ErrorMessageModal';
 import DOMPurify from 'dompurify';
 
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
@@ -16,16 +17,30 @@ interface FormData {
 
 export const LoginForm = () => {
 
-    const { socket } = useSocket();  // Get the socket from context
-
+    const { socket } = useSocket();
+    
     const navigate = useNavigate();
-
+    
     const [formData, setFormData] = useState<FormData>({
         email: '',
         password: '',
     });
 
     const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModal, setShowModal] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+      };
+    
+      const handleShowModal = () => {
+        setShowModal(true);
+      };
+    
+      const handleCloseModal = () => {
+        setShowModal(false);
+      };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -83,20 +98,22 @@ export const LoginForm = () => {
                     navigate(`/FortyTwoFA?userEmail=${response.data.user.email}`)
                 }
             } catch (error) {
-                console.log("ERROR Login catched !", error);
                 if (axios.isAxiosError(error)) {
                     if (error.response && error.response.data) {
-                      const customError = error.response.data.message; // Access the detailed error message
-                      if (customError) {
-                        alert(customError);
-                      }
+                        const receivedCustomError: string = error.response.data.message;
+                        if (receivedCustomError) {
+                            setCustomError(receivedCustomError);
+                            handleShowModal();
+                        }
                     }
-                  }
+                }
             }
         }
     };
 
     return (
+        <>
+        {customError && showModal && <ErrorMessageModal setShowModal={handleCloseModal} errorMessage={customError} />}
         <div className="app-container">
             <head>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
@@ -138,5 +155,6 @@ export const LoginForm = () => {
                 </div>
             </body>
         </div>
+        </>
     );
 };

@@ -91,14 +91,16 @@ export class AuthService {
                 if (error.code === 'P2002') {
                     if (Array.isArray(error.meta?.target)) {
                         if (error.meta.target.includes('email')) {
-                            res.status(400).json({ error: 'Email already exists' });
+                            // res.status(400).json({ error: 'Email already exists' });
+                            throw new ForbiddenException('Error: Email already exists');
                         } else if (error.meta.target.includes('username')) {
-                            res.status(400).json({ error: 'Username already exists' });
+                            // res.status(400).json({ error: 'Username already exists' });
+                            throw new ForbiddenException('Error: Username already exists');
                         }
                     }
                 }
             } else {
-                res.status(500).json({ error: 'Internal server error' });
+                // res.status(500).json({ error: 'Internal server error' });
                 throw new InternalServerErrorException();
             }
         }
