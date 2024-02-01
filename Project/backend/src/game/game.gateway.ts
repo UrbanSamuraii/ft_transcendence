@@ -384,6 +384,10 @@ export class GameGateway implements OnGatewayInit {
         }
 
         const userGameInfo = this.userCurrentGameMap.get(playerUsername);
+        if (userGameInfo == null) {
+            console.error(`userGameInfo not found for username: ${playerUsername}`);
+            return;
+        }
         const gameId = userGameInfo.gameId || null; // Extract gameId from the userGameInfo object
         if (gameId === null || gameId === undefined) {
             console.error(`Game ID not found for username: ${playerUsername}`);
