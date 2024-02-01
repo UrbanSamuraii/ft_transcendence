@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import axios, { AxiosRequestConfig } from 'axios';
-const server_adress = process.env.REACT_APP_SERVER_ADRESS;
+const server_address = process.env.REACT_APP_SERVER_ADRESS;
+const API_URL = `http://${server_address}:3001`;
 
 export function useAuth() {
     const [user, setUser] = useState<any>();
     const [loading, setLoading] = useState(true);
 
-    const API_URL = `http://${server_adress}:3001`;
-    const config: AxiosRequestConfig = { withCredentials: true };
+    const config = useMemo<AxiosRequestConfig>(() => ({
+        withCredentials: true
+    }), []);
 
-    const checkAuthStatus = () => {
+    const checkAuthStatus = useCallback(() => {
         setLoading(true);
         axios.get(`${API_URL}/auth/me`, config)
             .then(({ data }) => {
@@ -18,14 +20,14 @@ export function useAuth() {
             })
             .catch((err) => {
                 console.error('Auth check failed:', err);
-                setUser(null); // Or handle the error as required
+                setUser(null);
             })
             .finally(() => setLoading(false));
-    };
+    }, [config]);
 
     useEffect(() => {
         checkAuthStatus();
-    }, []);
+    }, [checkAuthStatus]);
 
     return { user, loading, checkAuthStatus };
 }

@@ -3,17 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../../SocketContext';
 import './SelectMode.css';
 
-interface Champion {
-    name: string;
-    specialAbility: string;
-}
-
 const SelectModePage = () => {
     const navigate = useNavigate();
     const { socket } = useSocket();
     const [ongoingGameId, setOngoingGameId] = useState(null);
     const [gameMode, setGameMode] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // New loading state
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!socket) {

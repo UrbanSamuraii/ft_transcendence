@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import axios, { AxiosRequestConfig } from 'axios';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 

@@ -1,22 +1,14 @@
-import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
-// import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './PowerPongGame.css';
-import { drawGrid } from '../../Utils.js';
+// import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
-import { useSocket } from '../../SocketContext';  // Update the path accordingly if needed
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useSocket } from '../../SocketContext';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 
 const targetAspectRatio = 1318 / 807;
-const BASE_WIDTH = 1920;
-const BASE_HEIGHT = 945;
 const TARGET_WIDTH = 1318;
 const TARGET_HEIGHT = 807;
-
-const widthRatio = TARGET_WIDTH / BASE_WIDTH;
-const heightRatio = TARGET_HEIGHT / BASE_HEIGHT;
 
 interface Power {
     type: string;
@@ -160,7 +152,8 @@ function PowerPongGame({ }) {
         };
     }, [activeKeys, isGamePaused]);
 
-    const buttons: any = [];
+    // const buttons: any = [];
+    const buttonsRef = useRef<any[]>([]);
 
     const drawButton = (x: number, y: number, width: number, height: number, text: string, callback: () => void) => {
         console.log(`Drawing button with text: ${text}`);
@@ -192,42 +185,13 @@ function PowerPongGame({ }) {
         ctx.fillText(text, x + width / 2, y + height / 2 + fontSize / 4);
 
         // Store callback and button bounds for click detection
-        buttons.push({
+        buttonsRef.current.push({
             x, y, width, height, callback, text
         });
     }
 
     function clearButtons() {
-        buttons.length = 0;
-    }
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.addEventListener('click', handleCanvasClick);
-
-        return () => {
-            canvas.removeEventListener('click', handleCanvasClick);
-        };
-    }, []);
-
-    const handleCanvasClick = (e: MouseEvent) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        // Check if click is inside any button
-        for (let btn of buttons) {
-            if (mouseX > btn.x && mouseX < btn.x + btn.width && mouseY > btn.y && mouseY < btn.y + btn.height) {
-                console.log(`Clicked on button: ${btn.text}`);
-                btn.callback();
-                break;
-            }
-        }
+        buttonsRef.current.length = 0;
     }
 
     const drawNet = (data: any) => {
@@ -416,12 +380,29 @@ function PowerPongGame({ }) {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
+
+        const handleCanvasClick = (e: any) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            for (let btn of buttonsRef.current) {
+                if (
+                    mouseX > btn.x && mouseX < btn.x + btn.width &&
+                    mouseY > btn.y && mouseY < btn.y + btn.height
+                ) {
+                    console.log(`Clicked on button: ${btn.text}`);
+                    btn.callback();
+                    return; // Break after finding the button
+                }
+            }
+        };
         canvas.addEventListener('click', handleCanvasClick);
 
         return () => {
             canvas.removeEventListener('click', handleCanvasClick);
         };
-    }, [buttons]);
+    }, [buttonsRef.current]);
 
     return (
         <div style={{

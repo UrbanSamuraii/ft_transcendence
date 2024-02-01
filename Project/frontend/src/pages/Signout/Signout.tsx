@@ -14,10 +14,6 @@ const SignoutPage = () => {
                     method: 'GET',
                     credentials: 'include'
                 });
-                // if (socket && socket.id) {
-                //     console.log({ "Sign out socket": socket.id });
-                //     socket.disconnect();
-                // }
                 navigate('/');
             } catch (error) {
                 console.error('Signout failed:', error);
@@ -26,7 +22,7 @@ const SignoutPage = () => {
         };
 
         signout();
-    }, [socket]);
+    }, [socket, navigate]);
 
     return <div>Signing out...</div>;
 };

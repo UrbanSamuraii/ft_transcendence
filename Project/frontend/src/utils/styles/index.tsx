@@ -1,6 +1,4 @@
 import styled from 'styled-components';
-import { PageProps } from './styleType';
-import React, { MouseEvent, useState } from 'react';
 
 export const CSB_WIDTH: number = 350;
 export const NAVBAR_HEIGHT: number = 2; // define in rem
