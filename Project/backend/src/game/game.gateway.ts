@@ -26,7 +26,7 @@ interface Power {
 export interface PlayerInfo {
     username: string;
     score: number;
-    activeKeys: string[]; // array of keys currently being pressed
+    activeKeys: string[];
     currentElo: number;
     potentialEloGain: number;
     potentialEloLoss: number;
@@ -37,34 +37,31 @@ export interface PlayerInfo {
 
 @WebSocketGateway({
     cors: {
-        origin: [`http://${server_adress}:3000`, "*"], // allowed origins
-        methods: ["GET", "POST"], // allowed methods
-        credentials: true, // enable credentials
+        origin: [`http://${server_adress}:3000`, "*"],
+        methods: ["GET", "POST"],
+        credentials: true,
     },
 })
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() server: Server;
-    // private queue: Socket[] = [];
     private queue: { socket: Socket, gameMode: string }[] = [];
     private playerInfoMap = new Map<number, Map<string, PlayerInfo>>();
     private gameLoop: NodeJS.Timeout;
     private userInGameMap = new Map<string, boolean>();
-    // private userCurrentGameMap = new Map<string, number>();
-    // private userCurrentGameMap = new Map<string, Map<string, number>>();
     private userCurrentGameMap = new Map<string, { gameId: number, gameMode: string }>();
 
     constructor(private classicGameService: SquareGameService,
         private PowerPongGameService: PowerPongGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
-        private prisma: PrismaService // Inject Prisma service here
+        private prisma: PrismaService
 
     ) { }
 
     private removeFromQueue(clientToRemove: Socket) {
-        console.log("Queue before removal:", this.queue.map(client => client.socket.id)); // Adjusted for new queue structure
+        console.log("Queue before removal:", this.queue.map(client => client.socket.id));
         this.queue = this.queue.filter(client => client.socket !== clientToRemove);
-        console.log("Queue after removal:", this.queue.map(client => client.socket.id)); // Adjusted for new queue structure
+        console.log("Queue after removal:", this.queue.map(client => client.socket.id));
     }
 
     afterInit(server: Server) {
@@ -86,11 +83,9 @@ export class GameGateway implements OnGatewayInit {
     }
 
     async calculatePotentialEloChanges(player1Id: number, player2Id: number) {
-        const kFactor = 32; // K-factor for ELO calculation. Adjust as needed.
+        const kFactor = 32;
         const player1Rating = await this.userService.getEloRating(player1Id);
         const player2Rating = await this.userService.getEloRating(player2Id);
-        // console.log(`player1Rating: ${player1Rating}`)
-        // console.log(`player2Rating: ${player2Rating}`)
 
         // Calculate expected scores
         const expectedScorePlayer1 = 1 / (1 + Math.pow(10, (player2Rating - player1Rating) / 400));
@@ -101,10 +96,6 @@ export class GameGateway implements OnGatewayInit {
         const potentialLossPlayer1 = Math.round(kFactor * (0 - expectedScorePlayer1));
         const potentialGainPlayer2 = Math.round(kFactor * (1 - expectedScorePlayer2));
         const potentialLossPlayer2 = Math.round(kFactor * (0 - expectedScorePlayer2));
-        // console.log(`potentialGainPlayer1: ${potentialGainPlayer1}`)
-        // console.log(`potentialLossPlayer1: ${potentialLossPlayer1}`)
-        // console.log(`potentialGainPlayer2: ${potentialGainPlayer2}`)
-        // console.log(`potentialLossPlayer2: ${potentialLossPlayer2}`)
 
         return {
             player1: { potentialEloGain: potentialGainPlayer1, potentialEloLoss: potentialLossPlayer1 },
@@ -132,12 +123,6 @@ export class GameGateway implements OnGatewayInit {
 
                 const eloChangeWinner = newWinnerRating - winnerRating;
                 const eloChangeLoser = newLoserRating - loserRating;
-                // console.log(`winnerRating: ${winnerRating}`)
-                // console.log(`loserRating: ${loserRating}`)
-                // console.log(`newWinnerRating: ${newWinnerRating}`)
-                // console.log(`newLoserRating: ${newLoserRating}`)
-                // console.log(`eloChangeWinner: ${eloChangeWinner}`)
-                // console.log(`eloChangeLoser: ${eloChangeLoser}`)
 
                 // Update ELO ratings
                 await this.userService.updateEloRating(winnerId, newWinnerRating);
@@ -161,11 +146,8 @@ export class GameGateway implements OnGatewayInit {
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
-        // Listen for disconnect
         client.on('disconnect', (reason) => {
-            // console.log('Client disconnected:', client.id);
             console.log('Client disconnected:', 'Reason:', reason);
-            // console.log("this socket was in this room: ", client.rooms); // the Set contains at least the socket ID
         });
     }
 
@@ -217,10 +199,8 @@ export class GameGateway implements OnGatewayInit {
             currentElo = await this.userService.getEloRating(userInfo.id);
         } catch (error) {
             console.error(`Error fetching ELO rating for user ${userInfo.username}:`, error);
-            // Set a default ELO rating or handle the error as needed
-            currentElo = 1000; // Example default ELO rating
-            // Optionally, you can decide not to add the user to the queue if ELO is critical
-            // return; // Uncomment this line if you don't want to add users without a valid ELO rating
+            // Set a default ELO rating
+            currentElo = 1000;
         }
 
         const playerInfo: PlayerInfo = {
@@ -256,7 +236,7 @@ export class GameGateway implements OnGatewayInit {
             this.userInGameMap.set(player1.socket.data.user.username, true);
             this.userInGameMap.set(player2.socket.data.user.username, true);
 
-            const gameMode = player1.gameMode; // Store the game mode
+            const gameMode = player1.gameMode;
 
             const newGame = await this.createGame(player1.socket, player2.socket, gameMode);
             const gameService = gameMode === 'powerpong' ? this.PowerPongGameService : this.classicGameService;
@@ -289,7 +269,6 @@ export class GameGateway implements OnGatewayInit {
                 });
 
                 if (data.isGameOver && data.winnerUsername && data.loserUsername) {
-                    // console.log("GameOver Data:", data);
                     this.resetUserGameStatus(player1.socket.data.user.username);
                     this.resetUserGameStatus(player2.socket.data.user.username);
                     player1.socket.leave(gameId.toString());
@@ -317,19 +296,13 @@ export class GameGateway implements OnGatewayInit {
         return -1;
     }
 
-    // private async createGame(player1: Socket, player2: Socket): Promise<Game> {
     private async createGame(player1: Socket, player2: Socket, gameMode: string): Promise<Game> {
-        // Implement the logic to create a new game instance
-        // This could involve creating a record in the database, initializing game state, etc.
-        // For example, using a Prisma client:
         const newGame = await this.prisma.game.create({
             data: {
-                // Define the data needed to create a new game
                 uniqueId: uuidv4(),
                 player1Id: player1.data.user.id,
                 player2Id: player2.data.user.id,
-                gameMode: gameMode, // Include the gameMode field
-                // Other game-related data...
+                gameMode: gameMode,
             }
         });
 
@@ -344,16 +317,12 @@ export class GameGateway implements OnGatewayInit {
         return newGame;
     }
 
-    // private getCurrentGameIdForUser(username: string): number | null {
-    //     return this.userCurrentGameMap.get(username) || null;
-    // }
-
     @SubscribeMessage('enterMatchmaking')
     async handleEnterMatchmaking(client: Socket, payload: { gameMode: string }) {
 
         const userInfo = await this.verifyTokenAndGetUserInfo(client);
         if (!userInfo) {
-            client.disconnect(true); // Disconnect if no valid token
+            client.disconnect(true);
             return;
         }
 
@@ -389,7 +358,7 @@ export class GameGateway implements OnGatewayInit {
             console.error(`userGameInfo not found for username: ${playerUsername}`);
             return;
         }
-        const gameId = userGameInfo.gameId || null; // Extract gameId from the userGameInfo object
+        const gameId = userGameInfo.gameId || null;
         if (gameId === null || gameId === undefined) {
             console.error(`Game ID not found for username: ${playerUsername}`);
             return;

@@ -38,10 +38,10 @@ export class PowerPongGameService {
         return {
             squares: Array.from({ length: nbrOfSquares }, (_, index) => {
                 return {
-                    x: 50, // Positioning each square in the middle
+                    x: 50,
                     y: (100 / nbrOfSquares) * index,
-                    dx: squareDx, // Initial horizontal speed
-                    dy: squareDy, // Initial vertical speed
+                    dx: squareDx,
+                    dy: squareDy,
                     size: squareSize
                 };
             }),
