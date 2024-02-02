@@ -60,24 +60,23 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     private startPingRoutine(client: AuthenticatedSocket) {
-        // console.log(`Start ping routine for user ${client.user?.id}`);
 
         const pingRoutine = () => {
             this.pingClient(client);
 
             const pongTimeoutId = setTimeout(() => {
-                // console.log(`Pong not received from user ${client.user?.id} within timeout`);
+                console.log(`Pong not received from user ${client.user?.id} within timeout`);
                 this.handlePongTimeout(client);
-                // console.log("Client offline");
+                console.log("Client offline");
             }, this.pongTimeout);
 
             // Listen for pong from the client
 
             client.once('pong', async () => {
-                // console.log(`Received pong from user ${client.user?.id}`);
+                console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
                 this.handlePongInTime(client);
-                // console.log("Client online");
+                console.log("Client online");
                 await this.sleep(this.pingInterval);
                 pingRoutine();
             });
@@ -91,40 +90,39 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     pingClient(client: AuthenticatedSocket) {
-        // console.log("ping the client");
+        console.log(`ping the client ${client.user?.id}`);
         this.server.to(client.id.toString()).emit('ping');
     }
 
     async handlePongInTime(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'OFFLINE') {
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { status: 'ONLINE' },
-            });
-            const friendsList = await this.userService.getUserFriendsList(user.id)
-            for (const friend of friendsList) {
-                const friendSocket = this.sessions.getUserSocket(friend.id);
-                if (friendSocket) {
-                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
-                }
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'ONLINE' },
+        });
+        const friendsList = await this.userService.getUserFriendsList(user.id)
+        for (const friend of friendsList) {
+            const friendSocket = this.sessions.getUserSocket(friend.id);
+            if (friendSocket) {
+                this.server.to(client.id.toString()).emit('changeInFriendship');
+                this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
             }
         }
     }
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'ONLINE') {
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { status: 'OFFLINE' },
-            });
-            const friendsList = await this.userService.getUserFriendsList(user.id)
-            for (const friend of friendsList) {
-                const friendSocket = this.sessions.getUserSocket(friend.id);
-                if (friendSocket) {
-                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
-                }
+        console.log("Username disconnected", user.username);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'OFFLINE' },
+        });
+        const friendsList = await this.userService.getUserFriendsList(user.id)
+        for (const friend of friendsList) {
+            const friendSocket = this.sessions.getUserSocket(friend.id);
+            if (friendSocket) {
+                this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
+                // this.server.to(client.id.toString()).emit('changeInFriendship');
             }
         }
     }
