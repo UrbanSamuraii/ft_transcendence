@@ -45,11 +45,11 @@ export class MessagingGateway implements OnGatewayConnection {
 
                 // start to PING my user
                 this.startPingRoutine(client);
-            }
-            // To make my userSocket join all the room the user is member of
-            const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
-            for (const conversation of userWithConversations.conversations) {
-                client.join(conversation.id.toString());
+                // To make my userSocket join all the room the user is member of
+                const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
+                for (const conversation of userWithConversations.conversations) {
+                    client.join(conversation.id.toString());
+                }
             }
         }
 

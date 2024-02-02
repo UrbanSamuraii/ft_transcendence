@@ -1,18 +1,36 @@
 import { Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import  { AxiosError } from 'axios';
 import { useEffect, useState, useContext } from 'react';
 import { Friendspage, MainContentContainer, InvitationContainer, InvitationsListContainer, InvitationBarContainer, FriendsListContainer, FriendsListTitle, FriendItem, InvitationItem, InvitationBar } from './FriendsElems';
 import { useSocket } from '../../SocketContext';
 import { getFriendsList } from '../../utils/hooks/getFriendsList';
 import { getInvitationsList } from '../../utils/hooks/getInvitationsList';
 import DOMPurify from 'dompurify';
+import { ErrorMessageModal } from '../../components/modals/ErrorMessageModal';
 
 export const FriendsPage = () => {
 
     const chatSocketContextData = useSocket();
     const [friendsList, setFriendsList] = useState<any[]>([]);
     const [invitationsList, setInvitationsList] = useState<any[]>([]);
+
+    const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModalError, setShowModalError] = useState<boolean>(false);
+    
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+    };
+
+    const handleShowModalError = () => {
+    setShowModalError(true);
+    };
+
+    const handleCloseModalError = () => {
+    setShowModalError(false);
+    };
 
     useEffect(() => {
         const fetchFriendsList = async () => {
@@ -57,8 +75,20 @@ export const FriendsPage = () => {
             const removed_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/remove_friend`, { friendId: friendId }, {
                 withCredentials: true
             });
-        } catch (error) {
-            console.error('Error removing friend:', error);
+        } catch (error: any) {
+            const err = error as AxiosError;
+            if (axios.isAxiosError(error)) {
+                console.log(err.response);
+                if (error.response && error.response.data) {
+                    if (error.response.data.message) { 
+                        const receivedCustomError: string = error.response.data.message;
+                        setCustomError(receivedCustomError);}
+                    else { 
+                        const receivedCustomError: string = error.response.data.error; 
+                        setCustomError(receivedCustomError);}
+                    handleShowModalError();
+                }
+            }
         }
     };
 
@@ -67,8 +97,20 @@ export const FriendsPage = () => {
             const invitation = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/send_invitation`, { userName: DOMPurify.sanitize(invitationDetails.usernameOrEmail) }, {
                 withCredentials: true
             });
-        } catch (error) {
-            console.error('Error inviting friend:', error);
+        } catch (error: any) {
+            const err = error as AxiosError;
+            if (axios.isAxiosError(error)) {
+                console.log(err.response);
+                if (error.response && error.response.data) {
+                    if (error.response.data.message) { 
+                        const receivedCustomError: string = error.response.data.message;
+                        setCustomError(receivedCustomError);}
+                    else { 
+                        const receivedCustomError: string = error.response.data.error; 
+                        setCustomError(receivedCustomError);}
+                    handleShowModalError();
+                }
+            }
         }
     };
 
@@ -78,8 +120,20 @@ export const FriendsPage = () => {
             const added_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/add_friend`, { invitationId: invitationId }, {
                 withCredentials: true
             });
-        } catch (error) {
-            console.error('Error removing friend:', error);
+        } catch (error: any) {
+            const err = error as AxiosError;
+            if (axios.isAxiosError(error)) {
+                console.log(err.response);
+                if (error.response && error.response.data) {
+                    if (error.response.data.message) { 
+                        const receivedCustomError: string = error.response.data.message;
+                        setCustomError(receivedCustomError);}
+                    else { 
+                        const receivedCustomError: string = error.response.data.error; 
+                        setCustomError(receivedCustomError);}
+                    handleShowModalError();
+                }
+            }
         }
     };
 
@@ -88,13 +142,27 @@ export const FriendsPage = () => {
             const refused_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/refuse_invitation`, { invitationId: invitationId }, {
                 withCredentials: true
             });
-        } catch (error) {
-            console.error('Error removing friend:', error);
+        } catch (error: any) {
+            const err = error as AxiosError;
+            if (axios.isAxiosError(error)) {
+                console.log(err.response);
+                if (error.response && error.response.data) {
+                    if (error.response.data.message) { 
+                        const receivedCustomError: string = error.response.data.message;
+                        setCustomError(receivedCustomError);}
+                    else { 
+                        const receivedCustomError: string = error.response.data.error; 
+                        setCustomError(receivedCustomError);}
+                    handleShowModalError();
+                }
+            }
         }
     };
 
 
     return (
+        <>
+        {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <Friendspage>
             <MainContentContainer>
                 <FriendsListContainer>
@@ -129,5 +197,6 @@ export const FriendsPage = () => {
                 </InvitationContainer>
             </MainContentContainer>
         </Friendspage>
+        </>
     );
 };

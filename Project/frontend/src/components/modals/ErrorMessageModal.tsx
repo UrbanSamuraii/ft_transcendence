@@ -22,29 +22,29 @@ const ErrorContainer = styled.div`
 `;
 
 type ErrorFormProps = {
-  setShowModal: (show: boolean) => void;
+  setShowModalError: (show: boolean) => void;
   errorMessage: string;
 };
 
-export const ErrorForm: React.FC<ErrorFormProps> = ({ setShowModal, errorMessage }) => {
+export const ErrorForm: React.FC<ErrorFormProps> = ({ setShowModalError, errorMessage }) => {
   return (
     <ErrorContainer>
-      <p>An error occurred</p>
+      {/* <p>An error occurred</p> */}
       <p>{errorMessage}</p>
     </ErrorContainer>
   );
 };
 
 type ErrorMessageModalProps = {
-	setShowModal: (show: boolean) => void;
+	setShowModalError: (show: boolean) => void;
 	errorMessage: string;
 };
   
-export const ErrorMessageModal: React.FC<ErrorMessageModalProps> = ({ setShowModal, errorMessage }) => {
+export const ErrorMessageModal: React.FC<ErrorMessageModalProps> = ({ setShowModalError, errorMessage }) => {
 	return (
-		<OutsideClickHandler onOutsideClick={() => setShowModal(false)}>
+		<OutsideClickHandler onOutsideClick={() => setShowModalError(false)}>
 			<OverlayStyle>
-				<ErrorForm setShowModal={setShowModal} errorMessage={errorMessage} />
+				<ErrorForm setShowModalError={setShowModalError} errorMessage={errorMessage} />
 			</OverlayStyle>
 		</OutsideClickHandler>
 	);

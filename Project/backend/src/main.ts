@@ -37,7 +37,7 @@ async function bootstrap() {
         new UnauthorizedExceptionFilter(),
         new ForbiddenExceptionFilter(),
         // new PrismaExceptionFilter(httpAdapterHost),
-        // new HttpExceptionFilter(),
+        new HttpExceptionFilter(),
     );
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
         prefix: '/uploads/', // Virtual prefix to access files in the browser

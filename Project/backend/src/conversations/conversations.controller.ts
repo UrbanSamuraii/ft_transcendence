@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Res, UseGuards, Req, Param, HttpException, HttpStatus, ForbiddenException } from '@nestjs/common';
 import { AdminGuard, Jwt2faAuthGuard, OwnerGuard } from 'src/auth/guard';
 import { Response as ExpressResponse } from 'express';
 import { ConversationsService } from './conversations.service';
@@ -8,6 +8,7 @@ import { MembersService } from 'src/members/members.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagesService } from 'src/messages/messages.service';
 import { GetUser } from 'src/auth/decorator';
+import { ForbiddenExceptionFilter } from 'src/common/filters/forbidden-exception.filter';
 
 
 @UseGuards(Jwt2faAuthGuard)
@@ -23,7 +24,6 @@ export class ConversationsController {
 	@Post('create')
 	async CreateConversation(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		
 		const invitedMembers = await Promise.all(
 			req.body.users.map(async (usernameOrEmail) => {
 				const member = await this.userService.getUserByUsernameOrEmail(usernameOrEmail);
@@ -36,9 +36,8 @@ export class ConversationsController {
 		else { const usernames = [user.username, ...(invitedMembers.map(member => member.username))];
 			convName = usernames.join(' '); }
 		const createdConversation = await this.convService.createConversation(convName, user, invitedMembers);
-		
 		if (!createdConversation) {
-			res.status(403).json({ message: "A Conversation with the same name already exist" });}
+			throw new ForbiddenException(`Conversation ${req.body.name} already exist.`);}
 		else {
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
 			this.eventEmitter.emit('message.create', '');

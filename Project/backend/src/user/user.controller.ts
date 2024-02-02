@@ -1,10 +1,13 @@
-import { Controller, Get, UseGuards, Req, Res, Post, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, HttpException, HttpStatus, ForbiddenException } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { UserService } from 'src/user/user.service';
 import { Jwt2faAuthGuard } from 'src/auth/guard';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserNotFoundException } from 'src/common/custom-exception/user-not-found-exception';
+import { InternalServerErrorException } from 'src/common/custom-exception/internal-servor-exception';
+
 
 @UseGuards(Jwt2faAuthGuard)
 @Controller('users')
@@ -25,7 +28,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
 		if (!target || target.id == user.id) {
-			res.status(400).json({ message: "User not found." }); return;}
+            throw new UserNotFoundException(); }
 		else {
             const invitation_sent = await this.userService.sendInvitation(user.id, target.id);
             if (invitation_sent) {
@@ -35,7 +38,8 @@ export class UserController {
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
-                res.status(400).json({ message: "This user is already a friend." }); return;} 
+                throw new ForbiddenException(`User ${target.username} is already a friend.`);
+            }
         }
     }
 
@@ -44,7 +48,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserById(req.body.invitationId);
 		if (!target) {
-			res.status(400).json({ message: "User not found." }); return;}
+			throw new UserNotFoundException(); }
 		else {
             const decline_invitation = await this.userService.declineInvitation(user.id, target.id);
             if (decline_invitation) {
@@ -54,7 +58,7 @@ export class UserController {
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
-                res.status(400).json({ message: "An issue on the invitation has raised." }); return;} 
+                throw new InternalServerErrorException(); }
         }
     }
 
@@ -63,7 +67,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const invitationsList = await this.userService.getInvitations(user.id);
         if (invitationsList) { return invitationsList; } 
-		else { throw new HttpException('Friend List not found', HttpStatus.NOT_FOUND); }
+		else { throw new InternalServerErrorException(); }
     }
 
     @Post('add_friend')
@@ -71,7 +75,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserById(req.body.invitationId);
 		if (!target || !user) {
-			res.status(400).json({ message: "User not found." }); return;}
+			throw new UserNotFoundException();}
 		else {
             const friend_added = await this.userService.addNewFriend(user.id, target.id);
             if (friend_added) {
@@ -81,7 +85,7 @@ export class UserController {
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
-                res.status(400).json({ message: "This user is already a friend." }); return;} 
+                throw new ForbiddenException(`User ${target.username} is already a friend.`); } 
         }
     }
 
@@ -90,7 +94,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserById(req.body.friendId);
 		if (!target || !user) {
-			res.status(400).json({ message: "User not found." }); return;}
+			throw new UserNotFoundException();}
 		else {
             const friend_removed = await this.userService.removeFriend(user.id, target.id);
             if (friend_removed) {
@@ -100,7 +104,7 @@ export class UserController {
                 this.eventEmitter.emit('friend', {userId, targetId});
                 return;} 
             else {
-                res.status(400).json({ message: "This user was not a friend." }); return;} 
+                throw new ForbiddenException(`User ${target.username} is not a friend.`);} 
         }
     }
 
@@ -109,7 +113,7 @@ export class UserController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const friendsList = await this.userService.getUserFriendsList(user.id);
         if (friendsList) { return friendsList; } 
-		else { throw new HttpException('Friend List not found', HttpStatus.NOT_FOUND); }
+		else { throw new InternalServerErrorException(); }
     }
 
 }

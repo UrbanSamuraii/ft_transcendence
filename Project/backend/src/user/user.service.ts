@@ -40,14 +40,6 @@ export class UserService {
                 where: { accessToken: token },
                 include: { conversations: true, blockedUsers: true },
             });
-            if (!user) {
-                throw new HttpException({
-                    status: HttpStatus.BAD_REQUEST,
-                    error: "Error to get the user by token"
-                },
-                    HttpStatus.BAD_REQUEST
-                );
-            }
             return user;
         } catch (error) {
             throw new HttpException({
@@ -68,16 +60,16 @@ export class UserService {
             });
             if (!user) {
                 throw new HttpException({
-                    status: HttpStatus.BAD_REQUEST,
+                    status: HttpStatus.NOT_FOUND,
                     error: "Error: User not found"
-                }, HttpStatus.BAD_REQUEST);
+                }, HttpStatus.NOT_FOUND);
             }
             return user;
         } catch (error) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "Error: Unable to retrieve user"
-            }, HttpStatus.BAD_REQUEST);
+                status: HttpStatus.NOT_FOUND,
+                error: "Error: User not found"
+            }, HttpStatus.NOT_FOUND);
         }
     }
 
