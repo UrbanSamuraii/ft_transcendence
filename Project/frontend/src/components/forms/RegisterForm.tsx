@@ -131,7 +131,6 @@ export const RegisterForm = () => {
                     socket.disconnect()
                 }
                 navigate('/');
-                // }
             } catch (error) {
                 console.log("ERROR RegisterForm!");
                 if (axios.isAxiosError(error)) {
