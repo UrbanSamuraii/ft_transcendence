@@ -35,7 +35,6 @@ function SquareGame() {
 
     useEffect(() => {
         activeKeysRef.current = activeKeys;
-
     }, [activeKeys]);
 
     const goBackToMainMenu = useCallback(() => {

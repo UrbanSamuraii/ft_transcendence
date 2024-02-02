@@ -371,8 +371,9 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('playerActions')
     handlePlayerActions(client: Socket, activeKeys: string[]) {
+
         if (!client.data || !client.data.user) {
-            // console.error('User data is not available in handlePlayerActions');
+            console.error('User data is not available in handlePlayerActions');
             return;
         }
 
@@ -403,21 +404,9 @@ export class GameGateway implements OnGatewayInit {
         if (!playerInfo) {
             console.error(`Player info not found for username: ${playerUsername} in game ID: ${gameId}`);
             return;
-        }
-
-        if (playerInfo) {
+        } else {
             playerInfo.activeKeys = activeKeys;
         }
-    }
-
-    @SubscribeMessage('pauseGame')
-    handlePauseGame(client: Socket) {
-        this.classicGameService.isGamePaused = true;
-    }
-
-    @SubscribeMessage('resumeGame')
-    handleResumeGame(client: Socket) {
-        this.classicGameService.isGamePaused = false;
     }
 
     @SubscribeMessage('checkGameStatus')
@@ -438,6 +427,12 @@ export class GameGateway implements OnGatewayInit {
 
     @SubscribeMessage('attemptReconnect')
     async handleAttemptReconnect(client: Socket, payload: { username: string; gameId: string }): Promise<void> {
+        const userInfo = await this.verifyTokenAndGetUserInfo(client);
+        if (!userInfo) {
+            console.error('User verification failed on reconnect');
+            return;
+        }
+        client.data.user = userInfo;
         client.join(payload.gameId.toString());
     }
 }
