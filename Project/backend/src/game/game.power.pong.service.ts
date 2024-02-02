@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
 import { PlayerInfo } from './game.gateway';
 
 const nbrOfSquares = 1;
@@ -11,7 +10,6 @@ const leftPaddleY = 40;
 const leftPaddleX = paddleDistToWall;
 const rightPaddleY = 40;
 const rightPaddleX = 100 - paddleWidth - paddleDistToWall;
-const maxDy = 4;
 const squareSize = 2.2;
 const squareDy = 0;
 const squareDx = 1.25;
@@ -30,12 +28,10 @@ interface Power {
 @Injectable()
 export class PowerPongGameService {
 
-    private gameStates = new Map<string, any>(); // Using 'any' for simplicity, define a proper type for game state
+    private gameStates = new Map<string, any>();
 
-    constructor(private userService: UserService) { }
 
     private angleFactor = 5;  // Adjust this value to make the effect stronger or weaker.
-    public isGamePaused = false; // To keep track of the paused state
 
     private initializeGameState(playerInfoMap: any) {
         const playerInfos = Array.from(playerInfoMap.values());
@@ -79,7 +75,6 @@ export class PowerPongGameService {
             maxDyValue: 5,
             maxDxValue: 5,
             angleFactor: 5,
-            isGamePaused: false,
             leftPlayerInfo: playerInfos[0],
             rightPlayerInfo: playerInfos[1],
         };
@@ -98,17 +93,13 @@ export class PowerPongGameService {
             this.gameStates.set(gameId.toString(), gameState);
 
         }
-
-        // Assuming 2 players for left and right paddle
         const playerInfos = Array.from(playerInfoMap.values());
-        // Assuming 2 players for left and right paddle
         const currentTime = Date.now();
         const fillRatePerSecond = 20;
         const fillRatePerMs = fillRatePerSecond / 1000;
-        if (playerInfos.length >= 2 && !gameState.isGamePaused) {
+        if (playerInfos.length >= 2) {
             let gameState = this.gameStates.get(gameId.toString());
             if (!gameState) {
-                // Initialize game state for new gameId
                 gameState = this.initializeGameState(playerInfoMap);
                 this.gameStates.set(gameId.toString(), gameState);
             }
