@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -16,8 +18,6 @@ type CheckPasswordFormProps = {
 
 export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowModal, conversationId }) => {
 
-    // console.log("THE CONV ID", conversationId);
-
     const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
         password: '',
         convId: conversationId,
@@ -27,6 +27,9 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        let maxCharacterLimit;
+        maxCharacterLimit = 10;
+        if (value.length > maxCharacterLimit) { return; }
         setConvDataInput((prevData) => ({
             ...prevData,
             [name]: value,
@@ -48,12 +51,15 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
         }
         else {
             try {
-                // console.log({"DATA TO VALIDATE" : ConvDataInput});
-                const response = await axios.post(`http://${server_adress}:3001/conversations/validate_password`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    password: DOMPurify.sanitize(ConvDataInput.password),
+                    convId: ConvDataInput.convId
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/validate_password`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
                 setShowModal(false);
-                // console.log({"RESPONSE from VALIDATING PASSWORD": response}); 
                 if (response.status === 403) {
                     const customWarning = response.data.message;
                     alert(`Warning: ${customWarning}`);
@@ -81,7 +87,7 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
                     <InputLabel htmlFor="Conversation Name">
                         Please enter the Password
                         <InputField
-                            type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} />
+                            type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={10}/>
                         {formErrors.password && <div className="error-message">{formErrors.password}</div>}
                     </InputLabel>
                 </InputContainer>

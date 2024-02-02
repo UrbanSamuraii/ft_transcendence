@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { ForbiddenExceptionFilter } from './common/filters/forbidden-exception.filter';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception-filter';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { UnauthorizedExceptionFilter } from './auth/filters/unauthorized-exception.filter';
-import { ForbiddenExceptionFilter } from './auth/filters/forbidden-exception.filter';
+import { UnauthorizedExceptionFilter } from './common/filters/unauthorized-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import * as passport from "passport";
 import { WebsocketAdapter } from './gateway/gateway.adapter';
@@ -30,15 +32,17 @@ async function bootstrap() {
         whitelist: true,
     }));
     app.use(cookieParser());
+    const httpAdapterHost = app.get(HttpAdapterHost);
     app.useGlobalFilters(
         new UnauthorizedExceptionFilter(),
         new ForbiddenExceptionFilter(),
+        // new PrismaExceptionFilter(httpAdapterHost),
+        // new HttpExceptionFilter(),
     );
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
         prefix: '/uploads/', // Virtual prefix to access files in the browser
     });
     await app.listen(port);
-
 
     // Gracefully shutdown the server.
     app.enableShutdownHooks();

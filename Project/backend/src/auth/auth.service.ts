@@ -1,6 +1,8 @@
 import {
-    Injectable, Body, Res, Req, ForbiddenException,
-    UnauthorizedException, HttpStatus, HttpCode
+    Injectable, Body, Res, Req, ForbiddenException,HttpException,
+    UnauthorizedException, HttpStatus, HttpCode, InternalServerErrorException,
+    Logger, UseFilters,
+    NotFoundException,
 } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
@@ -12,7 +14,8 @@ import { Response as ExpressResponse } from 'express';
 import { UserService } from "src/user/user.service";
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-
+import { UserNotFoundException } from '../common/custom-exception/user-not-found-exception';
+import { PrismaExceptionFilter } from "src/common/filters/prisma-exception.filter";
 // import { pick } from 'lodash';
 // import * as cookie from 'cookie'; // Import the cookie library
 
@@ -23,6 +26,8 @@ export class AuthService {
         private jwt: JwtService,
         private config: ConfigService,
         private userService: UserService) { }
+    
+    private readonly logger = new Logger(AuthService.name);
 
     async signToken(userID: number, email: string): Promise<string> {
         const user = await this.userService.getUser({ email });
@@ -73,27 +78,32 @@ export class AuthService {
                 where: { id: user.id },
                 data: { accessToken: accessToken },
             });
-            res.status(200).cookie('token', accessToken, {
+            res.status(201).cookie('token', accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
                 expires: new Date(Date.now() + 5 * 24 * 60 * 1000),
             })
+            return { success: true, message: 'User created successfully' };
         }
         catch (error: any) {
+            // console.log(error)
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
                     if (Array.isArray(error.meta?.target)) {
                         if (error.meta.target.includes('email')) {
-                            res.status(400).json({ error: 'Email already exists' });
+                            // console.log("ERRRRRRRRRRRRRROR");
+                            // res.status(403).json({ error: 'Email already exists' });
+                            throw new ForbiddenException('Error: Email already exists');
                         } else if (error.meta.target.includes('username')) {
-                            res.status(400).json({ error: 'Username already exists' });
+                            // res.status(403).json({ error: 'Username already exists' });
+                            throw new ForbiddenException('Error: Username already exists');
                         }
                     }
                 }
-            } else {
-                res.status(500).json({ error: 'Internal server error' });
-            }
+            } // else {
+                // res.status(500).json({ error: 'Internal server error' });
+                // throw new InternalServerErrorException();
         }
     }
 

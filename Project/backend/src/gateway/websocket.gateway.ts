@@ -29,8 +29,8 @@ export class MessagingGateway implements OnGatewayConnection {
         private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
 
-    private readonly pingInterval = 10000; // 5 seconds
-    private readonly pongTimeout = 6000; // 3 seconds
+    private readonly pingInterval = 6000; // 5 seconds
+    private readonly pongTimeout = 3000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");

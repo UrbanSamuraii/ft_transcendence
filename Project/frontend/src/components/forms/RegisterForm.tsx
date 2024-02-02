@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
 import { useSocket } from './../../SocketContext';
+import { ErrorMessageModal } from '../modals/ErrorMessageModal';
+import DOMPurify from 'dompurify';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface FormData {
@@ -30,9 +33,37 @@ export const RegisterForm = () => {
     });
 
     const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModal, setShowModal] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+      };
+    
+      const handleShowModal = () => {
+        setShowModal(true);
+      };
+    
+      const handleCloseModal = () => {
+        setShowModal(false);
+      };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        
+        let maxCharacterLimit;
+        switch (name) {
+            case 'email':
+                maxCharacterLimit = 30;
+                break;
+            case 'username':
+                maxCharacterLimit = 10;
+                break;
+            default:
+                maxCharacterLimit = 15;
+        }
+        if (value.length > maxCharacterLimit) { return; }
+
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
@@ -56,6 +87,7 @@ export const RegisterForm = () => {
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: Partial<FormData> = {};
+
         if (!formData.email) {
             newErrors.email = 'Email is required';
         }
@@ -85,21 +117,29 @@ export const RegisterForm = () => {
         }
         else {
             try {
-                const response = await axios.post(`http://${server_adress}:3001/auth/signup`, formData, {
-                    withCredentials: true,
-                });
-                // console.log(response.status, response.data.token);
+                const sanitizedFormData = {
+                    ...formData,
+                    email: DOMPurify.sanitize(formData.email),
+                    username: DOMPurify.sanitize(formData.username),
+                    first_name: DOMPurify.sanitize(formData.first_name),
+                    last_name: DOMPurify.sanitize(formData.last_name),
+                    password: DOMPurify.sanitize(formData.password),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/auth/signup`, sanitizedFormData,
+                    { withCredentials: true });
                 if (socket) {
                     socket.disconnect()
                 }
                 navigate('/');
             } catch (error) {
-                console.error('Sign up request error:', error);
+                console.log("ERROR RegisterForm!");
                 if (axios.isAxiosError(error)) {
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.error;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
+                        const receivedCustomError: string = error.response.data.message;
+                        console.log("Error when register: ", receivedCustomError);
+                        if (receivedCustomError) {
+                            setCustomError(receivedCustomError);
+                            handleShowModal();
                         }
                     }
                 }
@@ -108,6 +148,8 @@ export const RegisterForm = () => {
     };
 
     return (
+        <>
+        {customError && showModal && <ErrorMessageModal setShowModal={handleCloseModal} errorMessage={customError} />}
         <div className="app-container">
             <head>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
@@ -121,7 +163,7 @@ export const RegisterForm = () => {
                         <section className="nameFieldRow">
                             <InputContainer>
                                 <InputField className='input'
-                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                    placeholder="email" type="email" name="email" value={formData.email} onChange={handleInputChange} maxLength={30} />
                                 {formErrors.email && <div className="error-message">{formErrors.email}</div>}
                                 <i className='bx bx-user'></i>
                             </InputContainer>
@@ -131,7 +173,7 @@ export const RegisterForm = () => {
                             <div className="nameFieldContainerFirst">
                                 <InputContainer>
                                     <InputField className='input'
-                                        placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange}
+                                        placeholder="first name" type="text" name="first_name" value={formData.first_name} onChange={handleInputChange} maxLength={15}
                                     />
                                     {formErrors.first_name && <div className="error-message">{formErrors.first_name}</div>}
                                 </InputContainer>
@@ -139,7 +181,7 @@ export const RegisterForm = () => {
                             <div className="nameFieldContainerLast">
                                 <InputContainer>
                                     <InputField className='input'
-                                        placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange}
+                                        placeholder="last name" type="text" name="last_name" value={formData.last_name} onChange={handleInputChange} maxLength={15}
                                     />
                                     {formErrors.last_name && <div className="error-message">{formErrors.last_name}</div>}
                                 </InputContainer>
@@ -147,7 +189,7 @@ export const RegisterForm = () => {
                             <div className="nameFieldContainerFirst">
                                 <InputContainer>
                                     <InputField className='input'
-                                        placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange}
+                                        placeholder="username" type="text" name="username" value={formData.username} onChange={handleInputChange} maxLength={10}
                                     />
                                     {formErrors.username && <div className="error-message">{formErrors.username}</div>}
                                 </InputContainer>
@@ -157,7 +199,7 @@ export const RegisterForm = () => {
                             <div className="nameFieldContainerLast">
                                 <InputContainer>
                                     <InputField
-                                        placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} />
+                                        placeholder="password" type="password" name="password" value={formData.password} onChange={handleInputChange} maxLength={15} />
                                     {formErrors.password && <div className="error-message">{formErrors.password}</div>}
                                     <i className='bx bxs-lock-alt'></i>
                                 </InputContainer>
@@ -180,5 +222,6 @@ export const RegisterForm = () => {
                 </div>
             </body>
         </div>
+        </>
     );
 };

@@ -29,11 +29,10 @@ function SquareGame() {
     const navigate = useNavigate();
     const lastSentWasEmptyRef = useRef(true);
     const { user } = useAuth();
-    const username = user?.username || 'Guest'; // Default to 'Guest' if user is null or undefined
+    const username = user?.username || 'Guest';
     const [gameData, setGameData] = useState(null);
     const [buttons, setButtons] = useState<Button[]>([]);
 
-    // Update the interval based on active keys
     useEffect(() => {
         activeKeysRef.current = activeKeys;
 
@@ -160,14 +159,13 @@ function SquareGame() {
         setButtons([]);
 
         if (data.isGameOver) {
-            // Constants for layout
             const buttonOffsetY = gameHeight * 0.6;
             const winnerNameFontSize = gameHeight * 0.06;
             const textOffsetY = buttonOffsetY - winnerNameFontSize * 2;
             const eloTextOffsetY = textOffsetY + winnerNameFontSize + 5; // Below the winner's name
             const buttonWidth = gameWidth * 0.3;
             const buttonHeight = gameHeight * 0.1;
-            const eloFontSize = winnerNameFontSize * 0.75; // Adjusted proportionally
+            const eloFontSize = winnerNameFontSize * 0.75;
 
             // Determine the winner's side for X positioning
             const winnerSideX = data.leftScore > data.rightScore ? gameWidth * 0.25 : gameWidth * 0.75;
@@ -201,7 +199,7 @@ function SquareGame() {
             const newElo = localPlayerCurrentElo + localPlayerEloChange;
             console.log("New ELO:", newElo);
 
-            ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`; // Update font size
+            ctx.font = `${eloFontSize}px 'Press Start 2P', cursive`;
             const eloChangeText = `Your ELO: ${newElo}`;
             ctx.fillText(eloChangeText, textX, offsetY + eloTextOffsetY);
 
@@ -217,11 +215,10 @@ function SquareGame() {
 
         drawNet(data);
 
-        const fontSize = 100 * gameWidth / 1920; // Adjust font size based on gameWidth
+        const fontSize = 100 * gameWidth / 1920;
         ctx.font = `${fontSize}px Arial`;
-        ctx.fillStyle = '#ffffff';  // Resetting fill color for score
-        ctx.textAlign = 'center';  // Resetting text alignment for score
-
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
         ctx.fillText(data.leftScore, offsetX + 0.25 * gameWidth, offsetY + fontSize);
         ctx.fillText(data.rightScore, offsetX + 0.75 * gameWidth, offsetY + fontSize);
 

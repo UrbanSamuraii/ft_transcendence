@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const CSB_WIDTH: number = 350;
 export const NAVBAR_HEIGHT: number = 2; // define in rem
@@ -39,6 +39,12 @@ export const InputFieldCCF = styled.input`
     color: pink !important;
     background-color: inherit !important;
   }
+  
+  ${({ maxLength }) =>
+        maxLength &&
+        css`
+      max-length: ${maxLength};
+    `}
 `;
 
 export const InputContainer = styled.div`

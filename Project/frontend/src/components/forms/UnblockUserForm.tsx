@@ -38,7 +38,6 @@ export const UnblockUserForm: React.FC<MemberFormProps> = ({ setShowModal }) => 
             const response = await axios.post(`http://${server_adress}:3001/conversations/unblock_user`,
                 { userToUnblock: username },
                 { withCredentials: true });
-            console.log("USER SELECTED ", response)
         } catch (error: any) {
             if (error.response && error.response.status === 403) {
                 alert("Unauthorized: Please log in.");

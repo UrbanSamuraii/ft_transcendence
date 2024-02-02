@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useSocket } from '../../SocketContext';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 type Member = {
@@ -44,7 +45,6 @@ export const AllowMemberInConversationForm: React.FC<MemberInConversationFormPro
             const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/allow_user`,
                 { userToAllow: username },
                 { withCredentials: true });
-            // console.log("USER SELECTED ", response)
         } catch (error: any) {
             if (error.response && error.response.status === 403) {
                 alert("Unauthorized: Please log in.");
