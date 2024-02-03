@@ -1,5 +1,5 @@
 export async function fetchMe() {
-    const token = localStorage.getItem('token');  // Or use getCookie if you're using cookies
+    const token = localStorage.getItem('token');
 
     const response = await fetch('/auth/me', {
         method: 'GET',
