@@ -43,15 +43,18 @@ export const ConversationChannelPage = () => {
         const fetchConversations = async () => {
             const conversations = await getConversationsIdentified(conversationId);
             setConversationsArray(conversations);
+            console.log("FETCHING THE CONV WHEN UNBLOCK / BLOCK!");
         };
         fetchConversations();
+
+        console.log("Blocking / Unblocking !!!");
     
         const socket = chatSocketContextData?.socket;
         if (socket) { socket.on('onBeingBlockedorBlocked', fetchConversations) }
         return () => {
             if (socket) { socket.off('onBeingBlockedorBlocked', fetchConversations) }
         };
-    }, [chatSocketContextData, conversationId]);
+    }, [chatSocketContextData, chatSocketContextData?.socket, conversationId]);
 
     // To get last message sent - need to not socket emit to the user who blocked the author
     useEffect(() => {

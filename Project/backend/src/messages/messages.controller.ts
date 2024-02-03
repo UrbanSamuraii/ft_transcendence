@@ -44,7 +44,6 @@ export class MessagesController {
 		const blockedUsers = user.blockedUsers || [];
 		const blockedBy = user.blockedBy || [];
 		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId), blockedUsers, blockedBy);
-		console.log("Conversation from id:", conversation);
 		if (!conversation) {throw new HttpException("Conversation not found", HttpStatus.NOT_FOUND)}
 		const messagesInTheConversationId = conversation.messages;
 		return messagesInTheConversationId;
@@ -63,11 +62,8 @@ export class MessagesController {
 
 		let isLastMessageDeleted = false;
 		const numberOfMessages = existingConversation.messages.length;
-		// console.log("Size of the conversation", numberOfMessages);
-		// console.log("Last message of the conv id", existingConversation.messages[numberOfMessages - 1].id);
 		if (messageId === existingConversation.messages[numberOfMessages - 1].id) { 
 			isLastMessageDeleted = true;
-			// console.log("Deleting last message");
 			this.eventEmitter.emit('last.message.deleted', messageToDelete);
 		}
 		

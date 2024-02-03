@@ -158,7 +158,6 @@ export class ConversationsService {
 			const isMember = existingConversation.members.some((member) => member.id === userId);
 			if (isMember) {
 				const isOwner = await this.isOwnerOfTheConversation(userId, conversationId)
-				console.log({"is owner to remove ?": isOwner});
 				if (isOwner) { return false; }
 				await this.downgradeAdminStatus(userId, conversationId); // remove the user from the admin list of the conv before
 				await this.prismaService.conversation.update({
@@ -521,7 +520,6 @@ export class ConversationsService {
 		});
 		if (conversation) {
 			const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
-			// console.log("Members : ", membersWithoutUser);
 		  return membersWithoutUser; 
 		} 
 		else { return null; }
@@ -595,7 +593,6 @@ export class ConversationsService {
 				if (!isMuted) { unMutes.push(member); }
 			}
 			const notMutesWithoutUser = unMutes.filter((unmute) => unmute.id !== userIdToExclude);
-			// console.log("UNMUTES user in the conv'", unMutes);
 			return (notMutesWithoutUser);
 		} else {
 			return null;

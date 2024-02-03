@@ -247,7 +247,6 @@ export class MessagingGateway implements OnGatewayConnection {
     async blockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-
         this.server.to(userSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
         if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload); };
     }
@@ -256,7 +255,6 @@ export class MessagingGateway implements OnGatewayConnection {
     async unblockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-
         this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
         if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload); };
     }

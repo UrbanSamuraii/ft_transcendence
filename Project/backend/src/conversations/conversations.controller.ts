@@ -227,7 +227,7 @@ export class ConversationsController {
 	@Post('blocked_users_list')
 	async GetBlockedUsersList(@Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		if (user) { console.log("Blocked Users List : ", user.blockedUsers); return user.blockedUsers; } 
+		if (user) { return user.blockedUsers; } 
 		else { throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
 	}
 
