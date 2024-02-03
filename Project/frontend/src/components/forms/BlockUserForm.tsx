@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { useState } from "react";
+import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { BlockUserModal } from "../modals/BlockUserModal";

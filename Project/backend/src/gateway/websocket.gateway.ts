@@ -65,18 +65,18 @@ export class MessagingGateway implements OnGatewayConnection {
             this.pingClient(client);
 
             const pongTimeoutId = setTimeout(() => {
-                console.log(`Pong not received from user ${client.user?.id} within timeout`);
+                // console.log(`Pong not received from user ${client.user?.id} within timeout`);
                 this.handlePongTimeout(client);
-                console.log("Client offline");
+                // console.log("Client offline");
             }, this.pongTimeout);
 
             // Listen for pong from the client
 
             client.once('pong', async () => {
-                console.log(`Received pong from user ${client.user?.id}`);
+                // console.log(`Received pong from user ${client.user?.id}`);
                 clearTimeout(pongTimeoutId);
                 this.handlePongInTime(client);
-                console.log("Client online");
+                // console.log("Client online");
                 await this.sleep(this.pingInterval);
                 pingRoutine();
             });
@@ -90,7 +90,7 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     pingClient(client: AuthenticatedSocket) {
-        console.log(`ping the client ${client.user?.id}`);
+        // console.log(`ping the client ${client.user?.id}`);
         this.server.to(client.id.toString()).emit('ping');
     }
 

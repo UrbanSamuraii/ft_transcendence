@@ -36,6 +36,7 @@ export class UserController {
                 const userId = user ? user.id : null;
                 const targetId = target ? target.id : null;
                 this.eventEmitter.emit('friend', {userId, targetId});
+                this.eventEmitter.emit('invitation', {targetId});
                 return;} 
             else {
                 throw new ForbiddenException(`User ${target.username} is already a friend.`);

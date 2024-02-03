@@ -1,13 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { useAuth } from '../../AuthContext';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { getInvitationsList } from '../../utils/hooks/getInvitationsList';
+import { useSocket } from '../../SocketContext';
 
 function Navbar() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const chatSocketContextData = useSocket();
 
     const [hasInvitations, setHasInvitations] = useState(false);
 
@@ -21,10 +22,16 @@ function Navbar() {
             }
         };
 
-        if (user) {
-            fetchInvitations();
+        const socket = chatSocketContextData?.socket;
+        if (socket) {
+            socket.on('changeInFriendship', fetchInvitations);
         }
-    }, [user]);
+        return () => {
+            if (socket) {
+                socket.off('changeInFriendship', fetchInvitations);
+            }
+        };
+    }, [chatSocketContextData]);
 
     return (
         <div className="navbar">
@@ -48,9 +55,13 @@ function Navbar() {
                         {/* <div className='navbar-button'>
                             <Link to="/friends">Friends</Link>
                         </div> */}
-                        <div className={`navbar-button ${hasInvitations ? 'has-invitations' : ''}`}>
-                            <Link to="/friends">Friends</Link>
-                            {hasInvitations && <div className="invitation-star">&#9733;</div>}
+                         <div className={`navbar-button ${hasInvitations ? 'has-invitations' : ''}`}>
+                            <Link to="/friends">
+                                Friends
+                                {hasInvitations && (
+                                    <span className="invitation-star">&#9733;</span>
+                                )}
+                            </Link>
                         </div>
                     </>
                 )}

@@ -1,8 +1,6 @@
-import { Outlet } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import  { AxiosError } from 'axios';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { Friendspage, MainContentContainer, InvitationContainer, InvitationsListContainer, InvitationBarContainer, FriendsListContainer, FriendsListTitle, FriendItem, InvitationItem, InvitationBar } from './FriendsElems';
 import { useSocket } from '../../SocketContext';
 import { getFriendsList } from '../../utils/hooks/getFriendsList';

@@ -25,7 +25,7 @@
 }
 
 .navbar-button {
-    color: white;
+    position: relative;
     background-color: transparent;
     padding: 0.25rem 0.7rem;
     font-size: 18px;
@@ -33,8 +33,19 @@
     transition: transform 0.3s ease;
 }
 
-.a {
+.navbar-button a {
     color: white;
+    text-decoration: none;
+}
+
+.has-invitations .navbar-button a {
+    font-weight: bold;
+}
+
+.has-invitations .invitation-star {
+    color: yellow;
+    font-size: 14px;
+    margin-left: 1px; /* Adjust as needed for spacing */
 }
 
 .navbar-button:hover {
