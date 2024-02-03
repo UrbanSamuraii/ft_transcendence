@@ -52,9 +52,6 @@ function Navbar() {
                         <div className='navbar-button'>
                             <Link to="/leaderboard">Leaderboard</Link>
                         </div>
-                        {/* <div className='navbar-button'>
-                            <Link to="/friends">Friends</Link>
-                        </div> */}
                          <div className={`navbar-button ${hasInvitations ? 'has-invitations' : ''}`}>
                             <Link to="/friends">
                                 Friends

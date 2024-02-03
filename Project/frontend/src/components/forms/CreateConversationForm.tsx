@@ -5,7 +5,7 @@ import axios from 'axios';
 import  { AxiosError } from 'axios';
 import { useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
-import { ErrorMessageModal } from "../modals/ErrorMessageModal";
+import { ErrorConversationMessageModal } from "../modals/ErrorConversationMessageModal";
 
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
@@ -115,7 +115,7 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
 
     return (
         <>
-        {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
+        {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <form className="form-Create-Conversation" onSubmit={handleCreateConversation}>
             <h2>new chat</h2>
 
