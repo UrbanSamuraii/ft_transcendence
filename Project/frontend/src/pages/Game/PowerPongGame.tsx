@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './PowerPongGame.css';
-// import { drawGrid } from '../../Utils.js';
 import { getCookie } from '../../utils/cookies'
 import { useSocket } from '../../SocketContext';
 import { useNavigate, useParams } from 'react-router-dom';
