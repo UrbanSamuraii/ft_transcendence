@@ -9,6 +9,12 @@ import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
+import { OverlayStyle, OverlayContent  } from '../utils/styles';
+import OutsideClickHandler from 'react-outside-click-handler';
+
+type GameInviteData = {
+    target: string;
+  };
 
 export const ConversationChannelPage = () => {
 
@@ -16,11 +22,13 @@ export const ConversationChannelPage = () => {
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
     const chatSocketContextData = useSocket();
+    const [showGameInvite, setShowGameInvite] = useState(true);
+    const [gameInviteData, setGameInviteData] = useState<GameInviteData | null>(null);
+
     const navigate = useNavigate()
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {
-            // console.log({ "REMOVED FROM A CONV !": payload });
             if (conversationId === payload.conversationId) {
                 navigate('/ConversationPage');
             }
@@ -49,7 +57,6 @@ export const ConversationChannelPage = () => {
     useEffect(() => {
         chatSocketContextData?.socket?.on('onMessage', (payload: ConversationMessage) => {
             chatSocketContextData.setLastMessageDeleted(false);
-            // console.log({ "NOUVEAU MESSAGE DANS LA CONV !": payload.conversation_id });
             const payloadConversationId = Number(payload.conversation_id);
             if (payloadConversationId === Number(conversationId)) {
                 setConversationsArray(prevConversations => {
@@ -76,9 +83,57 @@ export const ConversationChannelPage = () => {
         };
     }, [chatSocketContextData, conversationId]);
 
+    useEffect(() => {
+        const displayGameInvite = (data: any) => {
+            setShowGameInvite(true);
+            setGameInviteData(data);
+            console.log(data.target);
+        }
+
+        // displayGameInvite();
+        chatSocketContextData?.socket?.on('inviteGame', displayGameInvite);
+        return () => {
+            chatSocketContextData?.socket?.off('inviteGame', displayGameInvite);
+        };
+    }, [chatSocketContextData.socket, chatSocketContextData]);
+
+    const handleAcceptGameInvite = () => {
+        setShowGameInvite(false);
+        if (gameInviteData) {
+          const senderUsername = gameInviteData.target;
+    
+          const response = { target: senderUsername, accepted: true };
+          chatSocketContextData?.socket?.emit('gameInviteResponse', response);
+        }
+      };
+    
+      const handleRefuseGameInvite = () => {
+        setShowGameInvite(false);
+        if (gameInviteData) {
+          const senderUsername = gameInviteData.target;
+    
+          const response = { target: senderUsername, accepted: false };
+          chatSocketContextData?.socket?.emit('gameInviteResponse', response);
+        }
+      };
 
     return (
         <ConversationChannelPageStyle>
+            {showGameInvite && (
+            <OverlayStyle>
+                <OutsideClickHandler onOutsideClick={() => {
+                    setShowGameInvite(false);
+                }}>
+                    <OverlayContent>
+                        <div className="game-invite-interface">
+                            <p>You have received a game invite!</p>
+                            <button onClick={handleAcceptGameInvite}>Yes</button>
+                            <button onClick={handleRefuseGameInvite}>No</button>
+                        </div>
+                    </OverlayContent>
+                </OutsideClickHandler>
+            </OverlayStyle>
+            )}
             <MessagePanelHeader conversationId={Number(conversationId)} />
             <ScrollableContainer>
                 {conversationsArray.length > 0 ? (

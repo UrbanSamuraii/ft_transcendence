@@ -11,11 +11,10 @@ up:
 	${COMPOSE} up
 
 down:
-	${COMPOSE} down
+	${COMPOSE} down -v
 
 # CLEAN DATABASES
 dbclean: down
-	@echo "af"
 	docker system prune -af
 
 set-env:

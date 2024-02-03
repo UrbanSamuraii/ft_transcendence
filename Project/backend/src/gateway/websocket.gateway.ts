@@ -29,8 +29,8 @@ export class MessagingGateway implements OnGatewayConnection {
         private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
 
-    private readonly pingInterval = 6000; // 5 seconds
-    private readonly pongTimeout = 3000; // 3 seconds
+    private readonly pingInterval = 10000; // 5 seconds
+    private readonly pongTimeout = 5000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -150,6 +150,7 @@ export class MessagingGateway implements OnGatewayConnection {
         userSocket.join(conversationId.toString());
         console.log({ "User socket connected to the room !": userSocket.id });
         this.server.to(userSocket.id.toString()).emit('onJoinRoom', user, conversationId);
+        this.server.to(conversationId.toString()).emit('changeInConversation');
     }
 
     @OnEvent('message.create')
@@ -197,6 +198,7 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPrivacyEvent(payload: any) {
         console.log("The server has detect a change in privacy room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
+        this.server.to(payload.conversationId).emit('changeInConversation');
     }
 
     @OnEvent('admin.status.member')
@@ -227,6 +229,7 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPasswordEvent(payload: any) {
         console.log("The server has detect a change in password of room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePassword', payload);
+        this.server.to(payload.conversationId).emit('changeInConversation');
     }
 
     @OnEvent('remove.member')
@@ -236,6 +239,7 @@ export class MessagingGateway implements OnGatewayConnection {
         if (removedMemberSocket) {
             removedMemberSocket.leave(payload.conversationId.toString());
             this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
+            this.server.to(payload.conversationId).emit('changeInConversation');
         };
     }
 
@@ -294,4 +298,23 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(userSocket.id.toString()).emit('changeInFriendship');
         this.server.to(targetSocket.id.toString()).emit('changeInFriendship');
     }
+
+    @OnEvent('invite_game')
+    async inviteGame(payload: any) {
+        const user = await this.userService.getUserById(payload.userId);
+        const target = await this.userService.getUserById(payload.targetId);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        const targetSocket = await this.sessions.getUserSocket(target.id);
+        // console.log(userSocket);
+        console.log("here");
+        // console.log(targetSocket);
+        if (userSocket && targetSocket)
+            this.server.to(targetSocket.id.toString()).emit('inviteGame', {
+                message: 'You have been invited to a game!',
+                target: user.username, 
+              });
+        else
+            console.log("socket error in invite game")
+    }
+
 }

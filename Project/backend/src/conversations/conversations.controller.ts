@@ -63,10 +63,11 @@ export class ConversationsController {
 	async GetConversationById(@Param('id') id: string, @Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const blockedUsers = user.blockedUsers || [];
+		const blockedBy = user.blockedBy || [];
 		const idConv = parseInt(id);
-		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, blockedUsers);
+		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, blockedUsers,blockedBy);
 		if (conversation) { return conversation; } 
-		else { console.log("STATUS > 400"); throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
 	// WARNING : send back all OTHER MEMBERS of the conv' ! The user making the request is then excluded !!
@@ -169,11 +170,11 @@ export class ConversationsController {
 		const conversation = await this.convService.getConversationByName(req.body.conversationName);
 
 		if (!conversation) {
-			res.status(403).json({ message: "There is no conversation of this name, please verify." }); return;}
+			throw new HttpException('Conversation not found.', HttpStatus.NOT_FOUND); }
 		if ( await this.convService.isUserIdBannedFromConversation(user.id, conversation.id)) {
-			res.status(403).json({ message: "Your profil is banned from this conversation." }); return;}
+			throw new HttpException('You are banned from this conversation.', HttpStatus.FORBIDDEN); }
 		if (conversation.privacy === privacy_t.PRIVATE) {
-			res.status(403).json({ message: "The conversation is private, you can't join it - please wait to be invite by an administrator of it." }); return;}
+			throw new HttpException("The conversation is private, you can't join it - please wait to be invite by an administrator.", HttpStatus.FORBIDDEN); }
 		if (conversation.protected && conversation.password != null) {
 			res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;}
 		
@@ -210,7 +211,7 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserByUsernameOrEmail(req.body.userName);
 		if (!target) {
-			res.status(400).json({ message: "User not found." }); return;}
+			throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
 		else {
 			const isBlocked = await this.convService.blockUser(user.id, target.id);
 			if (isBlocked) {
@@ -226,7 +227,6 @@ export class ConversationsController {
 	@Post('blocked_users_list')
 	async GetBlockedUsersList(@Req() req) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
-		console.log("Username retrieving its block user list : ", user.username);
 		if (user) { console.log("Blocked Users List : ", user.blockedUsers); return user.blockedUsers; } 
 		else { throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
 	}
@@ -236,7 +236,7 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const target = await this.userService.getUserByUsernameOrEmail(req.body.userToUnblock);
 		if (!target) {
-			res.status(403).json({ message: "User not found." });}
+			throw new HttpException('User not found', HttpStatus.NOT_FOUND); }
 		else {
 			const unblockedUser = await this.convService.removeUserFromBlockList(user, target);
 			if (unblockedUser) {

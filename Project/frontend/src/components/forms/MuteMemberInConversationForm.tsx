@@ -35,8 +35,10 @@ export const MuteMemberInConversationForm: React.FC<MemberInConversationFormProp
         fetchMemberList();
 
         socket?.on('onMuteMember', fetchMemberList);
+        socket?.on('changeInConversation', fetchMemberList);
         return () => {
             socket?.off('onMuteMember', fetchMemberList);
+            socket?.off('changeInConversation', fetchMemberList);
         };
     }, [socket]);
 

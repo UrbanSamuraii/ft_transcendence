@@ -29,7 +29,7 @@ export class MessagesController {
 			where: { id: convId },
 			include: { members: true, messages: true },
 		});
-		if (!conversation) { throw new HttpException("Conversation not found", HttpStatus.BAD_REQUEST)};
+		if (!conversation) { throw new HttpException("Conversation not found", HttpStatus.NOT_FOUND)};
 
 		const newMessage = await this.messagesService.createMessage(user, content, conversation);
 		if (newMessage) {
@@ -42,8 +42,10 @@ export class MessagesController {
 	async getMessagesFromConversationId(@Param('conversationId') conversationId: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const blockedUsers = user.blockedUsers || [];
-		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId), blockedUsers);
-		if (!conversation) {res.status(404); return;}
+		const blockedBy = user.blockedBy || [];
+		const conversation = await this.conversationsService.getConversationWithAllMessagesById(parseInt(conversationId), blockedUsers, blockedBy);
+		console.log("Conversation from id:", conversation);
+		if (!conversation) {throw new HttpException("Conversation not found", HttpStatus.NOT_FOUND)}
 		const messagesInTheConversationId = conversation.messages;
 		return messagesInTheConversationId;
 	}

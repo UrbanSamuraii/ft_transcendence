@@ -117,4 +117,17 @@ export class UserController {
 		else { throw new InternalServerErrorException(); }
     }
 
-}
+    @Post('invite_game')
+    async InvitationGame(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+		const user = await this.userService.getUserByToken(req.cookies.token);
+		const target = await this.userService.getUserByUsernameOrEmail(req.body.userToInvite);
+        if (!target || !user) {
+			throw new UserNotFoundException();}
+		else {
+            const userId = user ? user.id : null;
+            const targetId = target ? target.id : null;
+            console.log("userId", targetId);
+            this.eventEmitter.emit('invite_game', {userId, targetId});
+        }
+    }
+}   

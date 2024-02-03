@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import  { AxiosError } from 'axios';
 import DOMPurify from 'dompurify';
+import { ErrorConversationMessageModal } from "../modals/ErrorConversationMessageModal";
 
 interface ConvDataInput {
     userToAdd: string;
@@ -20,6 +22,21 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
     });
 
     const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
+    const [formMsgError, setFormMsgError] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModalError, setShowModalError] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+    };
+
+    const handleShowModalError = () => {
+        setShowModalError(true);
+    };
+
+    const handleCloseModalError = () => {
+        setShowModalError(false);
+    };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -57,20 +74,21 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
                 const response = await axios.post(`http://${server_adress}:3001/conversations/${conversationId}/add_member`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                console.log({ "RESPONSE from ADDING USER TO CONVERSATION": response });
-                if (response.status === 403) {
-                    const customWarning = response.data.message;
-                    alert(`Warning: ${customWarning}`);
+                if (response.status !== 403) {
+                    setShowModal(false);
                 }
-                setShowModal(false);
             } catch (error) {
-                console.error('Adding user to conversation error:', error);
+                const err = error as AxiosError;
                 if (axios.isAxiosError(error)) {
+                    console.log(err.response);
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.message;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
-                        }
+                        if (error.response.data.message) { 
+                            const receivedCustomError: string = error.response.data.message;
+                            setCustomError(receivedCustomError);}
+                        else { 
+                            const receivedCustomError: string = error.response.data.error; 
+                            setCustomError(receivedCustomError);}
+                        handleShowModalError();
                     }
                 }
             }
@@ -78,6 +96,8 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
     };
 
     return (
+        <>
+        {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
             <h2>Add User to the Conversation</h2>
 
@@ -92,11 +112,10 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
                 </InputContainer>
             </div>
 
-
             <div className="button-createConv-container">
                 <ButtonCreateConv type="submit" >Add User</ButtonCreateConv>
             </div>
-
         </form>
+        </>
     );
 };

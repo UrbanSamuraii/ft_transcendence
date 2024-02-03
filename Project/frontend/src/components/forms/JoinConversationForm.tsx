@@ -2,6 +2,9 @@ import { useState } from "react";
 import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import  { AxiosError } from 'axios';
+import DOMPurify from 'dompurify';
+import { ErrorConversationMessageModal } from "../modals/ErrorConversationMessageModal";
 import { useNavigate } from "react-router-dom";
 import { CheckPasswordModal } from "../modals/CheckPasswordModal";
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
@@ -23,6 +26,21 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
     });
 
     const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
+    const [formMsgError, setFormMsgError] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModalError, setShowModalError] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+    };
+
+    const handleShowModalError = () => {
+        setShowModalError(true);
+    };
+
+    const handleCloseModalError = () => {
+        setShowModalError(false);
+    };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -52,23 +70,21 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
         }
         else {
             try {
-                // console.log({"DATA" : ConvDataInput});
-                const response = await axios.post(`http://${server_adress}:3001/conversations/join`, ConvDataInput, {
+                const sanitizedConvDataInput = {
+                    ...ConvDataInput,
+                    conversationName: DOMPurify.sanitize(ConvDataInput.conversationName),
+                };
+                const response = await axios.post(`http://${server_adress}:3001/conversations/join`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                // console.log({"RESPONSE from JOIGNING CONVERSATION": response}); 
-                if (response.status === 403) {
-                    const customWarning = response.data.message;
-                    alert(`Warning: ${customWarning}`);
-                }
-                else if (response.status === 202) {
-                    // console.log("There is a password protecting the conversation");
+                // if (response.status === 403) {
+                //     const customWarning = response.data.message;
+                //     alert(`Warning: ${customWarning}`);
+                // }
+                if (response.status === 202) {
                     const id = response.data.conversationId;
                     setConversationId(id);
-                    // convId = id;
-                    // console.log("Id of the protected conversation : ", convId);
                     setShowCheckPasswordModal(true);
-                    // setShowModal(false);
                 }
                 else {
                     const conversationId = response.data.conversationId;
@@ -76,13 +92,17 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
                     navigate(`channel/${conversationId}`);
                 }
             } catch (error) {
-                console.error('Creating conversation error:', error);
+                const err = error as AxiosError;
                 if (axios.isAxiosError(error)) {
+                    console.log(err.response);
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.message;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
-                        }
+                        if (error.response.data.message) { 
+                            const receivedCustomError: string = error.response.data.message;
+                            setCustomError(receivedCustomError);}
+                        else { 
+                            const receivedCustomError: string = error.response.data.error; 
+                            setCustomError(receivedCustomError);}
+                        handleShowModalError();
                     }
                 }
             }
@@ -91,6 +111,7 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
 
     return (
         <>
+        {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
             {showCheckPasswordModal && convId !== null && (<CheckPasswordModal
                 setShowModal={() => {
                     setShowCheckPasswordModal(false);

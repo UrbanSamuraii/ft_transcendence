@@ -4,6 +4,9 @@ import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { BlockUserModal } from "../modals/BlockUserModal";
 import DOMPurify from 'dompurify';
+import  { AxiosError } from 'axios';
+import { ErrorConversationMessageModal } from "../modals/ErrorConversationMessageModal";
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 interface ConvDataInput {
@@ -19,11 +22,27 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
     const [showCheckPasswordModal, setShowCheckPasswordModal] = useState(false);
     const [convId, setConversationId] = useState<number | null>(null);
 
+
     const [ConvDataInput, setConvDataInput] = useState<ConvDataInput>({
         userName: '',
     });
 
     const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
+    const [formMsgError, setFormMsgError] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModalError, setShowModalError] = useState<boolean>(false);
+
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+    };
+
+    const handleShowModalError = () => {
+        setShowModalError(true);
+    };
+
+    const handleCloseModalError = () => {
+        setShowModalError(false);
+    };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -58,20 +77,19 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
                 const response = await axios.post(`http://${server_adress}:3001/conversations/block_user`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                console.log({ "RESPONSE from BLOCKING USER": response });
-                if (response.status === 403) {
-                    const customWarning = response.data.message;
-                    alert(`Warning: ${customWarning}`);
-                }
                 setShowModal(false);
             } catch (error) {
-                console.error('Blocking User error:', error);
+                const err = error as AxiosError;
                 if (axios.isAxiosError(error)) {
+                    console.log(err.response);
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.message;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
-                        }
+                        if (error.response.data.message) { 
+                            const receivedCustomError: string = error.response.data.message;
+                            setCustomError(receivedCustomError);}
+                        else { 
+                            const receivedCustomError: string = error.response.data.error; 
+                            setCustomError(receivedCustomError);}
+                        handleShowModalError();
                     }
                 }
             }
@@ -79,6 +97,7 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
     };
     return (
         <>
+        {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
             {showCheckPasswordModal && convId !== null && (<BlockUserModal
                 setShowModal={() => {
                     setShowModal(false);

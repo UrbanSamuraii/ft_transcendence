@@ -324,11 +324,9 @@ export class ConversationsService {
 	/////////////////// ADD / REMOVE BLOCK USER ///////////////////
 
 	async blockUser(userId: number, targetId: number): Promise<boolean> {
-		// const userId = user.id;
-		// const targetId = target.id;
 		const userWithBlockedUsers = await this.prismaService.user.findUnique({
 			where: { id: userId },
-			include: { blockedUsers: true },
+			include: { blockedUsers: true, blockedBy: true },
 		});
 		const isAlreadyBlock = userWithBlockedUsers.blockedUsers.some((blocked) => blocked.id === targetId);
 		if (!isAlreadyBlock) {
@@ -338,7 +336,7 @@ export class ConversationsService {
 				});
 				await this.prismaService.user.update({
 					where: { id: targetId },
-					data: { blockedUsers: { connect: [{ id: userId }] } },
+					data: { blockedBy: { connect: [{ id: userId }] } },
 				});
 				return true;
 		} else { return false; }
@@ -357,9 +355,14 @@ export class ConversationsService {
 	async isBlockedByUser(user: User, userTarget: User): Promise<boolean> {
 		const isBlocked = await this.prismaService.user.findUnique({
 			where: { id: user.id },
-			include: { blockedUsers: { where: { id: userTarget.id } } },
-		});
-		return !!isBlocked?.blockedUsers.length;
+			include: {
+			  blockedUsers: { where: { id: userTarget.id } },
+			  blockedBy: { where: { id: userTarget.id } },
+			},
+		  });
+		  const blockedUsersLength = isBlocked?.blockedUsers.length || 0;
+		  const blockedByLength = isBlocked?.blockedBy.length || 0;
+		  return blockedUsersLength > 0 || blockedByLength > 0;
 	}
 
 	async removeUserFromBlockList(user: any, target: User): Promise<boolean> {
@@ -370,6 +373,14 @@ export class ConversationsService {
 				data: {
 					blockedUsers: {
 						disconnect: [{ id: target.id }],
+					},
+				},
+			});
+			await this.prismaService.user.update({
+				where: { id: target.id },
+				data: {
+					blockedBy: {
+						disconnect: [{ id: user.id }],
 					},
 				},
 			});
@@ -449,8 +460,7 @@ export class ConversationsService {
 		});
 	}
 	
-	async getConversationWithAllMessagesById(convId: number, blockedUsers: User[]) {
-		// console.log("ConvId when retrieving messages : ", convId);
+	async getConversationWithAllMessagesById(convId: number, blockedUsers: User[], blockedBy: User[]) {
 		const conversationFound = await this.prismaService.conversation.findUnique({
 			where: { id: convId },
 			include: { messages: true },
@@ -459,28 +469,32 @@ export class ConversationsService {
 		else {
 			return await this.prismaService.conversation.findUnique({
 				where: { id: convId },
-				include: { members: { select : {
-					id: true,
-					first_name: true,
-					last_name: true,
-					email: true,
-					username: true,
-					img_url: true,
-					isRegistered: true,
-					status: true,
-						}, 
-					},
-					messages: { orderBy: { updatedAt: 'desc' },
-					include: { author: { select: { id: true }}},
-					where: {
-                        author: {
-                            id: {
-                                not: {
-                                    in: blockedUsers.map((blockedUser) => blockedUser.id),
-                                },
-                            },
-                        },
-                    },
+				include: 
+					{ 
+					members: { select : {
+						id: true,
+						first_name: true,
+						last_name: true,
+						email: true,
+						username: true,
+						img_url: true,
+						isRegistered: true,
+						status: true, },},
+					messages: { 
+						orderBy: { updatedAt: 'desc' },
+						include: { author: { select: { id: true }}},
+						where: {
+							NOT: {
+								author: {
+								id: {
+									in: [
+									...blockedUsers.map((blockedUser) => blockedUser.id),
+									...blockedBy.map((blockedUser) => blockedUser.id),
+									],
+									},
+								},
+							},
+						},
 					},
 				},
 			});
