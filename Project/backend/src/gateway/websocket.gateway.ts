@@ -29,8 +29,8 @@ export class MessagingGateway implements OnGatewayConnection {
         private readonly prisma: PrismaService,
         private readonly convService: ConversationsService) { }
 
-    private readonly pingInterval = 6000; // 5 seconds
-    private readonly pongTimeout = 3000; // 3 seconds
+    private readonly pingInterval = 10000; // 5 seconds
+    private readonly pongTimeout = 5000; // 3 seconds
 
     async handleConnection(client: AuthenticatedSocket, ...args: any[]) {
         console.log("New incoming connection !");
@@ -45,11 +45,11 @@ export class MessagingGateway implements OnGatewayConnection {
 
                 // start to PING my user
                 this.startPingRoutine(client);
-            }
-            // To make my userSocket join all the room the user is member of
-            const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
-            for (const conversation of userWithConversations.conversations) {
-                client.join(conversation.id.toString());
+                // To make my userSocket join all the room the user is member of
+                const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(identifiedUser);
+                for (const conversation of userWithConversations.conversations) {
+                    client.join(conversation.id.toString());
+                }
             }
         }
 
@@ -60,7 +60,6 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     private startPingRoutine(client: AuthenticatedSocket) {
-        // console.log(`Start ping routine for user ${client.user?.id}`);
 
         const pingRoutine = () => {
             this.pingClient(client);
@@ -91,40 +90,39 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     pingClient(client: AuthenticatedSocket) {
-        // console.log("ping the client");
+        // console.log(`ping the client ${client.user?.id}`);
         this.server.to(client.id.toString()).emit('ping');
     }
 
     async handlePongInTime(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'OFFLINE') {
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { status: 'ONLINE' },
-            });
-            const friendsList = await this.userService.getUserFriendsList(user.id)
-            for (const friend of friendsList) {
-                const friendSocket = this.sessions.getUserSocket(friend.id);
-                if (friendSocket) {
-                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
-                }
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'ONLINE' },
+        });
+        const friendsList = await this.userService.getUserFriendsList(user.id)
+        for (const friend of friendsList) {
+            const friendSocket = this.sessions.getUserSocket(friend.id);
+            if (friendSocket) {
+                this.server.to(client.id.toString()).emit('changeInFriendship');
+                this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
             }
         }
     }
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        if (user.status === 'ONLINE') {
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { status: 'OFFLINE' },
-            });
-            const friendsList = await this.userService.getUserFriendsList(user.id)
-            for (const friend of friendsList) {
-                const friendSocket = this.sessions.getUserSocket(friend.id);
-                if (friendSocket) {
-                    this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
-                }
+        console.log("Username disconnected", user.username);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { status: 'OFFLINE' },
+        });
+        const friendsList = await this.userService.getUserFriendsList(user.id)
+        for (const friend of friendsList) {
+            const friendSocket = this.sessions.getUserSocket(friend.id);
+            if (friendSocket) {
+                this.server.to(friendSocket.id.toString()).emit('changeInFriendship');
+                // this.server.to(client.id.toString()).emit('changeInFriendship');
             }
         }
     }
@@ -152,6 +150,7 @@ export class MessagingGateway implements OnGatewayConnection {
         userSocket.join(conversationId.toString());
         console.log({ "User socket connected to the room !": userSocket.id });
         this.server.to(userSocket.id.toString()).emit('onJoinRoom', user, conversationId);
+        this.server.to(conversationId.toString()).emit('changeInConversation');
     }
 
     @OnEvent('message.create')
@@ -199,6 +198,7 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPrivacyEvent(payload: any) {
         console.log("The server has detect a change in privacy room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePrivacy', payload);
+        this.server.to(payload.conversationId).emit('changeInConversation');
     }
 
     @OnEvent('admin.status.member')
@@ -229,6 +229,7 @@ export class MessagingGateway implements OnGatewayConnection {
     displayChangeOfPasswordEvent(payload: any) {
         console.log("The server has detect a change in password of room number :", payload);
         this.server.to(payload.conversationId).emit('onChangePassword', payload);
+        this.server.to(payload.conversationId).emit('changeInConversation');
     }
 
     @OnEvent('remove.member')
@@ -238,6 +239,7 @@ export class MessagingGateway implements OnGatewayConnection {
         if (removedMemberSocket) {
             removedMemberSocket.leave(payload.conversationId.toString());
             this.server.to(removedMemberSocket.id.toString()).emit('onRemovedMember', payload);
+            this.server.to(payload.conversationId).emit('changeInConversation');
         };
     }
 
@@ -245,7 +247,6 @@ export class MessagingGateway implements OnGatewayConnection {
     async blockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-
         this.server.to(userSocket.id.toString()).emit('onBeingBlockedorBlocked', payload);
         if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingBlockedorBlocked', payload); };
     }
@@ -254,7 +255,6 @@ export class MessagingGateway implements OnGatewayConnection {
     async unblockUser(payload: any) {
         const userSocket = await this.sessions.getUserSocket(payload.user.id);
         const targetSocket = await this.sessions.getUserSocket(payload.target.id);
-
         this.server.to(userSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload);
         if (targetSocket) { this.server.to(targetSocket.id.toString()).emit('onBeingUnblockedorUnblocked', payload); };
     }
@@ -296,4 +296,23 @@ export class MessagingGateway implements OnGatewayConnection {
         this.server.to(userSocket.id.toString()).emit('changeInFriendship');
         this.server.to(targetSocket.id.toString()).emit('changeInFriendship');
     }
+
+    @OnEvent('invite_game')
+    async inviteGame(payload: any) {
+        const user = await this.userService.getUserById(payload.userId);
+        const target = await this.userService.getUserById(payload.targetId);
+        const userSocket = await this.sessions.getUserSocket(user.id);
+        const targetSocket = await this.sessions.getUserSocket(target.id);
+        // console.log(userSocket);
+        console.log("here");
+        // console.log(targetSocket);
+        if (userSocket && targetSocket)
+            this.server.to(targetSocket.id.toString()).emit('inviteGame', {
+                message: 'You have been invited to a game!',
+                target: user.username, 
+              });
+        else
+            console.log("socket error in invite game")
+    }
+
 }

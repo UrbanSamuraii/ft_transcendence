@@ -23,7 +23,7 @@ async function bootstrap() {
 
     app.use(passport.initialize());
     app.enableCors({
-        origin: `http://${server_adress}:3000`,
+        origin: `http://${server_adress}:3000`, 
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
@@ -37,7 +37,7 @@ async function bootstrap() {
         new UnauthorizedExceptionFilter(),
         new ForbiddenExceptionFilter(),
         // new PrismaExceptionFilter(httpAdapterHost),
-        // new HttpExceptionFilter(),
+        new HttpExceptionFilter(),
     );
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
         prefix: '/uploads/', // Virtual prefix to access files in the browser

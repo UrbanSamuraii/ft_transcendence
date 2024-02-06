@@ -28,18 +28,18 @@ export const LoginForm = () => {
 
     const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
     const [customError, setCustomError] = useState<string>('');
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [showModalError, setShowModalError] = useState<boolean>(false);
 
     const handleCustomAlertClose = () => {
         setCustomError('');
       };
     
-      const handleShowModal = () => {
-        setShowModal(true);
+      const handleShowModalError = () => {
+        setShowModalError(true);
       };
     
-      const handleCloseModal = () => {
-        setShowModal(false);
+      const handleCloseModalError = () => {
+        setShowModalError(false);
       };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +105,7 @@ export const LoginForm = () => {
                         const receivedCustomError: string = error.response.data.message;
                         if (receivedCustomError) {
                             setCustomError(receivedCustomError);
-                            handleShowModal();
+                            handleShowModalError();
                         }
                     }
                 }
@@ -115,7 +115,7 @@ export const LoginForm = () => {
 
     return (
         <>
-        {customError && showModal && <ErrorMessageModal setShowModal={handleCloseModal} errorMessage={customError} />}
+        {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <div className="app-container">
             <head>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>

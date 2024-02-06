@@ -18,6 +18,8 @@ import { AllowMemberInConversationModal } from '../modals/AllowMemberInConversat
 import { ImplementNewPasswordModal } from '../modals/ImplementNewPasswordModal';
 import { VerifyPasswordModal } from '../modals/VerifyPasswordModal';
 import { LeavingConversationModal } from '../modals/LeavingTheConversationModal';
+import { InviteToGameModal } from '../modals/InviteToGameModal';
+
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 type MessagePanelHeaderProps = {
@@ -80,6 +82,7 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
     const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
     const [showVerifyPasswordModal, setShowVerifyPasswordModal] = useState(false);
     const [showLeavingConversationModal, setShowLeavingConversationModal] = useState(false);
+    const [showInviteToGameModal, setShowInviteToGameModal] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const socketContextData = useSocket();
@@ -268,6 +271,10 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                 setShowModal={() => {
                     setShowLeavingConversationModal(false);
                 }} />)}
+            {showInviteToGameModal&& (<InviteToGameModal
+                setShowModal={() => {
+                    setShowInviteToGameModal(false);
+                }} />)}
             <div className='messagePanelHeader'>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
                 <div className="messagePanelTitle">
@@ -289,6 +296,7 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>)}
                                         <button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave the conversation</button>
+                                        <button className="convMenuButton" onClick={() => setShowInviteToGameModal(true)}>Invite Member to a Game</button>
                                         {isOwner && (<button className="convMenuButton" onClick={() => {
                                             if (isProtected) { setShowVerifyPasswordModal(true); }
                                             else { setShowNewPasswordModal(true); }

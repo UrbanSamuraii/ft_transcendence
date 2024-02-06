@@ -25,13 +25,10 @@ export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurr
     };
 
     const handleDelete = async (messageToDelete: ConversationMessage) => {
-        console.log('Deleting Message:', messageToDelete);
         const response = await axios.post(`http://${server_adress}:3001/messages/deleteMessage`, { messageToDelete: messageToDelete }, {
             withCredentials: true,
         });
         if (response.data.isLastMessageDeleted === true) {
-            console.log("LAST MESSAGE DELETED");
-            // console.log({"CONV ID": messageToDelete.conversation_id});
             setLastMessageDeleted(true);
             setConversationId(messageToDelete.conversation_id);
         }

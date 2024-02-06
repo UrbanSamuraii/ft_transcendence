@@ -2,8 +2,10 @@ import { useState } from "react";
 import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
+import  { AxiosError } from 'axios';
 import { useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
+import { ErrorConversationMessageModal } from "../modals/ErrorConversationMessageModal";
 
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
@@ -26,6 +28,22 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
     });
 
     const [formErrors, setFormErrors] = useState<Partial<ConvDataInput>>({});
+
+    const [formMsgError, setFormMsgError] = useState<Partial<FormData>>({});
+    const [customError, setCustomError] = useState<string>('');
+    const [showModalError, setShowModalError] = useState<boolean>(false);
+    
+    const handleCustomAlertClose = () => {
+        setCustomError('');
+    };
+
+    const handleShowModalError = () => {
+        setShowModalError(true);
+    };
+
+    const handleCloseModalError = () => {
+        setShowModalError(false);
+    };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -78,13 +96,17 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
                     navigate(`channel/${conversationId}`);
                 }
             } catch (error) {
-                console.error('Creating conversation error:', error);
+                const err = error as AxiosError;
                 if (axios.isAxiosError(error)) {
+                    console.log(err.response);
                     if (error.response && error.response.data) {
-                        const customError = error.response.data.message;
-                        if (customError) {
-                            alert(`Error: ${customError}`);
-                        }
+                        if (error.response.data.message) { 
+                            const receivedCustomError: string = error.response.data.message;
+                            setCustomError(receivedCustomError);}
+                        else { 
+                            const receivedCustomError: string = error.response.data.error; 
+                            setCustomError(receivedCustomError);}
+                        handleShowModalError();
                     }
                 }
             }
@@ -92,6 +114,8 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
     };
 
     return (
+        <>
+        {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <form className="form-Create-Conversation" onSubmit={handleCreateConversation}>
             <h2>new chat</h2>
 
@@ -125,5 +149,6 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
             </div>
 
         </form>
+        </>
     );
 };

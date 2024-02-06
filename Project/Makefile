@@ -4,18 +4,18 @@ COMPOSE		=	docker compose
 # Get formatted hostname (lowercase and trimmed)
 FORMATTED_HOSTNAME = $(shell hostname | tr 'A-Z' 'a-z' | cut -d'.' -f1)
 # BASIC COMPOSE COMMANDS
-build: set-env
+build: dbclean set-env
 	${COMPOSE} up --build
 
 up:
 	${COMPOSE} up
 
 down:
-	${COMPOSE} down
+	${COMPOSE} down -v
 
 # CLEAN DATABASES
 dbclean: down
-	docker volume prune -f
+	docker system prune -af
 
 set-env:
 	@echo "Setting environment variables..."
