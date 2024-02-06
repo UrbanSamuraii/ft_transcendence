@@ -244,11 +244,9 @@ function PowerPongGame() {
             if (data.leftPlayerInfo && data.leftPlayerInfo.username === user.username) {
                 setPowerBarLevel(data.leftPlayerInfo.powerBarLevel);
                 setCurrentPower(data.leftPlayerInfo.currentPower)
-                // console.log(`powerBarLevel: ${powerBarLevel}`);
             } else if (data.rightPlayerInfo && data.rightPlayerInfo.username === user.username) {
                 setPowerBarLevel(data.rightPlayerInfo.powerBarLevel);
                 setCurrentPower(data.rightPlayerInfo.currentPower)
-                // console.log(`powerBarLevel: ${powerBarLevel}`);
             }
             drawGame(data);
 
