@@ -186,7 +186,6 @@ export class GameGateway implements OnGatewayInit {
         return this.queue.some(client => client.socket.data.user.username === username);
     }
 
-
     private async addUserToQueue(client: { socket: Socket, gameMode: string }, userInfo: User): Promise<void> {
         client.socket.data.user = userInfo;
 
@@ -291,7 +290,7 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
-    private async createDirectGame(player1Socket, player2Socket, gameMode) {
+    private async createDirectGame(player1Socket: Socket, player2Socket: Socket, gameMode) {
         // Ensure both players are valid and not already in a game
         if (!player1Socket || !player2Socket) return;
 
@@ -303,13 +302,13 @@ export class GameGateway implements OnGatewayInit {
         const newGame = await this.createGame(player1Socket, player2Socket, gameMode);
         const gameId = newGame.id;
         const gameService = gameMode === 'powerpong' ? this.PowerPongGameService : this.classicGameService;
-        const gamePageURL = `/game/classic/${gameId}`; // Construct the URL to navigate to
-        player1Socket.emit('navigateToGame', { url: gamePageURL });
-        player2Socket.emit('navigateToGame', { url: gamePageURL });
-        // Initialize game state, potentially including ELO calculations
+        const gamePageURL = `/classic/${gameId}`; // Construct the URL to navigate to
+
         const eloChanges = await this.calculatePotentialEloChanges(player1Socket.data.user.id, player2Socket.data.user.id);
+
         const updatedPlayer1Info = { ...player1Socket.data.playerInfo, ...eloChanges.player1 };
         const updatedPlayer2Info = { ...player2Socket.data.playerInfo, ...eloChanges.player2 };
+
         const gamePlayerInfoMap = new Map<string, PlayerInfo>();
         gamePlayerInfoMap.set(player1Socket.data.user.username, updatedPlayer1Info);
         gamePlayerInfoMap.set(player2Socket.data.user.username, updatedPlayer2Info);
@@ -318,15 +317,15 @@ export class GameGateway implements OnGatewayInit {
         this.playerInfoMap.set(gameId, gamePlayerInfoMap);
 
         // Notify players to join the game room
-        player1Socket.join(gameId.toString());
-        player2Socket.join(gameId.toString());
+        await player1Socket.join(gameId.toString());
+        await player2Socket.join(gameId.toString());
         console.log(`${player1Socket.data.user.username} and ${player2Socket.data.user.username} have joined game room ${gameId}`);
 
-        // Emit match found event with game details
-        player1Socket.emit('matchFound', { opponent: player2Socket.data.user, gameId: gameId, gameMode });
-        player2Socket.emit('matchFound', { opponent: player1Socket.data.user, gameId: gameId, gameMode });
-
         // Start the game
+        player1Socket.emit('navigateToGame', { url: gamePageURL });
+        player2Socket.emit('navigateToGame', { url: gamePageURL });
+        this.server.to(gameId.toString()).emit('have you joined the room')
+
         gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
             this.server.to(gameId.toString()).emit('updateGameData', {
                 ...data,
@@ -346,6 +345,7 @@ export class GameGateway implements OnGatewayInit {
                 });
             }
         });
+
     }
 
     private findMatchingPlayerIndex(): number {
@@ -400,21 +400,36 @@ export class GameGateway implements OnGatewayInit {
     }
 
     @SubscribeMessage('gameInviteResponse')
-    async handleGameInviteResponse(client: Socket, { accepted, targetUsername }: { accepted: boolean; targetUsername: string }) {
+    async handleGameInviteResponse(client: Socket, { accepted, targetUsername, senderUsername }: { accepted: boolean; targetUsername: string; senderUsername: string; }) {
         if (!accepted) {
             // Optionally, notify the inviter that the invite was declined
             return;
         }
 
         // Use the provided methods to get user IDs and sockets
-        const inviteeId = await this.userService.getUserIdByUsername(client.data.user.username);
+        const userInfo1 = await this.verifyTokenAndGetUserInfo(client);
+        if (!userInfo1) {
+            client.disconnect(true);
+            return;
+        }
+
+        console.log(targetUsername)
+        console.log(senderUsername)
+        const inviteeId = await this.userService.getUserIdByUsername(senderUsername);
         const inviterId = await this.userService.getUserIdByUsername(targetUsername);
 
-        const inviterSocket = this.sessions.getUserSocket(inviterId);
-        const inviteeSocket = this.sessions.getUserSocket(inviteeId);
+        const inviterSocket = await this.sessions.getUserSocket(inviterId);
+        const inviteeSocket = await this.sessions.getUserSocket(inviteeId);
 
+        const userInfo2 = await this.verifyTokenAndGetUserInfo(inviteeSocket);
+        if (!userInfo2) {
+            client.disconnect(true);
+            return;
+        }
+
+        inviterSocket.data.user = userInfo1
+        inviteeSocket.data.user = userInfo2
         if (!inviterSocket || !inviteeSocket) {
-            // Handle error: one of the users is not connected
             console.error("Error: One of the users is not connected.");
             return;
         }
@@ -475,7 +490,6 @@ export class GameGateway implements OnGatewayInit {
             client.emit('gameStatusResponse', { inGame: false });
             return;
         }
-
         const userGameData = this.userCurrentGameMap.get(userInfo.username);
         const inGame = !!userGameData;
         const gameId = inGame ? userGameData.gameId : null;

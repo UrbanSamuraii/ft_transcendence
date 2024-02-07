@@ -19,7 +19,7 @@ export const ConversationPage = () => {
 
     useEffect(() => {
         const fetchConversations = async () => {
-            console.log("ConversationPage WORKING ON");
+            // console.log("ConversationPage WORKING ON");
             try {
                 const prismaConversations = await getConversations();
                 setPrismaConversations(prismaConversations);

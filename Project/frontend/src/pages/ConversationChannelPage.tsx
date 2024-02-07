@@ -45,9 +45,13 @@ export const ConversationChannelPage = () => {
     // To set all messages from the conv - need to sort on the getter at the backend
     useEffect(() => {
         const fetchConversations = async () => {
-            const conversations = await getConversationsIdentified(conversationId);
-            setConversationsArray(conversations);
-            console.log("FETCHING THE CONV WHEN UNBLOCK / BLOCK!");
+            try {
+                const conversations = await getConversationsIdentified(conversationId);
+                setConversationsArray(conversations);
+            } catch (error) {
+                console.error("Error fetching conversations:", error);
+                navigate('/ConversationPage');
+            }
         };
         fetchConversations();
 
@@ -121,9 +125,11 @@ export const ConversationChannelPage = () => {
     const handleAcceptGameInvite = () => {
         setShowGameInvite(false);
         if (gameInviteData) {
-            const senderUsername = gameInviteData.target;
+            console.log(`senderUsername: ${gameInviteData.target}`)
+            const senderUsername = user.username;
+            const targetUsername = gameInviteData.target;
 
-            const response = { target: senderUsername, accepted: true };
+            const response = { targetUsername: targetUsername, senderUsername: senderUsername, accepted: true };
             chatSocketContextData?.socket?.emit('gameInviteResponse', response);
         }
     };

@@ -30,11 +30,12 @@ export class ConversationsController {
 				return member;
 			})
 		);
+		console.log("INVITED MEMBERS", invitedMembers);
 		let convName = null;
 		if (req.body.name) { 
 			convName = await this.convService.establishConvName(req.body.name); }
-		else { const usernames = [user.username, ...(invitedMembers.map(member => member.username))];
-			convName = usernames.join(' '); }
+		else { if (invitedMembers && invitedMembers.length > 0) { const usernames = [user.username, ...(invitedMembers.map(member => member.username))];
+			convName = usernames.join(' '); }}
 		const createdConversation = await this.convService.createConversation(convName, user, invitedMembers);
 		if (!createdConversation) {
 			throw new ForbiddenException(`Conversation ${req.body.name} already exist.`);}
@@ -67,7 +68,9 @@ export class ConversationsController {
 		const idConv = parseInt(id);
 		const conversation = await this.convService.getConversationWithAllMessagesById(idConv, blockedUsers,blockedBy);
 		if (conversation) { return conversation; } 
-		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
+		else { 
+			console.log("CONV NOT FOUND")
+			throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
 	// WARNING : send back all OTHER MEMBERS of the conv' ! The user making the request is then excluded !!
@@ -134,7 +137,7 @@ export class ConversationsController {
 	async GetStatusOfTheConversation(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const status = await this.convService.getStatus(idConv);
-		if (status) { return status; } 
+		if (status != null) { return status; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
@@ -143,7 +146,7 @@ export class ConversationsController {
 	async GetProtectionOfTheConversation(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const status = await this.convService.isProtected(idConv);
-		if (status) { return status; } 
+		if (status != null) { return status; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 

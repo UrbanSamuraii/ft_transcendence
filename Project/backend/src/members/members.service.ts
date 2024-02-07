@@ -50,7 +50,7 @@ export class MembersService implements IMembersService {
 					  createdAt: 'desc', // Order messages by createdAt in descending order
 					},
 					take: 1, // Take the first message = the newest one
-				  }
+				  },
 				}
 			  }
 			}

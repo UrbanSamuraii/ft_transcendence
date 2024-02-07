@@ -155,7 +155,6 @@ export class MessagingGateway implements OnGatewayConnection {
 
     @OnEvent('message.create')
     async handleMessageCreatedEvent(payload: any) {
-        // console.log("PAYLOAD message.create : ", payload);
         if (payload.newMessage.author) {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
@@ -169,8 +168,8 @@ export class MessagingGateway implements OnGatewayConnection {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
                         if (memberSocket !== undefined) {
                             this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage);
-                            this.server.to(memberSocket.id.toString()).emit('onNewMessage');
                         }
+                        this.server.to(memberSocket.id.toString()).emit('onNewMessage');
                     }
                 }
             }
@@ -309,8 +308,8 @@ export class MessagingGateway implements OnGatewayConnection {
         if (userSocket && targetSocket)
             this.server.to(targetSocket.id.toString()).emit('inviteGame', {
                 message: 'You have been invited to a game!',
-                target: user.username, 
-              });
+                target: user.username,
+            });
         else
             console.log("socket error in invite game")
     }
