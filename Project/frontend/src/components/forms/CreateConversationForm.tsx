@@ -87,14 +87,9 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
                 const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/conversations/create`, sanitizedConvDataInput, {
                     withCredentials: true
                 });
-                if (response.status === 403) {
-                    const customWarning = response.data.message;
-                    alert(`Warning: ${customWarning}`);
-                } else {
-                    const conversationId = response.data.conversationId;
-                    setShowModal(false);
-                    navigate(`channel/${conversationId}`);
-                }
+                const conversationId = response.data.conversationId;
+                setShowModal(false);
+                navigate(`channel/${conversationId}`);
             } catch (error) {
                 const err = error as AxiosError;
                 if (axios.isAxiosError(error)) {

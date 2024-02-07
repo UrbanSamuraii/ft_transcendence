@@ -139,7 +139,7 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
         fetchPrivacyStatus();
 
         const onChangePrivacyHandler = (payload: any) => {
-            console.log("Change of privacy", payload.privacy);
+            // console.log("Change of privacy", payload.privacy);
             setIsPrivate(payload.privacy === 'PRIVATE');
         };
         socketContextData?.socket?.on('onChangePrivacy', onChangePrivacyHandler);
@@ -193,7 +193,6 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                 const response = await axios.get(`http://${server_adress}:3001/conversations/${conversationId}/isAdmin`, {
                     withCredentials: true,
                 });
-                // console.log("Is ADMIN of the conversation ? ", response.data);
                 setIsAdmin(response.data);
             } catch (error) {
                 console.error('Error fetching conversation owner status:', error);

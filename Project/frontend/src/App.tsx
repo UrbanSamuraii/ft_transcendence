@@ -126,14 +126,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
         navigate('/ConversationPage')
     }
 
-    // function handleLoginClick() {
-    //     navigate("/login");
-    // }
-
-    // function handleSignupClick() {
-    //     navigate("/signup");
-    // }
-
     return (
         <Routes>
             {/* Public routes */}

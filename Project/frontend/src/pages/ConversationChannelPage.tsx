@@ -27,6 +27,20 @@ export const ConversationChannelPage = () => {
 
     const navigate = useNavigate()
 
+    // useEffect(() => {
+        
+    //     const convList 
+    //     const isValidConversationId =
+        
+    //     if (!isValidConversationId) {
+          
+    //       navigate('/');
+    //     }
+    
+    //   }, [conversationId, navigate]);
+    
+    // };);
+
     useEffect(() => {
         chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {
             if (conversationId === payload.conversationId) {
@@ -41,9 +55,12 @@ export const ConversationChannelPage = () => {
     // To set all messages from the conv - need to sort on the getter at the backend
     useEffect(() => {
         const fetchConversations = async () => {
+        try {
             const conversations = await getConversationsIdentified(conversationId);
             setConversationsArray(conversations);
-            console.log("FETCHING THE CONV WHEN UNBLOCK / BLOCK!");
+        } catch (error) {
+            console.error("Error fetching conversations:", error);
+            navigate('/ConversationPage');}
         };
         fetchConversations();
 
