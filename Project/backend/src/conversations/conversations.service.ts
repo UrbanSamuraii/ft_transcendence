@@ -32,11 +32,12 @@ export class ConversationsService {
 			members: { connect: { id: userMember.id } },
 		};
 		const createdConversation = await this.prismaService.conversation.create({data: conversationData});
-		if (invitedMembers && invitedMembers.length > 0 && invitedMembers[0] !== null) {
+		if (invitedMembers && invitedMembers.length > 0) {
 			for (const invitedMember of invitedMembers) {
-				const isAlreadyMember = await this.isMemberOfTheConversation(invitedMember.id, createdConversation.id);
-				if (!isAlreadyMember) {
-					await this.addUserToConversation(invitedMember.id, createdConversation.id); }
+				if (invitedMember != null) {
+					const isAlreadyMember = await this.isMemberOfTheConversation(invitedMember.id, createdConversation.id);
+					if (!isAlreadyMember) {
+						await this.addUserToConversation(invitedMember.id, createdConversation.id); }}
 			}}
 		return createdConversation;
 	}
@@ -397,7 +398,7 @@ export class ConversationsService {
 			include: { members: true, messages: true },
 		});
 
-		const updatedConversation = await this.prismaService.conversation.update({
+		await this.prismaService.conversation.update({
 			where: { id: conversation.id },
 			data: { messages: { connect: { id: newMessageId } } },
 		});
@@ -427,7 +428,7 @@ export class ConversationsService {
 		const updatedMessages = currentConversation.messages.filter(
 			(message) => message.id !== messageToDeleteId
 		);	
-		const updatedConversation = await this.prismaService.conversation.update({
+		await this.prismaService.conversation.update({
 			where: { id: conversationId },
 			data: {
 				messages: {
@@ -520,7 +521,8 @@ export class ConversationsService {
 		});
 		if (conversation) {
 			const membersWithoutUser = conversation.members.filter((member) => member.id !== userIdToExclude);
-		  return membersWithoutUser; 
+			console.log("Other members : ", membersWithoutUser);
+			return membersWithoutUser; 
 		} 
 		else { return null; }
 	}

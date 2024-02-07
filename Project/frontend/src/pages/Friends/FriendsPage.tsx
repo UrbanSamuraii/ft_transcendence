@@ -14,13 +14,13 @@ export const FriendsPage = () => {
     const [friendsList, setFriendsList] = useState<any[]>([]);
     const [invitationsList, setInvitationsList] = useState<any[]>([]);
 
-    const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
+    // const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
     const [customError, setCustomError] = useState<string>('');
     const [showModalError, setShowModalError] = useState<boolean>(false);
     
-    const handleCustomAlertClose = () => {
-        setCustomError('');
-    };
+    // const handleCustomAlertClose = () => {
+    //     setCustomError('');
+    // };
 
     const handleShowModalError = () => {
     setShowModalError(true);
@@ -34,7 +34,6 @@ export const FriendsPage = () => {
         const fetchFriendsList = async () => {
             try {
                 const friendsList = await getFriendsList();
-                console.log("Fetched Friends List: ", friendsList);
                 setFriendsList(friendsList);
             } catch (error) {
                 console.error('Error fetching friends list:', error);
@@ -44,7 +43,6 @@ export const FriendsPage = () => {
         const fetchInvitationsList = async () => {
             try {
                 const invitationsList = await getInvitationsList();
-                console.log("Fetched Invitations List: ", invitationsList);
                 setInvitationsList(invitationsList);
             } catch (error) {
                 console.error('Error fetching invitations list:', error);
@@ -70,7 +68,7 @@ export const FriendsPage = () => {
 
     const handleRemoveFriend = async (friendId: number) => {
         try {
-            const removed_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/remove_friend`, { friendId: friendId }, {
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/remove_friend`, { friendId: friendId }, {
                 withCredentials: true
             });
         } catch (error: any) {
@@ -92,7 +90,7 @@ export const FriendsPage = () => {
 
     const handleSendInvitation = async (invitationDetails: { usernameOrEmail: string }) => {
         try {
-            const invitation = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/send_invitation`, { userName: DOMPurify.sanitize(invitationDetails.usernameOrEmail) }, {
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/send_invitation`, { userName: DOMPurify.sanitize(invitationDetails.usernameOrEmail) }, {
                 withCredentials: true
             });
         } catch (error: any) {
@@ -115,7 +113,7 @@ export const FriendsPage = () => {
     const handleAcceptInvitation = async (invitationId: number) => {
         console.log("Invitation from id USER :", invitationId);
         try {
-            const added_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/add_friend`, { invitationId: invitationId }, {
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/add_friend`, { invitationId: invitationId }, {
                 withCredentials: true
             });
         } catch (error: any) {
@@ -137,7 +135,7 @@ export const FriendsPage = () => {
 
     const handleRefuseInvitation = async (invitationId: number) => {
         try {
-            const refused_friend = await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/refuse_invitation`, { invitationId: invitationId }, {
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADRESS}:3001/users/refuse_invitation`, { invitationId: invitationId }, {
                 withCredentials: true
             });
         } catch (error: any) {

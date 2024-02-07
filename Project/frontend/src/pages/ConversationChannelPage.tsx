@@ -22,24 +22,10 @@ export const ConversationChannelPage = () => {
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
     const chatSocketContextData = useSocket();
-    const [showGameInvite, setShowGameInvite] = useState(true);
+    const [showGameInvite, setShowGameInvite] = useState(false);
     const [gameInviteData, setGameInviteData] = useState<GameInviteData | null>(null);
 
     const navigate = useNavigate()
-
-    // useEffect(() => {
-        
-    //     const convList 
-    //     const isValidConversationId =
-        
-    //     if (!isValidConversationId) {
-          
-    //       navigate('/');
-    //     }
-    
-    //   }, [conversationId, navigate]);
-    
-    // };);
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onRemovedMember', (payload: any) => {

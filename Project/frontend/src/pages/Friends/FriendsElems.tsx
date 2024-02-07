@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
-import { PageProps } from '../../utils/styles/styleType';
-import React, { MouseEvent, useState } from 'react';
+import React, { useState } from 'react';
 
 export const Friendspage = styled.div`
   width: 100%;

@@ -159,20 +159,16 @@ export class MessagingGateway implements OnGatewayConnection {
             const isMute = await this.memberService.isMuteMember(payload.newMessage.conversation_id, payload.newMessage.author.id);
             if (!isMute) {
                 const authorSocket = await this.sessions.getUserSocket(payload.user.id);
-                if (payload.newMessage) {
-                    this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage); }
+                this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage);
                 this.server.to(authorSocket.id.toString()).emit('onNewMessage');
                 const conversationOtherMembers = await this.convService.getConversationOtherMembers(payload.newMessage.conversation_id, payload.user.id);
                 for (const member of conversationOtherMembers) {
-                    // console.log("SENDING TO OTHER MEMBERS")
                     const isBlocked = await this.convService.isBlockedByUser(payload.user, member);
                     if (isBlocked == false) {
                         const memberSocket = await this.sessions.getUserSocket(member.id);
                         if (memberSocket !== undefined) {
-                            if (payload.newMessage) {
-                                this.server.to(authorSocket.id.toString()).emit('onMessage', payload.newMessage); }
+                            this.server.to(memberSocket.id.toString()).emit('onMessage', payload.newMessage); }
                             this.server.to(memberSocket.id.toString()).emit('onNewMessage');
-                        }
                     }
                 }
             }

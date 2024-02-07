@@ -30,6 +30,7 @@ export class ConversationsController {
 				return member;
 			})
 		);
+		console.log("INVITED MEMBERS", invitedMembers);
 		let convName = null;
 		if (req.body.name) { 
 			convName = await this.convService.establishConvName(req.body.name); }
@@ -39,7 +40,6 @@ export class ConversationsController {
 		if (!createdConversation) {
 			throw new ForbiddenException(`Conversation ${req.body.name} already exist.`);}
 		else {
-			console.log("EMITTING")
 			this.eventEmitter.emit('join.room', user, createdConversation.id);
 			this.eventEmitter.emit('message.create', '');
 			if (invitedMembers && invitedMembers.length > 0) {
@@ -58,15 +58,6 @@ export class ConversationsController {
 		const user = await this.userService.getUserByToken(req.cookies.token);
 		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
 		return (userWithConversations.conversations);
-	}
-
-	@Get('id_list')
-	async GetConversationsIdList(@Req() req) {
-		const user = await this.userService.getUserByToken(req.cookies.token);
-		const userWithConversations = await this.memberService.getMemberWithConversationsHeIsMemberOf(user);
-		// if (userWithConversations.conversations) {}
-		const idList: number[] = userWithConversations.conversations.map(conversation => conversation.id);
-		return (idList);
 	}
 
 	@Get(':id')
@@ -146,7 +137,7 @@ export class ConversationsController {
 	async GetStatusOfTheConversation(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const status = await this.convService.getStatus(idConv);
-		if (status) { return status; } 
+		if (status != null) { return status; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 
@@ -155,7 +146,7 @@ export class ConversationsController {
 	async GetProtectionOfTheConversation(@Param('id') id: string) {
 		const idConv = parseInt(id);
 		const status = await this.convService.isProtected(idConv);
-		if (status) { return status; } 
+		if (status != null) { return status; } 
 		else { throw new HttpException('Conversation not found', HttpStatus.NOT_FOUND); }
 	}
 

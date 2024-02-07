@@ -139,7 +139,6 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
         fetchPrivacyStatus();
 
         const onChangePrivacyHandler = (payload: any) => {
-            // console.log("Change of privacy", payload.privacy);
             setIsPrivate(payload.privacy === 'PRIVATE');
         };
         socketContextData?.socket?.on('onChangePrivacy', onChangePrivacyHandler);
