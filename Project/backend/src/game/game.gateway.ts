@@ -10,7 +10,10 @@ import { UserService } from '../user/user.service';
 import { PrismaService } from "src/prisma/prisma.service";
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma, User, Game } from '@prisma/client';
+import { GatewaySessionManager } from "../gateway/gateway.session";
+
 const server_adress = process.env.SERVER_ADRESS;
+
 
 enum PowerType {
     Expand = 'Expand',
@@ -54,7 +57,8 @@ export class GameGateway implements OnGatewayInit {
         private PowerPongGameService: PowerPongGameService,
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
-        private prisma: PrismaService
+        private prisma: PrismaService,
+        private readonly sessions: GatewaySessionManager
 
     ) { }
 
@@ -287,6 +291,63 @@ export class GameGateway implements OnGatewayInit {
         }
     }
 
+    private async createDirectGame(player1Socket, player2Socket, gameMode) {
+        // Ensure both players are valid and not already in a game
+        if (!player1Socket || !player2Socket) return;
+
+        // Mark players as in a game to prevent re-queueing or duplicate game sessions
+        this.userInGameMap.set(player1Socket.data.user.username, true);
+        this.userInGameMap.set(player2Socket.data.user.username, true);
+
+        // Create the game session
+        const newGame = await this.createGame(player1Socket, player2Socket, gameMode);
+        const gameId = newGame.id;
+        const gameService = gameMode === 'powerpong' ? this.PowerPongGameService : this.classicGameService;
+        const gamePageURL = `/game/classic/${gameId}`; // Construct the URL to navigate to
+        player1Socket.emit('navigateToGame', { url: gamePageURL });
+        player2Socket.emit('navigateToGame', { url: gamePageURL });
+        // Initialize game state, potentially including ELO calculations
+        const eloChanges = await this.calculatePotentialEloChanges(player1Socket.data.user.id, player2Socket.data.user.id);
+        const updatedPlayer1Info = { ...player1Socket.data.playerInfo, ...eloChanges.player1 };
+        const updatedPlayer2Info = { ...player2Socket.data.playerInfo, ...eloChanges.player2 };
+        const gamePlayerInfoMap = new Map<string, PlayerInfo>();
+        gamePlayerInfoMap.set(player1Socket.data.user.username, updatedPlayer1Info);
+        gamePlayerInfoMap.set(player2Socket.data.user.username, updatedPlayer2Info);
+
+        // Save the game state
+        this.playerInfoMap.set(gameId, gamePlayerInfoMap);
+
+        // Notify players to join the game room
+        player1Socket.join(gameId.toString());
+        player2Socket.join(gameId.toString());
+        console.log(`${player1Socket.data.user.username} and ${player2Socket.data.user.username} have joined game room ${gameId}`);
+
+        // Emit match found event with game details
+        player1Socket.emit('matchFound', { opponent: player2Socket.data.user, gameId: gameId, gameMode });
+        player2Socket.emit('matchFound', { opponent: player1Socket.data.user, gameId: gameId, gameMode });
+
+        // Start the game
+        gameService.updateGameState(gameId, this.playerInfoMap.get(gameId), (data) => {
+            this.server.to(gameId.toString()).emit('updateGameData', {
+                ...data,
+            });
+
+            if (data.isGameOver && data.winnerUsername && data.loserUsername) {
+                this.resetUserGameStatus(player1Socket.data.user.username);
+                this.resetUserGameStatus(player2Socket.data.user.username);
+                player1Socket.leave(gameId.toString());
+                player2Socket.leave(gameId.toString());
+                this.playerInfoMap.delete(player1Socket.data.user.username);
+                this.playerInfoMap.delete(player2Socket.data.user.username);
+                this.userCurrentGameMap.delete(player1Socket.data.user.username);
+                this.userCurrentGameMap.delete(player2Socket.data.user.username);
+                this.handleGameOver(data.winnerUsername, data.loserUsername, gameId).catch((error) => {
+                    console.error('Error handling game over:', error);
+                });
+            }
+        });
+    }
+
     private findMatchingPlayerIndex(): number {
         for (let i = 1; i < this.queue.length; i++) {
             if (this.queue[0].gameMode === this.queue[i].gameMode) {
@@ -337,6 +398,35 @@ export class GameGateway implements OnGatewayInit {
             this.startMatchmaking();
         }
     }
+
+    @SubscribeMessage('gameInviteResponse')
+    async handleGameInviteResponse(client: Socket, { accepted, targetUsername }: { accepted: boolean; targetUsername: string }) {
+        if (!accepted) {
+            // Optionally, notify the inviter that the invite was declined
+            return;
+        }
+
+        // Use the provided methods to get user IDs and sockets
+        const inviteeId = await this.userService.getUserIdByUsername(client.data.user.username);
+        const inviterId = await this.userService.getUserIdByUsername(targetUsername);
+
+        const inviterSocket = this.sessions.getUserSocket(inviterId);
+        const inviteeSocket = this.sessions.getUserSocket(inviteeId);
+
+        if (!inviterSocket || !inviteeSocket) {
+            // Handle error: one of the users is not connected
+            console.error("Error: One of the users is not connected.");
+            return;
+        }
+
+        // Assume "classic" game mode
+        const gameMode = 'classic';
+
+        // Proceed to create the game directly without queueing
+        await this.createDirectGame(inviterSocket, inviteeSocket, gameMode);
+    }
+
+
 
     @SubscribeMessage('playerActions')
     handlePlayerActions(client: Socket, activeKeys: string[]) {

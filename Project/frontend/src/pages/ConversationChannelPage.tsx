@@ -9,12 +9,16 @@ import { MessagePanelHeader } from "../components/messages/MessagePanelHeader";
 import { MessageInputField } from "../components/messages/MessageInputField";
 import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
-import { OverlayStyle, OverlayContent  } from '../utils/styles';
+import { OverlayStyle, OverlayContent } from '../utils/styles';
 import OutsideClickHandler from 'react-outside-click-handler';
 
 type GameInviteData = {
     target: string;
-  };
+};
+
+interface NavigateToGameEvent {
+    url: string;
+}
 
 export const ConversationChannelPage = () => {
 
@@ -22,7 +26,7 @@ export const ConversationChannelPage = () => {
     const [conversationsArray, setConversationsArray] = useState<ConversationMessage[]>([]);
     const { user } = useAuth();
     const chatSocketContextData = useSocket();
-    const [showGameInvite, setShowGameInvite] = useState(true);
+    const [showGameInvite, setShowGameInvite] = useState(false);
     const [gameInviteData, setGameInviteData] = useState<GameInviteData | null>(null);
 
     const navigate = useNavigate()
@@ -48,7 +52,7 @@ export const ConversationChannelPage = () => {
         fetchConversations();
 
         console.log("Blocking / Unblocking !!!");
-    
+
         const socket = chatSocketContextData?.socket;
         if (socket) { socket.on('onBeingBlockedorBlocked', fetchConversations) }
         return () => {
@@ -79,7 +83,8 @@ export const ConversationChannelPage = () => {
             if (isMessageInConversation) {
                 setConversationsArray(prevConversations => {
                     return prevConversations.filter(message => message.id !== deletedMessage.id);
-                });}
+                });
+            }
         });
         return () => {
             chatSocketContextData?.socket?.off('onDeleteMessage');
@@ -100,42 +105,55 @@ export const ConversationChannelPage = () => {
         };
     }, [chatSocketContextData.socket, chatSocketContextData]);
 
+    useEffect(() => {
+        const handleNavigateToGame = ({ url }: NavigateToGameEvent) => {
+            navigate(url);
+        };
+
+        const socket = chatSocketContextData?.socket;
+        socket?.on('navigateToGame', handleNavigateToGame);
+
+        return () => {
+            socket?.off('navigateToGame', handleNavigateToGame);
+        };
+    }, [chatSocketContextData?.socket, navigate]);
+
     const handleAcceptGameInvite = () => {
         setShowGameInvite(false);
         if (gameInviteData) {
-          const senderUsername = gameInviteData.target;
-    
-          const response = { target: senderUsername, accepted: true };
-          chatSocketContextData?.socket?.emit('gameInviteResponse', response);
+            const senderUsername = gameInviteData.target;
+
+            const response = { target: senderUsername, accepted: true };
+            chatSocketContextData?.socket?.emit('gameInviteResponse', response);
         }
-      };
-    
-      const handleRefuseGameInvite = () => {
+    };
+
+    const handleRefuseGameInvite = () => {
         setShowGameInvite(false);
         if (gameInviteData) {
-          const senderUsername = gameInviteData.target;
-    
-          const response = { target: senderUsername, accepted: false };
-          chatSocketContextData?.socket?.emit('gameInviteResponse', response);
+            const senderUsername = gameInviteData.target;
+
+            const response = { target: senderUsername, accepted: false };
+            chatSocketContextData?.socket?.emit('gameInviteResponse', response);
         }
-      };
+    };
 
     return (
         <ConversationChannelPageStyle>
             {showGameInvite && (
-            <OverlayStyle>
-                <OutsideClickHandler onOutsideClick={() => {
-                    setShowGameInvite(false);
-                }}>
-                    <OverlayContent>
-                        <div className="game-invite-interface">
-                            <p>You have received a game invite!</p>
-                            <button onClick={handleAcceptGameInvite}>Yes</button>
-                            <button onClick={handleRefuseGameInvite}>No</button>
-                        </div>
-                    </OverlayContent>
-                </OutsideClickHandler>
-            </OverlayStyle>
+                <OverlayStyle>
+                    <OutsideClickHandler onOutsideClick={() => {
+                        setShowGameInvite(false);
+                    }}>
+                        <OverlayContent>
+                            <div className="game-invite-interface">
+                                <p>You have received a game invite!</p>
+                                <button onClick={handleAcceptGameInvite}>Yes</button>
+                                <button onClick={handleRefuseGameInvite}>No</button>
+                            </div>
+                        </OverlayContent>
+                    </OutsideClickHandler>
+                </OverlayStyle>
             )}
             <MessagePanelHeader conversationId={Number(conversationId)} />
             <ScrollableContainer>

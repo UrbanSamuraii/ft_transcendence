@@ -14,7 +14,7 @@ export const ConversationPage = () => {
     const { id } = useParams();
     const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
     const { socket, isLastMessageDeleted } = useSocket();
-    const [showGameInvite, setShowGameInvite] = useState(true);
+    const [showGameInvite, setShowGameInvite] = useState(false);
     const chatSocketContextData = useSocket();
 
     useEffect(() => {
