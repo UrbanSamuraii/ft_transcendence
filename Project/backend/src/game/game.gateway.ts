@@ -405,50 +405,43 @@ export class GameGateway implements OnGatewayInit {
             return;
         }
 
-        // Use the provided methods to get user IDs and sockets
-        const userInfo1 = await this.verifyTokenAndGetUserInfo(client);
-        if (!userInfo1) {
-            client.disconnect(true);
-            return;
-        }
-
-        console.log(targetUsername)
-        console.log(senderUsername)
+        // console.log(targetUsername)
+        // console.log(senderUsername)
         const inviteeId = await this.userService.getUserIdByUsername(senderUsername);
         const inviterId = await this.userService.getUserIdByUsername(targetUsername);
-        console.log(`inviteeId: ${inviteeId}`)
-        console.log(`inviterId: ${inviterId}`)
+        // console.log(`inviteeId: ${inviteeId}`)
+        // console.log(`inviterId: ${inviterId}`)
         const inviterSocket = await this.sessions.getUserSocket(inviterId);
         const inviteeSocket = await this.sessions.getUserSocket(inviteeId);
 
+        const userInfo1 = await this.verifyTokenAndGetUserInfo(inviterSocket);
         const userInfo2 = await this.verifyTokenAndGetUserInfo(inviteeSocket);
-        if (!userInfo2) {
+        if (!userInfo2 || !userInfo1) {
             client.disconnect(true);
             return;
         }
 
         inviterSocket.data.user = userInfo1
         inviteeSocket.data.user = userInfo2
-        console.log(`userInfo1 : ${userInfo1}`)
-        console.log(`userInfo2 : ${userInfo2}`)
+        // console.log(`inviterSocket.data.user.username: ${inviterSocket.data.user.username}`)
+        // console.log(`inviteeSocket.data.user.username: ${inviteeSocket.data.user.username}`)
+        // console.log(`userInfo1 : ${userInfo1}`)
+        // console.log(`userInfo2 : ${userInfo2}`)
         if (!inviterSocket || !inviteeSocket) {
             console.error("Error: One of the users is not connected.");
             return;
         }
 
-        // Assume "classic" game mode
         const gameMode = 'classic';
 
         let inviterCurrentElo;
         let inviteeCurrentElo;
 
         try {
-            // Attempt to fetch the current ELO ratings
             inviterCurrentElo = await this.userService.getEloRating(inviterId);
             inviteeCurrentElo = await this.userService.getEloRating(inviteeId);
         } catch (error) {
             console.error(`Error fetching ELO rating for users ${targetUsername} and ${senderUsername}:`, error);
-            // Set default ELO ratings
             inviterCurrentElo = 1000;
             inviteeCurrentElo = 1000;
         }
@@ -479,8 +472,8 @@ export class GameGateway implements OnGatewayInit {
 
         inviterSocket.data.playerInfo = inviterPlayerInfo;
         inviteeSocket.data.playerInfo = inviteePlayerInfo;
-        console.log(`inviterSocket username: ${inviterSocket.data.user.username}`)
-        console.log(`inviteeSocket username: ${inviteeSocket.data.user.username}`)
+        // console.log(`inviterSocket username: ${inviterSocket.data.user.username}`)
+        // console.log(`inviteeSocket username: ${inviteeSocket.data.user.username}`)
         // Proceed to create the game directly without queueing
         await this.createDirectGame(inviterSocket, inviteeSocket, gameMode);
     }

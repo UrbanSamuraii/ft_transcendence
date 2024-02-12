@@ -302,9 +302,6 @@ export class MessagingGateway implements OnGatewayConnection {
         const target = await this.userService.getUserById(payload.targetId);
         const userSocket = await this.sessions.getUserSocket(user.id);
         const targetSocket = await this.sessions.getUserSocket(target.id);
-        // console.log(userSocket);
-        console.log("here");
-        // console.log(targetSocket);
         if (userSocket && targetSocket)
             this.server.to(targetSocket.id.toString()).emit('inviteGame', {
                 message: 'You have been invited to a game!',

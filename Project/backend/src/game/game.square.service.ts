@@ -89,18 +89,13 @@ export class SquareGameService {
 
         }
 
-        console.log("updating the gam1e")
         // Assuming 2 players for left and right paddle
         const playerInfos = Array.from(playerInfoMap.values());
-        console.log("updating the gam2e")
-        console.log(playerInfos)
 
         // Assuming 2 players for left and right paddle
         if (playerInfos.length >= 2 && !gameState.isGamePaused) {
-            console.log("updating the gam20e")
             const leftPlayerInfo = playerInfos[0];
             const rightPlayerInfo = playerInfos[1];
-            console.log("updating the gam21e")
 
             // Handle left player paddle movement
             if (leftPlayerInfo.activeKeys.includes("w")) {
@@ -119,7 +114,6 @@ export class SquareGameService {
                 const potentialY = gameState.rightPaddle.y + gameState.paddleMoveAmount;
                 gameState.rightPaddle.y = Math.min(potentialY, 100 - gameState.rightPaddle.height);
             }
-            console.log("updating the gam3e")
 
             gameState.squares.forEach((square, idx) => {
 
@@ -168,11 +162,9 @@ export class SquareGameService {
                 }
 
             });
-            console.log("updating the gam4e")
 
             gameState.leftScore = leftPlayerInfo.score;
             gameState.rightScore = rightPlayerInfo.score; //both lines are placeholders to remove when i do frontend
-            console.log("updating the gam5e")
 
             if (gameState.leftScore >= 10 || gameState.rightScore >= 10) {
                 gameState.isGameOver = true;
