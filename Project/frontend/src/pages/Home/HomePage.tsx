@@ -18,7 +18,7 @@ const HomePage = () => {
         return (
             <div className="homepage">
                 <div className='content'>
-                    <button className="text" data-text='Sign In' onClick={handleSignUpClick}>Sign Up</button>
+                    <button className="text" data-text='Sign In' onClick={handleSignUpClick}>Sign In</button>
                 </div>
             </div>
         );
