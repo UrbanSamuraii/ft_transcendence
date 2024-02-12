@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
+import { useAuth } from '../../utils/hooks/useAuthHook';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 function Profile() {
@@ -8,6 +9,7 @@ function Profile() {
     const [userInfo, setUserInfo] = useState({ username: '', email: '', eloRating: '', totalGamesWon: 0, totalGamesLost: 0, img_url: "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png", nbrFriends: 0 });
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
+    const { user } = useAuth();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -49,7 +51,6 @@ function Profile() {
             }
         });
     };
-
 
     const getSkillBarWidth = () => {
         if (userInfo.totalGamesWon) {
@@ -93,6 +94,10 @@ function Profile() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (user.username !== username) {
+            alert("You can only change your own avatar.");
+            return;
+        }
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
             if (file.size > 2 * 1024 * 1024) {
@@ -147,7 +152,9 @@ function Profile() {
                         <div className='profile-picture'>
                             <img src={userInfo.img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"} className="rounded-image" width="135" height="135" alt="User avatar" />
                             <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".png" onChange={handleAvatarChange} />
-                            <button onClick={() => fileInputRef.current?.click()}>Change Avatar</button>                        </div>
+                            {user && user.username === username && (
+                                <button onClick={() => fileInputRef.current?.click()}>Change Avatar</button>
+                            )}</div>
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
                     <div className="more-info">
@@ -190,8 +197,10 @@ function Profile() {
                         <Link to={`/@/${username}/match-history`} className="leaderboard-button">
                             View Match History</Link>
                     </div>
-                    <button className="edit-profile" onClick={toggleTheme}>
-                        <i className='bx bxs-palette'></i></button>
+                    {user && user.username === username && (
+                        <button className="edit-profile" onClick={toggleTheme}>
+                            <i className='bx bxs-palette'></i></button>
+                    )}
                 </div>
             </body>
         </div>
