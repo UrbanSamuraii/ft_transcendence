@@ -291,7 +291,6 @@ export class GameGateway implements OnGatewayInit {
     }
 
     private async createDirectGame(player1Socket: Socket, player2Socket: Socket, gameMode) {
-        // Ensure both players are valid and not already in a game
         if (!player1Socket || !player2Socket) return;
 
         // Mark players as in a game to prevent re-queueing or duplicate game sessions
@@ -417,7 +416,8 @@ export class GameGateway implements OnGatewayInit {
         console.log(senderUsername)
         const inviteeId = await this.userService.getUserIdByUsername(senderUsername);
         const inviterId = await this.userService.getUserIdByUsername(targetUsername);
-
+        console.log(`inviteeId: ${inviteeId}`)
+        console.log(`inviterId: ${inviterId}`)
         const inviterSocket = await this.sessions.getUserSocket(inviterId);
         const inviteeSocket = await this.sessions.getUserSocket(inviteeId);
 
@@ -429,6 +429,8 @@ export class GameGateway implements OnGatewayInit {
 
         inviterSocket.data.user = userInfo1
         inviteeSocket.data.user = userInfo2
+        console.log(`userInfo1 : ${userInfo1}`)
+        console.log(`userInfo2 : ${userInfo2}`)
         if (!inviterSocket || !inviteeSocket) {
             console.error("Error: One of the users is not connected.");
             return;
@@ -437,6 +439,48 @@ export class GameGateway implements OnGatewayInit {
         // Assume "classic" game mode
         const gameMode = 'classic';
 
+        let inviterCurrentElo;
+        let inviteeCurrentElo;
+
+        try {
+            // Attempt to fetch the current ELO ratings
+            inviterCurrentElo = await this.userService.getEloRating(inviterId);
+            inviteeCurrentElo = await this.userService.getEloRating(inviteeId);
+        } catch (error) {
+            console.error(`Error fetching ELO rating for users ${targetUsername} and ${senderUsername}:`, error);
+            // Set default ELO ratings
+            inviterCurrentElo = 1000;
+            inviteeCurrentElo = 1000;
+        }
+
+        const inviterPlayerInfo: PlayerInfo = {
+            username: targetUsername,
+            score: 0,
+            activeKeys: [],
+            currentElo: inviterCurrentElo,
+            potentialEloGain: 0,
+            potentialEloLoss: 0,
+            selectedPower: null,
+            powerBarLevel: 0,
+            lastPowerActivation: Date.now()
+        };
+
+        const inviteePlayerInfo: PlayerInfo = {
+            username: senderUsername,
+            score: 0,
+            activeKeys: [],
+            currentElo: inviteeCurrentElo,
+            potentialEloGain: 0,
+            potentialEloLoss: 0,
+            selectedPower: null,
+            powerBarLevel: 0,
+            lastPowerActivation: Date.now()
+        };
+
+        inviterSocket.data.playerInfo = inviterPlayerInfo;
+        inviteeSocket.data.playerInfo = inviteePlayerInfo;
+        console.log(`inviterSocket username: ${inviterSocket.data.user.username}`)
+        console.log(`inviteeSocket username: ${inviteeSocket.data.user.username}`)
         // Proceed to create the game directly without queueing
         await this.createDirectGame(inviterSocket, inviteeSocket, gameMode);
     }
