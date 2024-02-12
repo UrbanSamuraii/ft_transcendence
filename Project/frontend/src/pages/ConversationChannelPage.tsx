@@ -99,7 +99,7 @@ export const ConversationChannelPage = () => {
         const displayGameInvite = (data: any) => {
             setShowGameInvite(true);
             setGameInviteData(data);
-            console.log(data.target);
+            // console.log(data.target);
         }
 
         // displayGameInvite();
