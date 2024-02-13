@@ -10,7 +10,6 @@ import { JoinConversationModal } from '../modals/JoinConversationModal';
 import { ConversationMenuModal } from '../modals/CreateConversationMenuModal';
 import { BlockUserModal } from '../modals/BlockUserModal';
 import { UnblockUserModal } from '../modals/UnblockUserModal';
-// import { ButtonOverlay } from '../../utils/styles';
 import { useSocket } from '../../SocketContext';
 
 type Props = {
@@ -69,7 +68,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
     };
 
     return (
-        <>
+        <div className='chat'>
             {showMenuModal && ( <ConversationMenuModal
                 setShowModal={() => {
                     setShowMenuModal(false);}}
@@ -99,7 +98,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             <div className='sideMenuHeader'>
                 <header>
                     <div className="header-content">
-                        <h2>conversations</h2>
+                        <h2>chats</h2>
                         <button className='openMenuButton' onClick={openMenu}>
                             <MdPostAdd size={30} />{' '}
                         </button>
@@ -109,6 +108,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                     {conversations.map((conversation) => (
                         <ConversationSidebarItem key={conversation.id} onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
                             <div className='conversationAvatar'>
+                            <i className='bx bxs-ghost'></i>
                             </ div>
                             <ConversationSidebarTexts>
                                 <div className="conversationName">
@@ -116,13 +116,23 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                                 </div>
                                 <div className="conversationLastMessage">
                                     <div>
-                                        <span>{lastMessageDeletedMap[conversation.id] ? 'Last message deleted' : conversation.messages[0]?.message}</span>
+                                    <span>
+                                    {lastMessageDeletedMap[conversation.id]
+                                        ? 'Last message deleted'
+                                        : conversation.messages.length > 0
+                                        ? (
+                                            <>
+                                            <span className="author-name">{conversation.messages[0]?.authorName || 'Unknown User'}</span>: <span className="message-text">{conversation.messages[0]?.message}</span>
+                                            </>
+                                        )
+                                        : <span className="no-messages">No messages here yet...</span>}
+                                        </span>
                                     </div>
                                 </div>
                             </ConversationSidebarTexts>
                         </ ConversationSidebarItem>))}
                 </ConversationSidebarContainer>
             </div>
-        </>
+        </div>
     );
 };

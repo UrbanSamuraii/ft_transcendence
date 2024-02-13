@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import  { AxiosError } from 'axios';
@@ -118,22 +118,22 @@ export const JoinConversationForm: React.FC<JoinConversationFormProps> = ({ setS
                     setShowModal(false);
                 }} convId={convId} />)}
             <form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-                <h2>Join Conversation</h2>
+                <h2>Join a chat</h2>
 
                 <div className="input-createConv-container">
-                    <InputContainer>
-                        <InputLabel htmlFor="Conversation Name">
-                            Conversation Name
+                    <InputContainerChat>
+                        <InputLabelChat htmlFor="Conversation Name">
+                            chat name
+                        </InputLabelChat>
                             <InputFieldCCF
                                 type="text" name="conversationName" value={ConvDataInput.conversationName} onChange={handleInputChange} maxLength={15}/>
                             {formErrors.conversationName && <div className="error-message">{formErrors.conversationName}</div>}
-                        </InputLabel>
-                    </InputContainer>
+                    </InputContainerChat>
                 </div>
 
 
                 <div className="button-createConv-container">
-                    <ButtonCreateConv type="submit" >Join Conversation</ButtonCreateConv>
+                    <ButtonCreateConv type="submit" >Join chat</ButtonCreateConv>
                 </div>
             </form>
         </>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import  { AxiosError } from 'axios';
@@ -99,17 +99,17 @@ export const AddMemberToConversationForm: React.FC<AddMemberToConversationFormPr
         <>
         {customError && showModalError && <ErrorConversationMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-            <h2>Add User to the Conversation</h2>
+            <h2>Add User to the chat</h2>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Conversation Name">
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Conversation Name">
                         Username or email
-                        <InputField
+                    </InputLabelChat>
+                        <InputFieldCCF
                             type="text" name="userToAdd" value={ConvDataInput.userToAdd} onChange={handleInputChange} maxLength={30}/>
                         {formErrors.userToAdd && <div className="error-message">{formErrors.userToAdd}</div>}
-                    </InputLabel>
-                </InputContainer>
+                </InputContainerChat>
             </div>
 
             <div className="button-createConv-container">

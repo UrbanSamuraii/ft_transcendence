@@ -168,7 +168,7 @@ export const ConversationChannelPage = () => {
                         <MessageContainer key={index} message={conversation} isCurrentUser={user.username === conversation.authorName} />
                     ))
                 ) : (
-                    <div>No message in the conversation</div>
+                    <div></div>
                 )}
                 <MessageInputField conversationId={Number(conversationId)} />
             </ScrollableContainer>

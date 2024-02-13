@@ -1,7 +1,8 @@
 import axios from 'axios';
-import  { AxiosError } from 'axios';
+import './FriendsPage.css';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
-import { Friendspage, MainContentContainer, InvitationContainer, InvitationsListContainer, InvitationBarContainer, FriendsListContainer, FriendsListTitle, FriendItem, InvitationItem, InvitationBar } from './FriendsElems';
+import { Friendspage, InvitationContainer, InvitationsListContainer, InvitationBarContainer, FriendsListContainer, FriendsListTitle, FriendItem, InvitationItem, InvitationBar } from './FriendsElems';
 import { useSocket } from '../../SocketContext';
 import { getFriendsList } from '../../utils/hooks/getFriendsList';
 import { getInvitationsList } from '../../utils/hooks/getInvitationsList';
@@ -13,6 +14,7 @@ export const FriendsPage = () => {
     const chatSocketContextData = useSocket();
     const [friendsList, setFriendsList] = useState<any[]>([]);
     const [invitationsList, setInvitationsList] = useState<any[]>([]);
+    const [isInvitationBarVisible, setIsInvitationBarVisible] = useState(false);
 
     // const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
     const [customError, setCustomError] = useState<string>('');
@@ -21,6 +23,10 @@ export const FriendsPage = () => {
     // const handleCustomAlertClose = () => {
     //     setCustomError('');
     // };
+
+    const handleButtonClick = () => {
+        setIsInvitationBarVisible(!isInvitationBarVisible);
+    };
 
     const handleShowModalError = () => {
     setShowModalError(true);
@@ -160,9 +166,11 @@ export const FriendsPage = () => {
         <>
         {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
         <Friendspage>
-            <MainContentContainer>
                 <FriendsListContainer>
-                    <FriendsListTitle>Friends</FriendsListTitle>
+                    <FriendsListTitle>
+                    Friends
+                    <button className='friend-invitation-button' onClick={handleButtonClick}><i className='bx bxs-user-plus' ></i></button>
+                    </FriendsListTitle>
                     <div>
                         {friendsList.map((friend) => (
                             <FriendItem
@@ -174,9 +182,13 @@ export const FriendsPage = () => {
                     </div>
                 </FriendsListContainer>
                 <InvitationContainer>
-                    <InvitationBarContainer>
-                        <InvitationBar sendInvitation={handleSendInvitation} />
-                    </InvitationBarContainer>
+                {isInvitationBarVisible && (
+                <div>
+                <InvitationBarContainer>
+                    <InvitationBar sendInvitation={handleSendInvitation} />
+                </InvitationBarContainer>
+                </div>
+                )}
                     <InvitationsListContainer>
                         <FriendsListTitle>Invitations</FriendsListTitle>
                         <div>
@@ -191,7 +203,6 @@ export const FriendsPage = () => {
                         </div>
                     </InvitationsListContainer>
                 </InvitationContainer>
-            </MainContentContainer>
         </Friendspage>
         </>
     );

@@ -24,7 +24,7 @@ export const LeavingConversationForm: React.FC<LeavingConversationFormProps> = (
 
     return (
         <div className="leave-confirmation-container">
-            <h2>Are you sure you want to leave the conversation?</h2>
+            <h2>Are you sure you want to leave this chat?</h2>
             <div className="button-container">
                 <button className="yes-button" onClick={() => LeavingTheConv()}>Yes</button>
                 <button className="no-button" onClick={() => setShowModal(false)}>No</button>

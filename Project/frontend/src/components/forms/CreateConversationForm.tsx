@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputFieldCCF, ButtonAddUser, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, ButtonAddUser, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import  { AxiosError } from 'axios';
@@ -115,25 +115,25 @@ export const CreateConversationForm: React.FC<CreateConversationFormProps> = ({ 
             <h2>new chat</h2>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Conversation Name">
-                        enter chat name
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Conversation Name">
+                        chat name
+                    </InputLabelChat>
                         <InputFieldCCF maxLength={10}
                             className='lets-try-this' type="text" name="name" value={ConvDataInput.name} onChange={handleInputChange} />
                         {formErrors.name && <div className="error-message">{formErrors.name}</div>}
-                    </InputLabel>
-                </InputContainer>
+                </InputContainerChat>
             </div>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Username(s) or email(s) of the member(s)">
-                        Username(s) or email(s) of the member(s)
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Username(s) or email(s) of the member(s)">
+                        username or email
+                    </InputLabelChat>
                         <InputFieldCCF maxLength={30}
                             type="text" name="currentUsername" value={ConvDataInput.currentUsername} onChange={handleInputChange} />
-                    </InputLabel>
                     {formErrors.currentUsername && <div className="error-message">{formErrors.currentUsername}</div>}
-                </InputContainer>
+                </InputContainerChat>
                 <button className="button-add-user" type="button" onClick={handleAddUser}>
                     Add User
                 </button>

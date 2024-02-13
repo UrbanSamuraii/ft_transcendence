@@ -50,6 +50,7 @@ export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormP
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -64,6 +65,9 @@ export const UpgradeMemberInConversationForm: React.FC<MemberInConversationFormP
                     ))}
                 </ul>
             </div>
+            ) : (
+            <p>There are no-one to promote.</p>
+        )}
         </div>
     );
 };

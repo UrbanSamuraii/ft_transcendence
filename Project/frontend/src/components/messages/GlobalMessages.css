@@ -1,96 +1,75 @@
-
 .messageText {
 	display: block;
-	font-size: 20px;
-	color: rgb(255, 255, 255);
+	font-size: 18px;
+	color: white;
+	margin-bottom: 13px;
 }
 
 .messageAuthorName {
 	display: block;
 	font-style: italic;
-	font-size: 16px;
-	color: rgb(233, 180, 164);
+	font-size: 14px;
+	color: #db7eff;
 }
 
 .dateMessage {
 	display: block;
 	font-style: italic;
 	font-size: 12px;
-	margin-top: 8px;
-	color: rgb(0, 0, 0);
+	position: absolute;
+	right: 5px;
+	bottom: 5px;
+	color: #db7eff;
 }
 
 .scrollablePanel {
 	overflow-y: scroll;
-	height: 100px;
+	width: 100%;
 	scrollbar-width: thin;
-	scrollbar-color: #ccc #f4f4f4;
+	scrollbar-color: transparent transparent;
 	scroll-behavior: smooth;
 	scroll-snap-type: y mandatory;
-	padding: 10px;
-	scroll-padding: 0 10px;
+	position: absolute;
+	top: 114px;
+	bottom: 120px;
 }
 
 .messagePanelTitle {
-	font-style: italic;
 	padding: 10px;
-	background-color: rgb(0, 0, 0);
-	font-size: 50px;
-	margin-left: 60px;
-	color: rgb(255, 255, 255);
+	background-color: transparent;
+	font-size: 40px;
+	margin-left: 40px;
+	color: rgb(238, 238, 238);
 }
 
-.convMenu {
-	display: flex;
-	align-items: center;
-	margin-right: 450px;
-	/* background-color: rgb(211, 85, 85); */
-	margin-top: 25px;
-	&:hover::before {
-		content: "Click to handle conversation parameters";
-		position: absolute;
-		top: 50px;
-		left: 65%;
-		transform: translateX(-80%);
-		background-color: #333;
-		color: #fff;
-		padding: 5px;
-		border-radius: 3px;
-		opacity: 0.8;
-		font-size: 16px;
-		white-space: nowrap;
-	}
-  
-	button {
-	  font-size: 20px;
-	  margin-left: 10px;
-	}
-  
-	.profile-name {
-		color: black;
-		background-color: white;
-		border-radius: 10px;
-		cursor: pointer;
-		width: 50px;
-		height: 50px;
-		position: relative;
-		user-select: none;
-	}
-	.profile-name i {
-		font-size: 2.5rem;
-		padding: 4px;
-	}
-  
-	.dropdown-menu {
-		height: 538px;
-		position: absolute;
-		background-color: transparent;
-		backdrop-filter: blur(10px);
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-		right: 0;
-		align-items: center;
-		justify-content: space-around;
-	}
+.conv-menu-button {
+	color: white;
+	background-color: #222222;
+	border-radius: 50%;
+	padding: 1px;
+	cursor: pointer;
+	width: 50px;
+	height: 50px;
+	top: 50px;
+	right: 10%;
+	position: absolute;
+	transition: background-color 0.3s ease;
+}
+.conv-menu-button i {
+	font-size: 2.5rem;
+	padding: 4px;
+}
+
+.conv-menu-button:hover {
+	background-color: #363636;
+}
+
+.dropdown-menu {
+	z-index: 1000;
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
 }
 
 .owner-action-menu {
@@ -104,49 +83,46 @@
 }
 
 .convMenuButton {
-	width: 200px;
-	height: 45px;
+	height: 60px;
+	width: 250px;
+	background-color: rgb(29, 29, 29);
+	font-size: 20px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: #4b6c85;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	margin-top: 3px;
-	margin-right: 10px;
+	transition: background-color 0.3s ease;
 }
-
-/* Privacy button style */
+.convMenuButton:hover {
+	background-color: rgb(49, 49, 49);
+}
 
 .privacy-toggle {
 	display: flex;
 	justify-content: space-between;
-  }
-  
-  .toggle-button {
+}
+
+.toggle-button {
 	padding: 8px;
 	cursor: pointer;
-	transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .toggle-button.private {
-	background-color: #f02a2a; /* Red for private */
-	height: 45px;
-	width: 200px;
+	transition: background-color 0.3s ease;
+}
+
+.toggle-button {
+	width: 250px;
+	height: 60px;
 	font-size: 20px;
-	color: white;
-	border-radius: 5px;
-	margin-top: 3px;
+}
+
+.toggle-button.private {
+	background-color: #dd2525;
+}
+.toggle-button.private:hover {
+	background-color: #ff2e2e;
 }
 
 .toggle-button.public {
-	background-color: #276927; /* Green for public */
-	color: white;
-	width: 200px;
-	height: 45px;
-	font-size: 20px;
-	border-radius: 5px;
-	margin-top: 3px;
+	background-color: #276927;
+}
+.toggle-button.public:hover {
+	background-color: #358d35;
 }

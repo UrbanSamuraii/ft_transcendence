@@ -1,0 +1,17 @@
+.friend-invitation-button {
+    position: absolute !important;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    right: 25px;
+    top: 25px;
+    background-color: #222222;
+    transition: background-color 0.3s ease;
+    &:hover {
+        background-color: #363636;
+    }
+}
+
+.friend-invitation-button i {
+    font-size: 30px;
+}

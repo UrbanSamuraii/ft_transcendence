@@ -58,6 +58,7 @@ export const InviteToGameForm: React.FC<MemberInConversationFormProps> = ({ setS
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -72,6 +73,9 @@ export const InviteToGameForm: React.FC<MemberInConversationFormProps> = ({ setS
                     ))}
                 </ul>
             </div>
+        ) : (
+            <p>There are no-one to invite to a game.</p>
+        )}
         </div>
     );
 };

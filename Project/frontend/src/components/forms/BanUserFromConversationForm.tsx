@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import DOMPurify from 'dompurify';
@@ -79,17 +79,17 @@ export const BanUserFromConversationForm: React.FC<BanUserFromConversationFormPr
 
     return (
         <form className="form-Create-Conversation" onSubmit={handleJoinConversation}>
-            <h2>Ban User from the Conversation</h2>
+            <h2>Ban User from the chat</h2>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Conversation Name">
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Conversation Name">
                         Username or email
+                    </InputLabelChat>
                         <InputFieldCCF
                             type="text" name="userToBan" value={ConvDataInput.userToBan} onChange={handleInputChange} maxLength={30}/>
                         {formErrors.userToBan && <div className="error-message">{formErrors.userToBan}</div>}
-                    </InputLabel>
-                </InputContainer>
+                </InputContainerChat>
             </div>
 
 

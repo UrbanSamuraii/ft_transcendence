@@ -328,22 +328,21 @@
 	}
 }
 
-
-/* FORMULA USERNAME DISPLAY */
-
 .member-list-container {
-	background-color: #4d4c4c;
-	width: 500px;
-	height: 200px;
+	background-color: #222222CC;
+	backdrop-filter: blur(6px);
+	border-radius: 10px;
+	width: 430px;
 	padding: 20px;
 	display: flex;
-  	flex-direction: column;
- 	align-items: center;
- 	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .member-list-container h2 {
-	margin-bottom: 30px;
+	text-transform: uppercase;
+	margin-bottom: 15px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -352,8 +351,8 @@
 
 .member-list-container p {
 	margin-bottom: 30px;
+	color: white;
 	font-size: 15px;
-	font-weight: italic;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -369,23 +368,20 @@
 .username-button {
 	display: block;
 	width: 100%;
-	padding: 8px 16px;
-	margin: 4px;
-	font-size: 14px;
+	padding: 15px 5px;
+	margin: 5px;
+	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
 	text-decoration: none;
 	cursor: pointer;
-	background-color: #4d4c4c;
 	color: white;
-	border: 1px solid #4d4c4c;
-	border-radius: 4px;
-	transition: background-color 0.3s, color 0.3s;
+	border-radius: 5px;
+	transition: background-color 0.3s, ease;
 }
 
 .username-button:hover {
-	background-color: #8d8f8d;
-	border: 1px solid #ffffff;
+	background-color: #363636;
 }
 
 /* To disable the password */
@@ -408,9 +404,11 @@
 }
 
 .leave-confirmation-container {
-	background-color: #f0f0f0;
+	background-color: #222222CC;
+	backdrop-filter: blur(6px);
 	padding: 20px;
-	border-radius: 8px;
+	max-width: 430px;
+	border-radius: 10px;
 	text-align: center;
 }
 
@@ -421,17 +419,16 @@
 }
 
 .yes-button, .no-button {
-	background-color: #ddd;
-	color: #333;
-	border: none;
+	background-color: #222222;
+	color: white;
 	padding: 10px 20px;
-	margin: 0 10px;
+	margin: 0 5px;
 	cursor: pointer;
-	border-radius: 4px;
+	font-weight: 600;
+	border-radius: 10px;
 	transition: background-color 0.3s;
 }
 
 .yes-button:hover, .no-button:hover {
-	background-color: #aaa;
+	background-color: #363636;
 }
-

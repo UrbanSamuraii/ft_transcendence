@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { useSocket } from '../../SocketContext';
@@ -61,6 +60,7 @@ export const MuteMemberInConversationForm: React.FC<MemberInConversationFormProp
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -75,6 +75,9 @@ export const MuteMemberInConversationForm: React.FC<MemberInConversationFormProp
                     ))}
                 </ul>
             </div>
+        ) : (
+            <p>There are no-one to mute.</p>
+        )}
         </div>
     );
 };

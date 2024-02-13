@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputFieldCCF, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { BlockUserModal } from "../modals/BlockUserModal";
@@ -103,17 +103,17 @@ export const BlockUserForm: React.FC<BlockUserFormProps> = ({ setShowModal }) =>
                     setShowModal(false);
                 }} />)}
             <form className="form-Create-Conversation" onSubmit={handleBlockUser}>
-                <h2>Block Specific User</h2>
+                <h2>Block a user</h2>
 
                 <div className="input-createConv-container">
-                    <InputContainer>
-                        <InputLabel htmlFor="Conversation Name">
+                    <InputContainerChat>
+                        <InputLabelChat htmlFor="Conversation Name">
                             Username or email
+                        </InputLabelChat>``
                             <InputFieldCCF
                                 type="text" name="userName" value={ConvDataInput.userName} onChange={handleInputChange} maxLength={30}/>
                             {formErrors.userName && <div className="error-message">{formErrors.userName}</div>}
-                        </InputLabel>
-                    </InputContainer>
+                    </InputContainerChat>
                 </div>
                 <div className="button-createConv-container">
                     <ButtonCreateConv type="submit" >Block User</ButtonCreateConv>

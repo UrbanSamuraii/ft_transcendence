@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../conversations/GlobalConversations.css';
 import { MessageInputFieldProps } from '../messages/MessageInputField';
-import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton, MessageSendIcon } from '../../utils/styles';
+import { MessageInputFieldStyle, MessageInputContainer, MessageInputTextArea, MessageSendButton } from '../../utils/styles';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
 export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps) => {
@@ -61,7 +61,7 @@ export const MessageInputTextForm = ({ conversationId }: MessageInputFieldProps)
                         onKeyDown={handleKeyPress}
                     />
                     <MessageSendButton type="submit" disabled={loading}>
-                        <MessageSendIcon>📨</MessageSendIcon>
+                    <i className='bx bxs-send'></i>
                     </MessageSendButton>
                 </MessageInputContainer>
             </MessageInputFieldStyle>

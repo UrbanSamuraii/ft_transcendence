@@ -283,18 +283,18 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                     <OutsideClickHandler onOutsideClick={handleOutsideClick}>
                         {user ? (
                             <>
-                                <div onClick={toggleDropdown} className="profile-name"><i className='bx bxs-cog'></i>
+                                <div onClick={toggleDropdown} className="conv-menu-button"><i className='bx bxs-cog'></i>
                                     {isDropdownOpen && (<div className="dropdown-menu">
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Upgrade Member to Admin</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Downgrade Admin to Member</button>)}
+                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Promote to Admin</button>)}
+                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Demote to Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unbanned User</button>)}
-                                        <button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave the conversation</button>
-                                        <button className="convMenuButton" onClick={() => setShowInviteToGameModal(true)}>Invite Member to a Game</button>
+                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unban User</button>)}
+                                        <button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave Chat</button>
+                                        <button className="convMenuButton" onClick={() => setShowInviteToGameModal(true)}>Send an Invite</button>
                                         {isOwner && (<button className="convMenuButton" onClick={() => {
                                             if (isProtected) { setShowVerifyPasswordModal(true); }
                                             else { setShowNewPasswordModal(true); }

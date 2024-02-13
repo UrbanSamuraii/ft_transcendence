@@ -11,10 +11,40 @@ type ConversationMessageProps = {
     isCurrentUser: boolean;
 };
 
+const formatDate = (updatedAtDate : Date): string => {
+    const now = new Date();
+    const timeDiff = now.getTime() - updatedAtDate.getTime();
+    const seconds = Math.floor(timeDiff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    const formatTime = (value: number): string => (value < 10 ? `0${value}` : `${value}`);
+
+    if (days === 0) {
+        if (hours === 0) {
+            if (minutes === 0) {
+                return `just now`;
+            }
+            return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+        }
+        return `today at ${formatTime(updatedAtDate.getHours())}:${formatTime(updatedAtDate.getMinutes())}`;
+    } else if (days === 1) {
+        return `yesterday at ${formatTime(updatedAtDate.getHours())}:${formatTime(updatedAtDate.getMinutes())}`;
+    } else {
+        const monthNames = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+        const month = monthNames[updatedAtDate.getMonth()];
+        return `${month} ${updatedAtDate.getDate()} at ${formatTime(updatedAtDate.getHours())}:${formatTime(updatedAtDate.getMinutes())}`;
+        }
+    };
+
 export const MessageContainer: FC<ConversationMessageProps> = ({ message, isCurrentUser }) => {
 
     const updatedAtDate = new Date(message.updatedAt);
-    const updatedAtFormatted = `${updatedAtDate.getFullYear()}-${(updatedAtDate.getMonth() + 1).toString().padStart(2, '0')}-${updatedAtDate.getDate()} at ${updatedAtDate.getHours()}:${updatedAtDate.getMinutes()}:${updatedAtDate.getSeconds()}`;
+    const updatedAtFormatted = formatDate(updatedAtDate);
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const chatSocketContextData = useSocket();
     const { isLastMessageDeleted, setLastMessageDeleted, setConversationId } = useSocket();

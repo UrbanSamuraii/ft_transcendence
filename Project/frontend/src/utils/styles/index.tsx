@@ -23,28 +23,57 @@ export const InputField = styled.input`
 
 
 export const InputFieldCCF = styled.input`
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: #ffffff;
-  font-family: Arial, sans-serif;
-  background-color: transparent;
-  outline: none !important;
-  border: none !important;
-  color: white !important;
-  font-size: 18px !important;
-  text-align: center;
-  width: 100% !important;
-  padding: 0 !important;
-
-  ::placeholder {
-    color: pink !important;
-    background-color: inherit !important;
-  }
-  
+-webkit-background-clip: text;
+-webkit-text-fill-color: #ffffff;
+font-family: Arial, sans-serif;
+background-color: transparent;
+outline: none !important;
+border: none !important;
+color: white !important;
+font-size: 18px !important;
+text-align: center;
+width: 100% !important;
+padding: 0 !important;
+bottom: 10px;
+transform: translateY(-20px);
+::placeholder {
+  color: pink !important;
+  background-color: inherit !important;
+}
   ${({ maxLength }) =>
         maxLength &&
         css`
       max-length: ${maxLength};
     `}
+`;
+
+export const InputContainerChat = styled.div`
+  background-color: transparent;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.137);
+  border-radius: 50px;
+  width: 100%;
+  height: 57px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  &:hover {
+    border-color: #9b59b6;
+    label {
+      color: #9b59b6;
+    }
+  }
+`;
+
+export const InputLabelChat = styled.label`
+background-color: #222222;
+display: flex;
+flex-direction: column;
+color: white;
+display: inline-block;
+padding: 1px;
+border-radius: 10px;
+transition: color 0.3s ease;
+transform: translateY(-22px);
 `;
 
 export const InputContainer = styled.div`
@@ -100,10 +129,13 @@ export const Button42 = styled.button`
 `;
 
 export const Page = styled.div`
-  width: 100%;
-  background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
+  background-image: url('https://wallpaperaccess.com/full/4848691.jpg');
+  background-color: #00000050;
+  background-blend-mode: color;
+  background-size: cover;
   height: 100%;
   display: flex;
+  background-size: cover;
   justify-content: center;
   align-items: center;
 `;
@@ -158,12 +190,17 @@ export const ConversationSidebarStyle = styled.aside`
 export const ConversationChannelPageStyle = styled.div`
   position: fixed;
   left: 0;
-  top: ${NAVBAR_HEIGHT}rem;
-  width: 100%;
+  width: calc(100% - 310px);
   height: 100%;
-  margin-left: ${CSB_WIDTH}px; 
-  background-color: gray;
-  // background-color: transparent;
+  margin-left: 310px;
+  background-image: url('https://wallpaperaccess.com/full/4848691.jpg');
+  background-color: #00000050;
+  background-blend-mode: color;
+  background-size: cover;
+  @media screen and (max-width: 800px) {
+    width: 100%;
+    margin-left: 0;
+  }
 `;
 
 export const ConversationPannelStyle = styled.div`
@@ -183,14 +220,14 @@ export const ConversationSidebarContainer = styled.div`
 
 export const ConversationSidebarItem = styled.div`
   display: flex;
-  align-items: center; 
+  align-items: center;
   gap: 15px;
-  margin-bottom: 8px;
-  margin-top: 8px;
-  margin-left: 10px;
-  width: ${CSB_WIDTH}px;
-  height: 90px;
+  height: 80px;
+  border-radius: 10px;
   border-bottom: 1px solid #606060;
+  &:hover {
+    background-color: #363636;
+  }
 `;
 
 export const ConversationSidebarTexts = styled.div`
@@ -270,13 +307,18 @@ export const OverlayContent = styled.div`
 // `;
 
 export const ButtonCreateConv = styled.button`
-  background-color: black;
-  color: #fff;
+  background-color: #222222;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   font-size: 20px;
   border-radius: 10px;
   height: 50px;
   width: 130px;
-`;
+  text-transform: capitalize;
+	transition: background-color 0.3s ease;
+  &:hover {
+    background-color: #363636;
+  }
+  `;
 
 export const ButtonAddUser = styled.button`
   background-color: ##181c50;
@@ -290,88 +332,73 @@ export const ButtonAddUser = styled.button`
   cursor: pointer;
 `;
 
-export const MessageContainerStyle = styled.div`
-  flex-grow: 1;
-  background: inherit;
-  border: 1px solid #e0e0e0; 
+const messageCommonStyles = css`
+	background: rgb(39, 39, 39);
   border-radius: 5px;
-  padding: 8px;
-  margin: 5px 0;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-  height: auto;
-  width: calc(40% - 100px);
-  margin-left: 50px;
+  padding: 4px 7px;
+  position: relative;
+  margin: 2px;
+  min-height: 60px;
+  max-width: 250px;
+  word-wrap: break-word;
+`;
+
+export const MessageContainerStyle = styled.div`
+  ${messageCommonStyles}
+  margin-left: 2%;
 `;
 
 export const MessageContainerPersonnalStyle = styled.div`
-  background: inherit;
-  border: 1px solid #e0e0e0; 
-  border-radius: 5px;
-  padding: 8px;
-  margin: 5px 0;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-  height: auto;
-  width: calc(40% - 100px);
-  margin-left: 40%;
-  margin-right: 100px;
+  ${messageCommonStyles}
+  margin-left: 75%;
 `;
 
 export const MessageInputFieldStyle = styled.div`
-  flex-grow: 1;
-  min-width: 300px;   
   display: flex;
   position: fixed;
-  bottom: 10px;
-  left: calc(10px + ${CSB_WIDTH}px);
-  right: 10px;
-  padding: 10px;
-  border: 1px solid #606060;
-  border-radius: 5px;
+  // background: red;
+  bottom: 20px;
+  left: 330px;
+  right: 0;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  @media screen and (max-width: 800px) {
+    left: 20px;
+  }
 `;
 
 export const MessageInputContainer = styled.div`
   display: flex;
   width: 100%;
-  background: red;
-  // color: black;
 `;
 
 export const MessageInputTextArea = styled.textarea`
-  min-width: 200px;
-  background: pink;
-  // color: black;
+	background-color: rgb(32, 32, 32);
+  border-radius: 15px;
+  padding: 5px;
   border: none;
   color: white;
   font-size: 16px;
   resize: none;
   overflow: hidden;
-  height: auto;
-  width: 85%; 
-  min-height: 54px;
-  max-height: 162px;
+  width: 85%;
+  outline: none;
   overflow-y: auto;
 `;
 
 export const MessageSendButton = styled.button`
-  background: #2c333d;
-  // color: pink;
-  background: black;
+  background: #9b59b6;
   border: none;
-  border-radius: 50%; 
-  margin-top: 5px;
-  margin-left: 50px;
+  border-radius: 50%;
+  margin-top: 10px;
+  margin-left: 10px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 45px;
-  min-width: 45px;
   height: 45px;
-`;
-
-export const MessageSendIcon = styled.span`
-  font-size: 100%;
-  line-height: 1;
+  & i {
+    color: white;
+    font-size: 25px;
+  }
 `;
 
 export const DarkRedButton = styled.button`

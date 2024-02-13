@@ -68,7 +68,7 @@ export const UnblockUserForm: React.FC<MemberFormProps> = ({ setShowModal }) => 
                     </ul>
                 </div>
             ) : (
-                <p>No user is blocked.</p>
+                <p>You haven't block anyone yet.</p>
             )}
         </div>
     );

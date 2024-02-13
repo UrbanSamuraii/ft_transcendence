@@ -11,14 +11,14 @@ const HomePage = () => {
     };
 
     const handleSignUpClick = () => {
-        navigate('/signup');
+        navigate('/login');
     };
 
     if (!user) {
         return (
             <div className="homepage">
                 <div className='content'>
-                    <button className="text" data-text='Sign In' onClick={handleSignUpClick}>Sign In</button>
+                    <button className="text" data-text='play' onClick={handleSignUpClick}>play</button>
                 </div>
             </div>
         );

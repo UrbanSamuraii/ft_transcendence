@@ -5,7 +5,7 @@ export type User = {
 export type ConversationType = {
 	id: number;
 	name: string;
-	messages: { message: string }[];
+	messages: { message: string, authorName: string }[];
 	members: User[];
 }
 

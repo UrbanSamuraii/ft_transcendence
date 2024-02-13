@@ -125,7 +125,7 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
 
 
             <div className="button-createConv-container">
-                <ButtonCreateConv type="submit" >Implement New Password</ButtonCreateConv>
+                <ButtonCreateConv type="submit" >submit</ButtonCreateConv>
             </div>
 
             <div className="disable-password-checkbox">

@@ -58,6 +58,7 @@ export const UnMuteMemberInConversationForm: React.FC<MemberInConversationFormPr
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -72,6 +73,9 @@ export const UnMuteMemberInConversationForm: React.FC<MemberInConversationFormPr
                     ))}
                 </ul>
             </div>
+            ) : (
+                <p>There is no-one to unmute.</p>
+            )}
         </div>
     );
 };

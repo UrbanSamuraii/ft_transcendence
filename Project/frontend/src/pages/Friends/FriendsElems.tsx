@@ -1,75 +1,90 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
 
+interface InvitationBarContainerProps {
+  visible: boolean;
+}
+
 export const Friendspage = styled.div`
   width: 100%;
-  background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D');
+  background-image: url('https://wallpaperaccess.com/full/4848691.jpg');
+  background-color: #00000050;
+  background-blend-mode: color;
+  background-size: cover;
   height: 100%;
   display: flex;
+  background-size: cover;
   justify-content: center;
   align-items: center;
-`;
-
-export const MainContentContainer = styled.div`
-  display: flex;
+  // display: flex;
 `;
 
 export const FriendsListContainer = styled.div`
-  width: 150%;
-  height: 500px;
-  background-color: rgba(39, 39, 39, 0.7);
-  margin-left: -80%;
-  border-radius: 8px;
-  overflow-y: auto; /* SCROLLBAR */
+  position: fixed;
+  height: 85%;
+  top: 10%;
+  left: 5%;
+  right: 51%;
+  background-color: #222222CC;
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  overflow-y: auto;
   
   &::-webkit-scrollbar {
-    width: 2px; /* Adjust the width as needed */
+    width: 5px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: transparent; /* Make the thumb transparent */
-    border: 1px solid #000; /* Thin black line around the thumb */
+    background-color: #363636;
+    border: 1px solid #222222;
   }
 `;
 
 export const FriendsListTitle = styled.div`
-  background-color: rgba(39, 39, 39, 0.7);
+  background-color: #222222;
   color: white;
-  padding: 10px;
+  padding: 30px;
+  text-transform: uppercase;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 1;
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
 `;
 
 const FriendItemContainer = styled.div`
-  padding: 30px;
-  border-bottom: 1px solid #111;
+  padding: 20px 30px;
+  gap: 30px;
+  margin-bottom: 1px;
+  border-radius: 10px;
   color: white;
   display: flex;
   align-items: center;
-  background-color: #4e4747;
+  background-color: #363636;
   position: relative;
 `;
 
 const ContextMenuButton = styled.button`
   position: absolute;
-  top: 4px;
-  right: 10px;
-  background-color: rgba(255, 0, 0, 0.5); /* Red with 50% transparency */
+  right: 17px;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: #be4747;
   color: white;
   border: none;
   padding: 5px;
   cursor: pointer;
+  & > i {
+    font-size: 25px;
+  }
 `;
 
 const BlueCircle = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: blue;
-  margin-right: 30px;
+  background-color: #db7eff;
 `;
 
 const StatusCircle = styled.div`
@@ -80,7 +95,7 @@ const StatusCircle = styled.div`
 `;
 
 const Username = styled.div`
-  font-size: 20px; /* Adjust the font size as needed */
+  font-size: 20px;
 `;
 
 interface FriendItemProps {
@@ -116,17 +131,12 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
       <BlueCircle />
       <Username>{username}</Username>
       {showDeleteButton && (
-        <ContextMenuButton onClick={handleRemoveFriend}>Remove from friends</ContextMenuButton>
+        <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
       )}
       <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
     </FriendItemContainer>
   );
 };
-
-//////////////////////////////////////////////////////////////
-				///////// INVITATION /////////
-//////////////////////////////////////////////////////////////
-
 
 export const InvitationContainer = styled.div`
   display: flex;
@@ -135,24 +145,45 @@ export const InvitationContainer = styled.div`
   margin-left: 30px; 
 `;
 
-
-///////// INVITATION BAR /////////
-
 export const InvitationBarContainer = styled.div`
-  width: 130%;
-  height: 120px;
-  display: flex;
+  position: fixed;
+  z-index: 100;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
   align-items: center;
-  justify-content: flex-end;
-  padding: 10px;
-  background-color: rgba(169, 169, 169, 0.5); /* Grey transparent 50% */
-  margin-left: 100px;
-  margin-right: -100px;
+  justify-content: center;
+  border-radius: 10px;
+`;
+
+const BackgroundForTisShit = styled.div`
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 120%;
+  height: 140%;
+  border-radius: 10px;
+  background-color: #222222CC;
+  backdrop-filter: blur(6px);
+  z-index: -1;
+`;
+
+const InputContainerFriends = styled.div`
+  border-radius: 20px;
+  padding: 2px 2px;
+  border: 1px solid #363636;
+  transition: border-color 0.3s ease;
+  &:hover {
+    border-color: #9b59b6;
 `;
 
 const Input = styled.input`
   margin-right: 10px;
   padding: 5px;
+  outline: none;
+  color: white !important;
+  border: none !important;
+  background-color: transparent;
   ${({ maxLength }) =>
     maxLength &&
     css`
@@ -166,13 +197,17 @@ const Message = styled.div`
 `;
 
 export const SendButton = styled.button`
-  height: 20%;  
-  background-color: #222;
+  background-color: #222222;
   color: white;
-  margin-top: 5px;
+  margin-top: 10px;
   border: none;
-  padding: 10px 10px;
+  border-radius: 10px;
+  padding: 10px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  &:hover {
+    background-color: #363636;
+  }
 `;
 
 interface InvitationBarProps {
@@ -202,13 +237,16 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 
   return (
 	<div>
+    <BackgroundForTisShit />
+	  <Message>{message}</Message>
+    <InputContainerFriends>
 	  <Input maxLength={30}
 		type="text"
 		placeholder="Username or Email"
 		value={inputValue}
 		onChange={handleInputChange}
 	  />
-	  <Message>{message}</Message>
+    </InputContainerFriends>
 	  <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
 	</div>
   );
@@ -218,60 +256,64 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 
 
 export const InvitationsListContainer = styled.div`
-width: 200%;
-height: 350px;
-background-color: rgba(69, 69, 69, 0.5);;
-border-radius: 8px;
-overflow-y: auto; /* SCROLLBAR */
-margin-left: 100px;
-margin-right: -100px;
-margin-top: 30px;
-
-&::-webkit-scrollbar {
-	width: 2px; /* Adjust the width as needed */
-}
-&::-webkit-scrollbar-thumb {
-	background-color: transparent; /* Make the thumb transparent */
-    border: 1px solid #000; /* Thin black line around the thumb */
-}
+  position: fixed;
+  height: 85%;
+  left: 51%;
+  right: 5%;
+  background-color: #222222CC;
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  overflow-y: auto;
+  top: 10%;
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+      border: 1px solid #000;
+  }
 `;
 
 const InvitationItemContainer = styled.div`
-  padding: 10px;
-  border-bottom: 1px solid #111;
+  padding: 20px 30px;
+  gap: 30px;
+  margin-bottom: 1px;
   color: white;
   display: flex;
   align-items: center;
-  background-color: #4e4747;
+  background-color: #363636;
   position: relative;
 `;
 
 const ActionButton = styled.button`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   border: none;
   color: white;
-  margin-left: 10px;
-  padding: 10px;
+  padding: 5px;
+  right: 30px;
   cursor: pointer;
-  position: relative;
+  position: fixed;
 `;
 
 const AcceptButton = styled(ActionButton)`
-  background-color: #24703b;
-  margin-left: 90px;
+  background-color: #3c9e43;
+  right: 65px;
   &:before {
     content: '✔';
   }
 `;
 
 const RefuseButton = styled(ActionButton)`
-  background-color: #ad2929;
+  background-color: #be4747;
   &:before {
     content: '✖';
   }
 `;
 
 const invitUsername = styled.div`
-  font-size: 20px; /* Adjust the font size as needed */
+  font-size: 20px;
 `;
 
 interface InvitationItemProps {

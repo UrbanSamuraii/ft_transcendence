@@ -63,6 +63,7 @@ export const RemoveMemberFromConversationForm: React.FC<MemberInConversationForm
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -77,6 +78,9 @@ export const RemoveMemberFromConversationForm: React.FC<MemberInConversationForm
                     ))}
                 </ul>
             </div>
+        ) : (
+            <p>This chat is as empty as your soul.</p>
+        )}
         </div>
     );
 };

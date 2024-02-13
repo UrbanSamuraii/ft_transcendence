@@ -58,7 +58,7 @@ export const AllowMemberInConversationForm: React.FC<MemberInConversationFormPro
 
     return (
         <div className="member-list-container">
-            <h2>Banned Users from the Conversation</h2>
+            <h2>Banned Users</h2>
             {memberList.length > 0 ? (
                 <div className="member-list">
                     <ul>
@@ -75,7 +75,7 @@ export const AllowMemberInConversationForm: React.FC<MemberInConversationFormPro
                     </ul>
                 </div>
             ) : (
-                <p>No user is banned from this conversation.</p>
+                <p>No-one is banned from this chat.</p>
             )}
         </div>
     );

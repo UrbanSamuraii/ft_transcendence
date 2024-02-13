@@ -51,6 +51,7 @@ export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFor
     return (
         <div className="member-list-container">
             <h2>Member List</h2>
+            {memberList.length > 0 ? (
             <div className="member-list">
                 <ul>
                     {memberList.map((member) => (
@@ -65,6 +66,9 @@ export const DowngradeMemberInConversationForm: React.FC<MemberInConversationFor
                     ))}
                 </ul>
             </div>
+        ) : (
+            <p>There are no-one to demote.</p>
+        )}
         </div>
     );
 };
