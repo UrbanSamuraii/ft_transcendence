@@ -153,7 +153,7 @@ function Profile() {
                             <img src={userInfo.img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"} className="rounded-image" width="135" height="135" alt="User avatar" />
                             <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".png" onChange={handleAvatarChange} />
                             {user && user.username === username && (
-                                <button onClick={() => fileInputRef.current?.click()}>Change Avatar</button>
+                                <button className='change-avatar' onClick={() => fileInputRef.current?.click()}>Change Avatar</button>
                             )}</div>
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
@@ -192,11 +192,11 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        {/* <Link to={`/leaderboard`} className="leaderboard-button">
-                            Leaderboard</Link> */}
                         <Link to={`/@/${username}/match-history`} className="leaderboard-button">
-                            View Match History</Link>
+                            Match History</Link>
                     </div>
+                    <Link to={`/2fa-enable`} className="twoFA-button">
+                        2FA</Link>
                     {user && user.username === username && (
                         <button className="edit-profile" onClick={toggleTheme}>
                             <i className='bx bxs-palette'></i></button>

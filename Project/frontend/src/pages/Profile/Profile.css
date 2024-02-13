@@ -1,24 +1,28 @@
 @import url('https://fonts.googleapis.com/css?family=Abel');
 
 * {
-  -webkit-user-select: none;  /* Chrome all / Safari all */
-  -moz-user-select: none;     /* Firefox all */
-  -ms-user-select: none;      /* IE 10+ */
-  user-select: none;          /* Likely future */ 
+    -webkit-user-select: none;
+    /* Chrome all / Safari all */
+    -moz-user-select: none;
+    /* Firefox all */
+    -ms-user-select: none;
+    /* IE 10+ */
+    user-select: none;
+    /* Likely future */
 }
 
 body {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .bw-style {
-  background-image: url(https://static.vecteezy.com/system/resources/previews/030/697/151/non_2x/gray-minimalist-wallpaper-high-quality-4k-hdr-free-photo.jpg);
-  display: flex;
-  background-size: cover;
-  --text-color-main: #ffffffc0;
-  --text-color-dark: #ffffff79;
-  --text-color-hover: #ffffffdc;
-  --text-color-accent: #000000;
+    background-image: url(https://static.vecteezy.com/system/resources/previews/030/697/151/non_2x/gray-minimalist-wallpaper-high-quality-4k-hdr-free-photo.jpg);
+    display: flex;
+    background-size: cover;
+    --text-color-main: #ffffffc0;
+    --text-color-dark: #ffffff79;
+    --text-color-hover: #ffffffdc;
+    --text-color-accent: #000000;
 }
 
 /* .cyber-style {
@@ -32,59 +36,59 @@ body {
 } */
 
 .rainbow-style {
-	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
-  display: flex;
-  background-size: cover;
-  --text-color-main: #27e6ffc0;
-  --text-color-dark: #27e6ff79;
-  --text-color-hover: #27e6ffdc;
-  --text-color-accent: #fff;
+    background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+    display: flex;
+    background-size: cover;
+    --text-color-main: #27e6ffc0;
+    --text-color-dark: #27e6ff79;
+    --text-color-hover: #27e6ffdc;
+    --text-color-accent: #fff;
 }
 
 .retrowave-style {
-	background-image: url(https://rare-gallery.com/thumbs/101168-retrowave-lines-sunset-4k.jpg);
-  background-position: 50%;
-  display: flex;
-  background-size: cover;
-  --text-color-main: #ff2770c0;
-  --text-color-dark: #ff277079;
-  --text-color-hover: #ff2770dc;
-  --text-color-accent: #fff;
+    background-image: url(https://rare-gallery.com/thumbs/101168-retrowave-lines-sunset-4k.jpg);
+    background-position: 50%;
+    display: flex;
+    background-size: cover;
+    --text-color-main: #ff2770c0;
+    --text-color-dark: #ff277079;
+    --text-color-hover: #ff2770dc;
+    --text-color-accent: #fff;
 }
 
 .rounded-image {
-  margin-top: 45px;
-  margin-left: 13px;
-  border-radius: 50%;
-  overflow: hidden;
+    margin-top: 45px;
+    margin-left: 13px;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .card {
-  width: 600px;
-  height: 350px;
-  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-  border-radius: 10px;
-  overflow: hidden;
-  position: absolute;
+    width: 600px;
+    height: 350px;
+    box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    overflow: hidden;
+    position: absolute;
 }
 
 .card h1 {
-  margin-top: 10px;
-  margin-bottom: 0px;
-  text-align: center;
-  font-size: 2rem;
-  color: var(--text-color-main);
+    margin-top: 10px;
+    margin-bottom: 0px;
+    text-align: center;
+    font-size: 2rem;
+    color: var(--text-color-main);
 }
 
 .card .user-card {
-  background-size: cover;
-  background-position: center center;
-  position: relative;
-  height: 100%;
-  float: left;
-  width: 200px;
+    background-size: cover;
+    background-position: center center;
+    position: relative;
+    height: 100%;
+    float: left;
+    width: 200px;
 }
 
 /* .card .user-card.cyber-style {
@@ -95,218 +99,264 @@ body {
 } */
 
 .card .user-card.rainbow-style {
-  background-color: rgba(0, 0, 0, 0.5);
-  background-blend-mode: color;
-  background-image: url(./rainbow.gif);
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: color;
+    background-image: url(./rainbow.gif);
 }
 
 .card .user-card.retrowave-style {
-  background-color: rgba(0, 0, 0, 0.3);
-  background-blend-mode: color;
-  background-image: url(./retrowave.gif);
+    background-color: rgba(0, 0, 0, 0.3);
+    background-blend-mode: color;
+    background-image: url(./retrowave.gif);
 }
 
 .card .user-card.bw-style {
-  background-color: black;
-  background-size: 300px;
-  background-repeat: repeat-x;
-  background-image: url(./bw-smoke.gif);
+    background-color: black;
+    background-size: 300px;
+    background-repeat: repeat-x;
+    background-image: url(./bw-smoke.gif);
 }
 
 
 .card .user-card .level,
 .card .user-card .points {
-  position: absolute;
-  top: 40px;
-  left: 5%;
-  width: 90%;
-  color: var(--text-color-main);
-  text-transform: uppercase;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 10px;
-  padding: 0.125rem 0.75rem;
-  letter-spacing: 1px;
+    position: absolute;
+    top: 40px;
+    left: 5%;
+    width: 90%;
+    color: var(--text-color-main);
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 0.125rem 0.75rem;
+    letter-spacing: 1px;
 }
 
 .card .user-card .points {
-  top: 290px;
+    top: 290px;
 }
 
 .card .user-card .profile-picture {
-  align-items: center;
-  margin-top: 60px;
-  margin-left: 20px;
+    align-items: center;
+    margin-top: 60px;
+    margin-left: 20px;
 }
 
 .card .more-info {
-  width: 400px;
-  position: absolute;
-  left: 200px;
-  height: 100%;
+    width: 400px;
+    position: absolute;
+    left: 200px;
+    height: 100%;
 }
 
 .card .coords {
-  margin: 1rem;
-  font-size: 1.3rem;
-  color: var(--text-color-main);
-  margin-bottom: 50px;
+    margin: 1rem;
+    font-size: 1.3rem;
+    color: var(--text-color-main);
+    margin-bottom: 50px;
 }
 
-.card .coords span + span {
-  float: right;
+.card .coords span+span {
+    float: right;
 }
 
 .card .stats {
-  font-size: 3rem;
-  display: flex;
-  position: absolute;
-  /* bottom: 2rem; */
-  left: 1rem;
-  right: 1rem;
-  color: var(--text-color-main);
-  text-align: center;
+    font-size: 3rem;
+    display: flex;
+    position: absolute;
+    /* bottom: 2rem; */
+    left: 1rem;
+    right: 1rem;
+    color: var(--text-color-main);
+    text-align: center;
 }
 
-.card .stats > div {
-  flex: 1;
+.card .stats>div {
+    flex: 1;
 }
 
 .card .stats i {
-  display: block;
+    display: block;
 }
 
 .card .stats .title {
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .card .stats .value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  line-height: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1.5rem;
 }
 
 .card .stats .value.infinity {
-  font-size: 2.5rem;
+    font-size: 2.5rem;
 }
 
 .signout-button {
-  width: 40px;
-  height: 40px;
-  background-color: var(--text-color-main);
-  color: var(--text-color-accent);
-  padding: 0.5rem;
-  border-radius: 10px;
-  position: absolute;
-  right: 7px;
-  top: 7px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.5rem;
+    border-radius: 10px;
+    position: absolute;
+    right: 7px;
+    top: 7px;
 }
 
 .signout-button i {
-  position: relative;
-  align-items: center;
-  font-size: 1.5rem;
+    position: relative;
+    align-items: center;
+    font-size: 1.5rem;
 }
 
 .signout-button:hover {
-  background-color: var(--text-color-hover);
+    background-color: var(--text-color-hover);
 }
 
 .edit-profile {
-  width: 40px;
-  height: 40px;
-  background-color: var(--text-color-main);
-  color: var(--text-color-accent);
-  padding: 0.5rem;
-  border-radius: 10px;
-  position: absolute;
-  right: 74px;
-  bottom: 15px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.5rem;
+    border-radius: 10px;
+    position: absolute;
+    right: 54px;
+    bottom: 15px;
 }
 
 .edit-profile i {
-  position: relative;
-  align-items: center;
-  font-size: 1.5rem;
+    position: relative;
+    align-items: center;
+    font-size: 1.5rem;
 }
 
 .edit-profile:hover {
-  background-color: var(--text-color-hover);
+    background-color: var(--text-color-hover);
 }
 
 .leaderboard-button {
-  text-transform: uppercase;
-  text-align: center;
-  text-decoration: none;
-  width: 165px;
-  height: 40px;
-  background-color: var(--text-color-main);
-  color: var(--text-color-accent);
-  padding: 0.7rem;
-  border-radius: 10px;
-  position: absolute;
-  bottom: 15px;
-  letter-spacing: 0.5px;
-  margin-left: 108px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    width: 165px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.7rem;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 15px;
+    letter-spacing: 0.5px;
+    margin-left: 130px;
 }
 
 .leaderboard-button i {
-  position: relative;
-  align-items: center;
-  font-size: 1.5rem;
+    position: relative;
+    align-items: center;
+    font-size: 1.5rem;
 }
 
 .leaderboard-button:hover {
-  background-color: var(--text-color-hover);
+    background-color: var(--text-color-hover);
+}
+
+.change-avatar {
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    width: 160px;
+    height: 35px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.5rem;
+    font-size: 15px;
+    border-radius: 10px;
+    position: relative;
+    letter-spacing: 0.5px;
+}
+
+.change-avatar:hover {
+    background-color: var(--text-color-hover);
+}
+
+.twoFA-button {
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    width: 65px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.7rem;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 15px;
+    letter-spacing: 0.5px;
+    margin-left: 54px;
+}
+
+.twoFA-button i {
+    position: relative;
+    align-items: center;
+    font-size: 1.5rem;
+}
+
+.twoFA-button:hover {
+    background-color: var(--text-color-hover);
 }
 
 .skill-name {
-  bottom: 20%;
-  left: 1%;
-  display: flex;
-  position: absolute;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-color-main);
-  text-transform: uppercase;
-  margin: 20px 0;
+    bottom: 20%;
+    left: 1%;
+    display: flex;
+    position: absolute;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color-main);
+    text-transform: uppercase;
+    margin: 20px 0;
 }
 
 .skill-bar {
-  display: flex;
-  position: absolute;
-  bottom: 20%;
-  left: 1%;
-  height: 14px;
-  width: 98%;
-  background-color: transparent;
-  border: 1px solid var(--text-color-dark);
-  border-radius: 5px;
+    display: flex;
+    position: absolute;
+    bottom: 20%;
+    left: 1%;
+    height: 14px;
+    width: 98%;
+    background-color: transparent;
+    border: 1px solid var(--text-color-dark);
+    border-radius: 5px;
 }
 
 .skill-per {
-  display: flex;
-  position: relative;
-  bottom: 8%;
-  height: 14px;
-  background-color: var(--text-color-main);
-  border-radius: 5px;
-  animation: fillBars 2.5s;
+    display: flex;
+    position: relative;
+    bottom: 8%;
+    height: 14px;
+    background-color: var(--text-color-main);
+    border-radius: 5px;
+    animation: fillBars 2.5s;
 }
 
 @keyframes fillBars {
-  from{
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
 }
 
 .separator {
-  border-top: 1px solid var(--text-color-dark);
-  margin: 10px 10px;
+    border-top: 1px solid var(--text-color-dark);
+    margin: 10px 10px;
 }
