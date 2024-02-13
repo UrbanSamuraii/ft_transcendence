@@ -13,11 +13,11 @@ const SelectModePage = () => {
     useEffect(() => {
         if (!socket) {
             console.error('Socket is not available');
-            setIsLoading(false); // Set loading to false if socket is not available
+            setIsLoading(false);
             return;
         }
 
-        setIsLoading(true); // Start loading before emitting 'checkGameStatus'
+        setIsLoading(true);
         socket.emit('checkGameStatus');
 
         const handleGameStatusResponse = (data: any) => {
@@ -25,7 +25,7 @@ const SelectModePage = () => {
                 setOngoingGameId(data.gameId);
                 setGameMode(data.gameMode);
             }
-            setIsLoading(false); // Stop loading after receiving the response
+            setIsLoading(false);
         };
 
         socket.on('gameStatusResponse', handleGameStatusResponse);
@@ -51,7 +51,7 @@ const SelectModePage = () => {
     };
 
     if (isLoading) {
-        return <div>Loading...</div>; // Or your custom loading indicator
+        return <div>Loading...</div>;
     }
 
     return (

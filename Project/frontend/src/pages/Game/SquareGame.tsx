@@ -51,29 +51,25 @@ function SquareGame() {
         if (!canvas) return;
 
         const ctx = canvas?.getContext('2d');
-        if (!ctx) return; // Check if ctx is not null
+        if (!ctx) return;
 
-        const borderThickness = width / 50; // Adjust the divisor to achieve desired scaling. 
+        const borderThickness = width / 50;
         ctx.lineWidth = borderThickness;
 
         ctx.fillStyle = '#0d0d0e';
         ctx.fillRect(x, y, width, height);
 
-        // Draw the button's white outline
         ctx.strokeStyle = '#FFF';
         ctx.strokeRect(x, y, width, height);
 
-        // Adjust font size based on button width (e.g., width / 10 gives 10% of button width)
         const fontSize = width / 7;
 
         ctx.fillStyle = '#ffffff';
         ctx.font = `${fontSize}px Arial`;
         ctx.textAlign = 'center';
 
-        // Adjust vertical positioning based on the fontSize
         ctx.fillText(text, x + width / 2, y + height / 2 + fontSize / 4);
 
-        // Store callback and button bounds for click detection
         return { x, y, width, height, callback, text };
     }, []);
 
@@ -82,9 +78,9 @@ function SquareGame() {
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) return; // Check if ctx is not null
+        if (!ctx) return;
 
-        const numberOfSquares = 15; // Adjust this number as per your requirement
+        const numberOfSquares = 15;
 
         const canvasAspectRatio = canvas.width / canvas.height;
         let gameWidth, gameHeight;
@@ -100,7 +96,7 @@ function SquareGame() {
 
         const pixelSize = data.squares[0].size * gameWidth / 100; // Assuming the first square in data.squares is representative
 
-        const gap = pixelSize; // Setting the gap equal to the pixelSize for even spacing
+        const gap = pixelSize;
 
         ctx.fillStyle = 'white';
 
@@ -118,7 +114,7 @@ function SquareGame() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const canvasAspectRatio = canvas.width / canvas.height;
 
@@ -139,8 +135,8 @@ function SquareGame() {
         data.squares.forEach((square: any) => {
             const pixelX = offsetX + square.x * gameWidth / 100;
             const pixelY = offsetY + square.y * gameHeight / 100;
-            const pixelSize = square.size * gameWidth / 100; // Assuming square sizes are relative to width
-            const pixelSize2 = square.size * gameWidth / 100; // Assuming square sizes are relative to width
+            const pixelSize = square.size * gameWidth / 100;
+            const pixelSize2 = square.size * gameWidth / 100;
             ctx.fillStyle = "white";
             ctx.fillRect(pixelX, pixelY, pixelSize, pixelSize2);
         });
@@ -272,13 +268,11 @@ function SquareGame() {
                 case "p":
                 case "P":
                     if (isGamePaused) {
-                        // Resume the game
                         setGamePaused(false);
-                        socket?.emit('resumeGame'); // Inform backend to resume sending updates
+                        socket?.emit('resumeGame');
                     } else {
-                        // Pause the game
                         setGamePaused(true);
-                        socket?.emit('pauseGame'); // Inform backend to pause sending updates
+                        socket?.emit('pauseGame');
                     }
                     break;
                 default:
@@ -319,7 +313,6 @@ function SquareGame() {
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        // Check if click is inside any button
         for (let btn of buttons) {
             if (mouseX > btn.x && mouseX < btn.x + btn.width && mouseY > btn.y && mouseY < btn.y + btn.height) {
                 console.log(`Clicked on button: ${btn.text}`);
@@ -354,7 +347,6 @@ function SquareGame() {
             let newCanvasWidth, newCanvasHeight;
 
             if (containerWidth <= 500 && containerHeight <= 440 - navbarHeight) {
-                // Set canvas to exact appearance at 500x440px
                 newCanvasWidth = 500;
                 newCanvasHeight = 440;
             } else {
