@@ -22,10 +22,9 @@ import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
 import NotFound from './pages/NotFound/NotFound';
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
-import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
-// import axios from 'axios';
+import { AuthProvider, useAuth } from './AuthContext';
 import { OnlySocketProvider } from './SocketContext';
-import PowerPongGame from './pages/Game/PowerPongGame'; // Import the new PowerPongGame component
+import PowerPongGame from './pages/Game/PowerPongGame';
 
 const defaultBackgroundStyle = {
     background: '#1a1a1a',
@@ -121,10 +120,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
             console.error('Signout failed:', error);
             navigate('/error');
         }
-    }
-
-    const GoToConversations = async () => {
-        navigate('/ConversationPage')
     }
 
     return (

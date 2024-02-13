@@ -1,14 +1,9 @@
 import { createContext, useContext, useEffect, ReactNode } from 'react';
-import { useAuth as useAuthHook } from './utils/hooks/useAuthHook'; // Update the path accordingly
+import { useAuth as useAuthHook } from './utils/hooks/useAuthHook';
 import { useLocation } from 'react-router-dom';
 
-// interface User {
-//     username: string;
-//     // Add other user properties you might need
-// }
-
 interface AuthContextType {
-    user: any;  // Replace 'any' with a more specific type if possible
+    user: any;
     loading: boolean;
 }
 
@@ -20,7 +15,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const location = useLocation();
-    const { user, loading, checkAuthStatus } = useAuthHook(); // Assume checkAuthStatus is a method to check auth
+    const { user, loading, checkAuthStatus } = useAuthHook();
 
     useEffect(() => {
         checkAuthStatus(); // Re-check auth status on location change
