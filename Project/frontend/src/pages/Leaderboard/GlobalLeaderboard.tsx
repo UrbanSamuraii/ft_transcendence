@@ -20,8 +20,6 @@ function GlobalLeaderboard() {
             const data = await response.json();
             if (response.ok) {
                 setLeaderboard(data);
-            } else {
-                // Handle error
             }
         };
 

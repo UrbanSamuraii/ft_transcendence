@@ -90,7 +90,6 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     pingClient(client: AuthenticatedSocket) {
-        // console.log(`ping the client ${client.user?.id}`);
         this.server.to(client.id.toString()).emit('ping');
     }
 
@@ -112,7 +111,6 @@ export class MessagingGateway implements OnGatewayConnection {
 
     async handlePongTimeout(client: AuthenticatedSocket) {
         const user = client.user;
-        console.log("Username disconnected", user.username);
         await this.prisma.user.update({
             where: { id: user.id },
             data: { status: 'OFFLINE' },

@@ -32,14 +32,13 @@ function PowerPongGame() {
     const navigate = useNavigate();
     const lastSentWasEmptyRef = useRef(true);
     const { user } = useAuth();
-    const username = user?.username || 'Guest'; // Default to 'Guest' if user is null or undefined
+    const username = user?.username || 'Guest';
     const [gameData, setGameData] = useState(null);
     const [buttons, setButtons] = useState<Button[]>([]);
-    const [powerBarLevel, setPowerBarLevel] = useState(0); // State to track the power bar level
-    const [currentPower, setCurrentPower] = useState<Power | null>(null); // State to track the current power
+    const [powerBarLevel, setPowerBarLevel] = useState(0);
+    const [currentPower, setCurrentPower] = useState<Power | null>(null);
     const [isWaitingForPlayer, setIsWaitingForPlayer] = useState(true);
 
-    // Update the interval based on active keys
     useEffect(() => {
         activeKeysRef.current = activeKeys;
 
@@ -91,9 +90,9 @@ function PowerPongGame() {
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) return; // Check if ctx is not null
+        if (!ctx) return;
 
-        const numberOfSquares = 15; // Adjust this number as per your requirement
+        const numberOfSquares = 15;
 
         const canvasAspectRatio = canvas.width / canvas.height;
         let gameWidth, gameHeight;
@@ -115,7 +114,7 @@ function PowerPongGame() {
 
         for (let i = 0; i < numberOfSquares; i++) {
             // const x = offsetX + (gameWidth.width / 2) - (pixelSize / 2); // Center it
-            const x = offsetX + (gameWidth / 2) - (pixelSize / 2); // Center it within the game area
+            const x = offsetX + (gameWidth / 2) - (pixelSize / 2);
             // const x = offsetX + (canvas.width / 2) - (pixelSize / 2); // Center it
             const y = offsetY + i * (pixelSize + gap);
             ctx.fillRect(x, y, pixelSize, pixelSize);
@@ -127,7 +126,7 @@ function PowerPongGame() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const canvasAspectRatio = canvas.width / canvas.height;
 
@@ -148,8 +147,8 @@ function PowerPongGame() {
         data.squares.forEach((square: any) => {
             const pixelX = offsetX + square.x * gameWidth / 100;
             const pixelY = offsetY + square.y * gameHeight / 100;
-            const pixelSize = square.size * gameWidth / 100; // Assuming square sizes are relative to width
-            const pixelSize2 = square.size * gameWidth / 100; // Assuming square sizes are relative to width
+            const pixelSize = square.size * gameWidth / 100;
+            const pixelSize2 = square.size * gameWidth / 100;
             ctx.fillStyle = "white";
             ctx.fillRect(pixelX, pixelY, pixelSize, pixelSize2);
         });
@@ -173,7 +172,7 @@ function PowerPongGame() {
             const eloTextOffsetY = textOffsetY + winnerNameFontSize + 5; // Below the winner's name
             const buttonWidth = gameWidth * 0.3;
             const buttonHeight = gameHeight * 0.1;
-            const eloFontSize = winnerNameFontSize * 0.75; // Adjusted proportionally
+            const eloFontSize = winnerNameFontSize * 0.75;
 
             // Determine the winner's side for X positioning
             const winnerSideX = data.leftScore > data.rightScore ? gameWidth * 0.25 : gameWidth * 0.75;
@@ -223,7 +222,7 @@ function PowerPongGame() {
 
         drawNet(data);
 
-        const fontSize = 100 * gameWidth / 1920; // Adjust font size based on gameWidth
+        const fontSize = 100 * gameWidth / 1920;
         ctx.font = `${fontSize}px Arial`;
         ctx.fillStyle = '#ffffff';  // Resetting fill color for score
         ctx.textAlign = 'center';  // Resetting text alignment for score
@@ -294,10 +293,6 @@ function PowerPongGame() {
                 default:
                     break;
             }
-            // if (event.key === "w" || event.key === "s" || event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === " ") {
-            //     socket?.emit('playerActions', [...activeKeys, event.key]);
-            //     lastSentWasEmptyRef.current = false;
-            // }
         };
 
         const handleKeyUp = (event: any) => {
@@ -315,11 +310,6 @@ function PowerPongGame() {
                 default:
                     break;
             }
-            // if (event.key === "w" || event.key === "s" || event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === " ") {
-            //     const updatedKeys = activeKeys.filter(key => key !== event.key);
-            //     socket?.emit('playerActions', updatedKeys);
-            //     lastSentWasEmptyRef.current = updatedKeys.length === 0;
-            // }
         };
 
         window.addEventListener('keydown', handleKeyDown);
@@ -400,7 +390,6 @@ function PowerPongGame() {
                 drawGame(gameData);
             }
         }
-
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -435,7 +424,5 @@ function PowerPongGame() {
             )}
         </div>
     );
-
-
 }
 export default PowerPongGame;
