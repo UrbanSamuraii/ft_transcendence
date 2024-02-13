@@ -20,6 +20,7 @@ import { TwoFACodePage } from './pages/TwoFACodePage';
 import Navbar from './components/Navbar/Navbar';
 import Matchmaking from './pages/Matchmaking/Matchmaking';
 import Profile from './pages/Profile/Profile';
+import NotFound from './pages/NotFound/NotFound';
 import GlobalLeaderboard from './pages/Leaderboard/GlobalLeaderboard';
 import { AuthProvider, useAuth } from './AuthContext'; // Update the path accordingly
 // import axios from 'axios';
@@ -129,21 +130,21 @@ function Content({ setBackgroundStyle }: ContentProps) {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/classic/:id" element={<SquareGame />} />
-            <Route path="/powerpong/:id" element={<PowerPongGame />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<HomePage />} />
             {/* Protected routes */}
             {user && (
                 <>
+                    <Route path="/classic/:id" element={<SquareGame />} />
+                    <Route path="/powerpong/:id" element={<PowerPongGame />} />
                     <Route path="/ConversationPage" element={<ConversationPage />} >
                         <Route path="channel/:id" element={<ConversationChannelPage />} />
                     </Route>
                     <Route path="/Friends" element={<FriendsPage />} />
                     <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
                     <Route path="/select-mode" element={<SelectModePage />} />
-                    <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} />
+                    {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} /> */}
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
                     <Route path="/@/:username" element={<Profile />} />
@@ -153,6 +154,7 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/signout" element={<Signout />} />
                 </>
             )}
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 
