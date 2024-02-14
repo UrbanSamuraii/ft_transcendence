@@ -227,7 +227,7 @@ body {
     padding: 0.5rem;
     border-radius: 10px;
     position: absolute;
-    right: 54px;
+    right: 34px;
     bottom: 15px;
 }
 
@@ -239,6 +239,26 @@ body {
 
 .edit-profile:hover {
     background-color: var(--text-color-hover);
+}
+
+.edit-profile-name {
+    color: var(--text-color-main);
+    border-radius: 10px;
+    position: absolute;
+    right: 145px;
+    top: 20px;
+    transition: scale 0.3s ease, color 0.3s ease;
+}
+
+.edit-profile-name i {
+    position: relative;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.edit-profile-name:hover {
+    color: var(--text-color-hover);
+    scale: 1.2;
 }
 
 .leaderboard-button {
@@ -254,7 +274,7 @@ body {
     position: absolute;
     bottom: 15px;
     letter-spacing: 0.5px;
-    margin-left: 130px;
+    margin-left: 150px;
 }
 
 .leaderboard-button i {
@@ -286,29 +306,55 @@ body {
     background-color: var(--text-color-hover);
 }
 
-.twoFA-button {
+.twoFA-button-on {
     text-transform: uppercase;
     text-align: center;
     text-decoration: none;
-    width: 65px;
+    width: 50px;
     height: 40px;
     background-color: var(--text-color-main);
     color: var(--text-color-accent);
-    padding: 0.7rem;
+    padding: 0.3rem 0rem;
     border-radius: 10px;
     position: absolute;
     bottom: 15px;
     letter-spacing: 0.5px;
-    margin-left: 54px;
+    margin-left: 34px;
 }
 
-.twoFA-button i {
+.twoFA-button-on i {
     position: relative;
     align-items: center;
     font-size: 1.5rem;
 }
 
-.twoFA-button:hover {
+.twoFA-button-on:hover {
+    background-color: var(--text-color-hover);
+}
+
+.twoFA-button-off {
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    width: 50px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    color: var(--text-color-accent);
+    padding: 0.3rem 0rem;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 15px;
+    letter-spacing: 0.5px;
+    margin-left: 89px;
+}
+
+.twoFA-button-off i {
+    position: relative;
+    align-items: center;
+    font-size: 1.5rem;
+}
+
+.twoFA-button-off:hover {
     background-color: var(--text-color-hover);
 }
 
