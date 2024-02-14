@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './Profile.css'
 import { useAuth } from '../../utils/hooks/useAuthHook';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
@@ -10,6 +10,7 @@ function Profile() {
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -23,6 +24,7 @@ function Profile() {
                 if (response.ok) {
                     setUserInfo(data);
                 } else {
+                    navigate(`/404`);
                     console.error('Failed to fetch user info:', data.error);
                 }
             } catch (error) {
@@ -33,6 +35,7 @@ function Profile() {
         if (username) {
             fetchUserInfo();
         }
+
     }, [username]);
 
     const toggleTheme = () => {
