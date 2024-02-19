@@ -135,7 +135,6 @@ export const Page = styled.div`
   background-size: cover;
   height: 100%;
   display: flex;
-  background-size: cover;
   justify-content: center;
   align-items: center;
 `;
@@ -215,7 +214,7 @@ export const ConversationPannelStyle = styled.div`
 
 export const ConversationSidebarContainer = styled.div`
   padding: 0px;
-  width: ${CSB_WIDTH}px;
+  width: 310px;
 `;
 
 export const ConversationSidebarItem = styled.div`
@@ -356,7 +355,6 @@ export const MessageContainerPersonnalStyle = styled.div`
 export const MessageInputFieldStyle = styled.div`
   display: flex;
   position: fixed;
-  // background: red;
   bottom: 20px;
   left: 330px;
   right: 0;

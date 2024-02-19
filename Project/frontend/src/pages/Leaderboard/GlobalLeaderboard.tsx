@@ -31,15 +31,15 @@ function GlobalLeaderboard() {
     );
 
     return (
-        <div>
+        <div className='leaderboard-container'>
             <h1>Global Leaderboard</h1>
+            <div className='search-input-container'>
             <input
-                type="text"
+                className="search-input"
                 placeholder="Search by username..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="search-input"
-            />
+            /></div>
             <table>
                 <thead>
                     <tr>
@@ -48,7 +48,7 @@ function GlobalLeaderboard() {
                         <th>ELO Rating</th>
                         <th>Wins</th>
                         <th>Losses</th>
-                        <th>Win %</th>
+                        <th>Win Rate</th>
                     </tr>
                 </thead>
                 <tbody>

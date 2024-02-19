@@ -22,7 +22,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    /* background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D'); */
   }
 
   .content{
@@ -41,7 +40,6 @@
     position: relative;
     color: #fff;
     background-color: transparent;
-    /* background-color: red; */
     font-weight: 700;
     font-size: 45px;
     transform: scale(2);
@@ -63,13 +61,13 @@
   .content .text:before{
     left: -30px;
     top: -10px;
-    text-shadow: -2px 0 red;
+    text-shadow: -2px 0 #ff2770;
     animation: glitch-1 2s linear infinite reverse;
   }
   .content .text:after{
     left: -30px;
     top: -10px;
-    text-shadow: -2px 0 blue;
+    text-shadow: -2px 0 #45f3ff;
     animation: glitch-2 2s linear infinite reverse;
   }
   @keyframes glitch-1 {
@@ -217,59 +215,69 @@
     }
 }
 
+.mode-selection-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://i.gifer.com/HU32.gif');
+  background-color: #00000050;
+  background-blend-mode: color;
+  display: flex;
+  background-size: cover;
+}
+
 .mode-selection {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    justify-content: center;
+  display: flex;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
 .mode-button {
-    padding: 20px 40px;
-    font-size: 24px;
+  position: relative;
+  padding: 20px 40px;
+  font-size: 24px;
 }
 
 .classic-mode {
     position: relative;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-family: 'Press Start 2P', cursive;
-    /* Pixelated font */
+    font-family: 'Press Start 2P';
     font-size: 24px;
     background-color: black;
     color: white;
     border: 2px solid white;
     align-items: center;
-}
+    width: 250px;
+  }
 
-/* Hover effect for CLASSIC mode */
 .classic-mode:hover {
     background-color: white;
     color: black;
 }
 
-/* Styles for PLACEHOLDER 1 */
-.placeholder-1 {
-    background-color: #2196F3;
-    /* Blue color */
-    color: white;
+.power-pong-mode {
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Anta';
+  font-size: 24px;
+  background-color: black;
+  color: #b95bdf;
+  border-radius: 10px;
+  align-items: center;
+  width: 250px;
 }
 
-/* Hover effect for PLACEHOLDER 1 */
-.placeholder-1:hover {
-    background-color: #0b7dda;
-}
-
-/* Styles for PLACEHOLDER 2 */
-.placeholder-2 {
-    background-color: #f44336;
-    /* Red color */
-    color: white;
-}
-
-/* Hover effect for PLACEHOLDER 2 */
-.placeholder-2:hover {
-    background-color: #da190b;
+.power-pong-mode:hover {
+  background-color: #b95bdf;
+  color: black;
 }
 
 .signup-section,
@@ -357,61 +365,6 @@ button {
     cursor: pointer;
 }
 
-/* .turn-on-2fa-button {
-    background-color: green;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 50px;
-    right: 10px;
-    z-index: 999;
-}
-
-.turn-on-2fa-button:hover {
-    background-color: darkgreen;
-} */
-
-/* .disable-2fa-button {
-    background-color: blueviolet;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 90px;
-    right: 10px;
-    z-index: 999;
-}
-
-.disable-2fa-button:hover {
-    background-color: darkslateblue;
-} */
-
-/* .conversations-button {
-    background-color: goldenrod;
-    color: rgb(58, 52, 52);
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 130px;
-    right: 10px;
-    z-index: 999;
-} */
-
-/* .conversations-button:hover {
-    background-color: darkgoldenrod;
-} */
-
-
 body,
 html {
     background-color: #1a1a1a;
@@ -422,31 +375,3 @@ h2 {
     margin: 0;
     color: #fff;
 }
-
-/* .profile-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    color: #1a1a1a;
-} */
-
-/* 
-.profile-button {
-    padding: 10px 20px;
-    border: 1px solid #ffffff;
-    background-color: transparent;
-    color: #1a1a1a;
-    margin-top: 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    text-transform: uppercase;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.profile-button:hover {
-    background-color: #1a1a1a;
-    color: #ffffff;
-} */

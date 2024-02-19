@@ -25,16 +25,6 @@ body {
     --text-color-accent: #000000;
 }
 
-/* .cyber-style {
-	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
-  display: flex;
-  background-size: cover;
-  --text-color-main: #45f3ffc0;
-  --text-color-dark: #45f3ff79;
-  --text-color-hover: #45f3ffdc;
-  --text-color-accent: #000000;
-} */
-
 .rainbow-style {
     background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
     display: flex;
@@ -91,13 +81,6 @@ body {
     width: 200px;
 }
 
-/* .card .user-card.cyber-style {
-  background-color: rgba(27, 0, 16, 0.2);
-  background-blend-mode: color;
-  height: 110%;
-  background-image: url(./cyber.gif);
-} */
-
 .card .user-card.rainbow-style {
     background-color: rgba(0, 0, 0, 0.5);
     background-blend-mode: color;
@@ -151,6 +134,10 @@ body {
     height: 100%;
 }
 
+.card .more-info h1 {
+    text-transform: none;
+}
+
 .card .coords {
     margin: 1rem;
     font-size: 1.3rem;
@@ -166,7 +153,6 @@ body {
     font-size: 3rem;
     display: flex;
     position: absolute;
-    /* bottom: 2rem; */
     left: 1rem;
     right: 1rem;
     color: var(--text-color-main);
