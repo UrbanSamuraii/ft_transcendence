@@ -10,6 +10,7 @@
     color: white;
     font-family: 'Roboto', sans-serif;
     z-index: 1;
+    font-family: 'Anta';
     & :last-child {
 		color: white;
         text-decoration: none;

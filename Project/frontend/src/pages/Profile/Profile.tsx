@@ -209,9 +209,9 @@ function Profile() {
                     </div>
                     {user && user.username === username && (
                         <div>
-                        <Link to={`/2fa-enable`} className="twoFA-button-on">
+                        <Link to={`/2fa-enable`} className="twoFA-button twoFA-button-on">
                         2FA on</Link>
-                        <Link to={`/2fa-disable`} className="twoFA-button-off">
+                        <Link to={`/2fa-disable`} className="twoFA-button twoFA-button-off">
                         2FA off</Link>
                         </div>
                     )}

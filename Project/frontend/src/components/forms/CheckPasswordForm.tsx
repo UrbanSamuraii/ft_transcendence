@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import DOMPurify from 'dompurify';
@@ -83,14 +83,14 @@ export const CheckPasswordForm: React.FC<CheckPasswordFormProps> = ({ setShowMod
             <h2>Password Verification</h2>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Conversation Name">
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Conversation Name">
                         Please enter the Password
-                        <InputField
-                            type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={10}/>
-                        {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                    </InputLabel>
-                </InputContainer>
+                    </InputLabelChat>
+                    <InputFieldCCF
+                        type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={10}/>
+                    {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                </InputContainerChat>
             </div>
 
 

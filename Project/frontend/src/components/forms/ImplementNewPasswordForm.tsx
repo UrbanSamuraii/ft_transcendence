@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import DOMPurify from 'dompurify';
@@ -53,13 +53,20 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
         }));
     };
 
+    const handleToggleDisablePassword = () => {
+        setConvDataInput(prevData => ({
+            ...prevData,
+            disablePassword: !prevData.disablePassword
+        }));
+    };
+
     const conversationId = useParams().id;
 
     const handleNewPasswordConversation = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: Partial<ConvDataInput> = {};
         if (!ConvDataInput.newPassword) {
-            newErrors.newPassword = 'New Password is required. To disable protection, please disable password';
+            newErrors.newPassword = 'New password is required';
         }
         if (Object.keys(newErrors).length > 0) {
             setFormErrors(newErrors);
@@ -113,22 +120,20 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
             <h2>New Password</h2>
 
             <div className="input-createConv-container">
-                <InputContainer>
-                    <InputLabel htmlFor="Conversation Name">
-
-                        <InputField
-                            type="text" name="newPassword" value={ConvDataInput.newPassword} onChange={handleInputChange} maxLength={10}/>
-                        {formErrors.newPassword && <div className="error-message">{formErrors.newPassword}</div>}
-                    </InputLabel>
-                </InputContainer>
+                <InputContainerChat>
+                    <InputLabelChat htmlFor="Conversation Name">
+                        Enter new password
+                    </InputLabelChat>
+                    <InputFieldCCF
+                        type="text" name="newPassword" value={ConvDataInput.newPassword} onChange={handleInputChange} maxLength={10}/>
+                    {formErrors.newPassword && <div className="error-message">{formErrors.newPassword}</div>}
+                </InputContainerChat>
             </div>
-
 
             <div className="button-createConv-container">
                 <ButtonCreateConv type="submit" >submit</ButtonCreateConv>
             </div>
-
-            <div className="disable-password-checkbox">
+            <label className="toggler-wrapper style-1">
                 <input
                     type="checkbox"
                     id="disablePasswordCheckbox"
@@ -136,8 +141,11 @@ export const ImplementNewPasswordForm: React.FC<SetUpNewPasswordFormProps> = ({ 
                     checked={ConvDataInput.disablePassword}
                     onChange={handleInputChange}
                 />
-                <label htmlFor="disablePasswordCheckbox">Disable Password</label>
-            </div>
+                <div className="toggler-slider">
+                    <div className="toggler-knob"></div>
+                </div>
+            </label>
+            <h3 className="toggle-name">Disable Password</h3>
 
         </form>
     );

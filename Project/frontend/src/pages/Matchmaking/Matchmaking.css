@@ -13,7 +13,6 @@
     height: 180px;
     margin: auto;
     background-color: transparent;
-    /* background-color: red; */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
     border-radius: 20px;
@@ -96,11 +95,11 @@
 }
 
 .searching-text {
-    color: white;
+    color: #04f8399c;
     position: absolute;
     top: 135px;
-    left: 63px;
-    font-weight: bolder;
+    left: 57px;
+    font-family: 'Anta';
     letter-spacing: 1px;
-    font-size: 18px;
+    font-size: 20px;
 }

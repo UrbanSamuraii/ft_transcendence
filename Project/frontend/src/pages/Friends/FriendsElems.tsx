@@ -16,7 +16,7 @@ export const Friendspage = styled.div`
   background-size: cover;
   justify-content: center;
   align-items: center;
-  // display: flex;
+  font-family: 'Anta';
 `;
 
 export const FriendsListContainer = styled.div`
@@ -49,6 +49,8 @@ export const FriendsListTitle = styled.div`
   top: 0;
   z-index: 1;
   font-size: 25px;
+  letter-spacing: 2px;
+	font-family: 'Anta';
   font-weight: bold;
 `;
 
@@ -70,7 +72,7 @@ const ContextMenuButton = styled.button`
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  background-color: #be4747;
+  background-color: #ff00009c;
   color: white;
   border: none;
   padding: 5px;
@@ -133,7 +135,7 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
       {showDeleteButton && (
         <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
       )}
-      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
+      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? '#04f8399c' : '#ff00009c' }} />
     </FriendItemContainer>
   );
 };
@@ -204,6 +206,7 @@ export const SendButton = styled.button`
   border-radius: 10px;
   padding: 10px;
   cursor: pointer;
+  font-family: 'Anta';
   transition: background-color 0.3s ease;
   &:hover {
     background-color: #363636;
@@ -277,6 +280,7 @@ export const InvitationsListContainer = styled.div`
 const InvitationItemContainer = styled.div`
   padding: 20px 30px;
   gap: 30px;
+  border-radius: 10px;
   margin-bottom: 1px;
   color: white;
   display: flex;
@@ -298,7 +302,7 @@ const ActionButton = styled.button`
 `;
 
 const AcceptButton = styled(ActionButton)`
-  background-color: #3c9e43;
+  background-color: #04f8399c;
   right: 65px;
   &:before {
     content: '✔';
@@ -306,7 +310,7 @@ const AcceptButton = styled(ActionButton)`
 `;
 
 const RefuseButton = styled(ActionButton)`
-  background-color: #be4747;
+  background-color: #ff00009c;
   &:before {
     content: '✖';
   }

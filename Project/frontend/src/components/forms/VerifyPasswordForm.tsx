@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonCreateConv, InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { ButtonCreateConv, InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 import '../conversations/GlobalConversations.css'
 import axios from 'axios';
 import { ImplementNewPasswordModal } from "../modals/ImplementNewPasswordModal";
@@ -91,14 +91,14 @@ export const VerifyPasswordForm: React.FC<VerifyPasswordFormFormProps> = ({ setS
                 <h2>Password Verification</h2>
 
                 <div className="input-createConv-container">
-                    <InputContainer>
-                        <InputLabel htmlFor="Conversation Name">
+                    <InputContainerChat>
+                        <InputLabelChat htmlFor="Conversation Name">
                             Please enter the Password
-                            <InputField
-                                type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={15}/>
-                            {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                        </InputLabel>
-                    </InputContainer>
+                        </InputLabelChat>
+                        <InputFieldCCF
+                            type="text" name="password" value={ConvDataInput.password} onChange={handleInputChange} maxLength={15}/>
+                        {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                    </InputContainerChat>
                 </div>
 
 
