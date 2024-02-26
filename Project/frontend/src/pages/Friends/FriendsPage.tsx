@@ -15,6 +15,7 @@ export const FriendsPage = () => {
     const [friendsList, setFriendsList] = useState<any[]>([]);
     const [invitationsList, setInvitationsList] = useState<any[]>([]);
     const [isInvitationBarVisible, setIsInvitationBarVisible] = useState(false);
+    // const [userInfo, setUserInfo] = useState({ img_url });
 
     // const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
     const [customError, setCustomError] = useState<string>('');
@@ -175,7 +176,7 @@ export const FriendsPage = () => {
                         {friendsList.map((friend) => (
                             <FriendItem
                                 key={friend.id}
-                                friend={{ id: friend.id, username: friend.username, status: friend.status }}
+                                friend={{ id: friend.id, username: friend.username, status: friend.status, img_url: friend.img_url }}
                                 removeFriend={handleRemoveFriend}
                             />
                         ))}

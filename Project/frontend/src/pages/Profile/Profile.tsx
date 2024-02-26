@@ -43,8 +43,6 @@ function Profile() {
         setTheme(prevTheme => {
             switch (prevTheme) {
                 case 'bw-style':
-                    //     return 'cyber-style';
-                    // case 'cyber-style':
                     return 'rainbow-style';
                 case 'rainbow-style':
                     return 'retrowave-style';
@@ -109,9 +107,21 @@ function Profile() {
                 return;
             }
 
+            const isValidFilename = validateFilename(file.name);
+            if (!isValidFilename) {
+                alert("Invalid filename. Please avoid spaces and special characters.");
+                return;
+            }
+
             // Upload the avatar and refresh user information when it's done
             uploadAvatar(file, username);
         }
+    };
+
+    const validateFilename = (filename: string): boolean => {
+        // Define a regex pattern to match valid filenames (no spaces or special characters)
+        const pattern = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9]+)?$/;
+        return pattern.test(filename);
     };
 
     const uploadAvatar = async (file: File, username: string) => {

@@ -67,6 +67,8 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         setShowMenuModal(false);
     };
 
+    const colors = ['#9b59b6', '#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#1abc9c'];
+
     return (
         <div className='chat'>
             {showMenuModal && ( <ConversationMenuModal
@@ -107,9 +109,9 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                 <ConversationSidebarContainer>
                     {conversations.map((conversation) => (
                         <ConversationSidebarItem key={conversation.id} onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
-                            <div className='conversationAvatar'>
+                            <div className="conversationAvatar" style={{ backgroundColor: colors[conversation.id % colors.length] }}>
                             <i className='bx bxs-ghost'></i>
-                            </ div>
+                            </div>
                             <ConversationSidebarTexts>
                                 <div className="conversationName">
                                     <div> <span>{conversation.name || conversation.members[0].username}</span> </div>

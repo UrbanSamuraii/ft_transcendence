@@ -312,20 +312,21 @@ const messageCommonStyles = css`
   border-radius: 5px;
   padding: 4px 7px;
   position: relative;
-  margin: 2px;
+  margin: 3px;
   min-height: 60px;
-  max-width: 300px;
   word-wrap: break-word;
 `;
 
 export const MessageContainerStyle = styled.div`
   ${messageCommonStyles}
   margin-left: 2%;
+  width: 50%;
 `;
 
 export const MessageContainerPersonnalStyle = styled.div`
   ${messageCommonStyles}
-  margin-left: 55%;
+  margin: 3px 2% 3px 48%;
+  width: 50%;
 `;
 
 export const MessageInputFieldStyle = styled.div`

@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
+import { empty } from '@prisma/client/runtime/library';
 
 interface InvitationBarContainerProps {
   visible: boolean;
@@ -86,7 +87,7 @@ const BlueCircle = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #db7eff;
+  background-size: cover;
 `;
 
 const StatusCircle = styled.div`
@@ -105,12 +106,13 @@ interface FriendItemProps {
     id: number;
     username: string;
     status: string;
+    img_url: string;
   };
   removeFriend: (friendId: number) => void;
 }
 
 export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) => {
-  const { id, username, status } = friend;
+  const { id, username, status, img_url } = friend;
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
   const handleMouseEnter = () => {
@@ -126,11 +128,15 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
     setShowDeleteButton(false);
   };
 
+  const img_url2 = img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png";
+
+  // console.log(img_url2 < "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png");
+
   return (
     <FriendItemContainer
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}>
-      <BlueCircle />
+      <BlueCircle style={{ backgroundImage: `url(${img_url2})` }} />
       <Username>{username}</Username>
       {showDeleteButton && (
         <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
