@@ -8,26 +8,26 @@ import { getFriendsList } from '../../utils/hooks/getFriendsList';
 import { getInvitationsList } from '../../utils/hooks/getInvitationsList';
 import DOMPurify from 'dompurify';
 import { ErrorMessageModal } from '../../components/modals/ErrorMessageModal';
+import OutsideClickHandler from 'react-outside-click-handler';
 
 export const FriendsPage = () => {
 
     const chatSocketContextData = useSocket();
     const [friendsList, setFriendsList] = useState<any[]>([]);
     const [invitationsList, setInvitationsList] = useState<any[]>([]);
-    const [isInvitationBarVisible, setIsInvitationBarVisible] = useState(false);
-    // const [userInfo, setUserInfo] = useState({ img_url });
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
     const [customError, setCustomError] = useState<string>('');
     const [showModalError, setShowModalError] = useState<boolean>(false);
-    
-    // const handleCustomAlertClose = () => {
-    //     setCustomError('');
-    // };
 
     const handleButtonClick = () => {
-        setIsInvitationBarVisible(!isInvitationBarVisible);
+        setIsMenuOpen(!isMenuOpen);
     };
+
+    const handleOutsideClick = () => {
+        setIsMenuOpen(false);
+    };
+
 
     const handleShowModalError = () => {
     setShowModalError(true);
@@ -183,13 +183,15 @@ export const FriendsPage = () => {
                     </div>
                 </FriendsListContainer>
                 <InvitationContainer>
-                {isInvitationBarVisible && (
-                <div>
-                <InvitationBarContainer>
-                    <InvitationBar sendInvitation={handleSendInvitation} />
-                </InvitationBarContainer>
-                </div>
-                )}
+                    {isMenuOpen && (
+                            <div className="overlay-friends">
+                                <OutsideClickHandler onOutsideClick={handleOutsideClick}>
+                                    <InvitationBarContainer>
+                                        <InvitationBar sendInvitation={handleSendInvitation} />
+                                    </InvitationBarContainer>
+                                </OutsideClickHandler>
+                            </div>
+                    )}
                     <InvitationsListContainer>
                         <FriendsListTitle>Invitations</FriendsListTitle>
                         <div>

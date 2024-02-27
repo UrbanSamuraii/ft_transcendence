@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
 import { empty } from '@prisma/client/runtime/library';
+import { InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 
 interface InvitationBarContainerProps {
   visible: boolean;
@@ -164,39 +165,31 @@ export const InvitationBarContainer = styled.div`
   border-radius: 10px;
 `;
 
-const BackgroundForTisShit = styled.div`
-  position: fixed;
-  top: -20%;
-  left: -10%;
-  width: 120%;
-  height: 140%;
-  border-radius: 10px;
-  background-color: #222222CC;
-  backdrop-filter: blur(6px);
-  z-index: -1;
-`;
-
 const InputContainerFriends = styled.div`
   border-radius: 20px;
-  padding: 2px 2px;
-  border: 1px solid #363636;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.137);
+  width: 300px;
+  height: 57px;
+  border-radius: 50px;
   transition: border-color 0.3s ease;
   &:hover {
     border-color: #9b59b6;
+    label {
+      color: #9b59b6;
+    }
+  }
 `;
 
-const Input = styled.input`
-  margin-right: 10px;
-  padding: 5px;
-  outline: none;
-  color: white !important;
-  border: none !important;
-  background-color: transparent;
-  ${({ maxLength }) =>
-    maxLength &&
-    css`
-      max-length: ${maxLength};
-    `}
+export const InputLabelFriends = styled.label`
+  background-color: #222222;
+  color: white;
+  display: inline-block;
+  padding: 1px;
+  border-radius: 10px;
+  transition: color 0.3s ease;
+  transform: translateY(-22px);
+  margin-left: 62px;
 `;
 
 const Message = styled.div`
@@ -207,7 +200,7 @@ const Message = styled.div`
 export const SendButton = styled.button`
   background-color: #222222;
   color: white;
-  margin-top: 10px;
+  margin-top: 15px;
   border: none;
   border-radius: 10px;
   padding: 10px;
@@ -217,6 +210,33 @@ export const SendButton = styled.button`
   &:hover {
     background-color: #363636;
   }
+`;
+
+export const MenuContainer = styled.div`
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  align-items: center;
+`;
+
+export const Title = styled.h2`
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+`;
+
+const BlurredBackground = styled.div`
+  position: fixed;
+  top: -0%;
+  left: -0%;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #222222CC;
+  backdrop-filter: blur(6px);
+  z-index: -1;
 `;
 
 interface InvitationBarProps {
@@ -246,18 +266,23 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 
   return (
 	<div>
-    <BackgroundForTisShit />
-	  <Message>{message}</Message>
+  <MenuContainer>
+    <Title>Invite Friends</Title>
+    <BlurredBackground />
+    <Message>{message}</Message>
     <InputContainerFriends>
-	  <Input maxLength={30}
-		type="text"
-		placeholder="Username or Email"
-		value={inputValue}
-		onChange={handleInputChange}
-	  />
+      <InputLabelFriends>
+          Username or email
+      </InputLabelFriends>
+      <InputFieldCCF maxLength={30}
+      type="text"
+      value={inputValue}
+      onChange={handleInputChange}
+      />
     </InputContainerFriends>
-	  <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
-	</div>
+    <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
+  </MenuContainer>
+  </div>
   );
 };
 

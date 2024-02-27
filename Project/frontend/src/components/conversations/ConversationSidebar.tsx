@@ -27,7 +27,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
-    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
+    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
@@ -58,11 +58,11 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             setShowModalUnblock(true);
         }
     };
-      
+
     const openMenu = () => {
         setShowMenuModal(true);
     };
-      
+
     const closeMenu = () => {
         setShowMenuModal(false);
     };

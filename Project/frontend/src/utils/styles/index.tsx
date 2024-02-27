@@ -68,6 +68,7 @@ export const InputLabelChat = styled.label`
 background-color: #222222;
 display: flex;
 flex-direction: column;
+font-family: 'Anta';
 color: white;
 display: inline-block;
 padding: 1px;
@@ -353,7 +354,8 @@ export const MessageInputTextArea = styled.textarea`
   padding: 5px;
   border: none;
   color: white;
-  font-size: 16px;
+  font-size: 17px;
+  // font-family: 'Anta';
   resize: none;
   overflow: hidden;
   width: 85%;
