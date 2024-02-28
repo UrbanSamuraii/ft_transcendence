@@ -11,7 +11,7 @@ const HomePage = () => {
     };
 
     const handleSignUpClick = () => {
-        navigate('/login');
+        navigate('/signup');
     };
 
     if (!user) {

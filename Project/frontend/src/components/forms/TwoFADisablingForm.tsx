@@ -25,12 +25,12 @@ export const TwoFADisablingForm = () => {
     }
 
     return (
-        <form className="TwoFA-form-container">
-            <div className="TwoFA-content-container">
-                <Text2FA>Please confirm that you want your Two-Factor Authentication Setup disabled</Text2FA>
+        <form>
+            <div className="TwoFA-off-container">
+                <h1>Are you sure you want to disable Two-Factor Authentication?</h1>
+                <button className='Disable-2FA' type="button" onClick={handleDisableClick}>Yes, Disable 2FA</button>
+                {error && <div className="error-message">{error}</div>} {/* Display error message */}
             </div>
-            <Button2FA type="button" onClick={handleDisableClick}>Disable 2FA</Button2FA>
-            {error && <div className="error-message">{error}</div>} {/* Display error message */}
         </form>
     );
 }

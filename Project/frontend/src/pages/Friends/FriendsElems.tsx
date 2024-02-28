@@ -1,5 +1,7 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
+import { empty } from '@prisma/client/runtime/library';
+import { InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
 
 interface InvitationBarContainerProps {
   visible: boolean;
@@ -16,7 +18,7 @@ export const Friendspage = styled.div`
   background-size: cover;
   justify-content: center;
   align-items: center;
-  // display: flex;
+  font-family: 'Anta';
 `;
 
 export const FriendsListContainer = styled.div`
@@ -49,6 +51,8 @@ export const FriendsListTitle = styled.div`
   top: 0;
   z-index: 1;
   font-size: 25px;
+  letter-spacing: 2px;
+	font-family: 'Anta';
   font-weight: bold;
 `;
 
@@ -70,7 +74,7 @@ const ContextMenuButton = styled.button`
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  background-color: #be4747;
+  background-color: #ff00009c;
   color: white;
   border: none;
   padding: 5px;
@@ -84,7 +88,7 @@ const BlueCircle = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #db7eff;
+  background-size: cover;
 `;
 
 const StatusCircle = styled.div`
@@ -103,12 +107,13 @@ interface FriendItemProps {
     id: number;
     username: string;
     status: string;
+    img_url: string;
   };
   removeFriend: (friendId: number) => void;
 }
 
 export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) => {
-  const { id, username, status } = friend;
+  const { id, username, status, img_url } = friend;
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
   const handleMouseEnter = () => {
@@ -124,16 +129,20 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
     setShowDeleteButton(false);
   };
 
+  const img_url2 = img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png";
+
+  // console.log(img_url2 < "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png");
+
   return (
     <FriendItemContainer
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}>
-      <BlueCircle />
+      <BlueCircle style={{ backgroundImage: `url(${img_url2})` }} />
       <Username>{username}</Username>
       {showDeleteButton && (
         <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
       )}
-      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? 'green' : 'red' }} />
+      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? '#04f8399c' : '#ff00009c' }} />
     </FriendItemContainer>
   );
 };
@@ -156,39 +165,31 @@ export const InvitationBarContainer = styled.div`
   border-radius: 10px;
 `;
 
-const BackgroundForTisShit = styled.div`
-  position: fixed;
-  top: -20%;
-  left: -10%;
-  width: 120%;
-  height: 140%;
-  border-radius: 10px;
-  background-color: #222222CC;
-  backdrop-filter: blur(6px);
-  z-index: -1;
-`;
-
 const InputContainerFriends = styled.div`
   border-radius: 20px;
-  padding: 2px 2px;
-  border: 1px solid #363636;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.137);
+  width: 300px;
+  height: 57px;
+  border-radius: 50px;
   transition: border-color 0.3s ease;
   &:hover {
     border-color: #9b59b6;
+    label {
+      color: #9b59b6;
+    }
+  }
 `;
 
-const Input = styled.input`
-  margin-right: 10px;
-  padding: 5px;
-  outline: none;
-  color: white !important;
-  border: none !important;
-  background-color: transparent;
-  ${({ maxLength }) =>
-    maxLength &&
-    css`
-      max-length: ${maxLength};
-    `}
+export const InputLabelFriends = styled.label`
+  background-color: #222222;
+  color: white;
+  display: inline-block;
+  padding: 1px;
+  border-radius: 10px;
+  transition: color 0.3s ease;
+  transform: translateY(-22px);
+  margin-left: 62px;
 `;
 
 const Message = styled.div`
@@ -199,15 +200,43 @@ const Message = styled.div`
 export const SendButton = styled.button`
   background-color: #222222;
   color: white;
-  margin-top: 10px;
+  margin-top: 15px;
   border: none;
   border-radius: 10px;
   padding: 10px;
   cursor: pointer;
+  font-family: 'Anta';
   transition: background-color 0.3s ease;
   &:hover {
     background-color: #363636;
   }
+`;
+
+export const MenuContainer = styled.div`
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  align-items: center;
+`;
+
+export const Title = styled.h2`
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+`;
+
+const BlurredBackground = styled.div`
+  position: fixed;
+  top: -0%;
+  left: -0%;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #222222CC;
+  backdrop-filter: blur(6px);
+  z-index: -1;
 `;
 
 interface InvitationBarProps {
@@ -237,18 +266,23 @@ export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) 
 
   return (
 	<div>
-    <BackgroundForTisShit />
-	  <Message>{message}</Message>
+  <MenuContainer>
+    <Title>Invite Friends</Title>
+    <BlurredBackground />
+    <Message>{message}</Message>
     <InputContainerFriends>
-	  <Input maxLength={30}
-		type="text"
-		placeholder="Username or Email"
-		value={inputValue}
-		onChange={handleInputChange}
-	  />
+      <InputLabelFriends>
+          Username or email
+      </InputLabelFriends>
+      <InputFieldCCF maxLength={30}
+      type="text"
+      value={inputValue}
+      onChange={handleInputChange}
+      />
     </InputContainerFriends>
-	  <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
-	</div>
+    <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
+  </MenuContainer>
+  </div>
   );
 };
 
@@ -277,6 +311,7 @@ export const InvitationsListContainer = styled.div`
 const InvitationItemContainer = styled.div`
   padding: 20px 30px;
   gap: 30px;
+  border-radius: 10px;
   margin-bottom: 1px;
   color: white;
   display: flex;
@@ -298,7 +333,7 @@ const ActionButton = styled.button`
 `;
 
 const AcceptButton = styled(ActionButton)`
-  background-color: #3c9e43;
+  background-color: #04f8399c;
   right: 65px;
   &:before {
     content: '✔';
@@ -306,7 +341,7 @@ const AcceptButton = styled(ActionButton)`
 `;
 
 const RefuseButton = styled(ActionButton)`
-  background-color: #be4747;
+  background-color: #ff00009c;
   &:before {
     content: '✖';
   }

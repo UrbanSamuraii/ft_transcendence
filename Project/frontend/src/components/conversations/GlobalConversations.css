@@ -15,11 +15,13 @@
 	text-align: center;
 	padding: 20px;
 	& h2 {
-	color: white;
-	text-transform: uppercase;
-	font-size: 20px;
-	font-weight: 600;
-	margin-bottom: 15px;
+		color: white;
+		text-transform: uppercase;
+		font-size: 20px;
+		font-family: 'Anta';
+		letter-spacing: 2px;
+		font-weight: 600;
+		margin-bottom: 15px;
 	}
 }
 
@@ -35,6 +37,7 @@
 	background-color: r#222222;
 	color: white;
 	font-size: 17px;
+	font-family: 'Anta';
 	border-radius: 10px;
 	height: 40px;
 	width: 100px;
@@ -62,6 +65,7 @@
 	background-color: rgb(29, 29, 29);
 	font-size: 20px;
 	cursor: pointer;
+	font-family: 'Anta';
 	transition: background-color 0.3s ease;
 }
 
@@ -75,7 +79,7 @@
 	width: 45px;
 	height: 45px;
 	padding: 7px;
-	margin-left: 140px;
+	margin-left: 135px;
 	border-radius: 50%;
 	transition: background-color 0.3s ease;
 }
@@ -106,6 +110,8 @@
 
 	& h2 {
 		text-transform: uppercase;
+		font-family: 'Anta';
+		letter-spacing: 2px;
 		font-weight: 600;
 		color: #ffffff;
 	}
@@ -142,7 +148,8 @@
 .conversationName {
 	margin-top: 8px;
 	font-weight: bold;
-	font-size: 16px;
+	font-family: 'Anta';
+	font-size: 17px;
 	color: white;
 }
 

@@ -19,45 +19,38 @@ body {
     background-image: url(https://static.vecteezy.com/system/resources/previews/030/697/151/non_2x/gray-minimalist-wallpaper-high-quality-4k-hdr-free-photo.jpg);
     display: flex;
     background-size: cover;
-    --text-color-main: #ffffffc0;
-    --text-color-dark: #ffffff79;
-    --text-color-hover: #ffffffdc;
-    --text-color-accent: #000000;
+    --text-color-main: #a26abd;
+    --text-color-main: #d4d4d4;
+    --text-color-dark: #ffffff9a;
+    --text-color-hover: white;
+    --text-color-accent: black;
 }
 
-/* .cyber-style {
-	background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
-  display: flex;
-  background-size: cover;
-  --text-color-main: #45f3ffc0;
-  --text-color-dark: #45f3ff79;
-  --text-color-hover: #45f3ffdc;
-  --text-color-accent: #000000;
-} */
 
 .rainbow-style {
-    background-image: url(https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8fA%3D%3D);
+    background-image: url(https://images.hdqwalls.com/wallpapers/abstract-geometry-glass-4k-tl.jpg);
     display: flex;
     background-size: cover;
-    --text-color-main: #27e6ffc0;
-    --text-color-dark: #27e6ff79;
-    --text-color-hover: #27e6ffdc;
-    --text-color-accent: #fff;
+    --text-color-main: #27e6ffdc;
+    --text-color-dark: #27e6ffc0;
+    --text-color-hover: #27e6ff;
+    --text-color-accent: black;
 }
 
 .retrowave-style {
-    background-image: url(https://rare-gallery.com/thumbs/101168-retrowave-lines-sunset-4k.jpg);
+    background-image: url(https://wallpapercrafter.com/desktop/103070-vaporwave-mountains-dark-minimalism.jpg
+    );
     background-position: 50%;
     display: flex;
     background-size: cover;
-    --text-color-main: #ff2770c0;
-    --text-color-dark: #ff277079;
-    --text-color-hover: #ff2770dc;
-    --text-color-accent: #fff;
+    --text-color-main: #ff2770dc;
+    --text-color-dark: #ff2770c0;
+    --text-color-hover: #ff2770;
+    --text-color-accent: #000000;
 }
 
 .rounded-image {
-    margin-top: 45px;
+    margin-top: 62px;
     margin-left: 13px;
     border-radius: 50%;
     overflow: hidden;
@@ -65,20 +58,21 @@ body {
 
 .card {
     width: 600px;
-    height: 350px;
+    height: 380px;
     box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.8);
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
     border-radius: 10px;
     overflow: hidden;
     position: absolute;
+	font-family: 'Anta';
 }
 
 .card h1 {
     margin-top: 10px;
     margin-bottom: 0px;
     text-align: center;
-    font-size: 2rem;
+    font-size: 30px;
     color: var(--text-color-main);
 }
 
@@ -90,13 +84,6 @@ body {
     float: left;
     width: 200px;
 }
-
-/* .card .user-card.cyber-style {
-  background-color: rgba(27, 0, 16, 0.2);
-  background-blend-mode: color;
-  height: 110%;
-  background-image: url(./cyber.gif);
-} */
 
 .card .user-card.rainbow-style {
     background-color: rgba(0, 0, 0, 0.5);
@@ -127,7 +114,7 @@ body {
     color: var(--text-color-main);
     text-transform: uppercase;
     text-align: center;
-    font-size: 1rem;
+    font-size: 17px;
     font-weight: bold;
     border-radius: 10px;
     padding: 0.125rem 0.75rem;
@@ -135,7 +122,7 @@ body {
 }
 
 .card .user-card .points {
-    top: 290px;
+    top: 310px;
 }
 
 .card .user-card .profile-picture {
@@ -151,6 +138,10 @@ body {
     height: 100%;
 }
 
+.card .more-info h1 {
+    text-transform: none;
+}
+
 .card .coords {
     margin: 1rem;
     font-size: 1.3rem;
@@ -163,10 +154,10 @@ body {
 }
 
 .card .stats {
-    font-size: 3rem;
+    font-size: 50px;
     display: flex;
     position: absolute;
-    /* bottom: 2rem; */
+    top: 135px;
     left: 1rem;
     right: 1rem;
     color: var(--text-color-main);
@@ -185,6 +176,13 @@ body {
     font-size: 0.75rem;
     font-weight: bold;
     text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stats div:hover .title {
+    visibility: visible;
+    opacity: 1;
 }
 
 .card .stats .value {
@@ -219,6 +217,26 @@ body {
     background-color: var(--text-color-hover);
 }
 
+.edit-profile-name {
+    color: var(--text-color-main);
+    border-radius: 10px;
+    position: absolute;
+    right: 145px;
+    top: 20px;
+    transition: scale 0.3s ease;
+}
+
+.edit-profile-name i {
+    position: relative;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.edit-profile-name:hover {
+    color: var(--text-color-hover);
+    scale: 1.2;
+}
+
 .edit-profile {
     width: 40px;
     height: 40px;
@@ -227,8 +245,8 @@ body {
     padding: 0.5rem;
     border-radius: 10px;
     position: absolute;
-    right: 54px;
-    bottom: 15px;
+    right: 34px;
+    bottom: 20px;
 }
 
 .edit-profile i {
@@ -246,43 +264,19 @@ body {
     text-align: center;
     text-decoration: none;
     width: 165px;
+    font-family: 'Anta';
     height: 40px;
     background-color: var(--text-color-main);
     color: var(--text-color-accent);
     padding: 0.7rem;
     border-radius: 10px;
     position: absolute;
-    bottom: 15px;
+    bottom: 20px;
     letter-spacing: 0.5px;
-    margin-left: 130px;
-}
-
-.leaderboard-button i {
-    position: relative;
-    align-items: center;
-    font-size: 1.5rem;
+    margin-left: 150px;
 }
 
 .leaderboard-button:hover {
-    background-color: var(--text-color-hover);
-}
-
-.change-avatar {
-    text-transform: uppercase;
-    text-align: center;
-    text-decoration: none;
-    width: 160px;
-    height: 35px;
-    background-color: var(--text-color-main);
-    color: var(--text-color-accent);
-    padding: 0.5rem;
-    font-size: 15px;
-    border-radius: 10px;
-    position: relative;
-    letter-spacing: 0.5px;
-}
-
-.change-avatar:hover {
     background-color: var(--text-color-hover);
 }
 
@@ -290,31 +284,39 @@ body {
     text-transform: uppercase;
     text-align: center;
     text-decoration: none;
-    width: 65px;
+    width: 50px;
     height: 40px;
     background-color: var(--text-color-main);
     color: var(--text-color-accent);
-    padding: 0.7rem;
+    padding: 0.3rem 0rem;
     border-radius: 10px;
     position: absolute;
-    bottom: 15px;
+    bottom: 20px;
     letter-spacing: 0.5px;
-    margin-left: 54px;
+    font-size: 15px;
 }
 
 .twoFA-button i {
     position: relative;
     align-items: center;
-    font-size: 1.5rem;
 }
 
 .twoFA-button:hover {
     background-color: var(--text-color-hover);
 }
 
+.twoFA-button-on {
+    margin-left: 34px;
+}
+
+.twoFA-button-off {
+    margin-left: 89px;
+}
+
+
 .skill-name {
-    bottom: 20%;
-    left: 1%;
+    bottom: 82px;
+    left: 10px;
     display: flex;
     position: absolute;
     font-size: 1rem;
@@ -327,10 +329,10 @@ body {
 .skill-bar {
     display: flex;
     position: absolute;
-    bottom: 20%;
-    left: 1%;
+    bottom: 80px;
+    left: 10px;
     height: 14px;
-    width: 98%;
+    width: 380px;
     background-color: transparent;
     border: 1px solid var(--text-color-dark);
     border-radius: 5px;

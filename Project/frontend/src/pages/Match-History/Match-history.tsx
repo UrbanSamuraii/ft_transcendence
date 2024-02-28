@@ -41,30 +41,32 @@ function MatchHistory() {
     }, [username]);
 
     return (
-        <div className="match-history-container">
-            <h1>Match History for {username}</h1>
-            <table className="match-history-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Game Mode</th>
-                        <th>Winner</th>
-                        <th>Loser</th>
-                        <th>ELO Change (Winner/Loser)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {matches.map(match => (
-                        <tr key={match.id}>
-                            <td>{new Date(match.createdAt).toLocaleDateString()}</td>
-                            <td>{match.gameMode}</td>
-                            <td>{match.winner ? match.winner.username : 'No winner yet'}</td>
-                            <td>{match.loser ? match.loser.username : 'No loser yet'}</td>
-                            <td>(+{match.eloChangeWinner}/{match.eloChangeLoser})</td>
+        <div className='match-history-background'>
+            <h1>{username}'s Match History</h1>
+            <div className="match-history-container">
+                <table className="match-history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Game Mode</th>
+                            <th>Winner</th>
+                            <th>Loser</th>
+                            <th>ELO Change (Winner/Loser)</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {matches.map(match => (
+                            <tr key={match.id}>
+                                <td>{new Date(match.createdAt).toLocaleDateString()}</td>
+                                <td>{match.gameMode}</td>
+                                <td>{match.winner ? match.winner.username : 'No winner yet'}</td>
+                                <td>{match.loser ? match.loser.username : 'No loser yet'}</td>
+                                <td>(+{match.eloChangeWinner}/{match.eloChangeLoser})</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

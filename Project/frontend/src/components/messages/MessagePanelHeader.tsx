@@ -1,7 +1,6 @@
 import './GlobalMessages.css';
 import axios from 'axios';
 import { useEffect, useState, FC, useRef } from "react";
-// import { MessageContainerHeaderStyle } from '../../utils/styles';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../../SocketContext';
@@ -284,7 +283,9 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                         {user ? (
                             <>
                                 <div onClick={toggleDropdown} className="conv-menu-button"><i className='bx bxs-cog'></i>
-                                    {isDropdownOpen && (<div className="dropdown-menu">
+                                    {isDropdownOpen && (
+                                        <div className="overlay-chat">
+                                        <div className="dropdown-menu">
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>)}
                                         {isAdmin && (<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>)}
@@ -300,13 +301,13 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                                             else { setShowNewPasswordModal(true); }
                                         }}>
                                             <LockIcon /> </button>)}
-                                        <div className="privacy-toggle">
-                                            <button
-                                                className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
-                                                onClick={handleTogglePrivacy} > {isPrivate ? 'Private Conversation' : 'Public Conversation'}
-                                            </button>
+                                            <div className="privacy-toggle">
+                                                <button
+                                                    className={`toggle-button ${isPrivate ? 'private' : 'public'}`}
+                                                    onClick={handleTogglePrivacy} > {isPrivate ? 'Private Conversation' : 'Public Conversation'}
+                                                </button>
+                                            </div>
                                         </div>
-
                                     </div>
                                     )}
                                 </div>

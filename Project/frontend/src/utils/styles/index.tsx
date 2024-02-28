@@ -68,6 +68,7 @@ export const InputLabelChat = styled.label`
 background-color: #222222;
 display: flex;
 flex-direction: column;
+font-family: 'Anta';
 color: white;
 display: inline-block;
 padding: 1px;
@@ -98,10 +99,11 @@ export const Button = styled.button`
   width: 100%;
   height: 57px;
 	background-color: rgb(188, 143, 243, 0.5);
-  color: rgb(0, 0, 0);
+  color: white;
   outline: none !important;
   border: none !important;
   border-radius: 50px;
+  font-family: 'Anta';
   transition: background-color 0.3s ease, transform 0.3s ease;
 
   &:hover {
@@ -135,7 +137,6 @@ export const Page = styled.div`
   background-size: cover;
   height: 100%;
   display: flex;
-  background-size: cover;
   justify-content: center;
   align-items: center;
 `;
@@ -215,7 +216,7 @@ export const ConversationPannelStyle = styled.div`
 
 export const ConversationSidebarContainer = styled.div`
   padding: 0px;
-  width: ${CSB_WIDTH}px;
+  width: 310px;
 `;
 
 export const ConversationSidebarItem = styled.div`
@@ -241,13 +242,13 @@ export const ConversationSidebarTexts = styled.div`
 `;
 
 export const Button2FA = styled.button`
-  width: 60%;
-  height: 50px;
-  background-color: #2b09ff;
+  padding: 10px;
+  background-color: #363636;
   color: #fff;
   display: block;
-  margin: 0 auto;
+  margin: 10px auto 0;
   text-align: center;
+  border-radius: 10px;
 `;
 
 export const Text2FA = styled.div`
@@ -255,11 +256,9 @@ export const Text2FA = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 100%;
-  background-color: #1a1a1a;
-  height: 130px;
   color: #fff;
-  font-size: 2em;
+  font-size: 32px;
+  font-family: 'Anta';
 `;
 
 export const OverlayStyle = styled.div`
@@ -282,34 +281,11 @@ export const OverlayContent = styled.div`
   align-items: center;
 `;
 
-// export const ButtonOverlay = styled.button`
-//   background-color: #1a1a1a;
-//   color: #fff; 
-//   border: none;
-//   padding: 0px 0px; 
-//   font-size: 16px; 
-//   border-radius: 5px;
-
-//   &:hover::before {
-//     content: "Click to open Conversations Menu";
-//     position: absolute;
-//     top: 60px;
-//     left: 70%;
-//     transform: translateX(-55%);
-//     background-color: #333;
-//     color: #fff;
-//     padding: 5px;
-//     border-radius: 3px;
-//     opacity: 0.8;
-//     font-size: 14px;
-//     white-space: nowrap;
-//   }
-// `;
-
 export const ButtonCreateConv = styled.button`
   background-color: #222222;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   font-size: 20px;
+  font-family: 'Anta';
   border-radius: 10px;
   height: 50px;
   width: 130px;
@@ -337,26 +313,26 @@ const messageCommonStyles = css`
   border-radius: 5px;
   padding: 4px 7px;
   position: relative;
-  margin: 2px;
+  margin: 3px;
   min-height: 60px;
-  max-width: 250px;
   word-wrap: break-word;
 `;
 
 export const MessageContainerStyle = styled.div`
   ${messageCommonStyles}
   margin-left: 2%;
+  width: 50%;
 `;
 
 export const MessageContainerPersonnalStyle = styled.div`
   ${messageCommonStyles}
-  margin-left: 75%;
+  margin: 3px 2% 3px 48%;
+  width: 50%;
 `;
 
 export const MessageInputFieldStyle = styled.div`
   display: flex;
   position: fixed;
-  // background: red;
   bottom: 20px;
   left: 330px;
   right: 0;
@@ -378,7 +354,8 @@ export const MessageInputTextArea = styled.textarea`
   padding: 5px;
   border: none;
   color: white;
-  font-size: 16px;
+  font-size: 17px;
+  // font-family: 'Anta';
   resize: none;
   overflow: hidden;
   width: 85%;

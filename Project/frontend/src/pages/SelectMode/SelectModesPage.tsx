@@ -55,16 +55,18 @@ const SelectModePage = () => {
     }
 
     return (
-        <div className="mode-selection">
-            {!ongoingGameId && (
-                <>
-                    <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
-                    <button className="mode-button power-pong-mode" onClick={handlePowerPongModeClick}>POWER PONG</button>
-                </>
-            )}
-            {ongoingGameId && (
-                <button className="mode-button reconnect-button" onClick={handleReconnectClick}>RECONNECT</button>
-            )}
+        <div className='mode-selection-container'>
+            <div className="mode-selection">
+                {!ongoingGameId && (
+                    <>
+                        <button className="mode-button classic-mode" onClick={handleClassicModeClick}>CLASSIC</button>
+                        <button className="mode-button power-pong-mode" onClick={handlePowerPongModeClick}>POWER PONG</button>
+                    </>
+                )}
+                {ongoingGameId && (
+                    <button className="mode-button reconnect-button" onClick={handleReconnectClick}>RECONNECT</button>
+                )}
+            </div>
         </div>
     );
 };

@@ -205,23 +205,63 @@
 	}
 }
 
+.TwoFA-off-container {
+	background-color: #222222CC;
+	backdrop-filter: blur(2px);
+	padding: 5px;
+	border-radius: 10px;
+	width: 500px;
+	& h1 {
+		font-family: 'Anta';
+		font-size: 22px;
+		text-transform: none;
+		font-weight: 500;
+	}
+}
 
-.TwoFA-form-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 700px;
-	height: 100vh;
-	margin: 0 auto;
+.Disable-2FA {
+	padding: 10px;
+	background-color: #222222;
+	color: #fff;
+	display: block;
+	margin: 0px auto 10px;
+	text-align: center;
+	border-radius: 10px;
+	transition: background-color 0.3s ease;
+}
+
+.Disable-2FA:hover {
+	background-color: #363636;
+}
+
+.start-2FA-setup {
+	padding: 10px;
+	background-color: #222222;
+	color: #fff;
+	display: block;
+	margin: 0px auto;
+	text-align: center;
+	border-radius: 10px;
+	transition: background-color 0.3s ease;
+}
+
+.start-2FA-setup {
+	background-color: #363636;
 }
 
 .TwoFA-content-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	margin: 0 auto;
+	background-color: #222222CC;
+	backdrop-filter: blur(2px);
+	padding: 10px;
+	border-radius: 10px;
+	width: 500px;
+	& h1 {
+		font-family: 'Anta';
+		font-size: 26px;
+		text-transform: none;
+		margin: 10px;
+		font-weight: 500;
+	}
 }
 
 .TwoFA-content-container-QR {
@@ -234,6 +274,18 @@
 .TwoFA-content-container-QR > * {
 	margin: 20px 0;
 }
+
+.auth-code {
+	position: relative;
+	font-size: 17px;
+	border: none;
+	outline: none;
+	background-color: #ebebeb;
+}
+
+/* .auth-code-container {
+    padding: 5px 40px;
+} */
 
 .input-login-container {
     margin-top: 10px;
@@ -311,8 +363,9 @@
 .zagolovok {
 	color: #fff;
 	text-align: center;
-	font-size: 36px;
-	font-family:Arial, Helvetica, sans-serif;
+	font-size: 32px;
+	letter-spacing: 2px;
+	font-family: 'Anta';
 	margin-top: 30px;
 }
 
@@ -332,7 +385,7 @@
 	background-color: #222222CC;
 	backdrop-filter: blur(6px);
 	border-radius: 10px;
-	width: 430px;
+	width: 350px;
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
@@ -344,15 +397,17 @@
 	text-transform: uppercase;
 	margin-bottom: 15px;
 	display: flex;
+	font-family: 'Anta';
 	flex-direction: column;
 	align-items: center;
 	justify-content: center; 
 }
 
 .member-list-container p {
-	margin-bottom: 30px;
+	margin-bottom: 10px;
 	color: white;
 	font-size: 15px;
+	font-family: 'Anta';
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -368,15 +423,16 @@
 .username-button {
 	display: block;
 	width: 100%;
-	padding: 15px 5px;
+	padding: 10px;
 	margin: 5px;
-	font-size: 16px;
+	font-size: 17px;
+	font-family: 'Anta';
 	font-weight: bold;
 	text-align: center;
 	text-decoration: none;
 	cursor: pointer;
 	color: white;
-	border-radius: 5px;
+	border-radius: 10px;
 	transition: background-color 0.3s, ease;
 }
 
@@ -384,23 +440,56 @@
 	background-color: #363636;
 }
 
-/* To disable the password */
-.disable-password-checkbox {
-	display: flex;
-	align-items: center;
-	margin-top: 10px;
-	color: white;
-}
-
-.disable-password-checkbox label {
-	margin-left: 5px;
-	user-select: none;
+.toggler-wrapper {
+	display: block;
+	margin: 15px 100px 5px;
+	width: 45px;
+	height: 25px;
 	cursor: pointer;
-	color: white;
+	position: relative;
 }
 
-.disable-password-checkbox input {
-	margin-right: 5px;
+.toggler-wrapper input[type="checkbox"] {
+	display: none;
+}
+
+.toggler-wrapper input[type="checkbox"]:checked+.toggler-slider {
+	background-color: #b144cc;
+}
+
+.toggler-wrapper .toggler-slider {
+	background-color: #bb6ece;
+	position: absolute;
+	border-radius: 100px;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-transition: all 300ms ease;
+	transition: all 300ms ease;
+}
+
+.toggler-wrapper .toggler-knob {
+	position: absolute;
+}
+
+.toggler-wrapper.style-1 .toggler-knob {
+	width: calc(25px - 6px);
+	height: calc(25px - 6px);
+	border-radius: 50%;
+	left: 3px;
+	top: 3px;
+	background-color: #decfe2;
+}
+
+.toggle-name {
+	position: absolute;
+	bottom: 25px;
+	left: 170px;
+	font-size: 17px;
+	font-family: 'Anta';
+	font-weight: 100;
+	color: white;
 }
 
 .leave-confirmation-container {

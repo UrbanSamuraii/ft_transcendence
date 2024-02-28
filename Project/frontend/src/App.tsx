@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import SquareGame from './pages/Game/SquareGame';
-import Play from './pages/Play/Play';
 import SelectModePage from './pages/SelectMode/SelectModesPage';
 import HomePage from './pages/Home/HomePage';
 import { CSSProperties } from 'react';
@@ -38,31 +37,6 @@ interface RouteBackgroundStyles {
     [key: string]: React.CSSProperties;
 }
 
-const routeBackgroundStyles: RouteBackgroundStyles = {
-    '/': {
-        // background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
-        // // backgroundSize: 'cover',
-        // backgroundRepeat: 'no-repeat',
-        // backgroundPosition: 'center center',
-        // backgroundColor: '#1a1a1a',
-    },
-    '/game': { background: '#1a1a1a' },
-    '/add-user': { background: '#1a1a1a)' },
-    '/signup': { background: '#1a1a1a' },
-    '/Friends': { background: '#1a1a1a' },
-    '/login': {
-        background: "url('/HomeBackgroundRetro2.png')", // Note the quotes around the URL
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-    },
-    '/ConversationPage': { background: '#1a1a1a' },
-    '/ConversationChannelPage': { background: '#1a1a1a' },
-    '/TwoFAEnablingPage': { background: '#1a1a1a' },
-    '/TwoFADisablingPage': { background: '#1a1a1a' },
-    '/TwoFACodePage': { background: '#1a1a1a' },
-};
-
 function App() {
     const [backgroundStyle, setBackgroundStyle] = useState<CSSProperties>(defaultBackgroundStyle);
 
@@ -87,10 +61,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
     const navigate = useNavigate();
     const prevPathnameRef = useRef(location.pathname);
     const { user } = useAuth();
-
-    useEffect(() => {
-        setBackgroundStyle(routeBackgroundStyles[location.pathname] || defaultBackgroundStyle);
-    }, [location.pathname, setBackgroundStyle]);
 
     useEffect(() => {
         const previousPathname = prevPathnameRef.current;
@@ -139,7 +109,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
                     <Route path="/Friends" element={<FriendsPage />} />
                     <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
                     <Route path="/select-mode" element={<SelectModePage />} />
-                    {/* <Route path="/play" element={<Play onPlayClick={handlePlayClick} onSignOutClick={handleSignoutClick} onTurnOn2FA={TurnOn2FA} onTurnOff2FA={TurnOff2FA} onConversations={GoToConversations} />} /> */}
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
                     <Route path="/@/:username" element={<Profile />} />

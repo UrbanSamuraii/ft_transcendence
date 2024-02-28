@@ -38,9 +38,7 @@ function Navbar() {
             <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
             <div className="navbar-left">
                 <div className='navbar-button'>
-                    <Link to="/" className="navbar-logo">
-                        {/* <i className='bx bxs-tennis-ball' ></i> */}
-                    </Link>
+                    <Link to="/" className="navbar-logo"></Link>
                 </div>
             </div>
             <div className="navbar-center">
@@ -70,7 +68,7 @@ function Navbar() {
                     </div>
                 ) : (
                     <div className='navbar-button'>
-                        <button onClick={() => navigate('/login')}>SIGN IN</button>
+                        <button onClick={() => navigate('/signup')}>SIGN IN</button>
                     </div>
                 )}
             </div>

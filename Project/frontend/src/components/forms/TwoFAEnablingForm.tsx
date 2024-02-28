@@ -44,22 +44,24 @@ export const TwoFAEnablingForm = () => {
     }
 
     return (
-        <form className="TwoFA-form-container">
+        <form>
             <div className="TwoFA-content-container">
-                <Text2FA>Two-Factor Authentication Setup</Text2FA>
+                <h1>Two-Factor Authentication Setup</h1>
                 {error && <div className="error-message">{error}</div>} {/* Display error message */}
                 {!qrCodeUrl && (
-                    <Button2FA type="button" onClick={handleSetupClick}>Start 2FA Setup</Button2FA>
+                    <button className='start-2FA-setup' type="button" onClick={handleSetupClick}>Start 2FA Setup</button>
                 )}
                 {qrCodeUrl && (
                     <div className="TwoFA-content-container-QR">
                         <img src={qrCodeUrl} alt="QR Code" />
+                        <div className='auth-code-container'>
                         <input
+                            className='auth-code'
                             type="text"
                             placeholder="Authentication Code"
                             value={authenticationCode}
-                            onChange={(e) => setAuthenticationCode(e.target.value)} />
-                        <Button2FA type="button" onClick={handleEnableClick}>Enable 2FA</Button2FA>
+                            onChange={(e) => setAuthenticationCode(e.target.value)} /></div>
+                        <button className='start-2FA-setup' type="button" onClick={handleEnableClick}>Enable 2FA</button>
                     </div>
                 )}
             </div>

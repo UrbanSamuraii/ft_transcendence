@@ -35,7 +35,7 @@ export const TwoFACodeForm = () => {
     }
 
     return (
-        <form className="TwoFA-form-container">
+        <form>
             <div className="TwoFA-content-container">
                 <Text2FA>Please enter your Two-Factor Authentication code</Text2FA>
                 <input

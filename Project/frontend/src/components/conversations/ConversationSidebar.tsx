@@ -27,7 +27,7 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
 
     const [lastMessageDeletedMap, setLastMessageDeletedMap] = useState<Record<string, boolean>>({});
     const chatSocketContextData = useSocket();
-    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();  
+    const { isLastMessageDeleted, setLastMessageDeleted, conversationId } = useSocket();
 
     useEffect(() => {
         chatSocketContextData?.socket?.on('onDeleteLastMessage', (deletedMessage: ConversationMessage) => {
@@ -58,14 +58,16 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
             setShowModalUnblock(true);
         }
     };
-      
+
     const openMenu = () => {
         setShowMenuModal(true);
     };
-      
+
     const closeMenu = () => {
         setShowMenuModal(false);
     };
+
+    const colors = ['#9b59b6', '#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#1abc9c'];
 
     return (
         <div className='chat'>
@@ -107,9 +109,9 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
                 <ConversationSidebarContainer>
                     {conversations.map((conversation) => (
                         <ConversationSidebarItem key={conversation.id} onClick={() => navigate(`/ConversationPage/channel/${conversation.id}`)}>
-                            <div className='conversationAvatar'>
+                            <div className="conversationAvatar" style={{ backgroundColor: colors[conversation.id % colors.length] }}>
                             <i className='bx bxs-ghost'></i>
-                            </ div>
+                            </div>
                             <ConversationSidebarTexts>
                                 <div className="conversationName">
                                     <div> <span>{conversation.name || conversation.members[0].username}</span> </div>

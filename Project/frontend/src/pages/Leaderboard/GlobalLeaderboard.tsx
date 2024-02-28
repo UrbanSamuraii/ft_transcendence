@@ -31,39 +31,41 @@ function GlobalLeaderboard() {
     );
 
     return (
-        <div>
+        <div className='leaderboard-background'>
             <h1>Global Leaderboard</h1>
-            <input
-                type="text"
-                placeholder="Search by username..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="search-input"
-            />
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>ELO Rating</th>
-                        <th>Wins</th>
-                        <th>Losses</th>
-                        <th>Win %</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredLeaderboard.map((user, index) => (
-                        <tr key={user.username}>
-                            <td>{index + 1}</td>
-                            <td>{user.username}</td>
-                            <td>{user.eloRating}</td>
-                            <td>{user.totalGamesWon}</td>
-                            <td>{user.totalGamesLost}</td>
-                            <td>{user.winPercentage}%</td>
+            <div className='search-input-container'>
+                <input
+                    className="search-input"
+                    placeholder="Search by username..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                /></div>
+                <div className='leaderboard-container'>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>ELO Rating</th>
+                            <th>Wins</th>
+                            <th>Losses</th>
+                            <th>Win Rate</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filteredLeaderboard.map((user, index) => (
+                            <tr key={user.username}>
+                                <td>{index + 1}</td>
+                                <td>{user.username}</td>
+                                <td>{user.eloRating}</td>
+                                <td>{user.totalGamesWon}</td>
+                                <td>{user.totalGamesLost}</td>
+                                <td>{user.winPercentage}%</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
