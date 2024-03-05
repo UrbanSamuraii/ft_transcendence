@@ -11,6 +11,7 @@ import { useAuth } from '../utils/hooks/useAuthHook';
 import { useSocket } from '../SocketContext';
 import { OverlayStyle, OverlayContent } from '../utils/styles';
 import OutsideClickHandler from 'react-outside-click-handler';
+import './ConversationPage.css'
 
 type GameInviteData = {
     target: string;
@@ -153,9 +154,11 @@ export const ConversationChannelPage = () => {
                     }}>
                         <OverlayContent>
                             <div className="game-invite-interface">
-                                <p>You have received a game invite!</p>
-                                <button onClick={handleAcceptGameInvite}>Yes</button>
-                                <button onClick={handleRefuseGameInvite}>No</button>
+                                <h2>You have received a game invite!</h2>
+                                <div className="button-container">
+                                    <button className="yes-button" onClick={handleAcceptGameInvite}>Accept</button>
+                                    <button className="no-button" onClick={handleRefuseGameInvite}>decline</button>
+                                </div>
                             </div>
                         </OverlayContent>
                     </OutsideClickHandler>

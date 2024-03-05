@@ -8,6 +8,7 @@ import { useEffect, useState, useContext } from 'react';
 import { getConversations } from '../utils/hooks/getConversations';
 import { useSocket } from '../SocketContext';
 import { useAuth } from '../utils/hooks/useAuthHook';
+import './ConversationPage.css'
 
 type GameInviteData = {
     target: string;
@@ -31,7 +32,6 @@ export const ConversationPage = () => {
 
     useEffect(() => {
         const fetchConversations = async () => {
-            // console.log("ConversationPage WORKING ON");
             try {
                 const prismaConversations = await getConversations();
                 setPrismaConversations(prismaConversations);
@@ -46,7 +46,6 @@ export const ConversationPage = () => {
         }
 
         fetchConversations();
-        // displayGameInvite();
 
         chatSocketContextData?.socket?.on('onNewMessage', fetchConversations);
         chatSocketContextData?.socket?.on('onJoinRoom', fetchConversations);
@@ -66,10 +65,8 @@ export const ConversationPage = () => {
         const displayGameInvite = (data: any) => {
             setShowGameInvite(true);
             setGameInviteData(data);
-            // console.log(data.target);
         }
 
-        // displayGameInvite();
         chatSocketContextData?.socket?.on('inviteGame', displayGameInvite);
         return () => {
             chatSocketContextData?.socket?.off('inviteGame', displayGameInvite);
@@ -116,13 +113,15 @@ export const ConversationPage = () => {
             <ConversationSidebar conversations={prismaConversations} />
             {!id && <ConversationPanel />}
 
-            {showGameInvite && (
+            {/* {showGameInvite && (
                 <div className="game-invite-interface">
-                    <p>You have received a game invite!</p>
-                    <button onClick={handleAcceptGameInvite}>Yes</button>
-                    <button onClick={handleRefuseGameInvite}>No</button>
+                    <h2>You have received a game invite!</h2>
+                    <div className="button-container">
+                        <button className='yes-button' onClick={handleAcceptGameInvite}>accept</button>
+                        <button className='no-button' onClick={handleRefuseGameInvite}>decline</button>
+                    </div>
                 </div>
-            )}
+            )} */}
 
             <Outlet />
         </Page>
