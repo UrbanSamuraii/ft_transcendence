@@ -30,6 +30,7 @@
     background-color: transparent;
     padding: 0.25rem 0.7rem;
     font-size: 18px;
+    font-family: 'Anta';
     cursor: pointer;
     transition: transform 0.3s ease;
 }

@@ -245,7 +245,7 @@
 	transition: background-color 0.3s ease;
 }
 
-.start-2FA-setup {
+.start-2FA-setup:hover {
 	background-color: #363636;
 }
 

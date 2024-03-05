@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import './Profile.css'
 import { useAuth } from '../../utils/hooks/useAuthHook';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
@@ -10,7 +10,6 @@ function Profile() {
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
     const { user } = useAuth();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -24,7 +23,6 @@ function Profile() {
                 if (response.ok) {
                     setUserInfo(data);
                 } else {
-                    navigate(`/404`);
                     console.error('Failed to fetch user info:', data.error);
                 }
             } catch (error) {
@@ -35,7 +33,6 @@ function Profile() {
         if (username) {
             fetchUserInfo();
         }
-
     }, [username]);
 
     const changeNickname = () => {
@@ -81,15 +78,15 @@ function Profile() {
     const getEloRank = (eloRating: number): string => {
         if (eloRating < 1000 || totalGamesPlayed === 0) {
             return 'just beginning';
-        } else if (eloRating < 1100) {
+        } else if (eloRating < 1010) {
             return 'getting there';
-        } else if (eloRating < 1200) {
+        } else if (eloRating < 1020) {
             return 'rock solid';
-        } else if (eloRating < 1300) {
+        } else if (eloRating < 1030) {
             return 'got swagger';
-        } else if (eloRating < 1400) {
+        } else if (eloRating < 1040) {
             return 'the hotness';
-        } else if (eloRating < 1500) {
+        } else if (eloRating < 1050) {
             return 'simply amazing';
         } else {
             return 'pinnacle of awesomeness';
@@ -179,11 +176,13 @@ function Profile() {
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
                     <div className="more-info">
+                        <div className='more-info-header'>
                         <h1>{userInfo.username}</h1>
                         {user && user.username === username && (
                             <button className="edit-profile-name" onClick={changeNickname}>
                                 <i className='bx bxs-pencil'></i></button>
                         )}
+                        </div>
                         <Link to={`/signout`} className="signout-button">
                             <i className='bx bx-exit'></i></Link>
                         <div className='separator'></div>

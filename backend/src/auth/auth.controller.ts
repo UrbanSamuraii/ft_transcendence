@@ -1,6 +1,6 @@
 import {
     Controller, Get, UseGuards, Req, Post, UseInterceptors, UploadedFile, HttpException, HttpStatus,
-    Res, Request, Param
+    Res, Request, Param, Query
 } from '@nestjs/common';
 import { AuthService } from "./auth.service";
 import { Jwt2faAuthGuard } from 'src/auth/guard';
@@ -21,14 +21,21 @@ export class AuthController {
         private prisma: PrismaService // Inject Prisma service here
     ) { }
 
+    @Get("hello")
+    async helloworld(){
+        console.log("hello world ici la")
+        return ("");
+    }
     @UseGuards(FortyTwoAuthGuard)
     @Get('signup42')
     async FortyTwoLogin() { }
 
-    @UseGuards(FortyTwoAuthGuard)
+    // @UseGuards(FortyTwoAuthGuard)
     @Get('sign42')
-    async FortyTwoRedirect(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-        return (await this.authService.forty2signup(req, res));
+    async FortyTwoRedirect(@Query("code") code: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
+        console.log("je suis ds le sign42")
+        console.log("my code is", code);
+        return (await this.authService.forty2signup(code, req, res));
     }
 
     @Post('signup')

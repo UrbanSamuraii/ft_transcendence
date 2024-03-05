@@ -217,18 +217,21 @@ body {
     background-color: var(--text-color-hover);
 }
 
+.more-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .edit-profile-name {
     color: var(--text-color-main);
     border-radius: 10px;
-    position: absolute;
-    right: 145px;
-    top: 20px;
+    margin-left: 5px;
+    margin-top: 18px;
     transition: scale 0.3s ease;
 }
 
 .edit-profile-name i {
-    position: relative;
-    align-items: center;
     font-size: 1.2rem;
 }
 

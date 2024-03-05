@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
-import { empty } from '@prisma/client/runtime/library';
-import { InputContainerChat, InputFieldCCF, InputLabelChat } from '../../utils/styles';
+// import { empty } from '@prisma/client/runtime/library';
+import { InputFieldCCF } from '../../utils/styles';
 
 interface InvitationBarContainerProps {
   visible: boolean;

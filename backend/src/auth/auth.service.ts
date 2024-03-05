@@ -3,6 +3,7 @@ import {
     UnauthorizedException, HttpStatus, HttpCode, InternalServerErrorException,
     Logger, UseFilters,
     NotFoundException,
+    Query,
 } from "@nestjs/common";
 import { PrismaClient, User } from '@prisma/client';
 import { PrismaService } from "../prisma/prisma.service";
@@ -16,6 +17,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { UserNotFoundException } from '../common/custom-exception/user-not-found-exception';
 import { PrismaExceptionFilter } from "src/common/filters/prisma-exception.filter";
+import axios from "axios";
 // import { pick } from 'lodash';
 // import * as cookie from 'cookie'; // Import the cookie library
 
@@ -250,20 +252,79 @@ export class AuthService {
         }
     }
 
-    async forty2signup(@Req() req, @Res() res: ExpressResponse) {
+    async getUserFrom42(token: string): Promise<any> {
+        const userDataResponse = await axios.get("https://api.intra.42.fr/v2/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // console.log("DATA RESPONSE ", userDataResponse.data)
+        return userDataResponse.data;;
+        // const userDto = fillUser(userDataResponse);
+        // if (userDto) {
+        //   return userDto;
+        // }
+        throw new Error("User not found");
+      }
+
+    async getToken(code: string): Promise<any> {
+
+        console.log("UID", process.env.UID_42_API)
+        console.log("SECRET", process.env.SECRET_42_API)
+        console.log("REDIRECT", process.env.REDIRECT_URI)
+        console.log("CODE", code)
+
+        const token = await axios
+          .post("https://api.intra.42.fr/oauth/token", null, {
+            params: {
+              grant_type: "authorization_code",
+              client_id: process.env.UID_42_API,
+              client_secret: process.env.SECRET_42_API,
+              code: code,
+              redirect_uri: process.env.REDIRECT_URI,
+            },
+          })
+          .then((response) => {
+            return response;
+          })
+          .catch((error) => {
+            return error;
+          });
+        if (!token.data.access_token) {
+          throw new Error("token not found");
+        }
+        return token.data.access_token;
+      }
+
+
+    async forty2signup(@Query("code") code: string, @Req() req, @Res() res: ExpressResponse) {
         try {
-            if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
+            // if (!req.user) { return res.status(401).json({ message: "Unauthorized" }); }
+            const moha = await this.getToken(code);
+            const myuser = await this.getUserFrom42(moha)
 
-            const id42 = Number(req.user.id);
-            const email = req.user.emails[0]?.value || '';
-            const username = req.user.username;
-            const first_name = req.user.name.givenName;
-            const last_name = req.user.name.familyName;
-            const img_url = req.user.photos[0]?.value || '';
+            const id42 = Number(myuser.id);
+            console.log("ID42", id42)
+            const email = myuser.email || '';
+            console.log("EMAIL", email)
+            const username = myuser.login;
+            console.log("USERNAME", username)
+            const first_name = myuser.first_name;
+            console.log("FIRST NAME", first_name)
+            const last_name = myuser.last_name;
+            console.log("LAST NAME", last_name)
+            const img_url = myuser.image.versions.medium || '';
+            console.log("IMG URL", img_url)
 
-            const existingUser = await this.userService.getUser({ email });
+            const existingUser = await this.prisma.user.findUnique({
+                where: { email: email }
+            });
 
+
+            // const existingUser = await this.userService.getUserByEmail(email );
             if (!existingUser) {
+                console.log("USER DOES NOT EXIST")
                 const user = await this.userService.createUser({
                     id42,
                     email,
@@ -287,6 +348,7 @@ export class AuthService {
                 res.redirect(`http://${server_adress}:3000/`);
             }
             else {
+                console.log("USER EXISTS")
                 const user = await this.userService.getUser({ email });
                 if (user.is_two_factor_activate == false) {
                     const accessToken = await this.signToken(user.id, user.email);
