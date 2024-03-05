@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './Profile.css'
 import { useAuth } from '../../utils/hooks/useAuthHook';
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
@@ -10,6 +10,9 @@ function Profile() {
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
     const { user } = useAuth();
+    const [newNickname, setNewNickname] = useState('');
+    const [isEditingNickname, setIsEditingNickname] = useState(false);
+    const navigate = useNavigate(); // Hook for programmatically navigating
     const isOwner = user && user.username === username;
     const marginLeft = isOwner ? "150px" : "120px";
 
@@ -37,8 +40,32 @@ function Profile() {
         }
     }, [username]);
 
-    const changeNickname = () => {
+    const changeNickname = async () => {
+        if (!newNickname) {
+            alert('Please enter a nickname.');
+            return;
+        }
 
+        try {
+            // Adjust the URL to use query parameters for newNickname
+            const response = await fetch(`http://${server_adress}:3001/auth/change-nickname?newNickname=${encodeURIComponent(newNickname)}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                alert('Nickname changed successfully!');
+                // Update local state or re-fetch userInfo to reflect the change
+                navigate(`/`);
+                // navigate(`/profile/${encodeURIComponent(newNickname)}`);
+                setUserInfo((prev) => ({ ...prev, username: newNickname }));
+            } else {
+                const errorData = await response.json();
+                alert(`Failed to change nickname: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error changing nickname:', error);
+        }
     };
 
     const toggleTheme = () => {
@@ -166,24 +193,38 @@ function Profile() {
                     <div className={`user-card ${theme}`}>
                         <div className="level">{getEloRank(+userInfo.eloRating)}</div>
                         <div className='profile-picture'>
-                        <img 
-                            src={userInfo.img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"} 
-                            className="rounded-image" width="135" height="135" alt="User avatar" 
-                            onClick={user && user.username === username ? (() => fileInputRef.current?.click()) : undefined}
-                            style={{ cursor: user && user.username === username ? 'pointer' : 'default' }}/>
-                        <input 
-                            type="file" ref={fileInputRef} style={{ display: 'none' }} 
-                            accept=".png" onChange={handleAvatarChange} />
+                            <img
+                                src={userInfo.img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png"}
+                                className="rounded-image" width="135" height="135" alt="User avatar"
+                                onClick={user && user.username === username ? (() => fileInputRef.current?.click()) : undefined}
+                                style={{ cursor: user && user.username === username ? 'pointer' : 'default' }} />
+                            <input
+                                type="file" ref={fileInputRef} style={{ display: 'none' }}
+                                accept=".png" onChange={handleAvatarChange} />
                         </div>
                         <div className="points">{userInfo.eloRating}</div>
                     </div>
                     <div className="more-info">
                         <div className='more-info-header'>
-                        <h1>{userInfo.username}</h1>
-                        {user && user.username === username && (
-                            <button className="edit-profile-name" onClick={changeNickname}>
-                                <i className='bx bxs-pencil'></i></button>
-                        )}
+                            <h1>{userInfo.username}</h1>
+                            {user && user.username === username && (
+                                <button className="edit-profile-name" onClick={() => setIsEditingNickname(!isEditingNickname)}>
+                                    <i className='bx bxs-pencil'></i>
+                                </button>
+                            )}
+                            {isEditingNickname && (
+                                <div className="edit-nickname-form">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter new nickname"
+                                        value={newNickname}
+                                        onChange={(e) => setNewNickname(e.target.value)}
+                                    />
+                                    <button className="submit-nickname-change" onClick={changeNickname}>
+                                        Change Nickname
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <Link to={`/signout`} className="signout-button">
                             <i className='bx bx-exit'></i></Link>
@@ -223,10 +264,10 @@ function Profile() {
                     </div>
                     {user && user.username === username && (
                         <div>
-                        <Link to={`/2fa-enable`} className="twoFA-button twoFA-button-on">
-                        2FA on</Link>
-                        <Link to={`/2fa-disable`} className="twoFA-button twoFA-button-off">
-                        2FA off</Link>
+                            <Link to={`/2fa-enable`} className="twoFA-button twoFA-button-on">
+                                2FA on</Link>
+                            <Link to={`/2fa-disable`} className="twoFA-button twoFA-button-off">
+                                2FA off</Link>
                         </div>
                     )}
                     {user && user.username === username && (
