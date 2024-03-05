@@ -1,6 +1,6 @@
 import {
     Controller, Get, UseGuards, Req, Post, UseInterceptors, UploadedFile, HttpException, HttpStatus,
-    Res, Request, Param, Query
+    Res, Request, Param, Query, Body
 } from '@nestjs/common';
 import { AuthService } from "./auth.service";
 import { Jwt2faAuthGuard } from 'src/auth/guard';
@@ -155,9 +155,7 @@ export class AuthController {
     }
 
     @Post('change-nickname')
-    async changeNickname(@Req() req, @Res() res: ExpressResponse) {
-        const newNickname = req.query.newNickname as string;
-
+    async changeNickname(@Req() req, @Body('newNickname') newNickname: string): Promise<any> {
         if (!newNickname) {
             throw new HttpException('New nickname not provided', HttpStatus.BAD_REQUEST);
         }
@@ -168,7 +166,7 @@ export class AuthController {
         }
 
         await this.userService.changeUserNickname(user.id, newNickname);
-        return res.status(200);
+        return { message: 'Nickname changed successfully' };
     }
 
     @Get('match-history/:username')
