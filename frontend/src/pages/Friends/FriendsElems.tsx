@@ -74,7 +74,7 @@ const ContextMenuButton = styled.button`
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  background-color: #ff00009c;
+  background-color: #ad1f1f;
   color: white;
   border: none;
   padding: 5px;

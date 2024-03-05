@@ -10,6 +10,8 @@ function Profile() {
     const { username = '' } = useParams(); // Extract the username from the URL
     const totalGamesPlayed = userInfo.totalGamesWon + userInfo.totalGamesLost; //example
     const { user } = useAuth();
+    const isOwner = user && user.username === username;
+    const marginLeft = isOwner ? "150px" : "120px";
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -216,7 +218,7 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        <Link to={`/@/${username}/match-history`} className="leaderboard-button">
+                        <Link to={`/@/${username}/match-history`} className="leaderboard-button" style={{ marginLeft: marginLeft }}>
                             Match History</Link>
                     </div>
                     {user && user.username === username && (
