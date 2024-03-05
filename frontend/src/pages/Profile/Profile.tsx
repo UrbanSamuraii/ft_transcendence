@@ -47,17 +47,19 @@ function Profile() {
         }
 
         try {
-            // Adjust the URL to use query parameters for newNickname
-            const response = await fetch(`http://${server_adress}:3001/auth/change-nickname?newNickname=${encodeURIComponent(newNickname)}`, {
+            const response = await fetch(`http://${server_adress}:3001/auth/change-nickname`, {
                 method: 'POST',
                 credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ newNickname })
             });
 
+            console.log(response);
             if (response.ok) {
-                alert('Nickname changed successfully!');
-                // Update local state or re-fetch userInfo to reflect the change
-                navigate(`/`);
-                // navigate(`/profile/${encodeURIComponent(newNickname)}`);
+                navigate(`/@/${encodeURIComponent(newNickname)}`);
+                setIsEditingNickname(false); // Close the form upon successful nickname change
                 setUserInfo((prev) => ({ ...prev, username: newNickname }));
             } else {
                 const errorData = await response.json();
@@ -156,21 +158,20 @@ function Profile() {
     const uploadAvatar = async (file: File, username: string) => {
         const formData = new FormData();
         formData.append('avatar', file);
-        formData.append('username', username); // Include the username
+        formData.append('username', username);
 
         try {
             const response = await fetch(`http://${server_adress}:3001/auth/upload-avatar`, {
                 method: 'POST',
-                credentials: 'include', // To send cookies along with the request
-                body: formData // Automatically sets `Content-Type: multipart/form-data`
+                credentials: 'include',
+                body: formData
             });
 
             const data = await response.json();
             if (response.ok) {
-                // Refresh user information after successful avatar upload
                 setUserInfo((prevUserInfo) => ({
                     ...prevUserInfo,
-                    img_url: data.fileUrl // Update img_url with the new URL
+                    img_url: data.fileUrl
                 }));
                 console.log(data.fileUrl);
             } else {
