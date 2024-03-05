@@ -12,17 +12,16 @@ function Profile() {
     const { user } = useAuth();
     const [newNickname, setNewNickname] = useState('');
     const [isEditingNickname, setIsEditingNickname] = useState(false);
-    const navigate = useNavigate(); // Hook for programmatically navigating
+    const navigate = useNavigate();
     const isOwner = user && user.username === username;
     const marginLeft = isOwner ? "150px" : "120px";
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                // Use the username from the URL in the API request
                 const response = await fetch(`http://${server_adress}:3001/auth/user-info/${username}`, {
                     method: 'GET',
-                    credentials: 'include' // To send cookies along with the request
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -59,7 +58,7 @@ function Profile() {
             console.log(response);
             if (response.ok) {
                 navigate(`/@/${encodeURIComponent(newNickname)}`);
-                setIsEditingNickname(false); // Close the form upon successful nickname change
+                setIsEditingNickname(false);
                 setUserInfo((prev) => ({ ...prev, username: newNickname }));
             } else {
                 const errorData = await response.json();
