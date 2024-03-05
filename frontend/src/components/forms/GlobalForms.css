@@ -495,10 +495,14 @@
 .leave-confirmation-container {
 	background-color: #222222CC;
 	backdrop-filter: blur(6px);
-	padding: 20px;
-	max-width: 430px;
+	padding: 15px;
+	max-width: 500px;
 	border-radius: 10px;
 	text-align: center;
+	font-family: 'Anta';
+	& h2 {
+		font-weight: 500;
+	}
 }
 
 .button-container {

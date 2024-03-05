@@ -12,7 +12,6 @@
     z-index: 1;
     font-family: 'Anta';
     & :last-child {
-		color: white;
         text-decoration: none;
 	}
 }
@@ -44,10 +43,14 @@
     font-weight: bold;
 }
 
-.has-invitations .invitation-star {
-    color: yellow;
-    font-size: 14px;
-    margin-left: 1px; /* Adjust as needed for spacing */
+.star {
+    position: absolute;
+    top: 6px;
+    left: 75px;
+    font-size: 17px;
+    & i {
+        color: #cf73f3;
+    }
 }
 
 .navbar-button:hover {

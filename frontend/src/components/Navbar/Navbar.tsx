@@ -54,7 +54,9 @@ function Navbar() {
                             <Link to="/friends">
                                 Friends
                                 {hasInvitations && (
-                                    <span className="invitation-star">&#9733;</span>
+                                    <div className='star'>
+                                    <i className='bx bxs-star'></i>
+                                    </div>
                                 )}
                             </Link>
                         </div>

@@ -1,0 +1,37 @@
+.game-invite-interface {
+    color: white;
+	background-color: #222222CC;
+	backdrop-filter: blur(6px);
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-family: 'Anta';
+    z-index: 1000;
+    & h2 {
+        font-weight: 500;
+        font-size: 24px;
+    }
+}
+
+.button-container {
+	display: flex;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+.yes-button, .no-button {
+	background-color: #222222;
+    text-transform: uppercase;
+	color: white;
+	padding: 10px 20px;
+	margin: 0 5px;
+	cursor: pointer;
+    font-family: 'Anta';
+	font-weight: 600;
+	border-radius: 10px;
+	transition: background-color 0.3s;
+}
+
+.yes-button:hover, .no-button:hover {
+	background-color: #363636;
+}
