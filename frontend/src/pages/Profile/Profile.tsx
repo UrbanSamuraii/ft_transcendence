@@ -215,13 +215,14 @@ function Profile() {
                             {isEditingNickname && (
                                 <div className="edit-nickname-form">
                                     <input
+                                        className='new-nickname-input'
                                         type="text"
                                         placeholder="Enter new nickname"
                                         value={newNickname}
                                         onChange={(e) => setNewNickname(e.target.value)}
                                     />
                                     <button className="submit-nickname-change" onClick={changeNickname}>
-                                        Change Nickname
+                                    <i className='bx bxs-save'></i>
                                     </button>
                                 </div>
                             )}

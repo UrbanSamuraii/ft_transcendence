@@ -361,3 +361,44 @@ body {
     border-top: 1px solid var(--text-color-dark);
     margin: 10px 10px;
 }
+
+.edit-nickname-form {
+    top: 8px;
+    position: absolute;
+    width: 80%;
+    margin-right: 15%;
+    background-color: #ff0000;
+}
+
+.new-nickname-input {
+    position: absolute;
+    width: 90% !important;
+    height: 40px;
+    padding: 10px;
+    font-size: 17px;
+    outline: none;
+    border-radius: 10px !important;
+    color: white !important;
+    text-align: center;
+    background-color: var(--text-color-accent);
+    border: none !important;
+    z-index: 10;
+}
+
+.submit-nickname-change {
+    position: absolute;
+    margin-left: 82%;
+    width: 60px;
+    height: 40px;
+    background-color: var(--text-color-main);
+    border-radius: 10px;
+    & i {
+        color: var(--text-color-accent);
+        padding: 8px 30px;
+        font-size: 25px;
+    }
+}
+
+.submit-nickname-change:hover {
+    background-color: var(--text-color-hover);
+}
