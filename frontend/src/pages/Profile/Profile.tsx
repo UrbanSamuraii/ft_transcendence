@@ -13,6 +13,8 @@ function Profile() {
     const [newNickname, setNewNickname] = useState('');
     const [isEditingNickname, setIsEditingNickname] = useState(false);
     const navigate = useNavigate(); // Hook for programmatically navigating
+    const isOwner = user && user.username === username;
+    const marginLeft = isOwner ? "150px" : "120px";
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -257,7 +259,7 @@ function Profile() {
                         <div className='skill-bar'>
                             <div className='skill-per' style={getSkillBarWidth()}></div>
                         </div>
-                        <Link to={`/@/${username}/match-history`} className="leaderboard-button">
+                        <Link to={`/@/${username}/match-history`} className="leaderboard-button" style={{ marginLeft: marginLeft }}>
                             Match History</Link>
                     </div>
                     {user && user.username === username && (
