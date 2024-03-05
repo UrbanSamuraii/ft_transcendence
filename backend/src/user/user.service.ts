@@ -33,6 +33,20 @@ export class UserService {
         });
     }
 
+    async changeUserNickname(userId: number, newNickname: string): Promise<any> {
+        if (typeof newNickname !== 'string' || newNickname.length < 3 || newNickname.length > 20) {
+            throw new Error('Nickname must be a string between 3 and 20 characters.');
+        }
+
+        if (!/^[a-zA-Z0-9_.-]*$/.test(newNickname)) {
+            throw new Error('Nickname contains invalid characters. Allowed: letters, numbers, dots, underscores, and dashes.');
+        }
+
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { username: newNickname },
+        });
+    }
 
     async getUserByToken(token: string) {
         try {
@@ -273,22 +287,22 @@ export class UserService {
     async isAlreadyInvited(userId: number, targetId: number) {
         const invited = await this.prisma.user.findUnique({
             where: { id: userId },
-            include: { inviting: { where: { id: targetId }} },
-          });
-          return !!invited?.inviting.length;
+            include: { inviting: { where: { id: targetId } } },
+        });
+        return !!invited?.inviting.length;
     }
 
     async getInvitations(userId: number): Promise<User[] | null> {
-		const user = await this.prisma.user.findUnique({
-		  where: { id: userId },
-		  include: { invited_by: true },
-		});
-		if (user) {
-			const invitationList = user.invited_by;
-		    return invitationList; 
-		} 
-		else { return null; }
-	}
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { invited_by: true },
+        });
+        if (user) {
+            const invitationList = user.invited_by;
+            return invitationList;
+        }
+        else { return null; }
+    }
 
     async declineInvitation(userId: number, targetId: number) {
         const isFriend = await this.isAlreadyFriend(userId, targetId);
@@ -311,21 +325,25 @@ export class UserService {
 
         await this.prisma.user.update({
             where: { id: userId },
-            data: { friends: { connect: [{ id: targetId }] },
-                    invited_by: { disconnect: [{id: targetId}]} },
+            data: {
+                friends: { connect: [{ id: targetId }] },
+                invited_by: { disconnect: [{ id: targetId }] }
+            },
         });
         await this.prisma.user.update({
             where: { id: targetId },
-            data: { friends: { connect: [{ id: userId }] }},
+            data: { friends: { connect: [{ id: userId }] } },
         });
         await this.prisma.user.update({
             where: { id: targetId },
-            data: { friendOf: { connect: [{ id: userId }] },
-                    inviting: { disconnect: [{id: userId}]} },
+            data: {
+                friendOf: { connect: [{ id: userId }] },
+                inviting: { disconnect: [{ id: userId }] }
+            },
         });
         await this.prisma.user.update({
             where: { id: userId },
-            data: { friendOf: { connect: [{ id: targetId }] }},
+            data: { friendOf: { connect: [{ id: targetId }] } },
         });
         return true;
     }
@@ -356,25 +374,25 @@ export class UserService {
     async isAlreadyFriend(userId: number, targetId: number) {
         const friend = await this.prisma.user.findUnique({
             where: { id: userId },
-            include: { friends: { where: { id: targetId }} },
-          });
-          return !!friend?.friends.length;
+            include: { friends: { where: { id: targetId } } },
+        });
+        return !!friend?.friends.length;
     }
 
     async getUserFriendsList(userId: number): Promise<User[] | null> {
-		const user = await this.prisma.user.findUnique({
-		  where: { id: userId },
-		  include: { friends: true },
-		});
-		if (user) {
-			const friendsList = user.friends;
-		    return friendsList; 
-		} 
-		else { return null; }
-	}
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: { friends: true },
+        });
+        if (user) {
+            const friendsList = user.friends;
+            return friendsList;
+        }
+        else { return null; }
+    }
 
     // async getNbrOfFriends(userId: number) {
-	// 	const user = await this.prisma.user.findUnique({
+    // 	const user = await this.prisma.user.findUnique({
     //         where: { id: userId },
     //         include: { friends: true },
     //     });

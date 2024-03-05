@@ -22,7 +22,7 @@ export class AuthController {
     ) { }
 
     @Get("hello")
-    async helloworld(){
+    async helloworld() {
         console.log("hello world ici la")
         return ("");
     }
@@ -154,6 +154,23 @@ export class AuthController {
         return this.userService.getUserLeaderboard(username);
     }
 
+    @Post('change-nickname')
+    async changeNickname(@Req() req, @Res() res: ExpressResponse) {
+        const newNickname = req.query.newNickname as string;
+
+        if (!newNickname) {
+            throw new HttpException('New nickname not provided', HttpStatus.BAD_REQUEST);
+        }
+
+        const user = await this.userService.getUserByToken(req.cookies.token);
+        if (!user) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        await this.userService.changeUserNickname(user.id, newNickname);
+        return res.status(200);
+    }
+
     @Get('match-history/:username')
     async getMatchHistory(@Param('username') username: string, @Res() res: ExpressResponse) {
         try {
@@ -221,18 +238,12 @@ export class AuthController {
                 throw new HttpException('User not found', HttpStatus.NOT_FOUND);
             }
 
-            // Implement your logic to handle the file, save the path to the database, etc.
-            // For example, you can save the file path to the user's avatar field in the database.
             const filePath = `./uploads/${file.filename}`;
             const fileUrl = `${request.protocol}://${request.get('host')}/uploads/${file.filename}`;
             console.log(fileUrl)
-            // Update the user's avatar using the retrieved userId
-            // await this.userService.updateUserAvatar(userId, filePath);
             await this.userService.updateUserAvatar(userId, fileUrl); // Pass fileUrl instead of filePath
-            // return { message: 'File uploaded successfully', filePath: file.filename };
             return { message: 'File uploaded successfully', fileUrl }; // Return fileUrl in the response
         } catch (error) {
-            // Handle any errors that occur during file handling, user retrieval, or database update
             throw new HttpException('Error uploading file', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
