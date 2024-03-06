@@ -324,7 +324,6 @@ export class AuthService {
 
             // const existingUser = await this.userService.getUserByEmail(email );
             if (!existingUser) {
-                console.log("USER DOES NOT EXIST")
                 const user = await this.userService.createUser({
                     id42,
                     email,

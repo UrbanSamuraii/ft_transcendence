@@ -93,9 +93,11 @@ export class AuthController {
         return (await this.authService.turnOffTwoFactorAuthentication(req, res, user));
     }
 
-    @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated !
+    // @UseGuards(Jwt2faAuthGuard) // To make sure the user is authenticated !
     @Get('me')
     async getMe(@Request() req) {
+        if (!req.cookies.token)
+            return;
         const me = await this.userService.getUserByToken(req.cookies.token);
         delete me.hash;
         delete me.accessToken;
