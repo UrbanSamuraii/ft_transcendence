@@ -18,6 +18,7 @@ import { ImplementNewPasswordModal } from '../modals/ImplementNewPasswordModal';
 import { VerifyPasswordModal } from '../modals/VerifyPasswordModal';
 import { LeavingConversationModal } from '../modals/LeavingTheConversationModal';
 import { InviteToGameModal } from '../modals/InviteToGameModal';
+import { GoToProfileModal } from '../modals/GoToProfileModal';
 
 const server_adress = process.env.REACT_APP_SERVER_ADRESS;
 
@@ -82,6 +83,7 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
     const [showVerifyPasswordModal, setShowVerifyPasswordModal] = useState(false);
     const [showLeavingConversationModal, setShowLeavingConversationModal] = useState(false);
     const [showInviteToGameModal, setShowInviteToGameModal] = useState(false);
+    const [showGoToProfileModal, setShowGoToProfileModal] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const socketContextData = useSocket();
@@ -272,6 +274,10 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                 setShowModal={() => {
                     setShowInviteToGameModal(false);
                 }} />)}
+            {showGoToProfileModal&& (<GoToProfileModal
+                setShowModal={() => {
+                    setShowGoToProfileModal(false);
+                }} />)}
             <div className='messagePanelHeader'>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'></link>
                 <div className="messagePanelTitle">
@@ -286,16 +292,41 @@ export const MessagePanelHeader: FC<MessagePanelHeaderProps> = ({ conversationId
                                     {isDropdownOpen && (
                                         <div className="overlay-chat">
                                         <div className="dropdown-menu">
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Remove Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Promote to Admin</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Demote to Member</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban User</button>)}
-                                        {isAdmin && (<button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unban User</button>)}
+                                        <div className="buttonGroup">
+                                            {isAdmin && (
+                                                <div>
+                                                    <button className="convMenuButton" onClick={() => setShowAddMemberModal(true)}>Add</button>
+                                                    <button className="convMenuButton" onClick={() => setShowBanUserModal(true)}>Ban</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="buttonGroup">
+                                            {isAdmin && (
+                                                <div>
+                                                    <button className="convMenuButton" onClick={() => setShowRemoveMemberModal(true)}>Kick</button>
+                                                    <button className="convMenuButton" onClick={() => setShowAllowUserModal(true)}>Unban</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="buttonGroup">
+                                            {isAdmin && (
+                                                <div>
+                                                    <button className="convMenuButton" onClick={() => setShowMuteMemberModal(true)}>Mute</button>
+                                                    <button className="convMenuButton" onClick={() => setShowUpgradeMemberModal(true)}>Promote</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="buttonGroup">
+                                            {isAdmin && (
+                                                <div>
+                                                    <button className="convMenuButton" onClick={() => setShowUnMuteMemberModal(true)}>Unmute</button>
+                                                    <button className="convMenuButton" onClick={() => setShowDowngradeMemberModal(true)}>Demote</button>
+                                                </div>
+                                            )}
+                                        </div>
                                         <button className="convMenuButton" onClick={() => setShowLeavingConversationModal(true)}>Leave Chat</button>
                                         <button className="convMenuButton" onClick={() => setShowInviteToGameModal(true)}>Send an Invite</button>
+                                        <button className="convMenuButton" onClick={() => setShowGoToProfileModal(true)}>Check Profile</button>
                                         {isOwner && (<button className="convMenuButton" onClick={() => {
                                             if (isProtected) { setShowVerifyPasswordModal(true); }
                                             else { setShowNewPasswordModal(true); }

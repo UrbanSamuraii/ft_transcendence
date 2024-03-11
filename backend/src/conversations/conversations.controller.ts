@@ -186,7 +186,7 @@ export class ConversationsController {
             throw new HttpException('You are banned from this conversation.', HttpStatus.FORBIDDEN);
         }
         if (conversation.privacy === privacy_t.PRIVATE) {
-            throw new HttpException("The conversation is private, you can't join it - please wait to be invite by an administrator.", HttpStatus.FORBIDDEN);
+            throw new HttpException("The conversation is private, you can't join it - please wait to be invited by an administrator.", HttpStatus.FORBIDDEN);
         }
         if (conversation.protected && conversation.password != null) {
             res.status(202).json({ message: "The conversation is protected by a password - you are going to be redirected to guard page.", conversationId: conversation.id }); return;
