@@ -543,7 +543,7 @@ export class GameGateway implements OnGatewayInit {
         }
         const userGameData = this.userCurrentGameMap.get(data.username);
         const inGame = !!userGameData;
-        console.log(`Is in game : ${inGame}`)
+        // console.log(`Is in game : ${inGame}`)
 
         client.emit('friendGameStatusResponse', { inGame, gameId: userGameData?.gameId, gameMode: userGameData?.gameMode });
     }
