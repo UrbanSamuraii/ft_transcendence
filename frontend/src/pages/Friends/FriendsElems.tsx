@@ -2,10 +2,6 @@ import styled from 'styled-components';
 import React, { useState } from 'react';
 import { InputFieldCCF } from '../../utils/styles';
 
-interface InvitationBarContainerProps {
-  visible: boolean;
-}
-
 export const Friendspage = styled.div`
   width: 100%;
   background-image: url('https://wallpaperaccess.com/full/4848691.jpg');
@@ -344,10 +340,6 @@ const RefuseButton = styled(ActionButton)`
   &:before {
     content: '✖';
   }
-`;
-
-const invitUsername = styled.div`
-  font-size: 20px;
 `;
 
 interface InvitationItemProps {

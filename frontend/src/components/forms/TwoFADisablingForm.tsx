@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Button2FA, Text2FA } from '../../utils/styles';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './GlobalForms.css';
