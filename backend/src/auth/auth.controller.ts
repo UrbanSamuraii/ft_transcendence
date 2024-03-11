@@ -21,11 +21,6 @@ export class AuthController {
         private prisma: PrismaService // Inject Prisma service here
     ) { }
 
-    @Get("hello")
-    async helloworld() {
-        console.log("hello world ici la")
-        return ("");
-    }
     @UseGuards(FortyTwoAuthGuard)
     @Get('signup42')
     async FortyTwoLogin() { }
@@ -33,8 +28,8 @@ export class AuthController {
     // @UseGuards(FortyTwoAuthGuard)
     @Get('sign42')
     async FortyTwoRedirect(@Query("code") code: string, @Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
-        console.log("je suis ds le sign42")
-        console.log("my code is", code);
+        // console.log("je suis ds le sign42")
+        // console.log("my code is", code);
         return (await this.authService.forty2signup(code, req, res));
     }
 
@@ -110,11 +105,9 @@ export class AuthController {
     async getUserInfo(@Req() req, @Res() res: ExpressResponse) {
         try {
             const user = await this.userService.getUserByToken(req.cookies.token);
-            // Send back only the necessary user information
             return res.status(200).json({
                 username: user.username,
                 email: user.email,
-                // other fields you want to include 
             });
         } catch (error) {
             return res.status(500).json({ error: 'Internal server error' });
@@ -124,11 +117,10 @@ export class AuthController {
     @Get('user-info/:username')
     async getUserInfoDynamic(@Param('username') username: string, @Res() res: ExpressResponse) {
         try {
-            const user = await this.userService.getUserByUsername(username); // Assuming you have a method to get user by username
+            const user = await this.userService.getUserByUsername(username);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            // Send back only the necessary user information
             return res.status(200).json({
                 username: user.username,
                 email: user.email,
@@ -137,8 +129,6 @@ export class AuthController {
                 eloRating: user.eloRating,
                 img_url: user.img_url,
                 nbrFriends: user.friends.length
-
-                // other fields you want to include
             });
         } catch (error) {
             return res.status(500).json({ error: 'Internal server error' });
@@ -213,7 +203,7 @@ export class AuthController {
     @UseInterceptors(
         FileInterceptor('avatar', {
             storage: diskStorage({
-                destination: './uploads', // Ensure this directory exists and is writable
+                destination: './uploads',
                 filename: (req, file, callback) => {
                     const uniqueName = `${Date.now()}-avatar-${file.originalname}`;
                     callback(null, uniqueName);
@@ -232,7 +222,6 @@ export class AuthController {
         }
 
         try {
-            // Retrieve the user's ID by username using your UserService or Prisma method
             const userId = await this.userService.getUserIdByUsername(username);
 
             if (!userId) {
@@ -242,8 +231,8 @@ export class AuthController {
             const filePath = `./uploads/${file.filename}`;
             const fileUrl = `${request.protocol}://${request.get('host')}/uploads/${file.filename}`;
             console.log(fileUrl)
-            await this.userService.updateUserAvatar(userId, fileUrl); // Pass fileUrl instead of filePath
-            return { message: 'File uploaded successfully', fileUrl }; // Return fileUrl in the response
+            await this.userService.updateUserAvatar(userId, fileUrl);
+            return { message: 'File uploaded successfully', fileUrl };
         } catch (error) {
             throw new HttpException('Error uploading file', HttpStatus.INTERNAL_SERVER_ERROR);
         }
