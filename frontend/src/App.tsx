@@ -71,33 +71,13 @@ function Content({ setBackgroundStyle }: ContentProps) {
         prevPathnameRef.current = location.pathname;
     }, [location.pathname, prevPathnameRef, navigate]);
 
-    function handlePlayClick() {
-        navigate("/select-mode");
-    }
-
-    const TurnOn2FA = async () => {
-        navigate('/2fa-enable')
-    }
-
-    const TurnOff2FA = async () => {
-        navigate('/2fa-disable')
-    }
-
-    const handleSignoutClick = async () => {
-        try {
-            navigate('/signout');
-        } catch (error) {
-            console.error('Signout failed:', error);
-            navigate('/error');
-        }
-    }
-
     return (
         <Routes>
             {/* Public routes */}
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
             {/* Protected routes */}
             {user && (
                 <>
@@ -107,7 +87,6 @@ function Content({ setBackgroundStyle }: ContentProps) {
                         <Route path="channel/:id" element={<ConversationChannelPage />} />
                     </Route>
                     <Route path="/Friends" element={<FriendsPage />} />
-                    <Route path="/FortyTwoFA" element={<TwoFACodePage />} />
                     <Route path="/select-mode" element={<SelectModePage />} />
                     <Route path="/2fa-enable" element={<TwoFAEnablingPage />} />
                     <Route path="/2fa-disable" element={<TwoFADisablingPage />} />
