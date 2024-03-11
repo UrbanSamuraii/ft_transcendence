@@ -51,11 +51,7 @@ export const FriendsPage = () => {
                 return reject(new Error('Socket is not available'));
             }
 
-            // Emit the check request
             socket.emit('checkFriendGameStatus', { username });
-
-            // Listen for the response
-            // Note: Be mindful of setting up multiple listeners in a real app
             socket.once('friendGameStatusResponse', (response: GameStatusResponse) => {
                 if (response.error) {
                     reject(new Error(response.error));
@@ -66,32 +62,35 @@ export const FriendsPage = () => {
         });
     };
 
-
     useEffect(() => {
-        const checkGameStatusForAllFriends = async () => {
-            const gameStatusPromises = friendsList.map(friend =>
-                checkFriendGameStatus(friend.username)
-                    .catch(error => {
-                        console.error('Error checking game status for:', friend.username, error);
-                        return null; // Handle failure gracefully
-                    })
-            );
+        const intervalId = setInterval(() => {
+            const checkGameStatusForAllFriends = async () => {
+                const gameStatusPromises = friendsList.map(friend =>
+                    checkFriendGameStatus(friend.username)
+                        .catch(error => {
+                            console.error('Error checking game status for:', friend.username, error);
+                            return null;
+                        })
+                );
 
-            const gameStatuses = await Promise.all(gameStatusPromises);
-            const updatedFriendsList = friendsList.map((friend, index) => ({
-                ...friend,
-                inGame: gameStatuses[index]?.inGame,
-                gameId: gameStatuses[index]?.gameId,
-                gameMode: gameStatuses[index]?.gameMode,
-            }));
+                const gameStatuses = await Promise.all(gameStatusPromises);
+                const updatedFriendsList = friendsList.map((friend, index) => ({
+                    ...friend,
+                    inGame: gameStatuses[index]?.inGame,
+                    gameId: gameStatuses[index]?.gameId,
+                    gameMode: gameStatuses[index]?.gameMode,
+                }));
 
-            setFriendsList(updatedFriendsList);
-        };
+                setFriendsList(updatedFriendsList);
+            };
 
-        if (friendsList.length > 0) {
-            checkGameStatusForAllFriends();
-        }
-    }, [friendsList]); // Re-run when friendsList changes
+            if (friendsList.length > 0) {
+                checkGameStatusForAllFriends();
+            }
+        }, 1500);
+
+        return () => clearInterval(intervalId);
+    }, [friendsList]);
 
     useEffect(() => {
         const fetchFriendsList = async () => {
