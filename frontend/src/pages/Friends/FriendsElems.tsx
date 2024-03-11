@@ -98,48 +98,52 @@ const Username = styled.div`
 `;
 
 interface FriendItemProps {
-  friend: {
-    id: number;
-    username: string;
-    status: string;
-    img_url: string;
-  };
-  removeFriend: (friendId: number) => void;
+    friend: {
+        id: number;
+        username: string;
+        status: string;
+        img_url: string;
+        inGame?: boolean;
+        gameId?: string | null;
+        gameMode?: string | null;
+    };
+    removeFriend: (friendId: number) => void;
 }
 
 export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) => {
-  const { id, username, status, img_url } = friend;
-  const [showDeleteButton, setShowDeleteButton] = useState(false);
+    const { id, username, status, img_url, inGame } = friend;
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
 
-  const handleMouseEnter = () => {
-    setShowDeleteButton(true);
-  };
+    const handleMouseEnter = () => {
+        setShowDeleteButton(true);
+    };
 
-  const handleMouseLeave = () => {
-    setShowDeleteButton(false);
-  };
+    const handleMouseLeave = () => {
+        setShowDeleteButton(false);
+    };
 
-  const handleRemoveFriend = () => {
-    removeFriend(id);
-    setShowDeleteButton(false);
-  };
+    const handleRemoveFriend = () => {
+        removeFriend(id);
+        setShowDeleteButton(false);
+    };
 
-  const img_url2 = img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png";
+    const img_url2 = img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png";
 
-  // console.log(img_url2 < "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png");
+    // console.log(img_url2 < "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png");
 
-  return (
-    <FriendItemContainer
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}>
-      <BlueCircle style={{ backgroundImage: `url(${img_url2})` }} />
-      <Username>{username}</Username>
-      {showDeleteButton && (
-        <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
-      )}
-      <StatusCircle style={{ backgroundColor: status === 'ONLINE' ? '#04f8399c' : '#ff00009c' }} />
-    </FriendItemContainer>
-  );
+    return (
+        <FriendItemContainer
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}>
+            <BlueCircle style={{ backgroundImage: `url(${img_url2})` }} />
+            <Username>{username}</Username>
+            {showDeleteButton && (
+                <ContextMenuButton onClick={handleRemoveFriend}><i className='bx bxs-user-minus'></i></ContextMenuButton>
+            )}
+            <StatusCircle style={{ backgroundColor: friend.inGame ? '#f0b429' : (status === 'ONLINE' ? '#04f8399c' : '#ff00009c') }} />
+            <i className="game-indicator-icon" />
+        </FriendItemContainer>
+    );
 };
 
 export const InvitationContainer = styled.div`
@@ -235,50 +239,50 @@ const BlurredBackground = styled.div`
 `;
 
 interface InvitationBarProps {
-  sendInvitation: (invitationDetails: { usernameOrEmail: string }) => void;
+    sendInvitation: (invitationDetails: { usernameOrEmail: string }) => void;
 }
 
 export const InvitationBar: React.FC<InvitationBarProps> = ({ sendInvitation }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [message, setMessage] = useState('');
+    const [inputValue, setInputValue] = useState('');
+    const [message, setMessage] = useState('');
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-    setMessage('');
-  };
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(event.target.value);
+        setMessage('');
+    };
 
-  const handleSendInvitation = () => {
-    if (inputValue.trim() === '') {
-      setMessage('Please enter the username or email.');
-    } if (inputValue.length > 10) {
-      setMessage('Input exceeds the maximum character limit.');
-    } else {
-      sendInvitation({ usernameOrEmail: inputValue });
-      setInputValue('');
-      setMessage('');
-    }
-  };
+    const handleSendInvitation = () => {
+        if (inputValue.trim() === '') {
+            setMessage('Please enter the username or email.');
+        } if (inputValue.length > 10) {
+            setMessage('Input exceeds the maximum character limit.');
+        } else {
+            sendInvitation({ usernameOrEmail: inputValue });
+            setInputValue('');
+            setMessage('');
+        }
+    };
 
-  return (
-	<div>
-  <MenuContainer>
-    <Title>Invite Friends</Title>
-    <BlurredBackground />
-    <Message>{message}</Message>
-    <InputContainerFriends>
-      <InputLabelFriends>
-          Username or email
-      </InputLabelFriends>
-      <InputFieldCCF maxLength={30}
-      type="text"
-      value={inputValue}
-      onChange={handleInputChange}
-      />
-    </InputContainerFriends>
-    <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
-  </MenuContainer>
-  </div>
-  );
+    return (
+        <div>
+            <MenuContainer>
+                <Title>Invite Friends</Title>
+                <BlurredBackground />
+                <Message>{message}</Message>
+                <InputContainerFriends>
+                    <InputLabelFriends>
+                        Username or email
+                    </InputLabelFriends>
+                    <InputFieldCCF maxLength={30}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                    />
+                </InputContainerFriends>
+                <SendButton onClick={handleSendInvitation}>Send Invitation</SendButton>
+            </MenuContainer>
+        </div>
+    );
 };
 
 ///////// INVITATION LIST /////////
@@ -343,32 +347,31 @@ const RefuseButton = styled(ActionButton)`
 `;
 
 interface InvitationItemProps {
-	invitation: {
-	  id: number;
-	  username: string;
-	};
-	acceptInvitation: (invitationId: number) => void;
-	refuseInvitation: (invitationId: number) => void;
-  }
-  
-  export const InvitationItem: React.FC<InvitationItemProps> = ({ invitation, acceptInvitation, refuseInvitation }) => {
-	const { id, username } = invitation;
+    invitation: {
+        id: number;
+        username: string;
+    };
+    acceptInvitation: (invitationId: number) => void;
+    refuseInvitation: (invitationId: number) => void;
+}
 
-	const handleRefuseInvitation = () => {
-		refuseInvitation(id);
-	};
+export const InvitationItem: React.FC<InvitationItemProps> = ({ invitation, acceptInvitation, refuseInvitation }) => {
+    const { id, username } = invitation;
 
-	const handleAcceptInvitation = () => {
-		acceptInvitation(id);
-	};
-  
-	return (
-	  <InvitationItemContainer>
-		<BlueCircle />
-		<Username>{username}</Username>
-		<AcceptButton onClick={handleAcceptInvitation} />
-      	<RefuseButton onClick={handleRefuseInvitation} />
-	  </InvitationItemContainer>
-	);
-  };
-  
+    const handleRefuseInvitation = () => {
+        refuseInvitation(id);
+    };
+
+    const handleAcceptInvitation = () => {
+        acceptInvitation(id);
+    };
+
+    return (
+        <InvitationItemContainer>
+            <BlueCircle />
+            <Username>{username}</Username>
+            <AcceptButton onClick={handleAcceptInvitation} />
+            <RefuseButton onClick={handleRefuseInvitation} />
+        </InvitationItemContainer>
+    );
+};

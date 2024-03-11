@@ -20,6 +20,13 @@ export const FriendsPage = () => {
     const [customError, setCustomError] = useState<string>('');
     const [showModalError, setShowModalError] = useState<boolean>(false);
 
+    interface GameStatusResponse {
+        inGame: boolean;
+        gameId?: string | null;
+        gameMode?: string | null;
+        error?: string;
+    }
+
     const handleButtonClick = () => {
         setIsMenuOpen(!isMenuOpen);
     };
@@ -30,12 +37,61 @@ export const FriendsPage = () => {
 
 
     const handleShowModalError = () => {
-    setShowModalError(true);
+        setShowModalError(true);
     };
 
     const handleCloseModalError = () => {
-    setShowModalError(false);
+        setShowModalError(false);
     };
+
+    const checkFriendGameStatus = (username: string): Promise<GameStatusResponse> => {
+        return new Promise((resolve, reject) => {
+            const socket = chatSocketContextData?.socket;
+            if (!socket) {
+                return reject(new Error('Socket is not available'));
+            }
+
+            // Emit the check request
+            socket.emit('checkFriendGameStatus', { username });
+
+            // Listen for the response
+            // Note: Be mindful of setting up multiple listeners in a real app
+            socket.once('friendGameStatusResponse', (response: GameStatusResponse) => {
+                if (response.error) {
+                    reject(new Error(response.error));
+                } else {
+                    resolve(response);
+                }
+            });
+        });
+    };
+
+
+    useEffect(() => {
+        const checkGameStatusForAllFriends = async () => {
+            const gameStatusPromises = friendsList.map(friend =>
+                checkFriendGameStatus(friend.username)
+                    .catch(error => {
+                        console.error('Error checking game status for:', friend.username, error);
+                        return null; // Handle failure gracefully
+                    })
+            );
+
+            const gameStatuses = await Promise.all(gameStatusPromises);
+            const updatedFriendsList = friendsList.map((friend, index) => ({
+                ...friend,
+                inGame: gameStatuses[index]?.inGame,
+                gameId: gameStatuses[index]?.gameId,
+                gameMode: gameStatuses[index]?.gameMode,
+            }));
+
+            setFriendsList(updatedFriendsList);
+        };
+
+        if (friendsList.length > 0) {
+            checkGameStatusForAllFriends();
+        }
+    }, [friendsList]); // Re-run when friendsList changes
 
     useEffect(() => {
         const fetchFriendsList = async () => {
@@ -83,12 +139,14 @@ export const FriendsPage = () => {
             if (axios.isAxiosError(error)) {
                 console.log(err.response);
                 if (error.response && error.response.data) {
-                    if (error.response.data.message) { 
+                    if (error.response.data.message) {
                         const receivedCustomError: string = error.response.data.message;
-                        setCustomError(receivedCustomError);}
-                    else { 
-                        const receivedCustomError: string = error.response.data.error; 
-                        setCustomError(receivedCustomError);}
+                        setCustomError(receivedCustomError);
+                    }
+                    else {
+                        const receivedCustomError: string = error.response.data.error;
+                        setCustomError(receivedCustomError);
+                    }
                     handleShowModalError();
                 }
             }
@@ -105,12 +163,14 @@ export const FriendsPage = () => {
             if (axios.isAxiosError(error)) {
                 console.log(err.response);
                 if (error.response && error.response.data) {
-                    if (error.response.data.message) { 
+                    if (error.response.data.message) {
                         const receivedCustomError: string = error.response.data.message;
-                        setCustomError(receivedCustomError);}
-                    else { 
-                        const receivedCustomError: string = error.response.data.error; 
-                        setCustomError(receivedCustomError);}
+                        setCustomError(receivedCustomError);
+                    }
+                    else {
+                        const receivedCustomError: string = error.response.data.error;
+                        setCustomError(receivedCustomError);
+                    }
                     handleShowModalError();
                 }
             }
@@ -128,12 +188,14 @@ export const FriendsPage = () => {
             if (axios.isAxiosError(error)) {
                 console.log(err.response);
                 if (error.response && error.response.data) {
-                    if (error.response.data.message) { 
+                    if (error.response.data.message) {
                         const receivedCustomError: string = error.response.data.message;
-                        setCustomError(receivedCustomError);}
-                    else { 
-                        const receivedCustomError: string = error.response.data.error; 
-                        setCustomError(receivedCustomError);}
+                        setCustomError(receivedCustomError);
+                    }
+                    else {
+                        const receivedCustomError: string = error.response.data.error;
+                        setCustomError(receivedCustomError);
+                    }
                     handleShowModalError();
                 }
             }
@@ -150,12 +212,14 @@ export const FriendsPage = () => {
             if (axios.isAxiosError(error)) {
                 console.log(err.response);
                 if (error.response && error.response.data) {
-                    if (error.response.data.message) { 
+                    if (error.response.data.message) {
                         const receivedCustomError: string = error.response.data.message;
-                        setCustomError(receivedCustomError);}
-                    else { 
-                        const receivedCustomError: string = error.response.data.error; 
-                        setCustomError(receivedCustomError);}
+                        setCustomError(receivedCustomError);
+                    }
+                    else {
+                        const receivedCustomError: string = error.response.data.error;
+                        setCustomError(receivedCustomError);
+                    }
                     handleShowModalError();
                 }
             }
@@ -165,18 +229,26 @@ export const FriendsPage = () => {
 
     return (
         <>
-        {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
-        <Friendspage>
+            {customError && showModalError && <ErrorMessageModal setShowModalError={handleCloseModalError} errorMessage={customError} />}
+            <Friendspage>
                 <FriendsListContainer>
                     <FriendsListTitle>
-                    Friends
-                    <button className='friend-invitation-button' onClick={handleButtonClick}><i className='bx bxs-user-plus' ></i></button>
+                        Friends
+                        <button className='friend-invitation-button' onClick={handleButtonClick}><i className='bx bxs-user-plus' ></i></button>
                     </FriendsListTitle>
                     <div>
                         {friendsList.map((friend) => (
                             <FriendItem
                                 key={friend.id}
-                                friend={{ id: friend.id, username: friend.username, status: friend.status, img_url: friend.img_url }}
+                                friend={{
+                                    id: friend.id,
+                                    username: friend.username,
+                                    status: friend.status,
+                                    img_url: friend.img_url,
+                                    inGame: friend.inGame,
+                                    gameId: friend.gameId,
+                                    gameMode: friend.gameMode,
+                                }}
                                 removeFriend={handleRemoveFriend}
                             />
                         ))}
@@ -184,13 +256,13 @@ export const FriendsPage = () => {
                 </FriendsListContainer>
                 <InvitationContainer>
                     {isMenuOpen && (
-                            <div className="overlay-friends">
-                                <OutsideClickHandler onOutsideClick={handleOutsideClick}>
-                                    <InvitationBarContainer>
-                                        <InvitationBar sendInvitation={handleSendInvitation} />
-                                    </InvitationBarContainer>
-                                </OutsideClickHandler>
-                            </div>
+                        <div className="overlay-friends">
+                            <OutsideClickHandler onOutsideClick={handleOutsideClick}>
+                                <InvitationBarContainer>
+                                    <InvitationBar sendInvitation={handleSendInvitation} />
+                                </InvitationBarContainer>
+                            </OutsideClickHandler>
+                        </div>
                     )}
                     <InvitationsListContainer>
                         <FriendsListTitle>Invitations</FriendsListTitle>
@@ -206,7 +278,7 @@ export const FriendsPage = () => {
                         </div>
                     </InvitationsListContainer>
                 </InvitationContainer>
-        </Friendspage>
+            </Friendspage>
         </>
     );
 };
