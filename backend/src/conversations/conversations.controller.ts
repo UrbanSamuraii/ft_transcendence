@@ -478,7 +478,7 @@ export class ConversationsController {
                 return;
             }
             else {
-                res.status(403).json({ message: "User is already banned from the conversation." });
+                res.status(403).json({ message: "You can't ban this user ! Already banned ? The conv' owner ?" });
             }
         }
     }

@@ -126,8 +126,6 @@ export const FriendItem: React.FC<FriendItemProps> = ({ friend, removeFriend }) 
 
   const img_url2 = img_url || "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png";
 
-  // console.log(img_url2 < "https://openseauserdata.com/files/b261626a159edf64a8a92aa7306053b8.png");
-
   return (
     <FriendItemContainer
       onMouseEnter={handleMouseEnter}
