@@ -41,3 +41,5 @@ prisma/migrations
 #file uploads
 
 uploads/*.png
+
+.env
