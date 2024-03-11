@@ -1,11 +1,6 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import React, { useState } from 'react';
-// import { empty } from '@prisma/client/runtime/library';
 import { InputFieldCCF } from '../../utils/styles';
-
-interface InvitationBarContainerProps {
-  visible: boolean;
-}
 
 export const Friendspage = styled.div`
   width: 100%;
@@ -345,10 +340,6 @@ const RefuseButton = styled(ActionButton)`
   &:before {
     content: '✖';
   }
-`;
-
-const invitUsername = styled.div`
-  font-size: 20px;
 `;
 
 interface InvitationItemProps {
