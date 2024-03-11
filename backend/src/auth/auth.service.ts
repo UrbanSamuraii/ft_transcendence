@@ -1,5 +1,5 @@
 import {
-    Injectable, Body, Res, Req, ForbiddenException,HttpException,
+    Injectable, Body, Res, Req, ForbiddenException, HttpException,
     UnauthorizedException, HttpStatus, HttpCode, InternalServerErrorException,
     Logger, UseFilters,
     NotFoundException,
@@ -28,7 +28,7 @@ export class AuthService {
         private jwt: JwtService,
         private config: ConfigService,
         private userService: UserService) { }
-    
+
     private readonly logger = new Logger(AuthService.name);
 
     async signToken(userID: number, email: string): Promise<string> {
@@ -104,8 +104,8 @@ export class AuthService {
                     }
                 }
             } // else {
-                // res.status(500).json({ error: 'Internal server error' });
-                // throw new InternalServerErrorException();
+            // res.status(500).json({ error: 'Internal server error' });
+            // throw new InternalServerErrorException();
         }
     }
 
@@ -254,9 +254,9 @@ export class AuthService {
 
     async getUserFrom42(token: string): Promise<any> {
         const userDataResponse = await axios.get("https://api.intra.42.fr/v2/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
 
         // console.log("DATA RESPONSE ", userDataResponse.data)
@@ -266,36 +266,36 @@ export class AuthService {
         //   return userDto;
         // }
         throw new Error("User not found");
-      }
+    }
 
     async getToken(code: string): Promise<any> {
 
-        console.log("UID", process.env.UID_42_API)
-        console.log("SECRET", process.env.SECRET_42_API)
-        console.log("REDIRECT", process.env.REDIRECT_URI)
-        console.log("CODE", code)
+        // console.log("UID", process.env.UID_42_API)
+        // console.log("SECRET", process.env.SECRET_42_API)
+        // console.log("REDIRECT", process.env.REDIRECT_URI)
+        // console.log("CODE", code)
 
         const token = await axios
-          .post("https://api.intra.42.fr/oauth/token", null, {
-            params: {
-              grant_type: "authorization_code",
-              client_id: process.env.UID_42_API,
-              client_secret: process.env.SECRET_42_API,
-              code: code,
-              redirect_uri: process.env.REDIRECT_URI,
-            },
-          })
-          .then((response) => {
-            return response;
-          })
-          .catch((error) => {
-            return error;
-          });
+            .post("https://api.intra.42.fr/oauth/token", null, {
+                params: {
+                    grant_type: "authorization_code",
+                    client_id: process.env.UID_42_API,
+                    client_secret: process.env.SECRET_42_API,
+                    code: code,
+                    redirect_uri: process.env.REDIRECT_URI,
+                },
+            })
+            .then((response) => {
+                return response;
+            })
+            .catch((error) => {
+                return error;
+            });
         if (!token.data.access_token) {
-          throw new Error("token not found");
+            throw new Error("token not found");
         }
         return token.data.access_token;
-      }
+    }
 
 
     async forty2signup(@Query("code") code: string, @Req() req, @Res() res: ExpressResponse) {
@@ -305,17 +305,17 @@ export class AuthService {
             const myuser = await this.getUserFrom42(moha)
 
             const id42 = Number(myuser.id);
-            console.log("ID42", id42)
+            // console.log("ID42", id42)
             const email = myuser.email || '';
-            console.log("EMAIL", email)
+            // console.log("EMAIL", email)
             const username = myuser.login;
-            console.log("USERNAME", username)
+            // console.log("USERNAME", username)
             const first_name = myuser.first_name;
-            console.log("FIRST NAME", first_name)
+            // console.log("FIRST NAME", first_name)
             const last_name = myuser.last_name;
-            console.log("LAST NAME", last_name)
+            // console.log("LAST NAME", last_name)
             const img_url = myuser.image.versions.medium || '';
-            console.log("IMG URL", img_url)
+            // console.log("IMG URL", img_url)
 
             const existingUser = await this.prisma.user.findUnique({
                 where: { email: email }
@@ -347,7 +347,7 @@ export class AuthService {
                 res.redirect(`http://${server_adress}:3000/`);
             }
             else {
-                console.log("USER EXISTS")
+                // console.log("USER EXISTS")
                 const user = await this.userService.getUser({ email });
                 if (user.is_two_factor_activate == false) {
                     const accessToken = await this.signToken(user.id, user.email);
