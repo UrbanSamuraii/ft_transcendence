@@ -1,6 +1,5 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import React, { useState } from 'react';
-// import { empty } from '@prisma/client/runtime/library';
 import { InputFieldCCF } from '../../utils/styles';
 
 interface InvitationBarContainerProps {

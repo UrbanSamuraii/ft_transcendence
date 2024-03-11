@@ -43,6 +43,7 @@ export class AuthController {
         return (await this.authService.signup(req, res));
     }
 
+    // @UseGuards(Jwt2faAuthGuard)
     @Post('login')
     async login(@Req() req, @Res({ passthrough: true }) res: ExpressResponse) {
         return (await this.authService.login(req, res));

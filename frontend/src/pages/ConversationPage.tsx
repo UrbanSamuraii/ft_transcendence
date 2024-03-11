@@ -3,8 +3,7 @@ import { Page } from '../utils/styles';
 import { ConversationSidebar } from '../components/conversations/ConversationSidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ConversationPanel } from '../components/conversations/ConversationPannel';
-import { ConversationMessage } from "../utils/types";
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { getConversations } from '../utils/hooks/getConversations';
 import { useSocket } from '../SocketContext';
 import { useAuth } from '../utils/hooks/useAuthHook';
@@ -23,7 +22,7 @@ export const ConversationPage = () => {
 
     const { id } = useParams();
     const [prismaConversations, setPrismaConversations] = useState<any[]>([]);
-    const { socket, isLastMessageDeleted } = useSocket();
+    const { isLastMessageDeleted } = useSocket();
     const [showGameInvite, setShowGameInvite] = useState(false);
     const [gameInviteData, setGameInviteData] = useState<GameInviteData | null>(null);
     const chatSocketContextData = useSocket();
