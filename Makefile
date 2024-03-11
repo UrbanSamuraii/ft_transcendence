@@ -12,6 +12,7 @@ up:
 
 down:
 	${COMPOSE} down -v
+	docker system prune -af
 
 # CLEAN DATABASES
 dbclean: down
